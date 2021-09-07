@@ -76,6 +76,57 @@ const Var varMuonTrackCaloP([](const caf::SRSliceProxy* slc) -> double {
   }
 });
 
+const Var varMuonTrackPlane0CaloP([](const caf::SRSliceProxy* slc) -> double {
+  int muonTrackIndex = varMuonTrackIndex(slc);
+  if(muonTrackIndex>=0){
+    auto const& trk_Muon = slc->reco.trk.at(muonTrackIndex);
+
+    double best_calo = trk_Muon.calo0.ke;
+    double KE_Muon = best_calo/1000.;
+    double E_Muon = KE_Muon+M_MUON;
+    double P_Muon = sqrt( E_Muon*E_Muon - M_MUON*M_MUON );
+    return P_Muon;
+
+  }
+  else{
+    return -999;
+  }
+});
+
+const Var varMuonTrackPlane1CaloP([](const caf::SRSliceProxy* slc) -> double {
+  int muonTrackIndex = varMuonTrackIndex(slc);
+  if(muonTrackIndex>=0){ 
+    auto const& trk_Muon = slc->reco.trk.at(muonTrackIndex);
+      
+    double best_calo = trk_Muon.calo1.ke;
+    double KE_Muon = best_calo/1000.;
+    double E_Muon = KE_Muon+M_MUON;
+    double P_Muon = sqrt( E_Muon*E_Muon - M_MUON*M_MUON );
+    return P_Muon;
+
+  }
+  else{
+    return -999;
+  }
+});
+
+const Var varMuonTrackPlane2CaloP([](const caf::SRSliceProxy* slc) -> double {
+  int muonTrackIndex = varMuonTrackIndex(slc);
+  if(muonTrackIndex>=0){ 
+    auto const& trk_Muon = slc->reco.trk.at(muonTrackIndex);
+      
+    double best_calo = trk_Muon.calo2.ke;
+    double KE_Muon = best_calo/1000.;
+    double E_Muon = KE_Muon+M_MUON;
+    double P_Muon = sqrt( E_Muon*E_Muon - M_MUON*M_MUON );
+    return P_Muon;
+
+  }
+  else{
+    return -999;
+  }
+});
+
 const Var varMuonTrackCaloKE([](const caf::SRSliceProxy* slc) -> double {
   int muonTrackIndex = varMuonTrackIndex(slc);
   if(muonTrackIndex>=0){
@@ -130,6 +181,16 @@ const Var varMuonTrackMatchedTruthP([](const caf::SRSliceProxy* slc) -> double {
   }
 });
 
+const Var varMuonTrackMatchedTruthPDG([](const caf::SRSliceProxy* slc) -> double {
+  int muonTrackIndex = varMuonTrackIndex(slc);
+  if(muonTrackIndex>=0){
+    return slc->reco.trk.at(muonTrackIndex).truth.p.pdg;
+  }
+  else{
+    return -999.;
+  }
+});
+
 //====   Residual study
 
 const Var varMuonTrackRangePResidual([](const caf::SRSliceProxy* slc) -> double {
@@ -155,6 +216,27 @@ const Var varMuonTrackCombinedPResidual([](const caf::SRSliceProxy* slc) -> doub
 
 const Var varMuonTrackCaloPResidual([](const caf::SRSliceProxy* slc) -> double {
   double P_Muon_Reco = varMuonTrackCaloP(slc);
+  double P_Muon_Truth = varMuonTrackMatchedTruthP(slc);
+  double P_Muon_Diff = P_Muon_Reco-P_Muon_Truth;
+  return P_Muon_Diff;
+});
+
+const Var varMuonTrackPlane0CaloPResidual([](const caf::SRSliceProxy* slc) -> double {
+  double P_Muon_Reco = varMuonTrackPlane0CaloP(slc);
+  double P_Muon_Truth = varMuonTrackMatchedTruthP(slc);
+  double P_Muon_Diff = P_Muon_Reco-P_Muon_Truth;
+  return P_Muon_Diff;
+});
+
+const Var varMuonTrackPlane1CaloPResidual([](const caf::SRSliceProxy* slc) -> double {
+  double P_Muon_Reco = varMuonTrackPlane1CaloP(slc);
+  double P_Muon_Truth = varMuonTrackMatchedTruthP(slc);
+  double P_Muon_Diff = P_Muon_Reco-P_Muon_Truth;
+  return P_Muon_Diff;
+});
+
+const Var varMuonTrackPlane2CaloPResidual([](const caf::SRSliceProxy* slc) -> double {
+  double P_Muon_Reco = varMuonTrackPlane2CaloP(slc);
   double P_Muon_Truth = varMuonTrackMatchedTruthP(slc);
   double P_Muon_Diff = P_Muon_Reco-P_Muon_Truth;
   return P_Muon_Diff;
@@ -188,6 +270,26 @@ const Var varMuonTrackCaloPResidualFraction([](const caf::SRSliceProxy* slc) -> 
   return P_Muon_Diff/P_Muon_Truth;
 });
 
+const Var varMuonTrackPlane0CaloPResidualFraction([](const caf::SRSliceProxy* slc) -> double {
+  double P_Muon_Reco = varMuonTrackPlane0CaloP(slc);
+  double P_Muon_Truth = varMuonTrackMatchedTruthP(slc);
+  double P_Muon_Diff = P_Muon_Reco-P_Muon_Truth;
+  return P_Muon_Diff/P_Muon_Truth;
+});
+
+const Var varMuonTrackPlane1CaloPResidualFraction([](const caf::SRSliceProxy* slc) -> double {
+  double P_Muon_Reco = varMuonTrackPlane1CaloP(slc);
+  double P_Muon_Truth = varMuonTrackMatchedTruthP(slc);
+  double P_Muon_Diff = P_Muon_Reco-P_Muon_Truth;
+  return P_Muon_Diff/P_Muon_Truth;
+});
+
+const Var varMuonTrackPlane2CaloPResidualFraction([](const caf::SRSliceProxy* slc) -> double {
+  double P_Muon_Reco = varMuonTrackPlane2CaloP(slc);
+  double P_Muon_Truth = varMuonTrackMatchedTruthP(slc);
+  double P_Muon_Diff = P_Muon_Reco-P_Muon_Truth;
+  return P_Muon_Diff/P_Muon_Truth;
+});
 
 //==== Proton
 
@@ -259,6 +361,57 @@ const Var varProtonTrackCaloP([](const caf::SRSliceProxy* slc) -> double {
   }
 });
 
+const Var varProtonTrackPlane0CaloP([](const caf::SRSliceProxy* slc) -> double {
+  int protonTrackIndex = varProtonTrackIndex(slc);
+  if(protonTrackIndex>=0){
+    auto const& trk_Proton = slc->reco.trk.at(protonTrackIndex);
+
+    double best_calo = trk_Proton.calo0.ke;
+    double KE_Proton = best_calo/1000.;
+    double E_Proton = KE_Proton+M_PROTON;
+    double P_Proton = sqrt( E_Proton*E_Proton - M_PROTON*M_PROTON );
+    return P_Proton;
+
+  }
+  else{
+    return -999;
+  }
+});
+
+const Var varProtonTrackPlane1CaloP([](const caf::SRSliceProxy* slc) -> double {
+  int protonTrackIndex = varProtonTrackIndex(slc);
+  if(protonTrackIndex>=0){
+    auto const& trk_Proton = slc->reco.trk.at(protonTrackIndex);
+
+    double best_calo = trk_Proton.calo1.ke;
+    double KE_Proton = best_calo/1000.;
+    double E_Proton = KE_Proton+M_PROTON;
+    double P_Proton = sqrt( E_Proton*E_Proton - M_PROTON*M_PROTON );
+    return P_Proton;
+
+  }
+  else{
+    return -999;
+  }
+});
+
+const Var varProtonTrackPlane2CaloP([](const caf::SRSliceProxy* slc) -> double {
+  int protonTrackIndex = varProtonTrackIndex(slc);
+  if(protonTrackIndex>=0){
+    auto const& trk_Proton = slc->reco.trk.at(protonTrackIndex);
+
+    double best_calo = trk_Proton.calo2.ke;
+    double KE_Proton = best_calo/1000.;
+    double E_Proton = KE_Proton+M_PROTON;
+    double P_Proton = sqrt( E_Proton*E_Proton - M_PROTON*M_PROTON );
+    return P_Proton;
+
+  }
+  else{
+    return -999;
+  }
+});
+
 const Var varProtonTrackCaloKE([](const caf::SRSliceProxy* slc) -> double {
   int protonTrackIndex = varProtonTrackIndex(slc);
   if(protonTrackIndex>=0){
@@ -313,6 +466,16 @@ const Var varProtonTrackMatchedTruthP([](const caf::SRSliceProxy* slc) -> double
   }
 });
 
+const Var varProtonTrackMatchedTruthPDG([](const caf::SRSliceProxy* slc) -> int {
+  int protonTrackIndex = varProtonTrackIndex(slc);
+  if(protonTrackIndex>=0){
+    return slc->reco.trk.at(protonTrackIndex).truth.p.pdg;
+  }
+  else{
+    return -999999;
+  }
+});
+
 //====   Residual study
 
 const Var varProtonTrackRangePResidual([](const caf::SRSliceProxy* slc) -> double {
@@ -343,6 +506,28 @@ const Var varProtonTrackCaloPResidual([](const caf::SRSliceProxy* slc) -> double
   return P_Proton_Diff;
 });
 
+const Var varProtonTrackPlane0CaloPResidual([](const caf::SRSliceProxy* slc) -> double {
+  double P_Proton_Reco = varProtonTrackPlane0CaloP(slc);
+  double P_Proton_Truth = varProtonTrackMatchedTruthP(slc);
+  double P_Proton_Diff = P_Proton_Reco-P_Proton_Truth;
+  return P_Proton_Diff;
+});
+
+const Var varProtonTrackPlane1CaloPResidual([](const caf::SRSliceProxy* slc) -> double {
+  double P_Proton_Reco = varProtonTrackPlane1CaloP(slc);
+  double P_Proton_Truth = varProtonTrackMatchedTruthP(slc);
+  double P_Proton_Diff = P_Proton_Reco-P_Proton_Truth;
+  return P_Proton_Diff;
+});
+
+const Var varProtonTrackPlane2CaloPResidual([](const caf::SRSliceProxy* slc) -> double {
+  double P_Proton_Reco = varProtonTrackPlane2CaloP(slc);
+  double P_Proton_Truth = varProtonTrackMatchedTruthP(slc);
+  double P_Proton_Diff = P_Proton_Reco-P_Proton_Truth;
+  return P_Proton_Diff;
+});
+
+
 const Var varProtonTrackRangePResidualFraction([](const caf::SRSliceProxy* slc) -> double {
   double P_Proton_Reco = varProtonTrackRangeP(slc);
   double P_Proton_Truth = varProtonTrackMatchedTruthP(slc);
@@ -371,6 +556,26 @@ const Var varProtonTrackCaloPResidualFraction([](const caf::SRSliceProxy* slc) -
   return P_Proton_Diff/P_Proton_Truth;
 });
 
+const Var varProtonTrackPlane0CaloPResidualFraction([](const caf::SRSliceProxy* slc) -> double {
+  double P_Proton_Reco = varProtonTrackPlane0CaloP(slc);
+  double P_Proton_Truth = varProtonTrackMatchedTruthP(slc);
+  double P_Proton_Diff = P_Proton_Reco-P_Proton_Truth;
+  return P_Proton_Diff/P_Proton_Truth;
+});
+
+const Var varProtonTrackPlane1CaloPResidualFraction([](const caf::SRSliceProxy* slc) -> double {
+  double P_Proton_Reco = varProtonTrackPlane1CaloP(slc);
+  double P_Proton_Truth = varProtonTrackMatchedTruthP(slc);
+  double P_Proton_Diff = P_Proton_Reco-P_Proton_Truth;
+  return P_Proton_Diff/P_Proton_Truth;
+});
+
+const Var varProtonTrackPlane2CaloPResidualFraction([](const caf::SRSliceProxy* slc) -> double {
+  double P_Proton_Reco = varProtonTrackPlane2CaloP(slc);
+  double P_Proton_Truth = varProtonTrackMatchedTruthP(slc);
+  double P_Proton_Diff = P_Proton_Reco-P_Proton_Truth;
+  return P_Proton_Diff/P_Proton_Truth;
+});
 
 //==== Neutrino
 
@@ -420,8 +625,8 @@ const Var varNeutrinoQE([](const caf::SRSliceProxy* slc) -> double {
     double mu_p = varMuonTrackCombinedP(slc);
     double mu_E = sqrt(mu_p*mu_p+M_MUON*M_MUON);
 
-    double EQE_num = M_NEUTRON*M_NEUTRON - (M_PROTON-Eb)*(M_PROTON-Eb) - M_MUON*M_MUON + 2.*(M_PROTON-Eb)*mu_E;
-    double EQE_den = 2.*(M_PROTON-Eb-mu_E+mu_p*mu_costh);
+    double EQE_num = M_PROTON*M_PROTON - (M_NEUTRON-Eb)*(M_NEUTRON-Eb) - M_MUON*M_MUON + 2.*(M_NEUTRON-Eb)*mu_E;
+    double EQE_den = 2.*(M_NEUTRON - Eb - mu_E + mu_p * mu_costh);
 
     return EQE_num/EQE_den;
 
@@ -607,6 +812,37 @@ const Var varTruthMuonMatchedTrackChi2Proton([](const caf::SRSliceProxy* slc) ->
   }
 });
 
+const Var varTruthMuonMatchedTrackNormalizedChi2Proton([](const caf::SRSliceProxy* slc) -> double {
+  int protonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+  if(protonTrackIndex>=0){
+
+    auto const& trk = slc->reco.trk.at(protonTrackIndex);
+    float Chi2Proton, Chi2Muon;
+    int Chi2Ndof;
+    if(trk.bestplane == 0){
+      Chi2Proton = trk.chi2pid0.chi2_proton;
+      Chi2Muon = trk.chi2pid0.chi2_muon;
+      Chi2Ndof = trk.chi2pid0.pid_ndof;
+    }
+    else if(trk.bestplane == 1){
+      Chi2Proton = trk.chi2pid1.chi2_proton;
+      Chi2Muon = trk.chi2pid1.chi2_muon;
+      Chi2Ndof = trk.chi2pid1.pid_ndof;
+    }
+    else{
+      Chi2Proton = trk.chi2pid2.chi2_proton;
+      Chi2Muon = trk.chi2pid2.chi2_muon;
+      Chi2Ndof = trk.chi2pid2.pid_ndof;
+    }
+
+    return Chi2Proton/Chi2Ndof;
+
+  }
+  else{
+    return 999999;
+  }
+});
+
 const Var varTruthMuonMatchedTrackChi2Muon([](const caf::SRSliceProxy* slc) -> double {
   int protonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
   if(protonTrackIndex>=0){
@@ -627,6 +863,38 @@ const Var varTruthMuonMatchedTrackChi2Muon([](const caf::SRSliceProxy* slc) -> d
     }
 
     return Chi2Muon;
+
+  }
+  else{
+    return 999999;
+  }
+
+});
+
+const Var varTruthMuonMatchedTrackNormalizedChi2Muon([](const caf::SRSliceProxy* slc) -> double {
+  int protonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+  if(protonTrackIndex>=0){
+
+    auto const& trk = slc->reco.trk.at(protonTrackIndex);
+    float Chi2Proton, Chi2Muon;
+    int Chi2Ndof;
+    if(trk.bestplane == 0){
+      Chi2Proton = trk.chi2pid0.chi2_proton;
+      Chi2Muon = trk.chi2pid0.chi2_muon;
+      Chi2Ndof = trk.chi2pid0.pid_ndof;
+    }
+    else if(trk.bestplane == 1){
+      Chi2Proton = trk.chi2pid1.chi2_proton;
+      Chi2Muon = trk.chi2pid1.chi2_muon;
+      Chi2Ndof = trk.chi2pid1.pid_ndof;
+    }
+    else{
+      Chi2Proton = trk.chi2pid2.chi2_proton;
+      Chi2Muon = trk.chi2pid2.chi2_muon;
+      Chi2Ndof = trk.chi2pid2.pid_ndof;
+    }
+
+    return Chi2Muon/Chi2Ndof;
 
   }
   else{
@@ -699,6 +967,37 @@ const Var varTruthProtonMatchedTrackChi2Proton([](const caf::SRSliceProxy* slc) 
   }
 });
 
+const Var varTruthProtonMatchedTrackNormalizedChi2Proton([](const caf::SRSliceProxy* slc) -> double {
+  int protonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
+  if(protonTrackIndex>=0){
+
+    auto const& trk = slc->reco.trk.at(protonTrackIndex);
+    float Chi2Proton, Chi2Muon;
+    int Chi2Ndof;
+    if(trk.bestplane == 0){
+      Chi2Proton = trk.chi2pid0.chi2_proton;
+      Chi2Muon = trk.chi2pid0.chi2_muon;
+      Chi2Ndof = trk.chi2pid0.pid_ndof;
+    }
+    else if(trk.bestplane == 1){
+      Chi2Proton = trk.chi2pid1.chi2_proton;
+      Chi2Muon = trk.chi2pid1.chi2_muon;
+      Chi2Ndof = trk.chi2pid1.pid_ndof;
+    }
+    else{
+      Chi2Proton = trk.chi2pid2.chi2_proton;
+      Chi2Muon = trk.chi2pid2.chi2_muon;
+      Chi2Ndof = trk.chi2pid2.pid_ndof;
+    }
+
+    return Chi2Proton/Chi2Ndof;
+
+  }
+  else{
+    return 999999;
+  }
+});
+
 const Var varTruthProtonMatchedTrackChi2Muon([](const caf::SRSliceProxy* slc) -> double {
   int protonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
   if(protonTrackIndex>=0){
@@ -719,6 +1018,38 @@ const Var varTruthProtonMatchedTrackChi2Muon([](const caf::SRSliceProxy* slc) ->
     }
 
     return Chi2Muon;
+
+  }
+  else{
+    return 999999;
+  }
+
+});
+
+const Var varTruthProtonMatchedTrackNormalizedChi2Muon([](const caf::SRSliceProxy* slc) -> double {
+  int protonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
+  if(protonTrackIndex>=0){
+
+    auto const& trk = slc->reco.trk.at(protonTrackIndex);
+    float Chi2Proton, Chi2Muon;
+    int Chi2Ndof;
+    if(trk.bestplane == 0){
+      Chi2Proton = trk.chi2pid0.chi2_proton;
+      Chi2Muon = trk.chi2pid0.chi2_muon;
+      Chi2Ndof = trk.chi2pid0.pid_ndof;
+    }
+    else if(trk.bestplane == 1){
+      Chi2Proton = trk.chi2pid1.chi2_proton;
+      Chi2Muon = trk.chi2pid1.chi2_muon;
+      Chi2Ndof = trk.chi2pid1.pid_ndof;
+    }
+    else{
+      Chi2Proton = trk.chi2pid2.chi2_proton;
+      Chi2Muon = trk.chi2pid2.chi2_muon;
+      Chi2Ndof = trk.chi2pid2.pid_ndof;
+    }
+
+    return Chi2Muon/Chi2Ndof;
 
   }
   else{

@@ -25,6 +25,11 @@ const Cut mykTFiducial([](const caf::SRSliceProxy* slc) {
 });
 
 
+//==== fmatch
+const Cut cutmyFMScore([](const caf::SRSliceProxy* slc) {
+    return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 10.0 );
+  });
+
 const Cut cutHasMuonTrack([](const caf::SRSliceProxy *slc){
   return ( varMuonTrackIndex(slc) >= 0);
 });

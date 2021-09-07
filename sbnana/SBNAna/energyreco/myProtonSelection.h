@@ -16,26 +16,32 @@ const Var varProtonTrackIndex([](const caf::SRSliceProxy* slc) -> int {
     auto const& trk = slc->reco.trk.at(i);
 
     float Chi2Proton, Chi2Muon;
+    int Chi2Ndof;
     if(trk.bestplane == 0){
       Chi2Proton = trk.chi2pid0.chi2_proton;
       Chi2Muon = trk.chi2pid0.chi2_muon;
+      Chi2Ndof = trk.chi2pid0.pid_ndof;
     }
     else if(trk.bestplane == 1){
       Chi2Proton = trk.chi2pid1.chi2_proton;
       Chi2Muon = trk.chi2pid1.chi2_muon;
+      Chi2Ndof = trk.chi2pid1.pid_ndof;
     }
     else{
       Chi2Proton = trk.chi2pid2.chi2_proton;
       Chi2Muon = trk.chi2pid2.chi2_muon;
+      Chi2Ndof = trk.chi2pid2.pid_ndof;
     }
 
-    //if( Chi2Muon > 60 && Chi2Proton < 30 ){
-    if( Chi2Proton<60 ){
+    //if( Chi2Muon > 60 && Chi2Proton < 30 ){ // ProtonSel__MuonChi2GT60_and_ProtonChi2LT30 // this chi2muon cut is too tight
+    if( Chi2Proton < 60 ){ // ProtonSel__ProtonChi2LT60
+    //if( Chi2Muon > 30 && Chi2Proton < 60 ){ // ProtonSel__MuonChi2GT30_and_ProtonChi2LT60 // adding a relaxed chi2muon cut
+    //if( Chi2Proton/Chi2Ndof < 1.0 ){ // ProtonSel__NormalizedProtonChi2LT1
 
-			if(trk.len > max_TrackLength){
-				max_TrackLength = trk.len;
-				PTrackInd = i;
-			}
+      if(trk.len > max_TrackLength){
+        max_TrackLength = trk.len;
+        PTrackInd = i;
+      }
 
     }
 
