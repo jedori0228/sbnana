@@ -6,13 +6,8 @@
 #include "TGraph.h"
 #include "THStack.h"
 #include "TH1.h"
+#include "TGraphAsymmErrors.h"
 #include "TH2.h"
-
-// fixOverlay: Redraws the axis
-
-void fixOverlay() {
-  gPad->RedrawAxis();
-}
 
 void setTDRStyle() {
   TStyle *tdrStyle = new TStyle("tdrStyle","Style for P-TDR");

@@ -5,9 +5,6 @@
 #include "sbnana/CAFAna/Core/Binning.h"
 #include "sbnana/CAFAna/Core/Spectrum.h"
 #include "sbnana/CAFAna/Core/SpectrumLoader.h"
-#include "sbnana/CAFAna/Systs/SBNWeightSysts.h"
-#include "sbnana/CAFAna/Core/EnsembleRatio.h"
-#include "sbnana/CAFAna/Core/EnsembleSpectrum.h"
 
 using namespace ana;
 
@@ -15,26 +12,29 @@ using namespace ana;
 
 #include "TCanvas.h"
 #include "TH1.h"
+#include "TH2.h"
 #include "TFile.h"
 #include "TString.h"
 #include "TLegend.h"
 #include "TLatex.h"
 #include "TSystem.h"
 
-#include "canvas_margin.h"
+#include "sbnana/SBNAna/energyreco/myMuonSelection.h"
+#include "sbnana/SBNAna/energyreco/myProtonSelection.h"
+#include "sbnana/SBNAna/energyreco/myEstimator.h"
+#include "sbnana/SBNAna/energyreco/myTruth.h"
+#include "sbnana/SBNAna/energyreco/myEventSelection.h"
 
-#include "myMuonSelection.h"
-#include "myProtonSelection.h"
-#include "myEstimator.h"
-#include "myTruth.h"
-#include "myEventSelection.h"
-
-#include "myFilelist.h"
-#include "myFilelistShort.h"
+#include "sbnana/SBNAna/energyreco/myFilelist.h"
+#include "sbnana/SBNAna/energyreco/myFilelistShort.h"
+#include "sbnana/SBNAna/energyreco/myFilelistReCAF.h"
 
 #include "TObject.h"
 #include "TVector3.h"
 #include <iostream>
+
+//==== Systematic
+#include "sbnana/CAFAna/Systs/SBNWeightSysts.h"
 
 using namespace std;
 
@@ -46,12 +46,17 @@ public:
   myEfficiency();
 
   void initialize();
-  void bookTruth(SpectrumLoader& loader, Cut cut);
-  void bookRecoMuon(SpectrumLoader& loader, Cut cut);
-  void bookRecoProton(SpectrumLoader& loader, Cut cut);
-  void bookRecoNeutrino(SpectrumLoader& loader, Cut cut);
+  void bookTruth(SpectrumLoader& loader, Cut cut, SpillCut spillCut=kNoSpillCut);
+  void bookRecoMuon(SpectrumLoader& loader, Cut cut, SpillCut spillCut=kNoSpillCut);
+  void bookRecoProton(SpectrumLoader& loader, Cut cut, SpillCut spillCut=kNoSpillCut);
+  void bookRecoNeutrino(SpectrumLoader& loader, Cut cut, SpillCut spillCut=kNoSpillCut);
 
   void saveHistograms();
+
+  //==== Systematic weights
+  std::vector<const ISyst*> ISysts;
+  std::vector<Var> systWs;
+  void setSystematicWeights();
 
   ~myEfficiency();
 
@@ -63,7 +68,6 @@ public:
   TString outputName;
 
   vector<Spectrum *> vec_Spectrums;
-
 
 private:
 

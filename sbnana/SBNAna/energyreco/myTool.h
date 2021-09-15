@@ -1,7 +1,7 @@
 #ifndef myTool_h
 #define myTool_h
 
-vector<string> removeZombie(const vector<string>& vec_ori){
+std::vector<std::string> removeZombie(const std::vector<std::string>& vec_ori){
 
   cout << "[removeZombie] Input number of files = " << vec_ori.size() << endl;
 

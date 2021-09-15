@@ -3,12 +3,12 @@
 
 #include "sbnana/SBNAna/Cuts/NumuCutsIcarus202106.h"
 #include "sbnana/SBNAna/Cuts/Cuts.h"
-#include "myMuonSelection.h"
-#include "myProtonSelection.h"
-#include "myTruth.h"
+#include "sbnana/SBNAna/energyreco/myMuonSelection.h"
+#include "sbnana/SBNAna/energyreco/myProtonSelection.h"
+#include "sbnana/SBNAna/energyreco/myTruth.h"
 
 //==== Truth fiducial
-const Cut mykTFiducial([](const caf::SRSliceProxy* slc) {
+const Cut cutmyTFiducial([](const caf::SRSliceProxy* slc) {
 
   double XMargin = 25.;
   double YMargin = 25.;
@@ -22,6 +22,22 @@ const Cut mykTFiducial([](const caf::SRSliceProxy* slc) {
          ( slc->truth.position.y > -181.7 + YMargin && slc->truth.position.y < 134.8 - YMargin ) &&
          !isnan(slc->truth.position.z) &&
          ( slc->truth.position.z > -895.95 + ZMarginUp && slc->truth.position.z < 895.95 - ZMarginDown ) );
+});
+//==== Reco fiducial
+const Cut cutmyRFiducial([](const caf::SRSliceProxy* slc) {
+
+  double XMargin = 25.;
+  double YMargin = 25.;
+  double ZMarginUp = 30.;
+  double ZMarginDown = 50.;
+
+  return ( !isnan(slc->vertex.x) &&
+         ( ( slc->vertex.x < -71.1 - XMargin && slc->vertex.x > -369.33 + XMargin ) ||
+         ( slc->vertex.x > 71.1 + XMargin && slc->vertex.x < 369.33 - XMargin ) ) &&
+         !isnan(slc->vertex.y) &&
+         ( slc->vertex.y > -181.7 + YMargin && slc->vertex.y < 134.8 - YMargin ) &&
+         !isnan(slc->vertex.z) &&
+         ( slc->vertex.z > -895.95 + ZMarginUp && slc->vertex.z < 895.95 - ZMarginDown ) );
 });
 
 

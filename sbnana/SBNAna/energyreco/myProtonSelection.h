@@ -3,7 +3,7 @@
 
 #include "sbnana/SBNAna/Cuts/NumuCutsIcarus202106.h"
 #include "sbnana/SBNAna/Cuts/Cuts.h"
-#include "myConstants.h"
+#include "sbnana/SBNAna/energyreco/myConstants.h"
 
 //==== Longest of the (proton-chi2) tracks
 //==== - loop over tracks, and check its chi2
@@ -15,22 +15,23 @@ const Var varProtonTrackIndex([](const caf::SRSliceProxy* slc) -> int {
   for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
     auto const& trk = slc->reco.trk.at(i);
 
-    float Chi2Proton, Chi2Muon;
-    int Chi2Ndof;
+    float Chi2Proton;
+    //float Chi2Muon;
+    //int Chi2Ndof;
     if(trk.bestplane == 0){
       Chi2Proton = trk.chi2pid0.chi2_proton;
-      Chi2Muon = trk.chi2pid0.chi2_muon;
-      Chi2Ndof = trk.chi2pid0.pid_ndof;
+      //Chi2Muon = trk.chi2pid0.chi2_muon;
+      //Chi2Ndof = trk.chi2pid0.pid_ndof;
     }
     else if(trk.bestplane == 1){
       Chi2Proton = trk.chi2pid1.chi2_proton;
-      Chi2Muon = trk.chi2pid1.chi2_muon;
-      Chi2Ndof = trk.chi2pid1.pid_ndof;
+      //Chi2Muon = trk.chi2pid1.chi2_muon;
+      //Chi2Ndof = trk.chi2pid1.pid_ndof;
     }
     else{
       Chi2Proton = trk.chi2pid2.chi2_proton;
-      Chi2Muon = trk.chi2pid2.chi2_muon;
-      Chi2Ndof = trk.chi2pid2.pid_ndof;
+      //Chi2Muon = trk.chi2pid2.chi2_muon;
+      //Chi2Ndof = trk.chi2pid2.pid_ndof;
     }
 
     //if( Chi2Muon > 60 && Chi2Proton < 30 ){ // ProtonSel__MuonChi2GT60_and_ProtonChi2LT30 // this chi2muon cut is too tight

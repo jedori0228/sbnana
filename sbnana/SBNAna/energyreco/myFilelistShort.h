@@ -1,4 +1,7 @@
-std::vector<std::string> inputFilesShort = {
+#ifndef myFilelistShort_h
+#define myFilelistShort_h
+
+static std::vector<std::string> inputFilesShort = {
 "/pnfs/icarus/persistent/users/icaruspro/SBNworkshopApril2021/CAF/corsika_nue_BNB/0/0/caf-01608068-6435-4a36-93b5-29ead574d963.root",
 "/pnfs/icarus/persistent/users/icaruspro/SBNworkshopApril2021/CAF/corsika_nue_BNB/0/0/caf-37bf4c15-9d3c-4148-8ad4-899eae3d384f.root",
 "/pnfs/icarus/persistent/users/icaruspro/SBNworkshopApril2021/CAF/corsika_nue_BNB/0/0/caf-401ef369-8ab0-4e71-9fa6-4293f52a7b9e.root",
@@ -354,3 +357,5 @@ std::vector<std::string> inputFilesShort = {
 "/pnfs/icarus/persistent/users/icaruspro/SBNworkshopApril2021/CAF/corsika_nue_BNB/0/f/caf-e7d8a661-e831-4506-8760-5c38d9c9ea95.root",
 "/pnfs/icarus/persistent/users/icaruspro/SBNworkshopApril2021/CAF/corsika_nue_BNB/0/f/caf-e9c44f5b-b174-4282-a9e4-ab4b25a78f8d.root",
 };
+
+#endif
