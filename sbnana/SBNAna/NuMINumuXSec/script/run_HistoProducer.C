@@ -141,7 +141,7 @@ void run_HistoProducer(int whichSample, TString outDirBase){
   HistoProducer m;
   m.outputDir = outDirBase;
   m.initialize();
-  //m.setSystematicWeights();
+  //m.setSystematicWeights(); // TODO Run this to get systematic variations
 
   for(unsigned int i=0; i<cuts.size(); i++){
 
