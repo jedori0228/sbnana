@@ -1,5 +1,4 @@
-#ifndef ICARUSNumuXsec_HistoProducer_h
-#define ICARUSNumuXsec_HistoProducer_h
+#pragma once
 
 // Make a plot with cuts
 #include "sbnana/CAFAna/Core/Binning.h"
@@ -79,4 +78,3 @@ namespace ICARUSNumuXsec{
 
 }
 
-#endif

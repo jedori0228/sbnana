@@ -1,5 +1,4 @@
-#ifndef ICARUSNumuXsec_Variables_h
-#define ICARUSNumuXsec_Variables_h
+#pragma once
 
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Contants.h"
 #include "sbnana/SBNAna/Cuts/NumuCutsIcarus202106.h"
@@ -1312,4 +1311,3 @@ namespace ICARUSNumuXsec{
 
 }
 
-#endif
