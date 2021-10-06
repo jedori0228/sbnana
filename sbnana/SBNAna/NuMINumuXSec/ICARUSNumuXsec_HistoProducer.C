@@ -457,7 +457,8 @@ void HistoProducer::saveHistograms(){
     for(unsigned int ic=0; ic<nCutName; ic++){
 
       TString cutName = vec_cutNames.at(ic);
-      TString dirName = "cutName"+TString::Itoa(ic,10);
+      //TString dirName = "cutName"+TString::Itoa(ic,10);
+      TString dirName = cutName; // I'd rather make the cutName simpler and use it as dirName too
       TDirectory *dir = outputfile->GetDirectory(dirName);
       if(!dir){
         outputfile->mkdir(dirName);

@@ -17,8 +17,18 @@ namespace ICARUSNumuXsec{
 
   //==== Truth variables
 
-  const Var varNeutrinoTruthE = SIMPLEVAR(truth.E);
-  const Var varTruthQ2 = SIMPLEVAR(truth.Q2);
+  //const Var varNeutrinoTruthE = SIMPLEVAR(truth.E);
+  //const Var varTruthQ2 = SIMPLEVAR(truth.Q2);
+
+  const Var varNeutrinoTruthE([](const caf::SRSliceProxy* slc) -> double {
+    if(isnan(slc->truth.E)) return -999.;
+    else return slc->truth.E;
+  });
+  const Var varTruthQ2([](const caf::SRSliceProxy* slc) -> double {
+    if(isnan(slc->truth.Q2)) return -999.;
+    else return slc->truth.Q2;
+  });
+
   const Var varTruthNNeutron = SIMPLEVAR(truth.nneutron);
   const Var varTruthNPiMinus = SIMPLEVAR(truth.npiminus);
   const Var varTruthNPiPlus = SIMPLEVAR(truth.npiplus);

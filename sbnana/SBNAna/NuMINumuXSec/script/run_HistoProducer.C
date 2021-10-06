@@ -19,7 +19,6 @@ void run_HistoProducer(int whichInputFile, TString outDirBase){
   //==== Inputfile
 
   string inputDef = "";
-  bool isCosmic = false;
   //====   BNB, new central sample, IcarusProd2021B_BNB_Nu_Cosmics_v09_28_01_01_01_caf
   if(whichInputFile==0){
     cout << "[run_Efficiency] Running BNB, IcarusProd2021B_BNB_Nu_Cosmics_v09_28_01_01_01_caf" << endl;
@@ -34,13 +33,12 @@ void run_HistoProducer(int whichInputFile, TString outDirBase){
   else if(whichInputFile==3){
     cout << "[run_Efficiency] Running In-time BNB cosmic" << endl;
     inputDef = "IcarusProd2021B_Intime_Cosmic_v09_28_01_01_01_caf";
-    isCosmic = true;
   }
 
-  //cout << "[run_Efficiency] Input definition : " << inputDef << endl;
-  //SpectrumLoader loader(inputDef);
+  cout << "[run_Efficiency] Input definition : " << inputDef << endl;
+  SpectrumLoader loader(inputDef);
 
-  //SpectrumLoader loader("root://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/sbn/data/sbn_fd/poms_production/ICARUS_Intime_Cosmic/mc/reconstructed/icaruscode/v09_28_01_01_01/caf/00/03/hist_caf-e161122e-ca21-420f-8cb3-537132658697.root");
+  //SpectrumLoader loader("/pnfs/sbn/data/sbn_fd/poms_production/ICARUS_NuMI_Nu_Cosmics/mc/reconstructed/icaruscode/v09_28_01_01_01/caf/00/49/prodcorsika_genie_protononly_icarus_numi_volDetEnclosure_tpc_gen_filter_g4_detsim_24037195_1096_reco1_20210913T155758_reco2.caf-6f94e5ce-28b2-4c27-bc19-525bf3c76d7f.root");
 
   //==== Define samples;
   vector<TString> baseSampleNames;
@@ -56,7 +54,7 @@ void run_HistoProducer(int whichInputFile, TString outDirBase){
   baseSampleSpillCuts.push_back(kNoSpillCut);
 
   baseSampleNames.push_back("Cosmic");
-  baseSampleCuts.push_back(kIsCosmicC);
+  baseSampleCuts.push_back(kIsCosmic);
   baseSampleSpillCuts.push_back(kNoSpillCut);
 
   //==== Define Cuts
@@ -77,79 +75,75 @@ void run_HistoProducer(int whichInputFile, TString outDirBase){
 
   cuts.push_back( kNoCut && cutRFiducial && kNotClearCosmic );
   spillcuts.push_back( kNoSpillCut );
-  cutNames.push_back( "RecoFiducial_NotClearCosmic" );
+  cutNames.push_back( "NotClearCosmic" );
 
   cuts.push_back( kNoCut && cutRFiducial && kNotClearCosmic );
   spillcuts.push_back( kCRTHitVetoFD );
-  cutNames.push_back( "RecoFiducial_NotClearCosmic_CRTVeto" );
-
-  cuts.push_back( kNoCut && cutRFiducial && kNotClearCosmic );
-  spillcuts.push_back( kCRTHitVetoFD );
-  cutNames.push_back( "RecoFiducial_NotClearCosmic_CRTVeto" );
+  cutNames.push_back( "CRTVeto" );
 
   cuts.push_back( kNoCut && cutRFiducial && kNotClearCosmic && cutFMScore );
   spillcuts.push_back( kCRTHitVetoFD );
-  cutNames.push_back( "RecoFiducial_NotClearCosmic_CRTVeto_FMScoreLT6" );
+  cutNames.push_back( "FMScoreLT6" );
 
   cuts.push_back( kNoCut && cutRFiducial && kNotClearCosmic && cutFMScore && kNuScore );
   spillcuts.push_back( kCRTHitVetoFD );
-  cutNames.push_back( "RecoFiducial_NotClearCosmic_CRTVeto_FMScoreLT6_NuScoreGT0p4" );
+  cutNames.push_back( "NuScoreGT0p4" );
 
   cuts.push_back( kNoCut && cutRFiducial && kNotClearCosmic && cutFMScore && kNuScore && cutHasMuon );
   spillcuts.push_back( kCRTHitVetoFD );
-  cutNames.push_back( "RecoFiducial_NotClearCosmic_CRTVeto_FMScoreLT6_NuScoreGT0p4_HasMuon" );
+  cutNames.push_back( "HasMuon" );
 
   //====     Contained/Exiting
 
   cuts.push_back( kNoCut && cutRFiducial && kNotClearCosmic && cutFMScore && kNuScore && cutHasMuon && cutMuonContained );
   spillcuts.push_back( kCRTHitVetoFD );
-  cutNames.push_back( "RecoFiducial_NotClearCosmic_CRTVeto_FMScoreLT6_NuScoreGT0p4_HasMuon_Contained" );
+  cutNames.push_back( "HasMuon_Contained" );
 
   cuts.push_back( kNoCut && cutRFiducial && kNotClearCosmic && cutFMScore && kNuScore && cutHasMuon && !cutMuonContained);
   spillcuts.push_back( kCRTHitVetoFD );
-  cutNames.push_back( "RecoFiducial_NotClearCosmic_CRTVeto_FMScoreLT6_NuScoreGT0p4_HasMuon_Exiting" );
+  cutNames.push_back( "HasMuon_Exiting" );
 
   //====       Matched to muon/proton
 
   cuts.push_back( kNoCut && cutRFiducial && kNotClearCosmic && cutFMScore && kNuScore && cutHasMuon && cutMuonContained && cutMuonMatchedToMuon );
   spillcuts.push_back( kCRTHitVetoFD );
-  cutNames.push_back( "RecoFiducial_NotClearCosmic_CRTVeto_FMScoreLT6_NuScoreGT0p4_HasMuon_Contained_MatchedToMuon" );
+  cutNames.push_back( "HasMuon_Contained_MatchedToMuon" );
 
   cuts.push_back( kNoCut && cutRFiducial && kNotClearCosmic && cutFMScore && kNuScore && cutHasMuon && cutMuonContained && cutMuonMatchedToProton );
   spillcuts.push_back( kCRTHitVetoFD );
-  cutNames.push_back( "RecoFiducial_NotClearCosmic_CRTVeto_FMScoreLT6_NuScoreGT0p4_HasMuon_Contained_MatchedToProton" );
+  cutNames.push_back( "HasMuon_Contained_MatchedToProton" );
 
   cuts.push_back( kNoCut && cutRFiducial && kNotClearCosmic && cutFMScore && kNuScore && cutHasMuon && !cutMuonContained && cutMuonMatchedToMuon );
   spillcuts.push_back( kCRTHitVetoFD );
-  cutNames.push_back( "RecoFiducial_NotClearCosmic_CRTVeto_FMScoreLT6_NuScoreGT0p4_HasMuon_Exiting_MatchedToMuon" );
+  cutNames.push_back( "HasMuon_Exiting_MatchedToMuon" );
 
   cuts.push_back( kNoCut && cutRFiducial && kNotClearCosmic && cutFMScore && kNuScore && cutHasMuon && !cutMuonContained && cutMuonMatchedToProton );
   spillcuts.push_back( kCRTHitVetoFD );
-  cutNames.push_back( "RecoFiducial_NotClearCosmic_CRTVeto_FMScoreLT6_NuScoreGT0p4_HasMuon_Exiting_MatchedToProton" );
+  cutNames.push_back( "HasMuon_Exiting_MatchedToProton" );
 
   //====     Additional particles
 
   cuts.push_back( kNoCut && cutRFiducial && kNotClearCosmic && cutFMScore && kNuScore && cutHasMuon && !cutTruthNoNeutron );
   spillcuts.push_back( kCRTHitVetoFD );
-  cutNames.push_back( "RecoFiducial_NotClearCosmic_CRTVeto_FMScoreLT6_NuScoreGT0p4_HasMuon_WithNeutron" );
+  cutNames.push_back( "HasMuon_WithNeutron" );
 
   cuts.push_back( kNoCut && cutRFiducial && kNotClearCosmic && cutFMScore && kNuScore && cutHasMuon && !cutTruthNoChargedPion );
   spillcuts.push_back( kCRTHitVetoFD );
-  cutNames.push_back( "RecoFiducial_NotClearCosmic_CRTVeto_FMScoreLT6_NuScoreGT0p4_HasMuon_WithChargedPion" );
+  cutNames.push_back( "HasMuon_WithChargedPion" );
 
   cuts.push_back( kNoCut && cutRFiducial && kNotClearCosmic && cutFMScore && kNuScore && cutHasMuon && !cutTruthNoPiZero );
   spillcuts.push_back( kCRTHitVetoFD );
-  cutNames.push_back( "RecoFiducial_NotClearCosmic_CRTVeto_FMScoreLT6_NuScoreGT0p4_HasMuon_WithNeutralPion" );
+  cutNames.push_back( "HasMuon_WithNeutralPion" );
 
   cuts.push_back( kNoCut && cutRFiducial && kNotClearCosmic && cutFMScore && kNuScore && cutHasMuon && cutTruthNoNeutron && cutTruthNoChargedPion && cutTruthNoPiZero );
   spillcuts.push_back( kCRTHitVetoFD );
-  cutNames.push_back( "RecoFiducial_NotClearCosmic_CRTVeto_FMScoreLT6_NuScoreGT0p4_HasMuon_WithoutNeutronOrPion" );
+  cutNames.push_back( "HasMuon_WithoutNeutronOrPion" );
 
   //====     HasProton added
 
   cuts.push_back( kNoCut && cutRFiducial && kNotClearCosmic && cutFMScore && kNuScore && cutHasMuon && cutHasProton );
   spillcuts.push_back( kCRTHitVetoFD );
-  cutNames.push_back( "RecoFiducial_NotClearCosmic_CRTVeto_FMScoreLT6_NuScoreGT0p4_HasMuon_HasProton" );
+  cutNames.push_back( "HasMuon_HasProton" );
 
   //==== Declare HistoProducer
 
@@ -164,10 +158,12 @@ void run_HistoProducer(int whichInputFile, TString outDirBase){
     Cut baseSampleCut = baseSampleCuts.at(is);
     SpillCut baseSampleSpillCut = baseSampleSpillCuts.at(is);
 
+    bool isCosmic = (baseSampleName=="Cosmic");
+
     for(unsigned int i=0; i<cuts.size(); i++){
 
       Cut myCut = baseSampleCut && cuts.at(i);
-      SpillCut mySpillCut = baseSampleCut && spillcuts.at(i);
+      SpillCut mySpillCut = baseSampleSpillCut && spillcuts.at(i);
       TString cutName = baseSampleName+"_"+cutNames.at(i);
 
       if( m.setCut(cutName) ){
@@ -186,12 +182,14 @@ void run_HistoProducer(int whichInputFile, TString outDirBase){
             bool isTruthVariable = false;
             if(mapit->first.Contains("True")) isTruthVariable = true;
             if(mapit->first.Contains("Residual")) isTruthVariable = true;
+            if(mapit->first.Contains("Truth")) isTruthVariable = true;
             map_cutName_to_vec_Spectrums.erase(mapit->first);
           }
           for(std::map< TString, vector<EnsembleSpectrum *> >::iterator mapit=map_cutName_to_vec_EnsembleSpectrums.begin(); mapit!=map_cutName_to_vec_EnsembleSpectrums.end(); mapit++){
             bool isTruthVariable = false;
             if(mapit->first.Contains("True")) isTruthVariable = true;
             if(mapit->first.Contains("Residual")) isTruthVariable = true;
+            if(mapit->first.Contains("Truth")) isTruthVariable = true;
             map_cutName_to_vec_EnsembleSpectrums.erase(mapit->first);
           }
 
