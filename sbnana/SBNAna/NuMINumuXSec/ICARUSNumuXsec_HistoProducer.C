@@ -557,8 +557,6 @@ HistoProducer::~HistoProducer(){
 
   cout << "[HistoProducer::~HistoProducer] output file : " << outputDir+outputName << endl;
 
-  vec_Spectrums.clear();
-
   cout << "[HistoProducer::~HistoProducer] Finished" << endl;
 
 }

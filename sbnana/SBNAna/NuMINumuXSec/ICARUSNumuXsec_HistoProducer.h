@@ -64,9 +64,6 @@ namespace ICARUSNumuXsec{
     TFile *outputfile;
     TString outputName;
 
-    vector<Spectrum *> vec_Spectrums;
-    vector<EnsembleSpectrum *> vec_EnsembleSpectrums;
-
     TString currentCutName;
     vector<TString> vec_cutNames;
     map< TString, vector<Spectrum *> > map_cutName_to_vec_Spectrums;
