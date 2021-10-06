@@ -461,6 +461,7 @@ void HistoProducer::saveHistograms(){
       TDirectory *dir = outputfile->GetDirectory(dirName);
       if(!dir){
         outputfile->mkdir(dirName);
+        dir = outputfile->GetDirectory(dirName);
       }
       outputfile->cd(dirName);
 
@@ -553,6 +554,9 @@ HistoProducer::~HistoProducer(){
   cout << "[HistoProducer::~HistoProducer] called" << endl;
 
   outputfile->Close();
+
+  cout << "[HistoProducer::~HistoProducer] output file : " << outputDir+outputName << endl;
+
   vec_Spectrums.clear();
 
   cout << "[HistoProducer::~HistoProducer] Finished" << endl;
