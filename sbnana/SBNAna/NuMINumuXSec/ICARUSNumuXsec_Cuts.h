@@ -9,17 +9,9 @@ namespace ICARUSNumuXsec{
       return ( kIsNuSlice(slc) && slc->truth.isnc && ( slc->truth.pdg == 14 || slc->truth.pdg == -14 ) );
     });
 
-  const Cut cutTruthNoPiZero([](const caf::SRSliceProxy *slc){
-    return (varTruthNPiZero(slc)==0);
-  });
-
-  const Cut cutTruthNoChargedPion([](const caf::SRSliceProxy *slc){
-    return (varTruthNChargedPion(slc)==0);
-  });
-
-  const Cut cutTruthNoNeutron([](const caf::SRSliceProxy *slc){
-    return (varTruthNNeutron(slc)==0);
-  });
+  const Cut cutTruthNoPiZero = (varTruthNPiZero==0);
+  const Cut cutTruthNoChargedPion = (varTruthNChargedPion==0);
+  const Cut cutTruthNoNeutron = (varTruthNNeutron==0);
 
   //==== FV
 
