@@ -45,23 +45,32 @@ void HistoProducer::bookSlice(SpectrumLoader& loader, Cut cut, SpillCut spillCut
   cout << "[HistoProducer::bookSlice] called" << endl;
   //==== some binnings
   double xFMScoreMin = 0.;
-  double xFMScoreMax = 200.;
+  double xFMScoreMax = 150.;
   double dxFMScore = 1.;
   const Binning binsFMScore = Binning::Simple( int( (xFMScoreMax-xFMScoreMin)/dxFMScore ), xFMScoreMin, xFMScoreMax );
+  double xFMTimeMin = -50;
+  double xFMTimeMax = 50.;
+  double dxFMTime = 1.;
+  const Binning binsFMTime = Binning::Simple( int( (xFMTimeMax-xFMTimeMin)/dxFMTime ), xFMTimeMin, xFMTimeMax );
 
   cout << "[HistoProducer::bookSlice] Delcaring HistAxis" << endl;
 
   //==== HistAxis
   const HistAxis axFMScore("FMScore", binsFMScore, varFMScore);
+  const HistAxis axFMTime("FMTime", binsFMTime, varFMTime);
 
   cout << "[HistoProducer::bookSlice] Delcaring Spectrum" << endl;
 
   //==== Spectrum
   Spectrum *sFMScore = new Spectrum(loader, axFMScore, spillCut, cut);
+  Spectrum *sFMTime = new Spectrum(loader, axFMTime, spillCut, cut);
+  Spectrum *sFMScore_vs_FMTime = new Spectrum(loader, axFMTime, axFMTime, spillCut, cut);
 
   cout << "[HistoProducer::bookTruth] Saving spectrums" << endl;
 
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMScore);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMTime);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMScore_vs_FMTime);
 
 }
 
@@ -78,7 +87,7 @@ void HistoProducer::bookTruth(SpectrumLoader& loader, Cut cut, SpillCut spillCut
   double dxCosineTheta = 0.05;
   const Binning binsCosineTheta = Binning::Simple( int( (xCosineThetaMax-xCosineThetaMin)/dxCosineTheta ), xCosineThetaMin, xCosineThetaMax );
   const Binning binsN = Binning::Simple(5, 0., 5.);
-  const Binning binsLength = Binning::Simple(2000, 0., 200.);
+  const Binning binsLength = Binning::Simple(2000, 0., 2000.);
   const Binning binsChi2B = Binning::Simple(1500, 0., 150);
   const Binning binsReducedChi2B = Binning::Simple(1000, 0., 10);
 
@@ -217,6 +226,7 @@ void HistoProducer::bookRecoMuon(SpectrumLoader& loader, Cut cut, SpillCut spill
   Spectrum *sMuonTrueP = new Spectrum(loader, axMuonTrueP, spillCut, cut);
   Spectrum *sMuonTruePDG = new Spectrum(loader, axMuonTruePDG, spillCut, cut);
   Spectrum *sMuon_TrueP_vs_RecoP = new Spectrum(loader, axMuonTrueP, axMuonRecoP, spillCut, cut);
+  Spectrum *sMuon_RecoP_vs_TrueP = new Spectrum(loader, axMuonRecoP, axMuonTrueP, spillCut, cut);
   Spectrum *sMuonPResidual = new Spectrum(loader, axMuonPResidual, spillCut, cut);
   Spectrum *sMuonPResidualFraction = new Spectrum(loader, axMuonPResidualFraction, spillCut, cut);
   Spectrum *sMuonCaloPlane0PResidualFraction = new Spectrum(loader, axMuonCaloPlane0PResidualFraction, spillCut, cut);
@@ -225,6 +235,7 @@ void HistoProducer::bookRecoMuon(SpectrumLoader& loader, Cut cut, SpillCut spill
   Spectrum *sMuonRecoCosineTheta = new Spectrum(loader, axMuonRecoCosineTheta, spillCut, cut);
   Spectrum *sMuonTrueCosineTheta = new Spectrum(loader, axMuonTrueCosineTheta, spillCut, cut);
   Spectrum *sMuon_TrueCosineTheta_vs_RecoCosineTheta = new Spectrum(loader, axMuonTrueCosineTheta, axMuonRecoCosineTheta, spillCut, cut);
+  Spectrum *sMuon_RecoCosineTheta_vs_TrueCosineTheta = new Spectrum(loader, axMuonRecoCosineTheta, axMuonTrueCosineTheta, spillCut, cut);
   Spectrum *sMuonCosineThetaResidual = new Spectrum(loader, axMuonCosineThetaResidual, spillCut, cut);
   Spectrum *sMuon_True_P_vs_CosineTheta = new Spectrum(loader, axMuonTrueP, axMuonTrueCosineTheta, spillCut, cut);
   Spectrum *sMuon_Reco_P_vs_CosineTheta = new Spectrum(loader, axMuonRecoP, axMuonRecoCosineTheta, spillCut, cut);
@@ -256,6 +267,7 @@ void HistoProducer::bookRecoMuon(SpectrumLoader& loader, Cut cut, SpillCut spill
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonTrueP);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonTruePDG);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuon_TrueP_vs_RecoP);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuon_RecoP_vs_TrueP);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonPResidual);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonPResidualFraction);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonCaloPlane0PResidualFraction);
@@ -264,6 +276,7 @@ void HistoProducer::bookRecoMuon(SpectrumLoader& loader, Cut cut, SpillCut spill
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoCosineTheta);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonTrueCosineTheta);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuon_TrueCosineTheta_vs_RecoCosineTheta);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuon_RecoCosineTheta_vs_TrueCosineTheta);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonCosineThetaResidual);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuon_True_P_vs_CosineTheta);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuon_Reco_P_vs_CosineTheta);
@@ -335,11 +348,13 @@ void HistoProducer::bookRecoProton(SpectrumLoader& loader, Cut cut, SpillCut spi
   Spectrum *sProtonTrueP = new Spectrum(loader, axProtonTrueP, spillCut, cut);
   Spectrum *sProtonTruePDG = new Spectrum(loader, axProtonTruePDG, spillCut, cut);
   Spectrum *sProton_TrueP_vs_RecoP = new Spectrum(loader, axProtonTrueP, axProtonRecoP, spillCut, cut);
+  Spectrum *sProton_RecoP_vs_TrueP = new Spectrum(loader, axProtonRecoP, axProtonTrueP, spillCut, cut);
   Spectrum *sProtonPResidual = new Spectrum(loader, axProtonPResidual, spillCut, cut);
   Spectrum *sProtonPResidualFraction = new Spectrum(loader, axProtonPResidualFraction, spillCut, cut);
   Spectrum *sProtonRecoCosineTheta = new Spectrum(loader, axProtonRecoCosineTheta, spillCut, cut);
   Spectrum *sProtonTrueCosineTheta = new Spectrum(loader, axProtonTrueCosineTheta, spillCut, cut);
   Spectrum *sProton_TrueCosineTheta_vs_RecoCosineTheta = new Spectrum(loader, axProtonTrueCosineTheta, axProtonRecoCosineTheta, spillCut, cut);
+  Spectrum *sProton_RecoCosineTheta_vs_TrueCosineTheta = new Spectrum(loader, axProtonRecoCosineTheta, axProtonTrueCosineTheta, spillCut, cut);
   Spectrum *sProtonCosineThetaResidual = new Spectrum(loader, axProtonCosineThetaResidual, spillCut, cut);
   Spectrum *sProton_True_P_vs_CosineTheta = new Spectrum(loader, axProtonTrueP, axProtonTrueCosineTheta, spillCut, cut);
   Spectrum *sProton_Reco_P_vs_CosineTheta = new Spectrum(loader, axProtonRecoP, axProtonRecoCosineTheta, spillCut, cut);
@@ -356,11 +371,13 @@ void HistoProducer::bookRecoProton(SpectrumLoader& loader, Cut cut, SpillCut spi
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonTrueP);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonTruePDG);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sProton_TrueP_vs_RecoP);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProton_RecoP_vs_TrueP);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonPResidual);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonPResidualFraction);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonRecoCosineTheta);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonTrueCosineTheta);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sProton_TrueCosineTheta_vs_RecoCosineTheta);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProton_RecoCosineTheta_vs_TrueCosineTheta);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonCosineThetaResidual);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sProton_True_P_vs_CosineTheta);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sProton_Reco_P_vs_CosineTheta);

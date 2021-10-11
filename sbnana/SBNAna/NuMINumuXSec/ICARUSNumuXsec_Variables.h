@@ -15,6 +15,11 @@ namespace ICARUSNumuXsec{
     else return slc->fmatch.score;
   });
 
+  const Var varFMTime([](const caf::SRSliceProxy* slc) -> double {
+    if(isnan(slc->fmatch.time)) return -999.;
+    else return slc->fmatch.time;
+  });
+
   //==== Truth variables
 
   //const Var varNeutrinoTruthE = SIMPLEVAR(truth.E);

@@ -4,13 +4,6 @@
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Cuts.h"
 #include "sbnana/SBNAna/Cuts/Cuts.h"
 
-#include "myFilelist.h"
-#include "myFilelistReCAF.h"
-#include "myFilelistShort.h"
-#include "myFilelistBNB.h"
-#include "myFilelistNuMI.h"
-
-
 using namespace ana;
 using namespace ICARUSNumuXsec;
 
@@ -25,12 +18,12 @@ void run_HistoProducer(int whichInputFile, TString outDirBase){
     inputDef = "IcarusProd2021B_BNB_Nu_Cosmics_v09_28_01_01_01_caf";
   }
   //====   NuMI, new central sample, IcarusProd2021B_NuMI_Nu_Cosmics_v09_28_01_01_01_caf
-  else if(whichInputFile==2){
+  else if(whichInputFile==1){
     cout << "[run_Efficiency] Running NuMI, IcarusProd2021B_NuMI_Nu_Cosmics_v09_28_01_01_01_caf" << endl;
     inputDef = "IcarusProd2021B_NuMI_Nu_Cosmics_v09_28_01_01_01_caf";
   }
   //====   Cosmic, IcarusProd2021B_Intime_Cosmic_v09_28_01_01_01_caf
-  else if(whichInputFile==3){
+  else if(whichInputFile==2){
     cout << "[run_Efficiency] Running In-time BNB cosmic" << endl;
     inputDef = "IcarusProd2021B_Intime_Cosmic_v09_28_01_01_01_caf";
   }
