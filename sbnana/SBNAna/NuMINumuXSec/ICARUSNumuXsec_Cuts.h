@@ -4,7 +4,14 @@
 
 namespace ICARUSNumuXsec{
 
+  //==== Nue
+
+  const Cut cutIsNuECC([](const caf::SRSliceProxy* slc) {
+      return ( kIsNuSlice(slc) && slc->truth.iscc && ( slc->truth.pdg == 12 || slc->truth.pdg == -12 ) );
+    });
+
   //==== NC
+
   const Cut cutIsNuMuNC([](const caf::SRSliceProxy* slc) {
       return ( kIsNuSlice(slc) && slc->truth.isnc && ( slc->truth.pdg == 14 || slc->truth.pdg == -14 ) );
     });
@@ -32,6 +39,7 @@ namespace ICARUSNumuXsec{
   });
 
   //==== FMScore
+
   const Cut cutFMScore([](const caf::SRSliceProxy* slc) {
       return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 6.0 );
     });
@@ -57,6 +65,18 @@ namespace ICARUSNumuXsec{
 
   });
 
+  //==== CRT 
+
+  const SpillCut spillcutSideCRTHitVetoFD(
+      [](const caf::SRSpillProxy* sr){
+        for (auto const& crtHit: sr->crt_hits){
+          auto thistime = crtHit.time - 1600.; // manually shift to bring beam spill start to zero
+          if (thistime > -0.1 && thistime < 1.8 && crtHit.pe > 100 && crtHit.position.y > 425.)
+            return false;
+        }
+        return true;
+      }
+      );
 
   const Cut cutMuonMatchedToMuon([](const caf::SRSliceProxy* slc) {
     return ( abs(varMuonTruePDG(slc)) == 13 );

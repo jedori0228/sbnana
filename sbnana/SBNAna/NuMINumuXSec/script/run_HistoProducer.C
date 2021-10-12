@@ -38,12 +38,20 @@ void run_HistoProducer(int whichInputFile, TString outDirBase){
   vector<Cut> baseSampleCuts;
   vector<SpillCut> baseSampleSpillCuts;
 
+  baseSampleNames.push_back("AllSamples");
+  baseSampleCuts.push_back(kNoCut);
+  baseSampleSpillCuts.push_back(kNoSpillCut);
+
   baseSampleNames.push_back("NuMuCC");
   baseSampleCuts.push_back(kIsNuMuCC);
   baseSampleSpillCuts.push_back(kNoSpillCut);
 
   baseSampleNames.push_back("NuMuNC");
   baseSampleCuts.push_back(cutIsNuMuNC);
+  baseSampleSpillCuts.push_back(kNoSpillCut);
+
+  baseSampleNames.push_back("NuECC");
+  baseSampleCuts.push_back(cutIsNuECC);
   baseSampleSpillCuts.push_back(kNoSpillCut);
 
   baseSampleNames.push_back("Cosmic");
