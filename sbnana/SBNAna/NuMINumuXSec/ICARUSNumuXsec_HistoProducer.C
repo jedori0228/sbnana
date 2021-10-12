@@ -64,7 +64,7 @@ void HistoProducer::bookSlice(SpectrumLoader& loader, Cut cut, SpillCut spillCut
   //==== Spectrum
   Spectrum *sFMScore = new Spectrum(loader, axFMScore, spillCut, cut);
   Spectrum *sFMTime = new Spectrum(loader, axFMTime, spillCut, cut);
-  Spectrum *sFMScore_vs_FMTime = new Spectrum(loader, axFMTime, axFMTime, spillCut, cut);
+  Spectrum *sFMScore_vs_FMTime = new Spectrum(loader, axFMScore, axFMTime, spillCut, cut);
 
   cout << "[HistoProducer::bookTruth] Saving spectrums" << endl;
 
