@@ -48,16 +48,16 @@ namespace ICARUSNumuXsec{
     if(isnan(slc->truth.Q2)) return -999.;
     else return slc->truth.Q2;
   });
-  const Var varTruthq0([](const caf::SRSliceProxy* slc) -> double {
-    if(isnan(slc->truth.q0)) return -999.;
-    else return slc->truth.q0;
+  const Var varTruthq0_lab([](const caf::SRSliceProxy* slc) -> double {
+    if(isnan(slc->truth.q0_lab)) return -999.;
+    else return slc->truth.q0_lab;
   });
-  const Var varTruthq3([](const caf::SRSliceProxy* slc) -> double {
+  const Var varTruthmodq_lab([](const caf::SRSliceProxy* slc) -> double {
     double Q2 = varTruthQ2(slc);
-    double q0 = varTruthq0(slc);
-    if(isnan(Q2)||isnan(q0)) return -999.;
+    double q0_lab = varTruthq0_lab(slc);
+    if(isnan(Q2)||isnan(q0_lab)) return -999.;
     else{
-      return sqrt(Q2*Q2+q0*q0);
+      return sqrt(Q2*Q2+q0_lab*q0_lab);
     }
   });
 
@@ -145,6 +145,51 @@ namespace ICARUSNumuXsec{
 
   });
 
+  const Var varTruthMuonProtonCosineTheta([](const caf::SRSliceProxy* slc) -> double {
+
+    double max_E(-999);
+    TVector3 v3_Muon;
+    //==== Muon
+    bool MuonFound = false;
+    for(std::size_t i(0); i < slc->truth.prim.size(); ++i){
+      if( abs(slc->truth.prim.at(i).pdg)== 13 ){
+        if(isnan(slc->truth.prim.at(i).genE)) continue;
+        double this_E = slc->truth.prim.at(i).genE;
+        if(this_E>max_E){
+          max_E = this_E;
+          TVector3 v3(slc->truth.prim.at(i).genp.x, slc->truth.prim.at(i).genp.y, slc->truth.prim.at(i).genp.z);
+          v3_Muon = v3;
+          MuonFound = true;
+        }
+      }
+    }
+
+    max_E = 999.;
+    TVector3 v3_Proton;
+    //==== Proton
+    bool ProtonFound = false;
+    for(std::size_t i(0); i < slc->truth.prim.size(); ++i){
+      if( abs(slc->truth.prim.at(i).pdg)== 2212 ){
+        if(isnan(slc->truth.prim.at(i).genE)) continue;
+        double this_E = slc->truth.prim.at(i).genE;
+        if(this_E>max_E){
+          max_E = this_E;
+          TVector3 v3(slc->truth.prim.at(i).genp.x, slc->truth.prim.at(i).genp.y, slc->truth.prim.at(i).genp.z);
+          v3_Proton = v3;
+          ProtonFound = true;
+        }
+      }
+    }
+
+    if(MuonFound&&ProtonFound){
+      return TMath::Cos( v3_Muon.Angle(v3_Proton) );
+    }
+    else{
+      return -999.;
+    }
+
+
+  });
 
   //==== For a given truth, find the matching Reco track
 

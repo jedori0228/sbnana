@@ -7,7 +7,6 @@ HistoProducer::HistoProducer(){
   cout << "[HistoProducer::HistoProducer] called" << endl;
   TargetPOT = 6.6e20;
   str_TargetPOT = "6.6e20 POT";
-  expotype = kPOT;
   outputName = "output.root";
   currentCutName = "DefaultCutName";
   vec_cutNames.clear();
@@ -105,11 +104,17 @@ void HistoProducer::bookTruth(SpectrumLoader& loader, Cut cut, SpillCut spillCut
   //==== HistAxis
   const HistAxis axNeutrinoTruthE("NeutrinoTruthE", binsEnergy, varNeutrinoTruthE);
   const HistAxis axTruthQ2("TruthQ2", binsEnergy, varTruthQ2);
+  const HistAxis axTruthq0_lab("Truthq0_lab", binsEnergy, varTruthq0_lab);
+  const HistAxis axTruthmodq_lab("Truthmodq_lab", binsEnergy, varTruthmodq_lab);
+  //==== Muon
   const HistAxis axMuonTruthP("MuonTruthP", binsEnergy, varMuonTruthP);
   const HistAxis axMuonTruthCosineTheta("MuonTruthCosineTheta", binsCosineTheta, varMuonTruthCosineTheta);
+  //==== Proton
   const HistAxis axProtonTruthP("ProtonTruthP", binsEnergy, varProtonTruthP);
   const HistAxis axProtonTruthCosineTheta("ProtonTruthCosineTheta", binsEnergy, varProtonTruthCosineTheta);
-  //==== matching
+  //==== Muon+Proton
+  const HistAxis axTruthMuonProtonCosineTheta("TruthMuonProtonCosineTheta", binsEnergy, varTruthMuonProtonCosineTheta);
+  //==== Truth match
   const HistAxis axTruthMuonMatchedTrackRangeP("TruthMuonMatchedTrackRangeP", binsEnergy, varTruthMuonMatchedTrackRangeP);
   const HistAxis axTruthMuonMatchedTrackMCSP("TruthMuonMatchedTrackMCSP", binsEnergy, varTruthMuonMatchedTrackMCSP);
   const HistAxis axTruthMuonMatchedTrackCombinedP("TruthMuonMatchedTrackCombinedP", binsEnergy, varTruthMuonMatchedTrackCombinedP);
@@ -127,35 +132,49 @@ void HistoProducer::bookTruth(SpectrumLoader& loader, Cut cut, SpillCut spillCut
   //==== Spectrum
   Spectrum *sNeutrinoTruthE = new Spectrum(loader, axNeutrinoTruthE, spillCut, cut);
   Spectrum *sTruthQ2 = new Spectrum(loader, axTruthQ2, spillCut, cut);
-
+  Spectrum *sTruthq0_lab = new Spectrum(loader, axTruthq0_lab, spillCut, cut);
+  Spectrum *sTruthmodq_lab = new Spectrum(loader, axTruthmodq_lab, spillCut, cut);
+  Spectrum *sTruth_modq_lab_vs_q0_lab = new Spectrum(loader, axTruthmodq_lab, axTruthq0_lab, spillCut, cut);
+  //==== Muon
   Spectrum *sMuonTruthP = new Spectrum(loader, axMuonTruthP, spillCut, cut);
   Spectrum *sMuonTruthCosineTheta = new Spectrum(loader, axMuonTruthCosineTheta, spillCut, cut);
   Spectrum *sMuonTruth_P_vs_CosineTheta = new Spectrum(loader, axMuonTruthP, axMuonTruthCosineTheta, spillCut, cut);
-
+  //==== Proton
   Spectrum *sProtonTruthP = new Spectrum(loader, axProtonTruthP, spillCut, cut);
   Spectrum *sProtonTruthCosineTheta = new Spectrum(loader, axProtonTruthCosineTheta, spillCut, cut);
-
+  //==== Muon+Proton
+  Spectrum *sTruthMuonProtonCosineTheta = new Spectrum(loader, axTruthMuonProtonCosineTheta, spillCut, cut);
+  //==== Truth match
   Spectrum *sTruthMuonMatchedTrackRangeP = new Spectrum(loader, axTruthMuonMatchedTrackRangeP, spillCut, cut);
   Spectrum *sTruthMuonMatchedTrackMCSP = new Spectrum(loader, axTruthMuonMatchedTrackMCSP, spillCut, cut);
   Spectrum *sTruthMuonMatchedTrackCombinedP = new Spectrum(loader, axTruthMuonMatchedTrackCombinedP, spillCut, cut);
-  //Spectrum *sTruthProtonMatchedTrackRangeP = new Spectrum(loader, axTruthProtonMatchedTrackRangeP, spillCut, cut);
-  //Spectrum *sTruthProtonMatchedTrackMCSP = new Spectrum(loader, axTruthProtonMatchedTrackMCSP, spillCut, cut);
+  Spectrum *sTruthProtonMatchedTrackRangeP = new Spectrum(loader, axTruthProtonMatchedTrackRangeP, spillCut, cut);
+  Spectrum *sTruthProtonMatchedTrackMCSP = new Spectrum(loader, axTruthProtonMatchedTrackMCSP, spillCut, cut);
   Spectrum *sTruthProtonMatchedTrackCombinedP = new Spectrum(loader, axTruthProtonMatchedTrackCombinedP, spillCut, cut);
   Spectrum *sTruthProtonMatchedTrackLength = new Spectrum(loader, axTruthProtonMatchedTrackLength, spillCut, cut);
-  //Spectrum *sTruthProtonMatchedTrackChi2Proton = new Spectrum(loader, axTruthProtonMatchedTrackChi2Proton, spillCut, cut);
-  //Spectrum *sTruthProtonMatchedTrackReducedChi2Proton = new Spectrum(loader, axTruthProtonMatchedTrackReducedChi2Proton, spillCut, cut);
-  //Spectrum *sTruthProtonMatchedTrack_Length_vs_Chi2Proton = new Spectrum(loader, axTruthProtonMatchedTrackLength, axTruthProtonMatchedTrackChi2Proton, spillCut, cut);
-  //Spectrum *sTruthProtonMatchedTrack_Length_vs_ReducedChi2Proton = new Spectrum(loader, axTruthProtonMatchedTrackLength, axTruthProtonMatchedTrackReducedChi2Proton, spillCut, cut);
+  Spectrum *sTruthProtonMatchedTrackChi2Proton = new Spectrum(loader, axTruthProtonMatchedTrackChi2Proton, spillCut, cut);
+  Spectrum *sTruthProtonMatchedTrackReducedChi2Proton = new Spectrum(loader, axTruthProtonMatchedTrackReducedChi2Proton, spillCut, cut);
+  Spectrum *sTruthProtonMatchedTrack_Length_vs_Chi2Proton = new Spectrum(loader, axTruthProtonMatchedTrackLength, axTruthProtonMatchedTrackChi2Proton, spillCut, cut);
+  Spectrum *sTruthProtonMatchedTrack_Length_vs_ReducedChi2Proton = new Spectrum(loader, axTruthProtonMatchedTrackLength, axTruthProtonMatchedTrackReducedChi2Proton, spillCut, cut);
   //Spectrum *sNStub = new Spectrum(loader, axNStub, spillCut, cut);
 
   cout << "[HistoProducer::bookTruth] Saving spectrums" << endl;
 
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sNeutrinoTruthE);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthQ2);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthq0_lab);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthmodq_lab);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruth_modq_lab_vs_q0_lab);
+  //==== Muon
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonTruthP);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonTruthCosineTheta);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonTruth_P_vs_CosineTheta);
+  //==== Proton
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonTruthP);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonTruthCosineTheta);
+  //==== Muon+Proton
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthMuonProtonCosineTheta);
+  //==== Truth match
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthMuonMatchedTrackRangeP);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthMuonMatchedTrackMCSP);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthMuonMatchedTrackCombinedP);
@@ -165,8 +184,8 @@ void HistoProducer::bookTruth(SpectrumLoader& loader, Cut cut, SpillCut spillCut
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrackLength);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrackChi2Proton);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrackReducedChi2Proton);
-  //map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrack_Length_vs_Chi2Proton);
-  //map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrack_Length_vs_ReducedChi2Proton);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrack_Length_vs_Chi2Proton);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrack_Length_vs_ReducedChi2Proton);
   //map_cutName_to_vec_Spectrums[currentCutName].push_back(sNStub);
 
   if(ISysts.size()>0){
