@@ -10,6 +10,10 @@ namespace ICARUSNumuXsec{
 
   //==== Slice variables
 
+  const Var varCountSlice([](const caf::SRSliceProxy* slc) ->int {
+    return 1.;
+  });
+
   const Var varFMScore([](const caf::SRSliceProxy* slc) -> double {
     if(isnan(slc->fmatch.score)) return -999.;
     else return slc->fmatch.score;
@@ -18,6 +22,17 @@ namespace ICARUSNumuXsec{
   const Var varFMTime([](const caf::SRSliceProxy* slc) -> double {
     if(isnan(slc->fmatch.time)) return -999.;
     else return slc->fmatch.time;
+  });
+
+  //==== GENIE interaction code
+  //==== https://internal.dunescience.org/doxygen/namespacesimb.html#a2cce734d1b71408bbc7d98d148ac4360
+  const Var varGENIEIntCode([](const caf::SRSliceProxy* slc) -> int {
+    if(!isnan(slc->truth.genie_intcode)){
+      if(slc->truth.genie_intcode<0) return -1;
+      else if(slc->truth.genie_intcode>13) return 14;
+      else return slc->truth.genie_intcode;
+    }
+    return -2;
   });
 
   //==== Truth variables
@@ -32,6 +47,18 @@ namespace ICARUSNumuXsec{
   const Var varTruthQ2([](const caf::SRSliceProxy* slc) -> double {
     if(isnan(slc->truth.Q2)) return -999.;
     else return slc->truth.Q2;
+  });
+  const Var varTruthq0([](const caf::SRSliceProxy* slc) -> double {
+    if(isnan(slc->truth.q0)) return -999.;
+    else return slc->truth.q0;
+  });
+  const Var varTruthq3([](const caf::SRSliceProxy* slc) -> double {
+    double Q2 = varTruthQ2(slc);
+    double q0 = varTruthq0(slc);
+    if(isnan(Q2)||isnan(q0)) return -999.;
+    else{
+      return sqrt(Q2*Q2+q0*q0);
+    }
   });
 
   const Var varTruthNNeutron = SIMPLEVAR(truth.nneutron);

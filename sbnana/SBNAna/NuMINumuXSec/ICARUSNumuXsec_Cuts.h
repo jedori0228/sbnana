@@ -4,6 +4,25 @@
 
 namespace ICARUSNumuXsec{
 
+  //==== GENIE Interaction code
+  const Cut cutIsQE = (varGENIEIntCode==0);
+  const Cut cutIsRes = (varGENIEIntCode==1);
+  const Cut cutIsDIS = (varGENIEIntCode==2);
+  const Cut cutIsCoh = (varGENIEIntCode==3);
+  const Cut cutIsCohElastic = (varGENIEIntCode==4);
+  const Cut cutIsElectronScattering = (varGENIEIntCode==5);
+  const Cut cutIsIMDAnnihilation = (varGENIEIntCode==6);
+  const Cut cutIsInverseBetaDecay = (varGENIEIntCode==7);
+  const Cut cutIsGlashowResonance = (varGENIEIntCode==8);
+  const Cut cutIsAMNuGamma = (varGENIEIntCode==9);
+  const Cut cutIsMEC = (varGENIEIntCode==10);
+  const Cut cutIsDiffractive = (varGENIEIntCode==11);
+  const Cut cutIsEM = (varGENIEIntCode==12);
+  const Cut cutIsWeakMix = (varGENIEIntCode==13);
+  const Cut cutIsUnknownInteractionType1 = (varGENIEIntCode==-1);
+  const Cut cutIsUnknownInteractionType2 = (varGENIEIntCode>13);
+  const Cut cutIsUnknownInteractionType3 = (varGENIEIntCode<-1);
+
   //==== Nue
 
   const Cut cutIsNuECC([](const caf::SRSliceProxy* slc) {
