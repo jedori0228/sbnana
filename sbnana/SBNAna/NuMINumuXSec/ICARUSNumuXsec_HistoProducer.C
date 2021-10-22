@@ -69,7 +69,7 @@ void HistoProducer::bookSlice(SpectrumLoader& loader, Cut cut, SpillCut spillCut
   Spectrum *sCountSlice = new Spectrum(loader, axCountSlice, spillCut, cut);
   Spectrum *sFMScore = new Spectrum(loader, axFMScore, spillCut, cut);
   Spectrum *sFMTime = new Spectrum(loader, axFMTime, spillCut, cut);
-  Spectrum *sFMScore_vs_FMTime = new Spectrum(loader, axFMScore, axFMTime, spillCut, cut);
+  //Spectrum *sFMScore_vs_FMTime = new Spectrum(loader, axFMScore, axFMTime, spillCut, cut);
   Spectrum *sGENIEIntCode = new Spectrum(loader, axGENIEIntCode, spillCut, cut);
 
   cout << "[HistoProducer::bookTruth] Saving spectrums" << endl;
@@ -77,7 +77,7 @@ void HistoProducer::bookSlice(SpectrumLoader& loader, Cut cut, SpillCut spillCut
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sCountSlice);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMScore);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMTime);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMScore_vs_FMTime);
+  //map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMScore_vs_FMTime);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sGENIEIntCode);
 
 }
@@ -111,9 +111,9 @@ void HistoProducer::bookTruth(SpectrumLoader& loader, Cut cut, SpillCut spillCut
   const HistAxis axMuonTruthCosineTheta("MuonTruthCosineTheta", binsCosineTheta, varMuonTruthCosineTheta);
   //==== Proton
   const HistAxis axProtonTruthP("ProtonTruthP", binsEnergy, varProtonTruthP);
-  const HistAxis axProtonTruthCosineTheta("ProtonTruthCosineTheta", binsEnergy, varProtonTruthCosineTheta);
+  const HistAxis axProtonTruthCosineTheta("ProtonTruthCosineTheta", binsCosineTheta, varProtonTruthCosineTheta);
   //==== Muon+Proton
-  const HistAxis axTruthMuonProtonCosineTheta("TruthMuonProtonCosineTheta", binsEnergy, varTruthMuonProtonCosineTheta);
+  const HistAxis axTruthMuonProtonCosineTheta("TruthMuonProtonCosineTheta", binsCosineTheta, varTruthMuonProtonCosineTheta);
   //==== Truth match
   const HistAxis axTruthMuonMatchedTrackRangeP("TruthMuonMatchedTrackRangeP", binsEnergy, varTruthMuonMatchedTrackRangeP);
   const HistAxis axTruthMuonMatchedTrackMCSP("TruthMuonMatchedTrackMCSP", binsEnergy, varTruthMuonMatchedTrackMCSP);
@@ -154,8 +154,8 @@ void HistoProducer::bookTruth(SpectrumLoader& loader, Cut cut, SpillCut spillCut
   Spectrum *sTruthProtonMatchedTrackLength = new Spectrum(loader, axTruthProtonMatchedTrackLength, spillCut, cut);
   Spectrum *sTruthProtonMatchedTrackChi2Proton = new Spectrum(loader, axTruthProtonMatchedTrackChi2Proton, spillCut, cut);
   Spectrum *sTruthProtonMatchedTrackReducedChi2Proton = new Spectrum(loader, axTruthProtonMatchedTrackReducedChi2Proton, spillCut, cut);
-  Spectrum *sTruthProtonMatchedTrack_Length_vs_Chi2Proton = new Spectrum(loader, axTruthProtonMatchedTrackLength, axTruthProtonMatchedTrackChi2Proton, spillCut, cut);
-  Spectrum *sTruthProtonMatchedTrack_Length_vs_ReducedChi2Proton = new Spectrum(loader, axTruthProtonMatchedTrackLength, axTruthProtonMatchedTrackReducedChi2Proton, spillCut, cut);
+  //Spectrum *sTruthProtonMatchedTrack_Length_vs_Chi2Proton = new Spectrum(loader, axTruthProtonMatchedTrackLength, axTruthProtonMatchedTrackChi2Proton, spillCut, cut);
+  //Spectrum *sTruthProtonMatchedTrack_Length_vs_ReducedChi2Proton = new Spectrum(loader, axTruthProtonMatchedTrackLength, axTruthProtonMatchedTrackReducedChi2Proton, spillCut, cut);
   //Spectrum *sNStub = new Spectrum(loader, axNStub, spillCut, cut);
 
   cout << "[HistoProducer::bookTruth] Saving spectrums" << endl;
@@ -184,8 +184,8 @@ void HistoProducer::bookTruth(SpectrumLoader& loader, Cut cut, SpillCut spillCut
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrackLength);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrackChi2Proton);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrackReducedChi2Proton);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrack_Length_vs_Chi2Proton);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrack_Length_vs_ReducedChi2Proton);
+  //map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrack_Length_vs_Chi2Proton);
+  //map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrack_Length_vs_ReducedChi2Proton);
   //map_cutName_to_vec_Spectrums[currentCutName].push_back(sNStub);
 
   if(ISysts.size()>0){
@@ -276,8 +276,8 @@ void HistoProducer::bookRecoMuon(SpectrumLoader& loader, Cut cut, SpillCut spill
   Spectrum *sMuonLength = new Spectrum(loader, axMuonLength, spillCut, cut);
   Spectrum *sMuonChi2Muon = new Spectrum(loader, axMuonChi2Muon, spillCut, cut);
   Spectrum *sMuonReducedChi2Muon = new Spectrum(loader, axMuonReducedChi2Muon, spillCut, cut);
-  Spectrum *sMuon_Length_vs_Chi2Muon = new Spectrum(loader, axMuonLength, axMuonChi2Muon, spillCut, cut);
-  Spectrum *sMuon_Length_vs_ReducedChi2Muon = new Spectrum(loader, axMuonLength, axMuonReducedChi2Muon, spillCut, cut);
+  //Spectrum *sMuon_Length_vs_Chi2Muon = new Spectrum(loader, axMuonLength, axMuonChi2Muon, spillCut, cut);
+  //Spectrum *sMuon_Length_vs_ReducedChi2Muon = new Spectrum(loader, axMuonLength, axMuonReducedChi2Muon, spillCut, cut);
 
 /*
   //==== Systematics
@@ -316,8 +316,8 @@ void HistoProducer::bookRecoMuon(SpectrumLoader& loader, Cut cut, SpillCut spill
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonLength);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonChi2Muon);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonReducedChi2Muon);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuon_Length_vs_Chi2Muon);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuon_Length_vs_ReducedChi2Muon);
+  //map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuon_Length_vs_Chi2Muon);
+  //map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuon_Length_vs_ReducedChi2Muon);
 
   if(ISysts.size()>0){
 
@@ -393,8 +393,8 @@ void HistoProducer::bookRecoProton(SpectrumLoader& loader, Cut cut, SpillCut spi
   Spectrum *sProtonLength = new Spectrum(loader, axProtonLength, spillCut, cut);
   Spectrum *sProtonChi2Proton = new Spectrum(loader, axProtonChi2Proton, spillCut, cut);
   Spectrum *sProtonReducedChi2Proton = new Spectrum(loader, axProtonReducedChi2Proton, spillCut, cut);
-  Spectrum *sProton_Length_vs_Chi2Proton = new Spectrum(loader, axProtonLength, axProtonChi2Proton, spillCut, cut);
-  Spectrum *sProton_Length_vs_ReducedChi2Proton = new Spectrum(loader, axProtonLength, axProtonReducedChi2Proton, spillCut, cut);
+  //Spectrum *sProton_Length_vs_Chi2Proton = new Spectrum(loader, axProtonLength, axProtonChi2Proton, spillCut, cut);
+  //Spectrum *sProton_Length_vs_ReducedChi2Proton = new Spectrum(loader, axProtonLength, axProtonReducedChi2Proton, spillCut, cut);
 
   cout << "[HistoProducer::bookRecoProton] Saving spectrums" << endl;
 
@@ -416,8 +416,8 @@ void HistoProducer::bookRecoProton(SpectrumLoader& loader, Cut cut, SpillCut spi
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonLength);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonChi2Proton);
   map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonReducedChi2Proton);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProton_Length_vs_Chi2Proton);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProton_Length_vs_ReducedChi2Proton);
+  //map_cutName_to_vec_Spectrums[currentCutName].push_back(sProton_Length_vs_Chi2Proton);
+  //map_cutName_to_vec_Spectrums[currentCutName].push_back(sProton_Length_vs_ReducedChi2Proton);
 
   if(ISysts.size()>0){
 

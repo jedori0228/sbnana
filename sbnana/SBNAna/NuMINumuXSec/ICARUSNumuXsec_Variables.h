@@ -8,10 +8,12 @@ using namespace std;
 
 namespace ICARUSNumuXsec{
 
+  double MuonContainedMinimumLength = 50.;
+
   //==== Slice variables
 
   const Var varCountSlice([](const caf::SRSliceProxy* slc) ->int {
-    return 1.;
+    return 0.;
   });
 
   const Var varFMScore([](const caf::SRSliceProxy* slc) -> double {
@@ -723,7 +725,7 @@ namespace ICARUSNumuXsec{
                   ( trk.end.z > -895.95 + 30 && trk.end.z < 895.95 - 50 ) );
 
       MaybeMuonExiting = ( !Contained && trk.len > 100);
-      MaybeMuonContained = ( Contained && PassChi2 && trk.len > 50 );
+      MaybeMuonContained = ( Contained && PassChi2 && trk.len > MuonContainedMinimumLength );
 
       if( AtSlice && ( MaybeMuonExiting || MaybeMuonContained ) && trk.len > Longest ){
         Longest = trk.len;
