@@ -23,6 +23,13 @@ namespace ICARUSNumuXsec{
   const Cut cutIsUnknownInteractionType2 = (varGENIEIntCode>13);
   const Cut cutIsUnknownInteractionType3 = (varGENIEIntCode<-1);
 
+  const Cut cutIsCC([](const caf::SRSliceProxy* slc) {
+      return ( kIsNuSlice(slc) && slc->truth.iscc );
+    });
+  const Cut cutIsNC([](const caf::SRSliceProxy* slc) {
+      return ( kIsNuSlice(slc) && slc->truth.isnc );
+    });
+
   //==== Nue
 
   const Cut cutIsNuECC([](const caf::SRSliceProxy* slc) {
