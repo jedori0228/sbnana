@@ -28,6 +28,7 @@ using namespace ana;
 //==== Systematic
 #include "sbnana/CAFAna/Systs/SBNWeightSysts.h"
 #include "sbnana/CAFAna/Core/EnsembleSpectrum.h"
+#include "sbnana/CAFAna/Systs/NuMIFluxSysts.h"
 
 using namespace std;
 
@@ -51,9 +52,10 @@ namespace ICARUSNumuXsec{
     void saveHistograms();
 
     //==== Systematic weights
-    std::vector<const ISyst*> ISysts;
-    std::vector<Var> systWs;
+    std::vector<const ISyst*> IGENIESysts;
+    std::vector<Var> systGENIEWs;
     void setSystematicWeights();
+    std::vector<const ISyst*> IFluxSysts;
 
     ~HistoProducer();
 
@@ -67,7 +69,14 @@ namespace ICARUSNumuXsec{
     TString currentCutName;
     vector<TString> vec_cutNames;
     map< TString, vector<Spectrum *> > map_cutName_to_vec_Spectrums;
+    //==== EnsembleSpectrum-based systematics
     map< TString, vector<EnsembleSpectrum *> > map_cutName_to_vec_EnsembleSpectrums;
+    //==== Other systematics
+    map< TString, vector< pair<TString, Spectrum *> > > map_cutName_to_vec_SystSpectrumPairs;
+
+    //==== booleans
+    bool doTruthMatch;
+    bool doPerformanceStudy;
 
   private:
 
