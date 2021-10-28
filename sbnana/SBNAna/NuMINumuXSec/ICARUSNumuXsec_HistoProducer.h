@@ -25,6 +25,7 @@ using namespace ana;
 #include "TObject.h"
 #include <iostream>
 
+
 //==== Systematic
 #include "sbnana/CAFAna/Systs/SBNWeightSysts.h"
 #include "sbnana/CAFAna/Core/EnsembleSpectrum.h"
@@ -43,17 +44,17 @@ namespace ICARUSNumuXsec{
 
     void initialize();
     bool setCut(TString cutName);
-    void bookSlice(SpectrumLoader& loader, Cut cut, SpillCut spillCut=kNoSpillCut);
-    void bookTruth(SpectrumLoader& loader, Cut cut, SpillCut spillCut=kNoSpillCut);
-    void bookRecoMuon(SpectrumLoader& loader, Cut cut, SpillCut spillCut=kNoSpillCut);
-    void bookRecoProton(SpectrumLoader& loader, Cut cut, SpillCut spillCut=kNoSpillCut);
-    void bookRecoNeutrino(SpectrumLoader& loader, Cut cut, SpillCut spillCut=kNoSpillCut);
+    void bookSlice(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    void bookTruth(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    void bookRecoMuon(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    void bookRecoProton(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    void bookRecoNeutrino(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
     void saveHistograms();
 
     //==== Systematic weights
     std::vector<const ISyst*> IGENIESysts;
-    std::vector<Var> systGENIEWs;
+    std::vector< vector<Var> > vec_UniverseWeightsForEachGENIESource;
     void setSystematicWeights();
     std::vector<const ISyst*> IFluxSysts;
 
@@ -68,11 +69,15 @@ namespace ICARUSNumuXsec{
 
     TString currentCutName;
     vector<TString> vec_cutNames;
-    map< TString, vector<Spectrum *> > map_cutName_to_vec_Spectrums;
+    std::map< TString, vector<Spectrum *> > map_cutName_to_vec_Spectrums;
     //==== EnsembleSpectrum-based systematics
-    map< TString, vector<EnsembleSpectrum *> > map_cutName_to_vec_EnsembleSpectrums;
+    std::map< TString, vector< pair<TString, EnsembleSpectrum *> > > map_cutName_to_vec_SystEnsembleSpectrumPairs;
+    void addEnsembleSpectrum(SpectrumLoader& loader, const HistAxis& ax, SpillCut spillCut, Cut cut, TString currentCutName, vector<Var> varWeights, TString systName);
+
     //==== Other systematics
-    map< TString, vector< pair<TString, Spectrum *> > > map_cutName_to_vec_SystSpectrumPairs;
+    std::map< TString, vector< pair<TString, Spectrum *> > > map_cutName_to_vec_SystSpectrumPairs;
+    void addUpDownSystematic(SpectrumLoader& loader, const HistAxis& ax, SpillCut spillCut, Cut cut, TString currentCutName, const ISyst* s);
+    void addUpDownSystematic(SpectrumLoader& loader, const HistAxis& axX, const HistAxis& axY, SpillCut spillCut, Cut cut, TString currentCutName, const ISyst* s);
 
     //==== booleans
     bool doTruthMatch;
