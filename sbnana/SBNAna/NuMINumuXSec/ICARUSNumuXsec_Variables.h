@@ -7,6 +7,7 @@
 #include "sbnana/CAFAna/StandardRecord/Proxy/SRProxy.h"
 
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Contants.h"
+#include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Utilities.h"
 #include "sbnana/SBNAna/Cuts/NumuCutsIcarus202106.h"
 #include "TVector3.h"
 #include <iostream>
@@ -281,13 +282,15 @@ namespace ICARUSNumuXsec{
     if(muonTrackIndex>=0){
 
       auto const& trk_Muon = slc->reco.trk.at(muonTrackIndex);
-
+/*
       double XMargin = 25.;
       double YMargin = 25.;
       double ZMarginUp = 30.;
       double ZMarginDown = 50.;
+*/
 
-      bool isContained;
+      bool isContained = fv.isContained(trk_Muon.end.x, trk_Muon.end.y, trk_Muon.end.z);
+/*
       //==== Cryo0
       if( trk_Muon.end.x < 0 ){
         isContained = ( !isnan(trk_Muon.end.x) &&
@@ -306,6 +309,7 @@ namespace ICARUSNumuXsec{
                       !isnan(trk_Muon.end.z) &&
                       ( trk_Muon.end.z > -895.95 + ZMarginUp && trk_Muon.end.z < 895.95 - ZMarginDown ) );
       }
+*/
       if(isContained) return 1;
       else return 0;
     }
@@ -516,13 +520,14 @@ namespace ICARUSNumuXsec{
     if(ProtonTrackIndex>=0){
 
       auto const& trk_Proton = slc->reco.trk.at(ProtonTrackIndex);
-
+/*
       double XMargin = 25.;
       double YMargin = 25.;
       double ZMarginUp = 30.;
       double ZMarginDown = 50.;
-
-      bool isContained;
+*/
+      bool isContained = fv.isContained(trk_Proton.end.x, trk_Proton.end.y, trk_Proton.end.z);
+/*
       //==== Cryo0
       if( trk_Proton.end.x < 0 ){
         isContained = ( !isnan(trk_Proton.end.x) &&
@@ -541,6 +546,7 @@ namespace ICARUSNumuXsec{
                       !isnan(trk_Proton.end.z) &&
                       ( trk_Proton.end.z > -895.95 + ZMarginUp && trk_Proton.end.z < 895.95 - ZMarginDown ) );
       }
+*/
       if(isContained) return 1;
       else return 0;
     }
@@ -754,12 +760,15 @@ namespace ICARUSNumuXsec{
         PassChi2 = Chi2Proton > 60 && Chi2Muon < 30; // MuonSel__MuonChi2LT30_and_ProtonChi2GT60
       }
 
+      Contained = fv.isContained(trk.end.x, trk.end.y, trk.end.z);
+/*
       Contained = ( !isnan(trk.end.x) &&
                   ( trk.end.x < -71.1 - 25 && trk.end.x > -369.33 + 25 ) &&
                   !isnan(trk.end.y) &&
                   ( trk.end.y > -181.7 + 25 && trk.end.y < 134.8 - 25 ) &&
                   !isnan(trk.end.z) &&
                   ( trk.end.z > -895.95 + 30 && trk.end.z < 895.95 - 50 ) );
+*/
 
       MaybeMuonExiting = ( !Contained && trk.len > 100);
       MaybeMuonContained = ( Contained && PassChi2 && trk.len > 50. );
@@ -782,12 +791,15 @@ namespace ICARUSNumuXsec{
     
     if( varMuonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
+      Contained = fv.isContained(trk.end.x, trk.end.y, trk.end.z);
+/*
       Contained = ( !isnan(trk.end.x) &&
                   ( trk.end.x < -71.1 - 25 && trk.end.x > -369.33 + 25 ) &&
                   !isnan(trk.end.y) &&
                   ( trk.end.y > -181.7 + 25 && trk.end.y < 134.8 - 25 ) &&
                   !isnan(trk.end.z) &&
                   ( trk.end.z > -895.95 + 30 && trk.end.z < 895.95 - 50 ) );
+*/
       if(Contained){
         p = trk.rangeP.p_muon;
       }
@@ -1064,13 +1076,15 @@ namespace ICARUSNumuXsec{
       //==== 10 cm and that the parent of the track has been marked as the primary.
       AtSlice = ( Atslc < 10.0 );//&& trk.parent_is_primary);
 
+      Contained = fv.isContained(trk.end.x, trk.end.y, trk.end.z);
+/*
       Contained = ( !isnan(trk.end.x) &&
                   ( trk.end.x < -71.1 - 25 && trk.end.x > -369.33 + 25 ) &&
                   !isnan(trk.end.y) &&
                   ( trk.end.y > -181.7 + 25 && trk.end.y < 134.8 - 25 ) &&
                   !isnan(trk.end.z) &&
                   ( trk.end.z > -895.95 + 30 && trk.end.z < 895.95 - 50 ) );
-
+*/
       bool Chi2Exist = ( !isnan(trk.chi2pid0.chi2_proton) ) || ( !isnan(trk.chi2pid1.chi2_proton) ) || ( !isnan(trk.chi2pid2.chi2_proton) );
       bool PassChi2 = false; // just pass is if chi2 is not saved in the ntuple.. this is for the old NuMI sample
       if(Chi2Exist){
@@ -1132,12 +1146,15 @@ namespace ICARUSNumuXsec{
     if( varProtonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varProtonTrackInd(slc));
 
+      Contained = fv.isContained(trk.end.x, trk.end.y, trk.end.z);
+/*
       Contained = ( !isnan(trk.end.x) &&
                   ( trk.end.x < -71.1 - 25 && trk.end.x > -369.33 + 25 ) &&
                   !isnan(trk.end.y) &&
                   ( trk.end.y > -181.7 + 25 && trk.end.y < 134.8 - 25 ) &&
                   !isnan(trk.end.z) &&
                   ( trk.end.z > -895.95 + 30 && trk.end.z < 895.95 - 50 ) );
+*/
       if(Contained){
         p = trk.rangeP.p_proton;
       }

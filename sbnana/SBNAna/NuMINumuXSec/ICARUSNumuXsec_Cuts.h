@@ -7,6 +7,7 @@
 #include "sbnana/CAFAna/StandardRecord/Proxy/SRProxy.h"
 
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Variables.h"
+#include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Utilities.h"
 
 using namespace ana;
 using namespace std;
@@ -59,11 +60,14 @@ namespace ICARUSNumuXsec{
 
   const Cut cutRFiducial([](const caf::SRSliceProxy* slc) {
 
+    if( !isnan(slc->vertex.x) ) return fv.isContained(slc->vertex.x, slc->vertex.y, slc->vertex.z);
+    else return false;
+
+/*
     double XMargin = 25.;
     double YMargin = 25.;
     double ZMarginUp = 30.;
     double ZMarginDown = 50.;
-
     return ( !isnan(slc->vertex.x) &&
            ( ( slc->vertex.x < -71.1 - XMargin && slc->vertex.x > -369.33 + XMargin ) ||
            ( slc->vertex.x > 71.1 + XMargin && slc->vertex.x < 369.33 - XMargin ) ) &&
@@ -71,20 +75,21 @@ namespace ICARUSNumuXsec{
            ( slc->vertex.y > -181.7 + YMargin && slc->vertex.y < 134.8 - YMargin ) &&
            !isnan(slc->vertex.z) &&
            ( slc->vertex.z > -895.95 + ZMarginUp && slc->vertex.z < 895.95 - ZMarginDown ) );
+*/
   });
 
   //==== FMScore
 
   const Cut cutFMScore([](const caf::SRSliceProxy* slc) {
-      //return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 6.0 );
+      return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 6.0 );
       //return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 7.0 && (slc->fmatch.time>-0.2 && slc->fmatch.time<9.9) );
-      return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 12.0 );
+      //return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 12.0 );
     });
 
   //==== NuScore
 
   const Cut cutNuScore([](const caf::SRSliceProxy* slc) {
-    return ( !isnan(slc->nu_score) && slc->nu_score > 0.2 );
+    return ( !isnan(slc->nu_score) && slc->nu_score > 0.4 );
   });
 
   const Cut cutHasMuon([](const caf::SRSliceProxy* slc) {
@@ -93,18 +98,23 @@ namespace ICARUSNumuXsec{
 
   const Cut cutMuonContained([](const caf::SRSliceProxy* slc) {
 
-    bool Contained(false);
     if( varMuonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
+      return fv.isContained(trk.end.x, trk.end.y, trk.end.z);
+
+/*
       Contained = ( !isnan(trk.end.x) &&
                   ( trk.end.x < -71.1 - 25 && trk.end.x > -369.33 + 25 ) &&
                   !isnan(trk.end.y) &&
                   ( trk.end.y > -181.7 + 25 && trk.end.y < 134.8 - 25 ) &&
                   !isnan(trk.end.z) &&
                   ( trk.end.z > -895.95 + 30 && trk.end.z < 895.95 - 50 ) );
-      return Contained;
+*/
+
     }
-    return Contained;
+    else{
+      return false;
+    }
 
   });
 
@@ -136,18 +146,21 @@ namespace ICARUSNumuXsec{
 
   const Cut cutProtonContained([](const caf::SRSliceProxy* slc) {
 
-    bool Contained(false);
     if( varProtonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varProtonTrackInd(slc));
+      return fv.isContained(trk.end.x, trk.end.y, trk.end.z);
+/*
       Contained = ( !isnan(trk.end.x) &&
                   ( trk.end.x < -71.1 - 25 && trk.end.x > -369.33 + 25 ) &&
                   !isnan(trk.end.y) &&
                   ( trk.end.y > -181.7 + 25 && trk.end.y < 134.8 - 25 ) &&
                   !isnan(trk.end.z) &&
                   ( trk.end.z > -895.95 + 30 && trk.end.z < 895.95 - 50 ) );
-      return Contained;
+*/
     }
-    return Contained;
+    else{
+      return false;
+    }
 
   });
 

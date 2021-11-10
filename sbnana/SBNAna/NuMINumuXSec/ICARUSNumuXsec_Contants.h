@@ -7,6 +7,7 @@
 #include "sbnana/CAFAna/StandardRecord/Proxy/SRProxy.h"
 
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Contants.h"
+#include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Utilities.h"
 #include "sbnana/SBNAna/Cuts/NumuCutsIcarus202106.h"
 #include "TVector3.h"
 #include <iostream>
@@ -21,6 +22,7 @@ using namespace ana;
 
 namespace ICARUSNumuXsec{
 
-  static TVector3 NuDirection_NuMI(3.94583e-01, 4.26067e-02, 9.17677e-01);
+  const TVector3 NuDirection_NuMI(3.94583e-01, 4.26067e-02, 9.17677e-01);
+  const FiducialVolumeTool fv = FiducialVolumeTool();
 
 }
