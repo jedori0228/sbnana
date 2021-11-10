@@ -1,14 +1,20 @@
 #pragma once
 
+#include "sbnana/SBNAna/Cuts/Cuts.h"
+#include "sbnana/SBNAna/Vars/Vars.h"
+#include "sbnana/SBNAna/Cuts/VolumeDefinitions.h"
+
+#include "sbnana/CAFAna/StandardRecord/Proxy/SRProxy.h"
+
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Contants.h"
 #include "sbnana/SBNAna/Cuts/NumuCutsIcarus202106.h"
 #include "TVector3.h"
+#include <iostream>
 
 using namespace std;
+using namespace ana;
 
 namespace ICARUSNumuXsec{
-
-  double MuonContainedMinimumLength = 50.;
 
   //==== Slice variables
 
@@ -24,6 +30,16 @@ namespace ICARUSNumuXsec{
   const Var varFMTime([](const caf::SRSliceProxy* slc) -> double {
     if(isnan(slc->fmatch.time)) return -999.;
     else return slc->fmatch.time;
+  });
+
+  const Var varNuScore([](const caf::SRSliceProxy* slc) -> double {
+    if(isnan(slc->nu_score)) return -999.;
+    else return slc->nu_score;
+  });
+
+  const Var varTruthTime([](const caf::SRSliceProxy* slc) -> double {
+    if(isnan(slc->truth.time)) return -999.;
+    else return slc->truth.time;
   });
 
   //==== GENIE interaction code
@@ -100,6 +116,27 @@ namespace ICARUSNumuXsec{
           max_E = this_E;
           TVector3 v3(slc->truth.prim.at(i).genp.x, slc->truth.prim.at(i).genp.y, slc->truth.prim.at(i).genp.z);
           costh = v3.CosTheta();
+        }
+      }
+    }
+    return costh;
+
+  });
+
+  const Var varMuonTruthNuMICosineTheta([](const caf::SRSliceProxy* slc) -> double {
+
+    double max_E(-999);
+    float costh(-5.f);
+
+    for(std::size_t i(0); i < slc->truth.prim.size(); ++i){
+      if( abs(slc->truth.prim.at(i).pdg)== 13 ){
+        if(isnan(slc->truth.prim.at(i).genE)) continue;
+        double this_E = slc->truth.prim.at(i).genE;
+        if(this_E>max_E){
+          max_E = this_E;
+          TVector3 v3(slc->truth.prim.at(i).genp.x, slc->truth.prim.at(i).genp.y, slc->truth.prim.at(i).genp.z);
+          double angleNuMI = v3.Angle(NuDirection_NuMI);
+          costh = TMath::Cos(angleNuMI);
         }
       }
     }
@@ -725,7 +762,7 @@ namespace ICARUSNumuXsec{
                   ( trk.end.z > -895.95 + 30 && trk.end.z < 895.95 - 50 ) );
 
       MaybeMuonExiting = ( !Contained && trk.len > 100);
-      MaybeMuonContained = ( Contained && PassChi2 && trk.len > MuonContainedMinimumLength );
+      MaybeMuonContained = ( Contained && PassChi2 && trk.len > 50. );
 
       if( AtSlice && ( MaybeMuonExiting || MaybeMuonContained ) && trk.len > Longest ){
         Longest = trk.len;
@@ -862,7 +899,9 @@ namespace ICARUSNumuXsec{
     }
   });
 
-  const Var varMuonTrueP([](const caf::SRSliceProxy* slc) -> float {
+  //==== Start from a reco Track, and look at its best match gen-particle.
+  //==== This means that the get-particle may not be a true muon
+  const Var varMuonBestmatchP([](const caf::SRSliceProxy* slc) -> float {
     float p(-5.f);
     
     if( varMuonTrackInd(slc) >= 0 ){
@@ -874,7 +913,7 @@ namespace ICARUSNumuXsec{
     return p;
   });
 
-  const Var varMuonTruePDG([](const caf::SRSliceProxy* slc) -> int {
+  const Var varMuonBestmatchPDG([](const caf::SRSliceProxy* slc) -> int {
     int pdg(-9999999);
 
     if( varMuonTrackInd(slc) >= 0 ){
@@ -889,7 +928,7 @@ namespace ICARUSNumuXsec{
 
     if( varMuonTrackInd(slc) >= 0 ){
       double RecoP = varMuonRecoP(slc);
-      double TrueP = varMuonTrueP(slc);
+      double TrueP = varMuonBestmatchP(slc);
       pr = RecoP-TrueP;
     }
     return pr;
@@ -900,7 +939,7 @@ namespace ICARUSNumuXsec{
 
     if( varMuonTrackInd(slc) >= 0 ){
       double RecoP = varMuonRecoP(slc);
-      double TrueP = varMuonTrueP(slc);
+      double TrueP = varMuonBestmatchP(slc);
       if(TrueP>0.){
         prf = (RecoP-TrueP)/TrueP;
       }
@@ -913,7 +952,7 @@ namespace ICARUSNumuXsec{
 
     if( varMuonTrackInd(slc) >= 0 ){
       double RecoP = varMuonCaloPlane0P(slc);
-      double TrueP = varMuonTrueP(slc);
+      double TrueP = varMuonBestmatchP(slc);
       if(TrueP>0.){
         prf = (RecoP-TrueP)/TrueP;
       }
@@ -926,7 +965,7 @@ namespace ICARUSNumuXsec{
 
     if( varMuonTrackInd(slc) >= 0 ){
       double RecoP = varMuonCaloPlane1P(slc);
-      double TrueP = varMuonTrueP(slc);
+      double TrueP = varMuonBestmatchP(slc);
       if(TrueP>0.){
         prf = (RecoP-TrueP)/TrueP;
       }
@@ -939,7 +978,7 @@ namespace ICARUSNumuXsec{
 
     if( varMuonTrackInd(slc) >= 0 ){
       double RecoP = varMuonCaloPlane2P(slc);
-      double TrueP = varMuonTrueP(slc);
+      double TrueP = varMuonBestmatchP(slc);
       if(TrueP>0.){
         prf = (RecoP-TrueP)/TrueP;
       }
@@ -957,7 +996,19 @@ namespace ICARUSNumuXsec{
     return costh;
   });
 
-  const Var varMuonTrueCosineTheta([](const caf::SRSliceProxy* slc) -> float {
+  const Var varMuonRecoNuMICosineTheta([](const caf::SRSliceProxy* slc) -> float {
+    float costh(-5.f);
+
+    if( varMuonTrackInd(slc) >= 0 ){
+      auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
+      TVector3 v3(trk.dir.x, trk.dir.y, trk.dir.z);
+      double angleNuMI = v3.Angle(NuDirection_NuMI);
+      costh = TMath::Cos(angleNuMI);
+    }
+    return costh;
+  });
+
+  const Var varMuonBestmatchCosineTheta([](const caf::SRSliceProxy* slc) -> float {
     float costh(-5.f);
 
     if( varMuonTrackInd(slc) >= 0 ){
@@ -973,7 +1024,7 @@ namespace ICARUSNumuXsec{
 
     if( varMuonTrackInd(slc) >= 0 ){
       double RecoCosineTheta = varMuonRecoCosineTheta(slc);
-      double TrueCosineTheta = varMuonTrueCosineTheta(slc);
+      double TrueCosineTheta = varMuonBestmatchCosineTheta(slc);
       costhr = RecoCosineTheta-TrueCosineTheta;
     }
     return costhr;
@@ -984,7 +1035,7 @@ namespace ICARUSNumuXsec{
 
     if( varMuonTrackInd(slc) >= 0 ){
       double RecoCosineTheta = varMuonRecoCosineTheta(slc);
-      double TrueCosineTheta = varMuonTrueCosineTheta(slc);
+      double TrueCosineTheta = varMuonBestmatchCosineTheta(slc);
       costhrf = (RecoCosineTheta-TrueCosineTheta)/TrueCosineTheta;
     }
     return costhrf;
@@ -1163,7 +1214,7 @@ namespace ICARUSNumuXsec{
     }
   });
 
-  const Var varProtonTrueP([](const caf::SRSliceProxy* slc) -> float {
+  const Var varProtonBestmatchP([](const caf::SRSliceProxy* slc) -> float {
     float p(-5.f);
     
     if( varProtonTrackInd(slc) >= 0 ){
@@ -1177,7 +1228,7 @@ namespace ICARUSNumuXsec{
     return p;
   });
 
-  const Var varProtonTruePDG([](const caf::SRSliceProxy* slc) -> int {
+  const Var varProtonBestmatchPDG([](const caf::SRSliceProxy* slc) -> int {
     int pdg(-9999999);
 
     if( varProtonTrackInd(slc) >= 0 ){
@@ -1192,7 +1243,7 @@ namespace ICARUSNumuXsec{
 
     if( varProtonTrackInd(slc) >= 0 ){
       double RecoP = varProtonRecoP(slc);
-      double TrueP = varProtonTrueP(slc);
+      double TrueP = varProtonBestmatchP(slc);
       pr = RecoP-TrueP;
     }
     return pr;
@@ -1203,7 +1254,7 @@ namespace ICARUSNumuXsec{
 
     if( varProtonTrackInd(slc) >= 0 ){
       double RecoP = varProtonRecoP(slc);
-      double TrueP = varProtonTrueP(slc);
+      double TrueP = varProtonBestmatchP(slc);
       if(TrueP>0.){
         prf = (RecoP-TrueP)/TrueP;
       }
@@ -1221,7 +1272,7 @@ namespace ICARUSNumuXsec{
     return costh;
   });
 
-  const Var varProtonTrueCosineTheta([](const caf::SRSliceProxy* slc) -> float {
+  const Var varProtonBestmatchCosineTheta([](const caf::SRSliceProxy* slc) -> float {
     float costh(-5.f);
 
     if( varProtonTrackInd(slc) >= 0 ){
@@ -1240,7 +1291,7 @@ namespace ICARUSNumuXsec{
 
     if( varProtonTrackInd(slc) >= 0 ){
       double RecoCosineTheta = varProtonRecoCosineTheta(slc);
-      double TrueCosineTheta = varProtonTrueCosineTheta(slc);
+      double TrueCosineTheta = varProtonBestmatchCosineTheta(slc);
       costhr = RecoCosineTheta-TrueCosineTheta;
     }
     return costhr;
@@ -1252,7 +1303,7 @@ namespace ICARUSNumuXsec{
 
     if( varProtonTrackInd(slc) >= 0 ){
       double RecoCosineTheta = varProtonRecoCosineTheta(slc);
-      double TrueCosineTheta = varProtonTrueCosineTheta(slc);
+      double TrueCosineTheta = varProtonBestmatchCosineTheta(slc);
       costhrf = (RecoCosineTheta-TrueCosineTheta)/TrueCosineTheta;
     }
     return costhrf;

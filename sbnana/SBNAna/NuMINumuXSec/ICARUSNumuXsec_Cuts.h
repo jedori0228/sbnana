@@ -1,6 +1,15 @@
 #pragma once
 
+#include "sbnana/SBNAna/Cuts/Cuts.h"
+#include "sbnana/SBNAna/Vars/Vars.h"
+#include "sbnana/SBNAna/Cuts/VolumeDefinitions.h"
+
+#include "sbnana/CAFAna/StandardRecord/Proxy/SRProxy.h"
+
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Variables.h"
+
+using namespace ana;
+using namespace std;
 
 namespace ICARUSNumuXsec{
 
@@ -67,8 +76,16 @@ namespace ICARUSNumuXsec{
   //==== FMScore
 
   const Cut cutFMScore([](const caf::SRSliceProxy* slc) {
-      return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 6.0 );
+      //return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 6.0 );
+      //return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 7.0 && (slc->fmatch.time>-0.2 && slc->fmatch.time<9.9) );
+      return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 12.0 );
     });
+
+  //==== NuScore
+
+  const Cut cutNuScore([](const caf::SRSliceProxy* slc) {
+    return ( !isnan(slc->nu_score) && slc->nu_score > 0.2 );
+  });
 
   const Cut cutHasMuon([](const caf::SRSliceProxy* slc) {
     return (varMuonTrackInd(slc) >= 0);
@@ -105,11 +122,11 @@ namespace ICARUSNumuXsec{
       );
 
   const Cut cutMuonMatchedToMuon([](const caf::SRSliceProxy* slc) {
-    return ( abs(varMuonTruePDG(slc)) == 13 );
+    return ( abs(varMuonBestmatchPDG(slc)) == 13 );
   });
 
   const Cut cutMuonMatchedToProton([](const caf::SRSliceProxy* slc) {
-    return ( abs(varMuonTruePDG(slc)) == 2212 );
+    return ( abs(varMuonBestmatchPDG(slc)) == 2212 );
   });
 
 
@@ -136,11 +153,11 @@ namespace ICARUSNumuXsec{
 
 
   const Cut cutProtonMatchedToMuon([](const caf::SRSliceProxy* slc) {
-    return ( abs(varProtonTruePDG(slc)) == 13 );
+    return ( abs(varProtonBestmatchPDG(slc)) == 13 );
   });
 
   const Cut cutProtonMatchedToProton([](const caf::SRSliceProxy* slc) {
-    return ( abs(varProtonTruePDG(slc)) == 2212 );
+    return ( abs(varProtonBestmatchPDG(slc)) == 2212 );
   });
 
 

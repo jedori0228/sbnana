@@ -30,6 +30,7 @@ using namespace ana;
 #include "sbnana/CAFAna/Systs/SBNWeightSysts.h"
 #include "sbnana/CAFAna/Core/EnsembleSpectrum.h"
 #include "sbnana/CAFAna/Systs/NuMIFluxSysts.h"
+#include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Systematics.h"
 
 using namespace std;
 
@@ -44,9 +45,11 @@ namespace ICARUSNumuXsec{
 
     void initialize();
     bool setCut(TString cutName);
+    void bookSpectrums(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     void bookSlice(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     void bookTruth(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     void bookRecoMuon(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    void bookMuonPerformance(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     void bookRecoProton(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     void bookRecoNeutrino(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
@@ -57,6 +60,7 @@ namespace ICARUSNumuXsec{
     std::vector< vector<Var> > vec_UniverseWeightsForEachGENIESource;
     void setSystematicWeights();
     std::vector<const ISyst*> IFluxSysts;
+    std::vector<const ISyst*> IDetectorSysts;
 
     ~HistoProducer();
 
@@ -73,6 +77,7 @@ namespace ICARUSNumuXsec{
     //==== EnsembleSpectrum-based systematics
     std::map< TString, vector< pair<TString, EnsembleSpectrum *> > > map_cutName_to_vec_SystEnsembleSpectrumPairs;
     void addEnsembleSpectrum(SpectrumLoader& loader, const HistAxis& ax, SpillCut spillCut, Cut cut, TString currentCutName, vector<Var> varWeights, TString systName);
+    void addEnsembleSpectrum(SpectrumLoader& loader, const HistAxis& axX, const HistAxis& axY, SpillCut spillCut, Cut cut, TString currentCutName, vector<Var> varWeights, TString systName);
 
     //==== Other systematics
     std::map< TString, vector< pair<TString, Spectrum *> > > map_cutName_to_vec_SystSpectrumPairs;
@@ -82,6 +87,8 @@ namespace ICARUSNumuXsec{
     //==== booleans
     bool doTruthMatch;
     bool doPerformanceStudy;
+    bool fillBeamInfo;
+    bool fillNominal;
 
   private:
 
