@@ -37,7 +37,8 @@ namespace ICARUSNumuXsec{
     FidVol fvCryo0, fvCryo1;
     double XMargin, YMargin, ZMarginUp, ZMarginDown;
 
-    bool isContained(double x, double y, double z) const ;
+    bool isContained(double x, double y, double z) const;
+    int containedCryo(double x, double y, double z) const;
 
   };
 

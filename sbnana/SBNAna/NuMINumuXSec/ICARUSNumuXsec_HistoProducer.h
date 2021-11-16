@@ -56,9 +56,10 @@ namespace ICARUSNumuXsec{
     void saveHistograms();
 
     //==== Systematic weights
-    std::vector<const ISyst*> IGENIESysts;
-    std::vector< vector<Var> > vec_UniverseWeightsForEachGENIESource;
     void setSystematicWeights();
+    std::vector<const ISyst*> IAllSysts; // TODO update later
+    std::vector<const ISyst*> IGENIESysts;
+    std::vector< vector<Var> > vec_UniverseWeightsForEachGENIESource; // For EnsembleSpectrum
     std::vector<const ISyst*> IFluxSysts;
     std::vector<const ISyst*> IDetectorSysts;
 

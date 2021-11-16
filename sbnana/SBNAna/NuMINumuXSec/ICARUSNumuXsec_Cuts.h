@@ -81,16 +81,20 @@ namespace ICARUSNumuXsec{
   //==== FMScore
 
   const Cut cutFMScore([](const caf::SRSliceProxy* slc) {
-      return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 6.0 );
+      //return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 6.0 );
       //return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 7.0 && (slc->fmatch.time>-0.2 && slc->fmatch.time<9.9) );
-      //return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 12.0 );
+      return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 12.0 );
     });
 
   //==== NuScore
 
   const Cut cutNuScore([](const caf::SRSliceProxy* slc) {
-    return ( !isnan(slc->nu_score) && slc->nu_score > 0.4 );
+    //return ( !isnan(slc->nu_score) && slc->nu_score > 0.4 );
+    //return ( !isnan(slc->nu_score) && slc->nu_score > 0.2 );
+    return true;
   });
+
+  //==== Muon related
 
   const Cut cutHasMuon([](const caf::SRSliceProxy* slc) {
     return (varMuonTrackInd(slc) >= 0);

@@ -75,6 +75,9 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
   double dxCosineTheta = 0.1;
   const Binning binsCosineTheta = Binning::Simple( int( (xCosineThetaMax-xCosineThetaMin)/dxCosineTheta ), xCosineThetaMin, xCosineThetaMax );
   const Binning binsOne = Binning::Simple( 1, 0., 1.);
+  const Binning binsLength = Binning::Simple(2000, 0., 2000.);
+  const Binning binsNhits = Binning::Simple(200, 0., 2000.);
+  const Binning binsCharge = Binning::Simple(100, 0., 1000.);
 
   //==== HistAxis
   //====   Slice variables
@@ -82,6 +85,15 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
   const HistAxis axFMTime("FMTime", binsFMTime, varFMTime);
   const HistAxis axNuScore("NuScore", binsNuScore, varNuScore);
   const HistAxis axCountSlice("CountSlice", binsOne, varCountSlice);
+  const HistAxis axSliceTrackNhitsPlane0("SliceTrackNhitsPlane0", binsNhits, varSliceTrackNhitsPlane0);
+  const HistAxis axSliceTrackNhitsPlane1("SliceTrackNhitsPlane1", binsNhits, varSliceTrackNhitsPlane1);
+  const HistAxis axSliceTrackNhitsPlane2("SliceTrackNhitsPlane2", binsNhits, varSliceTrackNhitsPlane2);
+  const HistAxis axSliceShowerNhitsPlane0("SliceShowerNhitsPlane0", binsNhits, varSliceShowerNhitsPlane0);
+  const HistAxis axSliceShowerNhitsPlane1("SliceShowerNhitsPlane1", binsNhits, varSliceShowerNhitsPlane1);
+  const HistAxis axSliceShowerNhitsPlane2("SliceShowerNhitsPlane2", binsNhits, varSliceShowerNhitsPlane2);
+  const HistAxis axSliceTrackChargePlane0("SliceTrackChargePlane0", binsCharge, varSliceTrackChargePlane0);
+  const HistAxis axSliceTrackChargePlane1("SliceTrackChargePlane1", binsCharge, varSliceTrackChargePlane1);
+  const HistAxis axSliceTrackChargePlane2("SliceTrackChargePlane2", binsCharge, varSliceTrackChargePlane2);
   //====   Truth variables
   //====     Neutrinos
   const HistAxis axNeutrinoTruthE("NeutrinoTruthE", binsEnergy, varNeutrinoTruthE);
@@ -95,6 +107,7 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
   //====     Proton
   const HistAxis axProtonTruthP("ProtonTruthP", binsMomentum, varProtonTruthP);
   const HistAxis axProtonTruthCosineTheta("ProtonTruthCosineTheta", binsCosineTheta, varProtonTruthCosineTheta);
+  const HistAxis axProtonTruthNuMICosineTheta("ProtonTruthNuMICosineTheta", binsCosineTheta, varProtonTruthNuMICosineTheta);
   //====     Muon+Proton
   const HistAxis axTruthMuonProtonCosineTheta("TruthMuonProtonCosineTheta", binsCosineTheta, varTruthMuonProtonCosineTheta);
   //====   Reco variables
@@ -102,9 +115,12 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
   const HistAxis axMuonRecoP("MuonRecoP", binsMomentum, varMuonRecoP);
   const HistAxis axMuonRecoCosineTheta("MuonRecoCosineTheta", binsCosineTheta, varMuonRecoCosineTheta);
   const HistAxis axMuonRecoNuMICosineTheta("MuonRecoNuMICosineTheta", binsCosineTheta, varMuonRecoNuMICosineTheta);
+  const HistAxis axMuonLength("MuonLength", binsLength, varMuonLength);
   //====     Proton
   const HistAxis axProtonRecoP("ProtonRecoP", binsMomentum, varProtonRecoP);
   const HistAxis axProtonRecoCosineTheta("ProtonRecoCosineTheta", binsCosineTheta, varProtonRecoCosineTheta);
+  const HistAxis axProtonRecoNuMICosineTheta("ProtonRecoNuMICosineTheta", binsCosineTheta, varProtonRecoNuMICosineTheta);
+  const HistAxis axProtonLength("ProtonLength", binsLength, varProtonLength);
   //====     Neutrino
   const HistAxis axNeutrinoCombinedEnergy("NeutrinoCombinedEnergy", binsEnergy, varNeutrinoCombinedEnergy);
   const HistAxis axNeutrinoQE("NeutrinoQE", binsEnergy, varNeutrinoQE);
@@ -115,6 +131,15 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
   Spectrum *sFMTime = new Spectrum(loader, axFMTime, spillCut, cut);
   Spectrum *sNuScore = new Spectrum(loader, axNuScore, spillCut, cut);
   Spectrum *sCountSlice = new Spectrum(loader, axCountSlice, spillCut, cut);
+  Spectrum *sSliceTrackNhitsPlane0 = new Spectrum(loader, axSliceTrackNhitsPlane0, spillCut, cut);
+  Spectrum *sSliceTrackNhitsPlane1 = new Spectrum(loader, axSliceTrackNhitsPlane1, spillCut, cut);
+  Spectrum *sSliceTrackNhitsPlane2 = new Spectrum(loader, axSliceTrackNhitsPlane2, spillCut, cut);
+  Spectrum *sSliceShowerNhitsPlane0 = new Spectrum(loader, axSliceShowerNhitsPlane0, spillCut, cut);
+  Spectrum *sSliceShowerNhitsPlane1 = new Spectrum(loader, axSliceShowerNhitsPlane1, spillCut, cut);
+  Spectrum *sSliceShowerNhitsPlane2 = new Spectrum(loader, axSliceShowerNhitsPlane2, spillCut, cut);
+  Spectrum *sSliceTrackChargePlane0 = new Spectrum(loader, axSliceTrackChargePlane0, spillCut, cut);
+  Spectrum *sSliceTrackChargePlane1 = new Spectrum(loader, axSliceTrackChargePlane1, spillCut, cut);
+  Spectrum *sSliceTrackChargePlane2 = new Spectrum(loader, axSliceTrackChargePlane2, spillCut, cut);
   //====   Truth variables
   //====     Neutrinos
   Spectrum *sNeutrinoTruthE = new Spectrum(loader, axNeutrinoTruthE, spillCut, cut);
@@ -128,6 +153,7 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
   //====     Proton
   Spectrum *sProtonTruthP = new Spectrum(loader, axProtonTruthP, spillCut, cut);
   Spectrum *sProtonTruthCosineTheta = new Spectrum(loader, axProtonTruthCosineTheta, spillCut, cut);
+  Spectrum *sProtonTruthNuMICosineTheta = new Spectrum(loader, axProtonTruthNuMICosineTheta, spillCut, cut);
   //====     Muon+Proton
   Spectrum *sTruthMuonProtonCosineTheta = new Spectrum(loader, axTruthMuonProtonCosineTheta, spillCut, cut);
   //====   Reco variables
@@ -135,9 +161,12 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
   Spectrum *sMuonRecoP = new Spectrum(loader, axMuonRecoP, spillCut, cut);
   Spectrum *sMuonRecoCosineTheta = new Spectrum(loader, axMuonRecoCosineTheta, spillCut, cut);
   Spectrum *sMuonRecoNuMICosineTheta = new Spectrum(loader, axMuonRecoNuMICosineTheta, spillCut, cut);
+  Spectrum *sMuonLength = new Spectrum(loader, axMuonLength, spillCut, cut);
   //====     Proton
   Spectrum *sProtonRecoP = new Spectrum(loader, axProtonRecoP, spillCut, cut);
   Spectrum *sProtonRecoCosineTheta = new Spectrum(loader, axProtonRecoCosineTheta, spillCut, cut);
+  Spectrum *sProtonRecoNuMICosineTheta = new Spectrum(loader, axProtonRecoNuMICosineTheta, spillCut, cut);
+  Spectrum *sProtonLength = new Spectrum(loader, axProtonLength, spillCut, cut);
   //====     Neutrino
   Spectrum *sNeutrinoCombinedEnergy = new Spectrum(loader, axNeutrinoCombinedEnergy, spillCut, cut);
   Spectrum *sNeutrinoQE = new Spectrum(loader, axNeutrinoQE, spillCut, cut);
@@ -152,6 +181,15 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMTime);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sNuScore);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sCountSlice);
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceTrackNhitsPlane0);
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceTrackNhitsPlane1);
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceTrackNhitsPlane2);
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceShowerNhitsPlane0);
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceShowerNhitsPlane1);
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceShowerNhitsPlane2);
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceTrackChargePlane0);
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceTrackChargePlane1);
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceTrackChargePlane2);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sNeutrinoTruthE);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthQ2);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthq0_lab);
@@ -161,12 +199,16 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonTruthNuMICosineTheta);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonTruthP);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonTruthCosineTheta);
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonTruthNuMICosineTheta);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthMuonProtonCosineTheta);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoP);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoCosineTheta);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoNuMICosineTheta);
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonLength);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonRecoP);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonRecoCosineTheta);
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonRecoNuMICosineTheta);
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonLength);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sNeutrinoCombinedEnergy);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sNeutrinoQE);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoP_vs_MuonTruthP);
@@ -983,6 +1025,7 @@ void HistoProducer::setSystematicWeights(){
 
   cout << "[HistoProducer::setSystematicWeights] Setting GENIE systematics" << endl;
   IGENIESysts = GetSBNGenieWeightSysts();
+  //==== For EnsembleSpectrum
   for(unsigned int i=0; i<IGENIESysts.size(); ++i){
     cout << "[HistoProducer::setSystematicWeights] " << i << " : " << IGENIESysts.at(i)->ShortName() << endl;
 

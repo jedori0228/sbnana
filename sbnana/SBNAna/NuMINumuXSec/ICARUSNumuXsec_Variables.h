@@ -43,6 +43,80 @@ namespace ICARUSNumuXsec{
     else return slc->truth.time;
   });
 
+  const Var varSliceTrackNhitsPlane0([](const caf::SRSliceProxy* slc) -> int {
+    int nHits(0);
+    for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
+      auto const& trk = slc->reco.trk.at(i);
+      nHits += trk.calo0.nhit;
+    }
+    return nHits;
+  });
+  const Var varSliceTrackNhitsPlane1([](const caf::SRSliceProxy* slc) -> int {
+    int nHits(0);
+    for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
+      auto const& trk = slc->reco.trk.at(i);
+      nHits += trk.calo1.nhit;
+    }
+    return nHits;
+  });
+  const Var varSliceTrackNhitsPlane2([](const caf::SRSliceProxy* slc) -> int {
+    int nHits(0);
+    for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
+      auto const& trk = slc->reco.trk.at(i);
+      nHits += trk.calo2.nhit;
+    }
+    return nHits;
+  });
+  const Var varSliceShowerNhitsPlane0([](const caf::SRSliceProxy* slc) -> int {
+    int nHits(0);
+    for(std::size_t i(0); i < slc->reco.shw.size(); ++i){
+      auto const& shw = slc->reco.shw.at(i);
+      nHits += shw.nHits_plane0;
+    }
+    return nHits;
+  });
+  const Var varSliceShowerNhitsPlane1([](const caf::SRSliceProxy* slc) -> int {
+    int nHits(0);
+    for(std::size_t i(0); i < slc->reco.shw.size(); ++i){
+      auto const& shw = slc->reco.shw.at(i);
+      nHits += shw.nHits_plane1;
+    }
+    return nHits;
+  });
+  const Var varSliceShowerNhitsPlane2([](const caf::SRSliceProxy* slc) -> int {
+    int nHits(0);
+    for(std::size_t i(0); i < slc->reco.shw.size(); ++i){
+      auto const& shw = slc->reco.shw.at(i);
+      nHits += shw.nHits_plane2;
+    }
+    return nHits;
+  });
+  const Var varSliceTrackChargePlane0([](const caf::SRSliceProxy* slc) -> double {
+    double sumCharge(0);
+    for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
+      auto const& trk = slc->reco.trk.at(i);
+      sumCharge += trk.calo0.charge;
+    }
+    return sumCharge/1000.;
+  });
+  const Var varSliceTrackChargePlane1([](const caf::SRSliceProxy* slc) -> double {
+    double sumCharge(0);
+    for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
+      auto const& trk = slc->reco.trk.at(i);
+      sumCharge += trk.calo1.charge;
+    }
+    return sumCharge/1000.;
+  });
+  const Var varSliceTrackChargePlane2([](const caf::SRSliceProxy* slc) -> double {
+    double sumCharge(0);
+    for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
+      auto const& trk = slc->reco.trk.at(i);
+      sumCharge += trk.calo2.charge;
+    }
+    return sumCharge/1000.;
+  });
+
+
   //==== GENIE interaction code
   //==== https://internal.dunescience.org/doxygen/namespacesimb.html#a2cce734d1b71408bbc7d98d148ac4360
   const Var varGENIEIntCode([](const caf::SRSliceProxy* slc) -> int {
@@ -178,6 +252,27 @@ namespace ICARUSNumuXsec{
           max_E = this_E;
           TVector3 v3(slc->truth.prim.at(i).genp.x, slc->truth.prim.at(i).genp.y, slc->truth.prim.at(i).genp.z);
           costh = v3.CosTheta();
+        }
+      }
+    }
+    return costh;
+
+  });
+
+  const Var varProtonTruthNuMICosineTheta([](const caf::SRSliceProxy* slc) -> double {
+
+    double max_E(-999);
+    float costh(-5.f);
+
+    for(std::size_t i(0); i < slc->truth.prim.size(); ++i){
+      if( abs(slc->truth.prim.at(i).pdg)== 2212 ){
+        if(isnan(slc->truth.prim.at(i).genE)) continue;
+        double this_E = slc->truth.prim.at(i).genE;
+        if(this_E>max_E){
+          max_E = this_E;
+          TVector3 v3(slc->truth.prim.at(i).genp.x, slc->truth.prim.at(i).genp.y, slc->truth.prim.at(i).genp.z);
+          double angleNuMI = v3.Angle(NuDirection_NuMI);
+          costh = TMath::Cos(angleNuMI);
         }
       }
     }
@@ -1285,6 +1380,18 @@ namespace ICARUSNumuXsec{
     if( varProtonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varProtonTrackInd(slc));
       costh = trk.costh;
+    }
+    return costh;
+  });
+
+  const Var varProtonRecoNuMICosineTheta([](const caf::SRSliceProxy* slc) -> float {
+    float costh(-5.f);
+
+    if( varProtonTrackInd(slc) >= 0 ){
+      auto const& trk = slc->reco.trk.at(varProtonTrackInd(slc));
+      TVector3 v3(trk.dir.x, trk.dir.y, trk.dir.z);
+      double angleNuMI = v3.Angle(NuDirection_NuMI);
+      costh = TMath::Cos(angleNuMI);
     }
     return costh;
   });
