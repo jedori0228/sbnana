@@ -74,7 +74,7 @@ namespace ICARUSNumuXsec{
     int nHits(0);
     for(std::size_t i(0); i < slc->reco.shw.size(); ++i){
       auto const& shw = slc->reco.shw.at(i);
-      nHits += shw.nHits_plane0;
+      nHits += shw.plane[0].nHits;
     }
     return nHits;
   });
@@ -82,7 +82,7 @@ namespace ICARUSNumuXsec{
     int nHits(0);
     for(std::size_t i(0); i < slc->reco.shw.size(); ++i){
       auto const& shw = slc->reco.shw.at(i);
-      nHits += shw.nHits_plane1;
+      nHits += shw.plane[1].nHits;
     }
     return nHits;
   });
@@ -90,7 +90,7 @@ namespace ICARUSNumuXsec{
     int nHits(0);
     for(std::size_t i(0); i < slc->reco.shw.size(); ++i){
       auto const& shw = slc->reco.shw.at(i);
-      nHits += shw.nHits_plane2;
+      nHits += shw.plane[2].nHits;
     }
     return nHits;
   });
@@ -149,12 +149,12 @@ namespace ICARUSNumuXsec{
   //==== GENIE interaction code
   //==== https://internal.dunescience.org/doxygen/namespacesimb.html#a2cce734d1b71408bbc7d98d148ac4360
   const Var varGENIEIntCode([](const caf::SRSliceProxy* slc) -> int {
-    if(!isnan(slc->truth.genie_intcode)){
-      if(slc->truth.genie_intcode<0) return -1;
-      else if(slc->truth.genie_intcode>13) return 14;
-      else return slc->truth.genie_intcode;
-    }
-    return -2;
+    //if(!isnan(slc->truth.genie_mode)){
+      if(slc->truth.genie_mode<0) return -1;
+      else if(slc->truth.genie_mode>13) return 14;
+      else return slc->truth.genie_mode;
+    //}
+    //return -2;
   });
 
   //==== Truth variables
