@@ -50,7 +50,7 @@ namespace ICARUSNumuXsec{
     int nHits(0);
     for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
       auto const& trk = slc->reco.trk.at(i);
-      nHits += trk.calo0.nhit;
+      nHits += trk.calo[0].nhit;
     }
     return nHits;
   });
@@ -58,7 +58,7 @@ namespace ICARUSNumuXsec{
     int nHits(0);
     for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
       auto const& trk = slc->reco.trk.at(i);
-      nHits += trk.calo1.nhit;
+      nHits += trk.calo[1].nhit;
     }
     return nHits;
   });
@@ -66,7 +66,7 @@ namespace ICARUSNumuXsec{
     int nHits(0);
     for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
       auto const& trk = slc->reco.trk.at(i);
-      nHits += trk.calo2.nhit;
+      nHits += trk.calo[2].nhit;
     }
     return nHits;
   });
@@ -98,8 +98,8 @@ namespace ICARUSNumuXsec{
     double sumCharge(0);
     for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
       auto const& trk = slc->reco.trk.at(i);
-      sumCharge += trk.calo0.charge;
-      //std::cout << "[varSliceTrackChargePlane0] trk.calo0.charge = " << trk.calo0.charge << std::endl;
+      sumCharge += trk.calo[0].charge;
+      //std::cout << "[varSliceTrackChargePlane0] trk.calo[0].charge = " << trk.calo[0].charge << std::endl;
     }
     //std::cout << "[varSliceTrackChargePlane0] -> sumCharge = " << sumCharge << std::endl;
     return sumCharge/1000.;
@@ -108,7 +108,7 @@ namespace ICARUSNumuXsec{
     double sumCharge(0);
     for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
       auto const& trk = slc->reco.trk.at(i);
-      sumCharge += trk.calo1.charge;
+      sumCharge += trk.calo[1].charge;
     }
     return sumCharge/1000.;
   });
@@ -116,7 +116,7 @@ namespace ICARUSNumuXsec{
     double sumCharge(0);
     for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
       auto const& trk = slc->reco.trk.at(i);
-      sumCharge += trk.calo2.charge;
+      sumCharge += trk.calo[2].charge;
     }
     return sumCharge/1000.;
   });
@@ -448,16 +448,8 @@ namespace ICARUSNumuXsec{
     if(muonTrackIndex>=0){
 
       auto const& trk = slc->reco.trk.at(muonTrackIndex);
-      float Chi2Proton(-999.);
-      if(trk.bestplane == 0){
-        Chi2Proton = trk.chi2pid0.chi2_proton;
-      }
-      else if(trk.bestplane == 1){
-        Chi2Proton = trk.chi2pid1.chi2_proton;
-      }
-      else{
-        Chi2Proton = trk.chi2pid2.chi2_proton;
-      }
+      int bp = trk.bestplane;
+      float Chi2Proton = trk.chi2pid[bp].chi2_proton;
       if(isnan(Chi2Proton)) return -999.;
       else return Chi2Proton;
 
@@ -472,20 +464,9 @@ namespace ICARUSNumuXsec{
     if(muonTrackIndex>=0){
 
       auto const& trk = slc->reco.trk.at(muonTrackIndex);
-      float Chi2Proton(-999.);
-      int Chi2Ndof(1.);
-      if(trk.bestplane == 0){
-        Chi2Proton = trk.chi2pid0.chi2_proton;
-        Chi2Ndof = trk.chi2pid0.pid_ndof;
-      }
-      else if(trk.bestplane == 1){
-        Chi2Proton = trk.chi2pid1.chi2_proton;
-        Chi2Ndof = trk.chi2pid1.pid_ndof;
-      }
-      else{
-        Chi2Proton = trk.chi2pid2.chi2_proton;
-        Chi2Ndof = trk.chi2pid2.pid_ndof;
-      }
+      int bp = trk.bestplane;
+      float Chi2Proton = trk.chi2pid[bp].chi2_proton;
+      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
       if(isnan(Chi2Proton)) return -999.;
       else if(Chi2Ndof==0) return -999.;
       else return Chi2Proton/double(Chi2Ndof);
@@ -501,16 +482,8 @@ namespace ICARUSNumuXsec{
     if(muonTrackIndex>=0){
 
       auto const& trk = slc->reco.trk.at(muonTrackIndex);
-      float Chi2Muon(-999.);
-      if(trk.bestplane == 0){
-        Chi2Muon = trk.chi2pid0.chi2_muon;
-      }
-      else if(trk.bestplane == 1){
-        Chi2Muon = trk.chi2pid1.chi2_muon;
-      }
-      else{
-        Chi2Muon = trk.chi2pid2.chi2_muon;
-      }
+      int bp = trk.bestplane;
+      float Chi2Muon = trk.chi2pid[bp].chi2_muon;
       if(isnan(Chi2Muon)) return -999.;
       else return Chi2Muon;
 
@@ -526,20 +499,9 @@ namespace ICARUSNumuXsec{
     if(muonTrackIndex>=0){
 
       auto const& trk = slc->reco.trk.at(muonTrackIndex);
-      float Chi2Muon(-999.);
-      int Chi2Ndof(1);
-      if(trk.bestplane == 0){
-        Chi2Muon = trk.chi2pid0.chi2_muon;
-        Chi2Ndof = trk.chi2pid0.pid_ndof;
-      }
-      else if(trk.bestplane == 1){
-        Chi2Muon = trk.chi2pid1.chi2_muon;
-        Chi2Ndof = trk.chi2pid1.pid_ndof;
-      }
-      else{
-        Chi2Muon = trk.chi2pid2.chi2_muon;
-        Chi2Ndof = trk.chi2pid2.pid_ndof;
-      }
+      int bp = trk.bestplane;
+      float Chi2Muon = trk.chi2pid[bp].chi2_muon;
+      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
       if(isnan(Chi2Muon)) return -999.;
       else if(Chi2Ndof==0) return -999.;
       else return Chi2Muon/double(Chi2Ndof);
@@ -685,16 +647,8 @@ namespace ICARUSNumuXsec{
     if(protonTrackIndex>=0){
 
       auto const& trk = slc->reco.trk.at(protonTrackIndex);
-      float Chi2Proton(-999.);
-      if(trk.bestplane == 0){
-        Chi2Proton = trk.chi2pid0.chi2_proton;
-      }
-      else if(trk.bestplane == 1){
-        Chi2Proton = trk.chi2pid1.chi2_proton;
-      }
-      else{
-        Chi2Proton = trk.chi2pid2.chi2_proton;
-      }
+      int bp = trk.bestplane;
+      float Chi2Proton = trk.chi2pid[bp].chi2_proton;
       if(isnan(Chi2Proton)) return -999.;
       else return Chi2Proton;
 
@@ -709,21 +663,9 @@ namespace ICARUSNumuXsec{
     if(protonTrackIndex>=0){
 
       auto const& trk = slc->reco.trk.at(protonTrackIndex);
-      float Chi2Proton(-999.);
-      int Chi2Ndof(1);
-      if(trk.bestplane == 0){
-        Chi2Proton = trk.chi2pid0.chi2_proton;
-        Chi2Ndof = trk.chi2pid0.pid_ndof;
-      }
-      else if(trk.bestplane == 1){
-        Chi2Proton = trk.chi2pid1.chi2_proton;
-        Chi2Ndof = trk.chi2pid1.pid_ndof;
-      }
-      else{
-        Chi2Proton = trk.chi2pid2.chi2_proton;
-        Chi2Ndof = trk.chi2pid2.pid_ndof;
-      }
-
+      int bp = trk.bestplane;
+      float Chi2Proton = trk.chi2pid[bp].chi2_proton;
+      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
       if( isnan(Chi2Proton) || isnan(Chi2Ndof) ) return -999.;
       else if(Chi2Ndof==0) return -999.;
       else return Chi2Proton/double(Chi2Ndof);
@@ -739,16 +681,8 @@ namespace ICARUSNumuXsec{
     if(protonTrackIndex>=0){
 
       auto const& trk = slc->reco.trk.at(protonTrackIndex);
-      float Chi2Muon(-999.);
-      if(trk.bestplane == 0){
-        Chi2Muon = trk.chi2pid0.chi2_muon;
-      }
-      else if(trk.bestplane == 1){
-        Chi2Muon = trk.chi2pid1.chi2_muon;
-      }
-      else{
-        Chi2Muon = trk.chi2pid2.chi2_muon;
-      }
+      int bp = trk.bestplane;
+      float Chi2Muon = trk.chi2pid[bp].chi2_muon;
       if(isnan(Chi2Muon)) return -999.;
       else return Chi2Muon;
 
@@ -764,20 +698,9 @@ namespace ICARUSNumuXsec{
     if(protonTrackIndex>=0){
 
       auto const& trk = slc->reco.trk.at(protonTrackIndex);
-      float Chi2Muon(-999.);
-      int Chi2Ndof(1);
-      if(trk.bestplane == 0){
-        Chi2Muon = trk.chi2pid0.chi2_muon;
-        Chi2Ndof = trk.chi2pid0.pid_ndof;
-      }
-      else if(trk.bestplane == 1){
-        Chi2Muon = trk.chi2pid1.chi2_muon;
-        Chi2Ndof = trk.chi2pid1.pid_ndof;
-      }
-      else{
-        Chi2Muon = trk.chi2pid2.chi2_muon;
-        Chi2Ndof = trk.chi2pid2.pid_ndof;
-      }
+      int bp = trk.bestplane;
+      float Chi2Muon = trk.chi2pid[bp].chi2_muon;
+      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
       if(isnan(Chi2Muon)) return -999.;
       else if(Chi2Ndof==0) return -999.;
       else return Chi2Muon/double(Chi2Ndof);
@@ -866,23 +789,10 @@ namespace ICARUSNumuXsec{
       //==== 10 cm and that the parent of the track has been marked as the primary.
       AtSlice = ( Atslc < 10.0 );//&& trk.parent_is_primary);
 
-      bool Chi2Exist = ( !isnan(trk.chi2pid0.chi2_muon) ) || ( !isnan(trk.chi2pid1.chi2_muon) ) || ( !isnan(trk.chi2pid2.chi2_muon) );
-      bool PassChi2 = false; // just pass is if chi2 is not saved in the ntuple.. this is for the old NuMI sample
-      if(Chi2Exist){
-        if(trk.bestplane == 0){
-          Chi2Proton = trk.chi2pid0.chi2_proton;
-          Chi2Muon = trk.chi2pid0.chi2_muon;
-        }
-        else if (trk.bestplane == 1){
-          Chi2Proton = trk.chi2pid1.chi2_proton;
-          Chi2Muon = trk.chi2pid1.chi2_muon;
-        }
-        else{
-          Chi2Proton = trk.chi2pid2.chi2_proton;
-          Chi2Muon = trk.chi2pid2.chi2_muon;
-        }
-        PassChi2 = Chi2Proton > 60 && Chi2Muon < 30; // MuonSel__MuonChi2LT30_and_ProtonChi2GT60
-      }
+      int bp = trk.bestplane;
+      Chi2Proton = trk.chi2pid[bp].chi2_proton;
+      Chi2Muon = trk.chi2pid[bp].chi2_muon;
+      bool PassChi2 = Chi2Proton > 60 && Chi2Muon < 30; // MuonSel__MuonChi2LT30_and_ProtonChi2GT60
 
       Contained = fv.isContained(trk.end.x, trk.end.y, trk.end.z);
 /*
@@ -939,7 +849,7 @@ namespace ICARUSNumuXsec{
 
     if( varMuonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
-      double KE = trk.calo0.ke/1000.; // Note ke for now is in MeV
+      double KE = trk.calo[0].ke/1000.; // Note ke for now is in MeV
       double E_Muon = KE+M_MUON;
       p = sqrt( E_Muon*E_Muon - M_MUON*M_MUON );
     }
@@ -951,7 +861,7 @@ namespace ICARUSNumuXsec{
 
     if( varMuonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
-      double KE = trk.calo1.ke/1000.; // Note ke for now is in MeV
+      double KE = trk.calo[1].ke/1000.; // Note ke for now is in MeV
       double E_Muon = KE+M_MUON;
       p = sqrt( E_Muon*E_Muon - M_MUON*M_MUON );
     }
@@ -963,7 +873,7 @@ namespace ICARUSNumuXsec{
 
     if( varMuonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
-      double KE = trk.calo2.ke/1000.; // Note ke for now is in MeV
+      double KE = trk.calo[2].ke/1000.; // Note ke for now is in MeV
       double E_Muon = KE+M_MUON;
       p = sqrt( E_Muon*E_Muon - M_MUON*M_MUON );
     }
@@ -983,22 +893,8 @@ namespace ICARUSNumuXsec{
   const Var varMuonChi2Muon([](const caf::SRSliceProxy* slc) -> float {
     if( varMuonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
-
-      bool Chi2Exist = ( !isnan(trk.chi2pid0.chi2_muon) ) || ( !isnan(trk.chi2pid1.chi2_muon) ) || ( !isnan(trk.chi2pid2.chi2_muon) );
-      double Chi2Muon=-999;
-      if(Chi2Exist){
-        if(trk.bestplane == 0){
-          Chi2Muon = trk.chi2pid0.chi2_muon;
-        }
-        else if (trk.bestplane == 1){
-          Chi2Muon = trk.chi2pid1.chi2_muon;
-        }
-        else{
-          Chi2Muon = trk.chi2pid2.chi2_muon;
-        }
-      }
-      return Chi2Muon;
-
+      int bp = trk.bestplane;
+      return trk.chi2pid[bp].chi2_muon;
     }
     else{
       return -999.;
@@ -1008,27 +904,11 @@ namespace ICARUSNumuXsec{
   const Var varMuonReducedChi2Muon([](const caf::SRSliceProxy* slc) -> float {
     if( varMuonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
-
-      bool Chi2Exist = ( !isnan(trk.chi2pid0.chi2_muon) ) || ( !isnan(trk.chi2pid1.chi2_muon) ) || ( !isnan(trk.chi2pid2.chi2_muon) );
-      double Chi2Muon(-999.);
-      int ndof(1);
-      if(Chi2Exist){
-        if(trk.bestplane == 0){
-          Chi2Muon = trk.chi2pid0.chi2_muon;
-          ndof = trk.chi2pid0.pid_ndof;
-        }
-        else if (trk.bestplane == 1){
-          Chi2Muon = trk.chi2pid1.chi2_muon;
-          ndof = trk.chi2pid1.pid_ndof;
-        }
-        else{
-          Chi2Muon = trk.chi2pid2.chi2_muon;
-          ndof = trk.chi2pid2.pid_ndof;
-        }
-      }
+      int bp = trk.bestplane;
+      double Chi2Muon = trk.chi2pid[bp].chi2_muon;
+      int ndof = trk.chi2pid[bp].pid_ndof;
       if(ndof==0) return -999.;
       else return Chi2Muon/double(ndof);
-
     }
     else{
       return -999.;
@@ -1209,24 +1089,10 @@ namespace ICARUSNumuXsec{
                   !isnan(trk.end.z) &&
                   ( trk.end.z > -895.95 + 30 && trk.end.z < 895.95 - 50 ) );
 */
-      bool Chi2Exist = ( !isnan(trk.chi2pid0.chi2_proton) ) || ( !isnan(trk.chi2pid1.chi2_proton) ) || ( !isnan(trk.chi2pid2.chi2_proton) );
-      bool PassChi2 = false; // just pass is if chi2 is not saved in the ntuple.. this is for the old NuMI sample
-      if(Chi2Exist){
-        if(trk.bestplane == 0){
-          Chi2Proton = trk.chi2pid0.chi2_proton;
-          //Chi2Muon = trk.chi2pid0.chi2_muon;
-        }
-        else if (trk.bestplane == 1){
-          Chi2Proton = trk.chi2pid1.chi2_proton;
-          //Chi2Muon = trk.chi2pid1.chi2_muon;
-        }
-        else{
-          Chi2Proton = trk.chi2pid2.chi2_proton;
-          //Chi2Muon = trk.chi2pid2.chi2_muon;
-        }
-
-        PassChi2 = Chi2Proton < 60;
-      }
+      int bp = trk.bestplane;
+      Chi2Proton = trk.chi2pid[bp].chi2_proton;
+      //Chi2Muon = trk.chi2pid[bp].chi2_muon;
+      bool PassChi2 = Chi2Proton < 60;
 
       if( AtSlice && Contained && PassChi2 && trk.len > Longest ){
         Longest = trk.len;
@@ -1244,17 +1110,8 @@ namespace ICARUSNumuXsec{
 
     if( varProtonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varProtonTrackInd(slc));
-
-      double best_calo = 0.;
-      if(trk.bestplane == 0){
-        best_calo = trk.calo0.ke;
-      }
-      else if(trk.bestplane == 1){
-        best_calo = trk.calo1.ke;
-      }
-      else{
-        best_calo = trk.calo2.ke;
-      }
+      int bp = trk.bestplane;
+      double best_calo = trk.calo[bp].ke;
       best_calo = best_calo/1000.; // Note ke for now is in MeV
       double E_Proton = best_calo+M_PROTON;
       p = sqrt( E_Proton*E_Proton - M_PROTON*M_PROTON );
@@ -1303,22 +1160,8 @@ namespace ICARUSNumuXsec{
   const Var varProtonChi2Proton([](const caf::SRSliceProxy* slc) -> float {
     if( varProtonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varProtonTrackInd(slc));
-
-      bool Chi2Exist = ( !isnan(trk.chi2pid0.chi2_proton) ) || ( !isnan(trk.chi2pid1.chi2_proton) ) || ( !isnan(trk.chi2pid2.chi2_proton) );
-      double Chi2Proton=-999;
-      if(Chi2Exist){
-        if(trk.bestplane == 0){
-          Chi2Proton = trk.chi2pid0.chi2_proton;
-        }
-        else if (trk.bestplane == 1){
-          Chi2Proton = trk.chi2pid1.chi2_proton;
-        }
-        else{
-          Chi2Proton = trk.chi2pid2.chi2_proton;
-        }
-      }
-      return Chi2Proton;
-
+      int bp = trk.bestplane;
+      return trk.chi2pid[bp].chi2_proton;
     }
     else{
       return -999.;
@@ -1328,24 +1171,9 @@ namespace ICARUSNumuXsec{
   const Var varProtonReducedChi2Proton([](const caf::SRSliceProxy* slc) -> float {
     if( varProtonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varProtonTrackInd(slc));
-
-      bool Chi2Exist = ( !isnan(trk.chi2pid0.chi2_proton) ) || ( !isnan(trk.chi2pid1.chi2_proton) ) || ( !isnan(trk.chi2pid2.chi2_proton) );
-      double Chi2Proton(-999.);
-      int ndof(1);
-      if(Chi2Exist){
-        if(trk.bestplane == 0){
-          Chi2Proton = trk.chi2pid0.chi2_proton;
-          ndof = trk.chi2pid0.pid_ndof;
-        }
-        else if (trk.bestplane == 1){
-          Chi2Proton = trk.chi2pid1.chi2_proton;
-          ndof = trk.chi2pid1.pid_ndof;
-        }
-        else{
-          Chi2Proton = trk.chi2pid2.chi2_proton;
-          ndof = trk.chi2pid2.pid_ndof;
-        }
-      }
+      int bp = trk.bestplane;
+      double Chi2Proton = trk.chi2pid[bp].chi2_proton;
+      int ndof = trk.chi2pid[bp].pid_ndof;
       if(ndof==0) return -999.;
       else return Chi2Proton/double(ndof);
 
