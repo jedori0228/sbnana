@@ -24,17 +24,20 @@ namespace ICARUSNumuXsec{
   });
 
   const Var varFMScore([](const caf::SRSliceProxy* slc) -> double {
-    if(isnan(slc->fmatch.score)) return -999.;
+    if(isnan(slc->fmatch.score)) return -2.;
+    else if(slc->fmatch.score<0) return -1.;
     else return slc->fmatch.score;
   });
 
   const Var varFMTime([](const caf::SRSliceProxy* slc) -> double {
-    if(isnan(slc->fmatch.time)) return -999.;
+    if(isnan(slc->fmatch.time)) return -62.;
+    else if(slc->fmatch.time<-50) return -61.;
     else return slc->fmatch.time;
   });
 
   const Var varNuScore([](const caf::SRSliceProxy* slc) -> double {
-    if(isnan(slc->nu_score)) return -999.;
+    if(isnan(slc->nu_score)) return -0.1;
+    else if(slc->nu_score<0) return -0.05;
     else return slc->nu_score;
   });
 
@@ -96,7 +99,9 @@ namespace ICARUSNumuXsec{
     for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
       auto const& trk = slc->reco.trk.at(i);
       sumCharge += trk.calo0.charge;
+      //std::cout << "[varSliceTrackChargePlane0] trk.calo0.charge = " << trk.calo0.charge << std::endl;
     }
+    //std::cout << "[varSliceTrackChargePlane0] -> sumCharge = " << sumCharge << std::endl;
     return sumCharge/1000.;
   });
   const Var varSliceTrackChargePlane1([](const caf::SRSliceProxy* slc) -> double {
@@ -114,6 +119,30 @@ namespace ICARUSNumuXsec{
       sumCharge += trk.calo2.charge;
     }
     return sumCharge/1000.;
+  });
+
+  const MultiVar varAllTrackStartPositionX([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      out.push_back(trk.start.x);
+    }
+    return out;
+  });
+
+  const MultiVar varAllTrackStartPositionY([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      out.push_back(trk.start.y);
+    }
+    return out;
+  });
+
+  const MultiVar varAllTrackStartPositionZ([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      out.push_back(trk.start.z);
+    }
+    return out;
   });
 
 

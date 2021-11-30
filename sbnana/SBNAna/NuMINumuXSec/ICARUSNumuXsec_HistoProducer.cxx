@@ -50,15 +50,15 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
   cout << "[HistoProducer::bookSpectrums] called" << endl;
 
   //==== Binning
-  double xFMScoreMin = 0.;
+  double xFMScoreMin = -2.;
   double xFMScoreMax = 150.;
   double dxFMScore = 1.;
   const Binning binsFMScore = Binning::Simple( int( (xFMScoreMax-xFMScoreMin)/dxFMScore ), xFMScoreMin, xFMScoreMax );
-  double xFMTimeMin = -60;
+  double xFMTimeMin = -62;
   double xFMTimeMax = 60.;
   double dxFMTime = 1.;
   const Binning binsFMTime = Binning::Simple( int( (xFMTimeMax-xFMTimeMin)/dxFMTime ), xFMTimeMin, xFMTimeMax );
-  double xNuScoreMin = 0.;
+  double xNuScoreMin = -0.1;
   double xNuScoreMax = 1.;
   double dxNuScore = 0.05;
   const Binning binsNuScore = Binning::Simple( int( (xNuScoreMax-xNuScoreMin)/dxNuScore ), xNuScoreMin, xNuScoreMax );
@@ -77,7 +77,10 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
   const Binning binsOne = Binning::Simple( 1, 0., 1.);
   const Binning binsLength = Binning::Simple(2000, 0., 2000.);
   const Binning binsNhits = Binning::Simple(200, 0., 2000.);
-  const Binning binsCharge = Binning::Simple(100, 0., 1000.);
+  const Binning binsCharge = Binning::Simple(1000, 0., 10000.);
+  const Binning binsXPosition = Binning::Simple(1000, -500., 500.);
+  const Binning binsYPosition = Binning::Simple(400, -200., 200.);
+  const Binning binsZPosition = Binning::Simple(2000, -1000., 1000.);
 
   //==== HistAxis
   //====   Slice variables
@@ -140,6 +143,9 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
   Spectrum *sSliceTrackChargePlane0 = new Spectrum(loader, axSliceTrackChargePlane0, spillCut, cut);
   Spectrum *sSliceTrackChargePlane1 = new Spectrum(loader, axSliceTrackChargePlane1, spillCut, cut);
   Spectrum *sSliceTrackChargePlane2 = new Spectrum(loader, axSliceTrackChargePlane2, spillCut, cut);
+  Spectrum *sAllTrackStartPositionX = new Spectrum("AllTrackStartPositionX", binsXPosition, loader, varAllTrackStartPositionX, spillCut, cut);
+  Spectrum *sAllTrackStartPositionY = new Spectrum("AllTrackStartPositionY", binsYPosition, loader, varAllTrackStartPositionY, spillCut, cut);
+  Spectrum *sAllTrackStartPositionZ = new Spectrum("AllTrackStartPositionZ", binsZPosition, loader, varAllTrackStartPositionZ, spillCut, cut);
   //====   Truth variables
   //====     Neutrinos
   Spectrum *sNeutrinoTruthE = new Spectrum(loader, axNeutrinoTruthE, spillCut, cut);
@@ -190,6 +196,9 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceTrackChargePlane0);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceTrackChargePlane1);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceTrackChargePlane2);
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(sAllTrackStartPositionX);
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(sAllTrackStartPositionY);
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(sAllTrackStartPositionZ);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sNeutrinoTruthE);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthQ2);
     map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthq0_lab);
