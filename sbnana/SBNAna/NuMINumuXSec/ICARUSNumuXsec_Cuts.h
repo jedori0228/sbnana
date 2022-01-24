@@ -4,7 +4,7 @@
 #include "sbnana/SBNAna/Vars/Vars.h"
 #include "sbnana/SBNAna/Cuts/VolumeDefinitions.h"
 
-#include "sbnana/CAFAna/StandardRecord/Proxy/SRProxy.h"
+#include "sbnanaobj/StandardRecord/Proxy/SRProxy.h"
 
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Variables.h"
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Utilities.h"
@@ -83,7 +83,8 @@ namespace ICARUSNumuXsec{
   const Cut cutFMScore([](const caf::SRSliceProxy* slc) {
       //return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 6.0 );
       //return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 7.0 && (slc->fmatch.time>-0.2 && slc->fmatch.time<9.9) );
-      return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 12.0 );
+      //return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 12.0 );
+      return true;
     });
 
   //==== NuScore

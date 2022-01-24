@@ -4,7 +4,7 @@
 #include "sbnana/SBNAna/Vars/Vars.h"
 #include "sbnana/SBNAna/Cuts/VolumeDefinitions.h"
 
-#include "sbnana/CAFAna/StandardRecord/Proxy/SRProxy.h"
+#include "sbnanaobj/StandardRecord/Proxy/SRProxy.h"
 
 #include "sbnana/SBNAna/Cuts/NumuCutsIcarus202106.h"
 #include "TVector3.h"

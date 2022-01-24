@@ -6,7 +6,7 @@ cet_make(LIBRARY_NAME NuMINumuXSec
                    CAFAnaSysts
                    SBNAnaVars
                    SBNAnaCuts
-                   StandardRecordProxy
+                   sbnanaobj_StandardRecordProxy
         )
 
 install_headers()

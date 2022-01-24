@@ -3,7 +3,7 @@
 #include "sbnana/CAFAna/Core/ISyst.h"
 #include "sbnana/CAFAna/Core/Utilities.h"
 #include "sbnana/CAFAna/Analysis/ExpInfo.h"
-#include "sbnana/CAFAna/StandardRecord/Proxy/SRProxy.h"
+#include "sbnanaobj/StandardRecord/Proxy/SRProxy.h"
 
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Systematics.h"
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Variables.h"
