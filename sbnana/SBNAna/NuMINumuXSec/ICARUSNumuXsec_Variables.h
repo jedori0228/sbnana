@@ -647,11 +647,25 @@ namespace ICARUSNumuXsec{
     if(protonTrackIndex>=0){
 
       auto const& trk = slc->reco.trk.at(protonTrackIndex);
+      float Chi2Proton(-999.);
+      if(trk.bestplane == 0){
+        Chi2Proton = trk.chi2pid[0].chi2_proton;
+      }
+      else if(trk.bestplane == 1){
+        Chi2Proton = trk.chi2pid[1].chi2_proton;
+      }
+      else{
+        Chi2Proton = trk.chi2pid[2].chi2_proton;
+      }
+      if(isnan(Chi2Proton)) return -999.;
+      else return Chi2Proton;
+/*
+      auto const& trk = slc->reco.trk.at(protonTrackIndex);
       int bp = trk.bestplane;
       float Chi2Proton = trk.chi2pid[bp].chi2_proton;
       if(isnan(Chi2Proton)) return -999.;
       else return Chi2Proton;
-
+*/
     }
     else{
       return 999999;
@@ -840,6 +854,15 @@ namespace ICARUSNumuXsec{
       else{
         p = trk.mcsP.fwdP_muon;
       }
+/*
+      if(p<0.1){
+        cout << "[varMuonRecoP] Contained = " << Contained << endl;
+        cout << "[varMuonRecoP] trk.rangeP.p_muon = " << trk.rangeP.p_muon << endl;
+        cout << "[varMuonRecoP] trk.mcsP.fwdP_muon = " << trk.mcsP.fwdP_muon << endl;
+        cout << "[varMuonRecoP] -> p = " << p << endl;
+      }
+*/
+
     }
     return p;
   });
@@ -895,6 +918,17 @@ namespace ICARUSNumuXsec{
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
       int bp = trk.bestplane;
       return trk.chi2pid[bp].chi2_muon;
+    }
+    else{
+      return -999.;
+    }
+  });
+
+  const Var varMuonChi2Proton([](const caf::SRSliceProxy* slc) -> float {
+    if( varMuonTrackInd(slc) >= 0 ){
+      auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
+      int bp = trk.bestplane;
+      return trk.chi2pid[bp].chi2_proton;
     }
     else{
       return -999.;
