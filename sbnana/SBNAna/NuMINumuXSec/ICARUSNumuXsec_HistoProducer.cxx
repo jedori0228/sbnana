@@ -404,9 +404,9 @@ void HistoProducer::saveHistograms(){
 
       for(unsigned int i=0; i<vec_SystSpectrumPairs.size(); i++){
 
-        cout << "[HistoProducer::saveHistograms]   " << i << "-th Systematic Spectrum.." << endl;
-
         TString systematicName = vec_SystSpectrumPairs.at(i).first;
+
+        cout << "[HistoProducer::saveHistograms]   " << i << "-th Systematic Spectrum; " << systematicName << endl;
 
         if(vec_SystSpectrumPairs.at(i).second->GetBinnings().size()==1){
           TH1 *h = vec_SystSpectrumPairs.at(i).second->ToTH1(TargetPOT);
