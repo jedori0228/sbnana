@@ -22,10 +22,10 @@ namespace ICARUSNumuXsec{
     FiducialVolumeTool()
     // : fvCryo0(fvfd_cryo1), fvCryo1(fvfd_cryo2)
     {
-      fvCryo0 = {-368.49,  -71.94,  // x
+      fvCryo0 = {-358.489, -61.94,  // x
                  -181.86, +134.96,  // y
                  -894.95, +894.85};
-      fvCryo1 = {+71.94,  +368.49,  // x
+      fvCryo1 = { +61.94, +358.489,  // x
                  -181.86, +134.96,  // y
                  -894.95, +894.85};
       XMargin=25.;
@@ -40,6 +40,11 @@ namespace ICARUSNumuXsec{
     bool isContained(double x, double y, double z) const;
     int containedCryo(double x, double y, double z) const;
 
-  };
+  }; // END Class FiducialVolumeTool
+
+  int GetMatchedRecoTrackIndex(const caf::SRSliceProxy* slc, int truth_idx);
+  int GetMatchedRecoShowerIndex(const caf::SRSliceProxy* slc, int truth_idx);
+  int GetMatchedRecoStubIndex(const caf::SRSliceProxy* slc, int truth_idx);
+
 
 }
