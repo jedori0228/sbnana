@@ -647,7 +647,7 @@ void HistoProducer::saveHistograms(){
             hU->SetName(baseLabel+"_"+systematicName+"_Univ"+TString::Itoa(iu,10)+"_"+dirName);
             hU->Write();
           }
-          TGraphAsymmErrors *grErrorBand = vec_SystEnsembleSpectrumPairs.at(i).second->ErrorBand(TargetPOT);
+          TGraphAsymmErrors *grErrorBand = vec_SystEnsembleSpectrumPairs.at(i).second->ErrorBand(1., TargetPOT);
           grErrorBand->SetName(baseLabel+"_"+systematicName+"_ErrorBandFromES_"+dirName);
           grErrorBand->Write();
         }
@@ -713,14 +713,12 @@ void HistoProducer::saveHistograms(){
 void HistoProducer::setSystematicWeights(){
 
   cout << "[HistoProducer::setSystematicWeights] Setting GENIE systematics" << endl;
-/*
-  std::vector<std::string> vec_GENIEKnobNames = GetSBNGenieWeightNames();
-  for(const std::string& name: GetSBNGenieWeightNames()){
-    ret.push_back(new SBNWeightSyst(name));
-  }
-*/
 
-  IGENIESysts = GetSBNGenieWeightSysts();
+  const std::vector<std::string> genieKnobNames = GetSBNGenieWeightNames();
+  for(const std::string& name: genieKnobNames){
+    std::string psetname(name);
+    IGENIESysts.push_back( new SBNWeightSyst("GENIEReWeight_ICARUS_v1_multisigma_"+psetname, name) );
+  }
 /*
   //==== For EnsembleSpectrum
   for(unsigned int i=0; i<IGENIESysts.size(); ++i){
