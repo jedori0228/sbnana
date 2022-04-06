@@ -34,6 +34,7 @@ namespace ana
   {
   public:
     SBNWeightSyst(const std::string& systName);
+    SBNWeightSyst(const std::string& systName, const std::string& latexName);
 
     void Shift(double x, caf::SRSliceProxy* sr, double& weight) const override;
 

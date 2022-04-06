@@ -49,6 +49,12 @@ namespace ana
       fIdx(-1)
   {
   }
+  SBNWeightSyst::SBNWeightSyst(const std::string& systName,
+                               const std::string& latexName)
+    : ISyst(systName, latexName),
+      fIdx(-1)
+  {
+  }
 
   // --------------------------------------------------------------------------
   void SBNWeightSyst::Shift(double x, caf::SRSliceProxy* sr, double& weight) const
