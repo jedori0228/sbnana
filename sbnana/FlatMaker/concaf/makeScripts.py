@@ -2,11 +2,8 @@ import os
 
 Samples = [
 
-#["data", "run_7033", "v09_37_02_01", "220406_TestSBN2022A_CRTT0Patch", "NUMI"]
-
-#["mc", "NUMI_Nu_Cosmics", "v09_37_02_04", "/pnfs/sbn/data/sbn_fd/poms_production/NUMI_Nu_Cosmics/mc/reconstructed/icaruscode/v09_37_02_04/caf/*/*/caf_*.root", "220520_DefaultRelease_MCP2022A_IcarusProd"],
-#["mc", "NUMI_in-time_Cosmics2", "v09_37_02_04", "/pnfs/sbn/data/sbn_fd/poms_production/NUMI_in-time_Cosmics2/mc/reconstructed/icaruscode/v09_37_02_04/caf/*/*/caf_*.root", "220520_DefaultRelease_MCP2022A_IcarusProd"],
-
+["mc", "NUMI_Nu_Cosmics", "v09_37_02_04", "/pnfs/sbn/data/sbn_fd/poms_production/NUMI_Nu_Cosmics/mc/reconstructed/icaruscode/v09_37_02_04/caf/*/*/caf_*.root", "220520_DefaultRelease_MCP2022A_IcarusProd"],
+["mc", "NUMI_in-time_Cosmics2", "v09_37_02_04", "/pnfs/sbn/data/sbn_fd/poms_production/NUMI_in-time_Cosmics2/mc/reconstructed/icaruscode/v09_37_02_04/caf/*/*/caf_*.root", "220520_DefaultRelease_MCP2022A_IcarusProd"],
 
 ["data", "run_7897", "v09_37_02_04", "/pnfs/icarus/persistent/users/jskim/data/run_7897/caf/v09_37_02_04/220520_DefaultRelease/NUMI/out/*_*/*stage1.caf.root", "220520_DefaultRelease", "NUMI" ],
 
@@ -78,4 +75,4 @@ for Sample in Samples:
 
   print(submitCMD)
 
-  #os.system(submitCMD)
+  os.system(submitCMD)

@@ -16,8 +16,8 @@ echo "@@ nProcess : "${nProcess}
 echo "@@ setup_icarus.sh"
 source /cvmfs/icarus.opensciencegrid.org/products/icarus/setup_icarus.sh
 
-setup icaruscode ${ICARUSCODE_VERSION} -q e20:prof
-setup sbnana ${SBNANA_VERSION} -q e20:prof
+setup icaruscode v09_37_02_04 -q e20:prof
+setup sbnana v09_37_02_03 -q e20:prof
 
 cd grid_dir/
 
