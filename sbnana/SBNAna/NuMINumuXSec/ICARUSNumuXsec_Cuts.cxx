@@ -279,9 +279,7 @@ namespace ICARUSNumuXsec{
       [](const caf::SRSpillProxy* sr){
         for (auto const& crtHit: sr->crt_hits){
           if(crtHit.plane>=40 && crtHit.plane<=47){
-            //if (crtHit.time > -0.1 && crtHit.time < 1.8 && crtHit.pe > 100) // Default, BNB window
-            if (crtHit.time > 0.1 && crtHit.time < 9.0 && crtHit.pe > 100) // CRTNuMIWindow
-            //if (crtHit.time > 0.1 && crtHit.time < 9.0 && crtHit.pe > 150)
+            if (crtHit.t0 > 0.1 && crtHit.t0 < 9.0 && crtHit.pe > 100) // CRTNuMIWindow
               return false;
           }
         }
@@ -289,13 +287,13 @@ namespace ICARUSNumuXsec{
       }
       );
 
-  const SpillCut spillcutFDCRTHitVeto(
+  const SpillCut spillcutFDTopCRTHitVeto(
       [](const caf::SRSpillProxy* sr){
         for (auto const& crtHit: sr->crt_hits){
-          //if (crtHit.time > -0.1 && crtHit.time < 1.8 && crtHit.pe > 100) // Default, BNB window
-          if (crtHit.time > 0.1 && crtHit.time < 9.0 && crtHit.pe > 100) // CRTNuMIWindow
-          //if (crtHit.time > 0.1 && crtHit.time < 9.0 && crtHit.pe > 150)
-            return false;
+          if(crtHit.plane>=30 && crtHit.plane<=34){
+            if (crtHit.t0 > 0.1 && crtHit.t0 < 9.0 && crtHit.pe > 100) // CRTNuMIWindow
+              return false;
+          }
         }
         return true;
       }
@@ -319,7 +317,7 @@ namespace ICARUSNumuXsec{
 
           if(crtHit.plane>=30 && crtHit.plane<=34){
 
-            if(crtHit.time > 0.1 && crtHit.time < 9.0 && crtHit.pe > 100){
+            if(crtHit.t0 > 0.1 && crtHit.t0 < 9.0 && crtHit.pe > 100){
 
               for(auto& muonTrackStart: muonTrackStarts){
                 //==== Cryo using sign of X
@@ -359,7 +357,7 @@ namespace ICARUSNumuXsec{
 
           if(crtHit.plane>=40 && crtHit.plane<=47){
 
-            if(crtHit.time > 0.1 && crtHit.time < 9.0 && crtHit.pe > 100){
+            if(crtHit.t0 > 0.1 && crtHit.t0 < 9.0 && crtHit.pe > 100){
 
               for(auto& muonTrackStart: muonTrackStarts){
                 //==== Cryo using sign of X
