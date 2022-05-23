@@ -275,20 +275,7 @@ namespace ICARUSNumuXsec{
 
   //==== CRT 
 
-  const SpillCut spillcutSideCRTHitVetoFD(
-      [](const caf::SRSpillProxy* sr){
-        for (auto const& crtHit: sr->crt_hits){
-          auto thistime = crtHit.time - 1600.; // manually shift to bring beam spill start to zero
-          if(crtHit.plane>=40 && crtHit.plane<=47){
-            if (thistime > -0.1 && thistime < 1.8 && crtHit.pe > 100)
-              return false;
-          }
-        }
-        return true;
-      }
-      );
-
-  const SpillCut spillcutSideCRTHitVetoFDUpdatedT0(
+  const SpillCut spillcutFDSideCRTHitVeto(
       [](const caf::SRSpillProxy* sr){
         for (auto const& crtHit: sr->crt_hits){
           if(crtHit.plane>=40 && crtHit.plane<=47){
@@ -302,7 +289,7 @@ namespace ICARUSNumuXsec{
       }
       );
 
-  const SpillCut spillcutCRTHitVetoFDUpdatedT0(
+  const SpillCut spillcutFDCRTHitVeto(
       [](const caf::SRSpillProxy* sr){
         for (auto const& crtHit: sr->crt_hits){
           //if (crtHit.time > -0.1 && crtHit.time < 1.8 && crtHit.pe > 100) // Default, BNB window
@@ -314,11 +301,10 @@ namespace ICARUSNumuXsec{
       }
       );
 
-  const SpillCut spillcutCRTHitVetoTestMatching(
+  const SpillCut spillcutFDTopCRTHitVetoTestMatching(
       [](const caf::SRSpillProxy* sr){
 
-        vector<TVector3> muonTrackEnds;
-        vector<TVector3> nuVertices;
+        vector<TVector3> muonTrackStarts;
         for(auto const& slc : sr->slc){
           if(!cutRFiducial(&slc)) continue;
           if(!kNotClearCosmic(&slc)) continue;
@@ -326,29 +312,66 @@ namespace ICARUSNumuXsec{
           if(!cutFMScore(&slc)) continue;
           if(!cutHasMuon(&slc)) continue;
           auto const& trk = slc.reco.trk.at(varMuonTrackInd(&slc));
-          muonTrackEnds.emplace_back(trk.end.x, trk.end.y, trk.end.z);
-          nuVertices.emplace_back(slc.vertex.x, slc.vertex.y, slc.vertex.z);
+          muonTrackStarts.emplace_back(trk.start.x, trk.start.y, trk.start.z);
         }
 
         for (auto const& crtHit: sr->crt_hits){
-          if(crtHit.time > 0.1 && crtHit.time < 9.0 && crtHit.pe > 100){
 
-            for(auto const& nuVertex: nuVertices){
-              //==== Cryo using sign of X
-              if( crtHit.position.x * nuVertex.X() > 0 ) return false;
-              //==== TPC using sign of Z
-              if( crtHit.position.z * nuVertex.Z() > 0 ) return false;
-            } // END Loop vertes 
-/*
-            for(auto& muonTrackEnd: muonTrackEnds){
-              //==== Cryo using sign of X
-              if( crtHit.position.x * muonTrackEnd.X() > 0 ) return false;
-              //==== TPC using sign of Z
-              if( crtHit.position.z * muonTrackEnd.Z() > 0 ) return false;
-            } // END Loop vertes 
-*/
+          if(crtHit.plane>=30 && crtHit.plane<=34){
 
-          } // END If intime-ed CRT hit exist
+            if(crtHit.time > 0.1 && crtHit.time < 9.0 && crtHit.pe > 100){
+
+              for(auto& muonTrackStart: muonTrackStarts){
+                //==== Cryo using sign of X
+                if( crtHit.position.x * muonTrackStart.X() > 0 ) return false;
+                //==== TPC using sign of Z
+                if( crtHit.position.z * muonTrackStart.Z() > 0 ) return false;
+              } // END Loop vertes 
+
+            } // END If intime-ed CRT hit exist
+
+          } // END If top crt
+
+        } // END Loop CRTHit
+
+
+        return true;
+
+      }
+      );
+
+
+  const SpillCut spillcutFDSideCRTHitVetoTestMatching(
+      [](const caf::SRSpillProxy* sr){
+
+        vector<TVector3> muonTrackStarts;
+        for(auto const& slc : sr->slc){
+          if(!cutRFiducial(&slc)) continue;
+          if(!kNotClearCosmic(&slc)) continue;
+          if(!cutNuScore(&slc)) continue;
+          if(!cutFMScore(&slc)) continue;
+          if(!cutHasMuon(&slc)) continue;
+          auto const& trk = slc.reco.trk.at(varMuonTrackInd(&slc));
+          muonTrackStarts.emplace_back(trk.start.x, trk.start.y, trk.start.z);
+        }
+
+        for (auto const& crtHit: sr->crt_hits){
+
+          if(crtHit.plane>=40 && crtHit.plane<=47){
+
+            if(crtHit.time > 0.1 && crtHit.time < 9.0 && crtHit.pe > 100){
+
+              for(auto& muonTrackStart: muonTrackStarts){
+                //==== Cryo using sign of X
+                if( crtHit.position.x * muonTrackStart.X() > 0 ) return false;
+                //==== TPC using sign of Z
+                if( crtHit.position.z * muonTrackStart.Z() > 0 ) return false;
+              } // END Loop vertes 
+
+            } // END If intime-ed CRT hit exist
+
+          } // END If top crt
+
         } // END Loop CRTHit
 
 
