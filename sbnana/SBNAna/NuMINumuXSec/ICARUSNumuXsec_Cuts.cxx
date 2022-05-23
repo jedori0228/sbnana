@@ -275,10 +275,10 @@ namespace ICARUSNumuXsec{
 
   //==== CRT 
 
-  const SpillCut spillcutFDSideCRTHitVeto(
+  const SpillCut spillcutFDTopCRTHitVeto(
       [](const caf::SRSpillProxy* sr){
         for (auto const& crtHit: sr->crt_hits){
-          if(crtHit.plane>=40 && crtHit.plane<=47){
+          if(crtHit.plane>=30 && crtHit.plane<=34){
             if (crtHit.t0 > 0.1 && crtHit.t0 < 9.0 && crtHit.pe > 100) // CRTNuMIWindow
               return false;
           }
@@ -287,10 +287,10 @@ namespace ICARUSNumuXsec{
       }
       );
 
-  const SpillCut spillcutFDTopCRTHitVeto(
+  const SpillCut spillcutFDSideCRTHitVeto(
       [](const caf::SRSpillProxy* sr){
         for (auto const& crtHit: sr->crt_hits){
-          if(crtHit.plane>=30 && crtHit.plane<=34){
+          if(crtHit.plane>=40 && crtHit.plane<=47){
             if (crtHit.t0 > 0.1 && crtHit.t0 < 9.0 && crtHit.pe > 100) // CRTNuMIWindow
               return false;
           }
