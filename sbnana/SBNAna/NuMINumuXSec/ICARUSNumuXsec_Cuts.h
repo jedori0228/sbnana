@@ -95,8 +95,8 @@ namespace ICARUSNumuXsec{
 
   //==== CRT 
 
-  extern const SpillCut spillcutFDSideCRTHitVeto;
   extern const SpillCut spillcutFDTopCRTHitVeto;
+  extern const SpillCut spillcutFDSideCRTHitVeto;
 
   extern const SpillCut spillcutFDTopCRTHitVetoTestMatching;
   extern const SpillCut spillcutFDSideCRTHitVetoTestMatching;
