@@ -90,12 +90,6 @@ namespace ICARUSNumuXsec{
     else return slc->fmatch.time;
   });
 
-  const Var varNuScore([](const caf::SRSliceProxy* slc) -> double {
-    if(isnan(slc->nu_score)) return -0.1;
-    else if(slc->nu_score<0) return -0.2;
-    else return slc->nu_score;
-  });
-
   const Var varTruthTime([](const caf::SRSliceProxy* slc) -> double {
     if(isnan(slc->truth.time)) return -999.;
     else return slc->truth.time;
@@ -200,6 +194,41 @@ namespace ICARUSNumuXsec{
     return out;
   });
 
+  const Var varNuScore([](const caf::SRSliceProxy* slc) -> double {
+    if(isnan(slc->nu_score)) return -0.1;
+    else if(slc->nu_score<0) return -0.2;
+    else return slc->nu_score;
+  });
+  const Var varSliceNuNFinalStatePfos([](const caf::SRSliceProxy* slc) -> double {
+    return slc->nuid.nufspfos;
+  });
+  const Var varSliceNuNHitsTotal([](const caf::SRSliceProxy* slc) -> double {
+    return slc->nuid.nutothits;
+  });
+  const Var varSliceNuVertexY([](const caf::SRSliceProxy* slc) -> double {
+    return slc->nuid.nuvtxy;
+  });
+  const Var varSliceNuWeightedDirZ([](const caf::SRSliceProxy* slc) -> double {
+    return slc->nuid.nuwgtdirz;
+  });
+  const Var varSliceNuNSpacePointsInSphere([](const caf::SRSliceProxy* slc) -> double {
+    return slc->nuid.nusps;
+  });
+  const Var varSliceNuEigenRatioInSphere([](const caf::SRSliceProxy* slc) -> double {
+    return slc->nuid.nueigen;
+  });
+  const Var varSliceCRLongestTrackDirY([](const caf::SRSliceProxy* slc) -> double {
+    return slc->nuid.crlongtrkdiry;
+  });
+  const Var varSliceCRLongestTrackDeflection([](const caf::SRSliceProxy* slc) -> double {
+    return slc->nuid.crlongtrkdef;
+  });
+  const Var varSliceCRFracHitsInLongestTrack([](const caf::SRSliceProxy* slc) -> double {
+    return slc->nuid.crlongtrkhitfrac;
+  });
+  const Var varSliceCRNHitsMax([](const caf::SRSliceProxy* slc) -> double {
+    return slc->nuid.crmaxhits;
+  });
 
   //==== GENIE interaction code
   //==== https://internal.dunescience.org/doxygen/namespacesimb.html#a2cce734d1b71408bbc7d98d148ac4360
@@ -877,6 +906,48 @@ namespace ICARUSNumuXsec{
 
   //====   Muon
 
+
+  //====   All muon-like tracks
+  const MultiVar varAllMuonTrackIndices([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+
+    std::vector<double> out;
+
+    //==== The (dis)qualification of a slice is based upon the track level information.
+    float Atslc;
+    float Chi2Proton, Chi2Muon;
+    bool AtSlice, Contained, MaybeMuonExiting, MaybeMuonContained;
+
+    for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
+
+      auto const& trk = slc->reco.trk.at(i);
+      //==== First we calculate the distance of each track to the slice vertex.
+      Atslc = sqrt( pow( slc->vertex.x - trk.start.x, 2.0 ) +
+              pow( slc->vertex.y - trk.start.y, 2.0 ) +
+              pow( slc->vertex.z - trk.start.z, 2.0 ) );
+      //==== We require that the distance of the track from the slice is less than
+      //==== 10 cm and that the parent of the track has been marked as the primary.
+      AtSlice = ( Atslc < 10.0 );//&& trk.parent_is_primary);
+
+      int bp = trk.bestplane;
+      Chi2Proton = trk.chi2pid[bp].chi2_proton;
+      Chi2Muon = trk.chi2pid[bp].chi2_muon;
+      bool PassChi2 = Chi2Proton > 60 && Chi2Muon < 30; // MuonSel__MuonChi2LT30_and_ProtonChi2GT60
+
+      Contained = fv.isContained(trk.end.x, trk.end.y, trk.end.z);
+
+      MaybeMuonExiting = ( !Contained && trk.len > 100);
+      MaybeMuonContained = ( Contained && PassChi2 && trk.len > 50. );
+
+      if( AtSlice && ( MaybeMuonExiting || MaybeMuonContained ) ){
+        out.push_back(i);
+      }
+
+    }
+
+    return out;
+  });
+
+  //====   Longest one only
   const Var varMuonTrackInd([](const caf::SRSliceProxy* slc) -> int {
 
     //==== The (dis)qualification of a slice is based upon the track level information.
@@ -1185,6 +1256,52 @@ namespace ICARUSNumuXsec{
 
   //====   Track-based
 
+  const Var varNProtonCandTrack([](const caf::SRSliceProxy* slc) -> int {
+    const int muTrackInd = varMuonTrackInd(slc);
+
+    //==== The (dis)qualification of a slice is based upon the track level information.
+    int nProtonTrackCand(0);
+
+    for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
+
+      if((int)i==muTrackInd) continue;
+
+      auto const& trk = slc->reco.trk.at(i);
+      bool Contained = fv.isContained(trk.end.x, trk.end.y, trk.end.z);
+
+      if(Contained){
+        nProtonTrackCand++;
+      }
+
+    }
+
+    return nProtonTrackCand;
+
+  });
+
+  const Var varNProtonCandMatched([](const caf::SRSliceProxy* slc) -> int {
+    const int muTrackInd = varMuonTrackInd(slc);
+
+    //==== The (dis)qualification of a slice is based upon the track level information.
+    int nProtonTrackCand(0);
+
+    for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
+
+      if((int)i==muTrackInd) continue;
+
+      auto const& trk = slc->reco.trk.at(i);
+      bool Contained = fv.isContained(trk.end.x, trk.end.y, trk.end.z);
+
+      if(Contained){
+        if(abs(trk.truth.p.pdg)==2212) nProtonTrackCand++;
+      }
+
+    }
+
+    return nProtonTrackCand;
+
+  });
+
   const Var varProtonTrackInd([](const caf::SRSliceProxy* slc) -> int {
 
     //==== The (dis)qualification of a slice is based upon the track level information.
@@ -1193,7 +1310,11 @@ namespace ICARUSNumuXsec{
     bool AtSlice, Contained;
     int PTrackInd(-1);
 
+    const int muTrackInd = varMuonTrackInd(slc);
+
     for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
+
+      if((int)i==muTrackInd) continue;
 
       auto const& trk = slc->reco.trk.at(i);
       //==== First we calculate the distance of each track to the slice vertex.
@@ -1210,6 +1331,10 @@ namespace ICARUSNumuXsec{
       Chi2Proton = trk.chi2pid[bp].chi2_proton;
       //Chi2Muon = trk.chi2pid[bp].chi2_muon;
       bool PassChi2 = Chi2Proton < 100;
+
+      //==== TEST
+      AtSlice = true;
+      PassChi2 = true;
 
       if( AtSlice && Contained && PassChi2 && trk.len > Longest ){
         Longest = trk.len;

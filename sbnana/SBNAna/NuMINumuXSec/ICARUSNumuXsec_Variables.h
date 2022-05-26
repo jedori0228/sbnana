@@ -41,7 +41,6 @@ namespace ICARUSNumuXsec{
   extern const Var varFMLightCenterZ;
 
   extern const Var varFMTime;
-  extern const Var varNuScore;
   extern const Var varTruthTime;
 
   extern const Var varSliceTrackNhitsPlane0;
@@ -57,6 +56,18 @@ namespace ICARUSNumuXsec{
   extern const MultiVar varAllTrackStartPositionX;
   extern const MultiVar varAllTrackStartPositionY;
   extern const MultiVar varAllTrackStartPositionZ;
+
+  extern const Var varNuScore;
+  extern const Var varSliceNuNFinalStatePfos;
+  extern const Var varSliceNuNHitsTotal;
+  extern const Var varSliceNuVertexY;
+  extern const Var varSliceNuWeightedDirZ;
+  extern const Var varSliceNuNSpacePointsInSphere;
+  extern const Var varSliceNuEigenRatioInSphere;
+  extern const Var varSliceCRLongestTrackDirY;
+  extern const Var varSliceCRLongestTrackDeflection;
+  extern const Var varSliceCRFracHitsInLongestTrack;
+  extern const Var varSliceCRNHitsMax;
 
   //==== GENIE interaction code
   //==== https://internal.dunescience.org/doxygen/namespacesimb.html#a2cce734d1b71408bbc7d98d148ac4360
@@ -137,6 +148,7 @@ namespace ICARUSNumuXsec{
 
   //====   Muon
 
+  extern const MultiVar varAllMuonTrackIndices;
   extern const Var varMuonTrackInd;
   extern const Var varMuonRecoP;
   extern const Var varMuonCaloPlane0P;
@@ -169,6 +181,8 @@ namespace ICARUSNumuXsec{
 
   //====   Track-based
 
+  extern const Var varNProtonCandTrack;
+  extern const Var varNProtonCandMatched;
   extern const Var varProtonTrackInd;
   extern const Var varProtonCaloP;
   extern const Var varProtonRecoP;
