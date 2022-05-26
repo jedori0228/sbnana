@@ -105,7 +105,7 @@ namespace ICARUSNumuXsec{
     double truthProtonT = varProtonTruthT(slc);
     static const double truthProtonTThreshold = 0.050;
     bool passProtonTCut = (truthProtonT > truthProtonTThreshold);
-    passProtonTCut = true; //TODO
+    //passProtonTCut = true; //TODO
 
     return passProtonTCut;
 
@@ -309,21 +309,44 @@ namespace ICARUSNumuXsec{
           if(!cutNuScore(&slc)) continue;
           if(!cutFMScore(&slc)) continue;
           if(!cutHasMuon(&slc)) continue;
-          auto const& trk = slc.reco.trk.at(varMuonTrackInd(&slc));
-          muonTrackStarts.emplace_back(trk.start.x, trk.start.y, trk.start.z);
+
+          vector<double> muIndices = varAllMuonTrackIndices(&slc);
+
+          for(auto const& muInd: muIndices){
+            auto const& trk = slc.reco.trk.at(muInd);
+            muonTrackStarts.emplace_back(trk.start.x, trk.start.y, trk.start.z);
+          }
+
         }
+
+        if(muonTrackStarts.size()==0) return true;
+
+        //std::cout << "[spillcutFDTopCRTHitVetoTestMatching] Muon track found, and looping over CRTHits" << std::endl;
+        //std::cout << "[spillcutFDTopCRTHitVetoTestMatching] muonTrackStarts.size() = " << muonTrackStarts.size() << std::endl;
 
         for (auto const& crtHit: sr->crt_hits){
 
           if(crtHit.plane>=30 && crtHit.plane<=34){
 
             if(crtHit.t0 > 0.1 && crtHit.t0 < 9.0 && crtHit.pe > 100){
-
+/*
+              std::cout << "[spillcutFDTopCRTHitVetoTestMatching] In-time CRTHit found:" << std::endl;
+              std::cout << "[spillcutFDTopCRTHitVetoTestMatching] x = " << crtHit.position.x << std::endl;
+              std::cout << "[spillcutFDTopCRTHitVetoTestMatching] y = " << crtHit.position.y << std::endl;
+              std::cout << "[spillcutFDTopCRTHitVetoTestMatching] z = " << crtHit.position.z << std::endl;
+*/
               for(auto& muonTrackStart: muonTrackStarts){
+/*
+                std::cout << "[spillcutFDTopCRTHitVetoTestMatching] Muon track information" << std::endl;
+                std::cout << "[spillcutFDTopCRTHitVetoTestMatching] x = " << muonTrackStart.X() << std::endl;
+                std::cout << "[spillcutFDTopCRTHitVetoTestMatching] y = " << muonTrackStart.Y() << std::endl;
+                std::cout << "[spillcutFDTopCRTHitVetoTestMatching] z = " << muonTrackStart.Z() << std::endl;
+*/
                 //==== Cryo using sign of X
                 if( crtHit.position.x * muonTrackStart.X() > 0 ) return false;
                 //==== TPC using sign of Z
                 if( crtHit.position.z * muonTrackStart.Z() > 0 ) return false;
+
               } // END Loop vertes 
 
             } // END If intime-ed CRT hit exist
@@ -349,9 +372,16 @@ namespace ICARUSNumuXsec{
           if(!cutNuScore(&slc)) continue;
           if(!cutFMScore(&slc)) continue;
           if(!cutHasMuon(&slc)) continue;
-          auto const& trk = slc.reco.trk.at(varMuonTrackInd(&slc));
-          muonTrackStarts.emplace_back(trk.start.x, trk.start.y, trk.start.z);
+
+          vector<double> muIndices = varAllMuonTrackIndices(&slc);
+
+          for(auto const& muInd: muIndices){
+            auto const& trk = slc.reco.trk.at(muInd);
+            muonTrackStarts.emplace_back(trk.start.x, trk.start.y, trk.start.z);
+          }
         }
+
+        if(muonTrackStarts.size()==0) return true;
 
         for (auto const& crtHit: sr->crt_hits){
 
