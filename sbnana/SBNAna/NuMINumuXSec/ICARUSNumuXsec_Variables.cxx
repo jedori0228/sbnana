@@ -1008,10 +1008,6 @@ namespace ICARUSNumuXsec{
       MaybeMuonExiting = ( !Contained && trk.len > 100);
       MaybeMuonContained = ( Contained && PassChi2 && trk.len > 50. );
 
-      //==== removing length cut here
-      MaybeMuonExiting = ( !Contained );
-      MaybeMuonContained = ( Contained && PassChi2 );
-
       if( AtSlice && ( MaybeMuonExiting || MaybeMuonContained ) && trk.len > Longest ){
         Longest = trk.len;
         PTrackInd = i;
