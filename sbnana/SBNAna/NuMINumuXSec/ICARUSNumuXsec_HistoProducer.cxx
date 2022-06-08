@@ -85,6 +85,7 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
   const Binning binsZPosition = Binning::Simple(2000, -1000., 1000.);
   const Binning binsFMLightPE = Binning::Simple(1002, -2, 1000.);
   const Binning binsChi2 = Binning::Simple(400, 0., 400);
+  const Binning binsPDG = Binning::Simple(10000, -5000., 5000.);
 
   //==== HistAxis
   //====   Slice variables
@@ -160,191 +161,106 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
   const HistAxis axProtonRecoNuMICosineTheta("ProtonRecoNuMICosineTheta", binsCosineTheta, varProtonRecoNuMICosineTheta);
   const HistAxis axProtonLength("ProtonLength", binsLength, varProtonLength);
   const HistAxis axProtonChi2Proton("ProtonChi2Proton", binsChi2, varProtonChi2Proton);
+  const HistAxis axProtonBestmatchPDG("ProtonBestmatchPDG", binsPDG, varProtonBestmatchPDG);
   //====     Neutrino
   const HistAxis axNeutrinoCombinedEnergy("NeutrinoCombinedEnergy", binsEnergy, varNeutrinoCombinedEnergy);
   const HistAxis axNeutrinoQE("NeutrinoQE", binsEnergy, varNeutrinoQE);
 
-  //==== Spectrum
-  //====   Slice variables
-  Spectrum *sVertexRecoX = new Spectrum(loader, axVertexRecoX, spillCut, cut);
-  Spectrum *sVertexRecoY = new Spectrum(loader, axVertexRecoY, spillCut, cut);
-  Spectrum *sVertexRecoZ = new Spectrum(loader, axVertexRecoZ, spillCut, cut);
-  Spectrum *sVertexRecoZvsX = new Spectrum(loader,
-                                           HistAxis("VertexRecoZ", Binning::Simple(20, -1000., 1000.), varVertexRecoZ),
-                                           HistAxis("VertexRecoX", Binning::Simple(10, -500., 500.), varVertexRecoX),
-                                           spillCut, cut);
-  Spectrum *sFMScore = new Spectrum(loader, axFMScore, spillCut, cut);
-  Spectrum *sFMTime = new Spectrum(loader, axFMTime, spillCut, cut);
-  Spectrum *sNuScore = new Spectrum(loader, axNuScore, spillCut, cut);
-  Spectrum *sCountSlice = new Spectrum(loader, axCountSlice, spillCut, cut);
-  Spectrum *sSliceTrackNhitsPlane0 = new Spectrum(loader, axSliceTrackNhitsPlane0, spillCut, cut);
-  Spectrum *sSliceTrackNhitsPlane1 = new Spectrum(loader, axSliceTrackNhitsPlane1, spillCut, cut);
-  Spectrum *sSliceTrackNhitsPlane2 = new Spectrum(loader, axSliceTrackNhitsPlane2, spillCut, cut);
-  Spectrum *sSliceShowerNhitsPlane0 = new Spectrum(loader, axSliceShowerNhitsPlane0, spillCut, cut);
-  Spectrum *sSliceShowerNhitsPlane1 = new Spectrum(loader, axSliceShowerNhitsPlane1, spillCut, cut);
-  Spectrum *sSliceShowerNhitsPlane2 = new Spectrum(loader, axSliceShowerNhitsPlane2, spillCut, cut);
-  Spectrum *sSliceTrackChargePlane0 = new Spectrum(loader, axSliceTrackChargePlane0, spillCut, cut);
-  Spectrum *sSliceTrackChargePlane1 = new Spectrum(loader, axSliceTrackChargePlane1, spillCut, cut);
-  Spectrum *sSliceTrackChargePlane2 = new Spectrum(loader, axSliceTrackChargePlane2, spillCut, cut);
-  //====   NuScore vars
-  Spectrum *sSliceNuNFinalStatePfos = new Spectrum(loader, axSliceNuNFinalStatePfos, spillCut, cut);
-  Spectrum *sSliceNuNHitsTotal = new Spectrum(loader, axSliceNuNHitsTotal, spillCut, cut);
-  Spectrum *sSliceNuVertexY = new Spectrum(loader, axSliceNuVertexY, spillCut, cut);
-  Spectrum *sSliceNuWeightedDirZ = new Spectrum(loader, axSliceNuWeightedDirZ, spillCut, cut);
-  Spectrum *sSliceNuNSpacePointsInSphere = new Spectrum(loader, axSliceNuNSpacePointsInSphere, spillCut, cut);
-  Spectrum *sSliceNuEigenRatioInSphere = new Spectrum(loader, axSliceNuEigenRatioInSphere, spillCut, cut);
-  Spectrum *sSliceCRLongestTrackDirY = new Spectrum(loader, axSliceCRLongestTrackDirY, spillCut, cut);
-  Spectrum *sSliceCRLongestTrackDeflection = new Spectrum(loader, axSliceCRLongestTrackDeflection, spillCut, cut);
-  Spectrum *sSliceCRFracHitsInLongestTrack = new Spectrum(loader, axSliceCRFracHitsInLongestTrack, spillCut, cut);
-  Spectrum *sSliceCRNHitsMax = new Spectrum(loader, axSliceCRNHitsMax, spillCut, cut);
-
-  Spectrum *sAllTrackStartPositionX = new Spectrum("AllTrackStartPositionX", binsXPosition, loader, varAllTrackStartPositionX, spillCut, cut);
-  Spectrum *sAllTrackStartPositionY = new Spectrum("AllTrackStartPositionY", binsYPosition, loader, varAllTrackStartPositionY, spillCut, cut);
-  Spectrum *sAllTrackStartPositionZ = new Spectrum("AllTrackStartPositionZ", binsZPosition, loader, varAllTrackStartPositionZ, spillCut, cut);
-  Spectrum *sFMChargeQ = new Spectrum("FMChargeQ", binsFMChargeQ, loader, varFMChargeQ, spillCut, cut);
-  Spectrum *sFMChargeCenterX = new Spectrum("FMChargeCenterX", binsXPosition, loader, varFMChargeCenterX, spillCut, cut);
-  Spectrum *sFMChargeCenterY = new Spectrum("FMChargeCenterY", binsYPosition, loader, varFMChargeCenterY, spillCut, cut);
-  Spectrum *sFMChargeCenterZ = new Spectrum("FMChargeCenterZ", binsZPosition, loader, varFMChargeCenterZ, spillCut, cut);
-  Spectrum *sFMLightCenterX = new Spectrum("FMLightCenterX", binsXPosition, loader, varFMLightCenterX, spillCut, cut);
-  Spectrum *sFMLightCenterY = new Spectrum("FMLightCenterY", binsYPosition, loader, varFMLightCenterY, spillCut, cut);
-  Spectrum *sFMLightCenterZ = new Spectrum("FMLightCenterZ", binsZPosition, loader, varFMLightCenterZ, spillCut, cut);
-  Spectrum *sFMLightPE = new Spectrum("FMLightPE", binsFMLightPE, loader, varFMLightPE, spillCut, cut);
-  //====   Truth variables
-  //====     Neutrinos
-  Spectrum *sNeutrinoTruthE = new Spectrum(loader, axNeutrinoTruthE, spillCut, cut);
-  Spectrum *sTruthQ2 = new Spectrum(loader, axTruthQ2, spillCut, cut);
-  Spectrum *sTruthq0_lab = new Spectrum(loader, axTruthq0_lab, spillCut, cut);
-  Spectrum *sTruthmodq_lab = new Spectrum(loader, axTruthmodq_lab, spillCut, cut);
-  //====     Muon
-  Spectrum *sMuonTruthP = new Spectrum(loader, axMuonTruthP, spillCut, cut);
-  Spectrum *sMuonTruthCosineTheta = new Spectrum(loader, axMuonTruthCosineTheta, spillCut, cut);
-  Spectrum *sMuonTruthNuMICosineTheta = new Spectrum(loader, axMuonTruthNuMICosineTheta, spillCut, cut);
-  Spectrum *sTruthMuonMatchedTrackChi2Muon = new Spectrum(loader, axTruthMuonMatchedTrackChi2Muon, spillCut, cut);
-  Spectrum *sTruthMuonMatchedTrackChi2Proton = new Spectrum(loader, axTruthMuonMatchedTrackChi2Proton, spillCut, cut);
-  Spectrum *sTruthMuonMatchedTrackScore = new Spectrum(loader, axTruthMuonMatchedTrackScore, spillCut, cut);
-  Spectrum *sTruthMuonMatchedTrackVertexDistance = new Spectrum(loader, axTruthMuonMatchedTrackVertexDistance, spillCut, cut);
-  Spectrum *sTruthMuonMatchedShowerScore = new Spectrum(loader, axTruthMuonMatchedShowerScore, spillCut, cut);
-  //====     Proton
-  Spectrum *sProtonTruthP = new Spectrum(loader, axProtonTruthP, spillCut, cut);
-  Spectrum *sProtonTruthCosineTheta = new Spectrum(loader, axProtonTruthCosineTheta, spillCut, cut);
-  Spectrum *sProtonTruthNuMICosineTheta = new Spectrum(loader, axProtonTruthNuMICosineTheta, spillCut, cut);
-  Spectrum *sTruthProtonMatchedTrackChi2Proton = new Spectrum(loader, axTruthProtonMatchedTrackChi2Proton, spillCut, cut);
-  Spectrum *sTruthProtonMatchedTrackChi2ProtonCollection = new Spectrum(loader, axTruthProtonMatchedTrackChi2ProtonCollection, spillCut, cut);
-  Spectrum *sTruthProtonMatchedTrackScore = new Spectrum(loader, axTruthProtonMatchedTrackScore, spillCut, cut);
-  Spectrum *sTruthProtonMatchedTrackVertexDistance = new Spectrum(loader, axTruthProtonMatchedTrackVertexDistance, spillCut, cut);
-  Spectrum *sTruthProtonMatchedShowerScore = new Spectrum(loader, axTruthProtonMatchedShowerScore, spillCut, cut);
-  //====     Muon+Proton
-  Spectrum *sTruthMuonProtonCosineTheta = new Spectrum(loader, axTruthMuonProtonCosineTheta, spillCut, cut);
-  //====   Reco variables
-  //====     Muon
-  Spectrum *sMuonRecoP = new Spectrum(loader, axMuonRecoP, spillCut, cut);
-  Spectrum *sMuonRecoCosineTheta = new Spectrum(loader, axMuonRecoCosineTheta, spillCut, cut);
-  Spectrum *sMuonRecoNuMICosineTheta = new Spectrum(loader, axMuonRecoNuMICosineTheta, spillCut, cut);
-  Spectrum *sMuonLength = new Spectrum(loader, axMuonLength, spillCut, cut);
-  Spectrum *sMuonChi2Muon = new Spectrum(loader, axMuonChi2Muon, spillCut, cut);
-  Spectrum *sMuonChi2Proton = new Spectrum(loader, axMuonChi2Proton, spillCut, cut);
-  Spectrum *sMuonRecoStartX = new Spectrum(loader, axMuonRecoStartX, spillCut, cut);
-  Spectrum *sMuonRecoStartY = new Spectrum(loader, axMuonRecoStartY, spillCut, cut);
-  Spectrum *sMuonRecoStartZ = new Spectrum(loader, axMuonRecoStartZ, spillCut, cut);
-  //====     Proton
-  Spectrum *sNProtonCandTrack = new Spectrum(loader, axNProtonCandTrack, spillCut, cut);
-  Spectrum *sNProtonCandMatched = new Spectrum(loader, axNProtonCandMatched, spillCut, cut);
-  Spectrum *sProtonRecoP = new Spectrum(loader, axProtonRecoP, spillCut, cut);
-  Spectrum *sProtonRecoCosineTheta = new Spectrum(loader, axProtonRecoCosineTheta, spillCut, cut);
-  Spectrum *sProtonRecoNuMICosineTheta = new Spectrum(loader, axProtonRecoNuMICosineTheta, spillCut, cut);
-  Spectrum *sProtonLength = new Spectrum(loader, axProtonLength, spillCut, cut);
-  Spectrum *sProtonChi2Proton = new Spectrum(loader, axProtonChi2Proton, spillCut, cut);
-  //====     Neutrino
-  Spectrum *sNeutrinoCombinedEnergy = new Spectrum(loader, axNeutrinoCombinedEnergy, spillCut, cut);
-  Spectrum *sNeutrinoQE = new Spectrum(loader, axNeutrinoQE, spillCut, cut);
-  //====   Reco vs Truth
-  Spectrum *sMuonRecoP_vs_MuonTruthP = new Spectrum(loader, axMuonRecoP, axMuonTruthP, spillCut, cut);
-  Spectrum *sMuonRecoCosineTheta_vs_MuonTruthCosineTheta = new Spectrum(loader, axMuonRecoCosineTheta, axMuonTruthCosineTheta, spillCut, cut);
-  Spectrum *sMuonRecoNuMICosineTheta_vs_MuonTruthNuMICosineTheta = new Spectrum(loader, axMuonRecoNuMICosineTheta, axMuonTruthNuMICosineTheta, spillCut, cut);
-  Spectrum *sNeutrinoCombinedEnergy_vs_NeutrinoTruthE = new Spectrum(loader, axNeutrinoCombinedEnergy, axNeutrinoTruthE, spillCut, cut);
-
   if(fillNominal){
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sVertexRecoX);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sVertexRecoY);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sVertexRecoZ);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sVertexRecoZvsX);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMScore);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMTime);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sNuScore);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sCountSlice);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceTrackNhitsPlane0);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceTrackNhitsPlane1);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceTrackNhitsPlane2);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceShowerNhitsPlane0);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceShowerNhitsPlane1);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceShowerNhitsPlane2);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceTrackChargePlane0);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceTrackChargePlane1);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceTrackChargePlane2);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceNuNFinalStatePfos);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceNuNHitsTotal);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceNuVertexY);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceNuWeightedDirZ);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceNuNSpacePointsInSphere);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceNuEigenRatioInSphere);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceCRLongestTrackDirY);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceCRLongestTrackDeflection);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceCRFracHitsInLongestTrack);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sSliceCRNHitsMax);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sAllTrackStartPositionX);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sAllTrackStartPositionY);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sAllTrackStartPositionZ);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMChargeQ);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMChargeCenterX);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMChargeCenterY);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMChargeCenterZ);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMLightCenterX);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMLightCenterY);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMLightCenterZ);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sFMLightPE);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sNeutrinoTruthE);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthQ2);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthq0_lab);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthmodq_lab);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonTruthP);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonTruthCosineTheta);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonTruthNuMICosineTheta);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthMuonMatchedTrackChi2Muon);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthMuonMatchedTrackChi2Proton);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthMuonMatchedTrackScore);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthMuonMatchedTrackVertexDistance);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthMuonMatchedShowerScore);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonTruthP);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonTruthCosineTheta);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonTruthNuMICosineTheta);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrackChi2Proton);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrackChi2ProtonCollection);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrackScore);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrackVertexDistance);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedShowerScore);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthMuonProtonCosineTheta);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoP);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoCosineTheta);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoNuMICosineTheta);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonLength);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonChi2Muon);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonChi2Proton);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoStartX);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoStartY);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoStartZ);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sNProtonCandTrack);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sNProtonCandMatched);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonRecoP);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonRecoCosineTheta);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonRecoNuMICosineTheta);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonLength);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonChi2Proton);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sNeutrinoCombinedEnergy);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sNeutrinoQE);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoP_vs_MuonTruthP);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoCosineTheta_vs_MuonTruthCosineTheta);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoNuMICosineTheta_vs_MuonTruthNuMICosineTheta);
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(sNeutrinoCombinedEnergy_vs_NeutrinoTruthE);
+    //====   Slice variables
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axVertexRecoX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axVertexRecoY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axVertexRecoZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axFMScore, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axFMTime, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNuScore, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axCountSlice, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceTrackNhitsPlane0, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceTrackNhitsPlane1, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceTrackNhitsPlane2, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceShowerNhitsPlane0, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceShowerNhitsPlane1, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceShowerNhitsPlane2, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceTrackChargePlane0, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceTrackChargePlane1, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceTrackChargePlane2, spillCut, cut));
+    //====   NuScore vars
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceNuNFinalStatePfos, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceNuNHitsTotal, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceNuVertexY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceNuWeightedDirZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceNuNSpacePointsInSphere, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceNuEigenRatioInSphere, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceCRLongestTrackDirY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceCRLongestTrackDeflection, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceCRFracHitsInLongestTrack, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceCRNHitsMax, spillCut, cut));
+
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackStartPositionX", binsXPosition, loader, varAllTrackStartPositionX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackStartPositionY", binsYPosition, loader, varAllTrackStartPositionY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackStartPositionZ", binsZPosition, loader, varAllTrackStartPositionZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("FMChargeQ", binsFMChargeQ, loader, varFMChargeQ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("FMChargeCenterX", binsXPosition, loader, varFMChargeCenterX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("FMChargeCenterY", binsYPosition, loader, varFMChargeCenterY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("FMChargeCenterZ", binsZPosition, loader, varFMChargeCenterZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("FMLightCenterX", binsXPosition, loader, varFMLightCenterX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("FMLightCenterY", binsYPosition, loader, varFMLightCenterY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("FMLightCenterZ", binsZPosition, loader, varFMLightCenterZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("FMLightPE", binsFMLightPE, loader, varFMLightPE, spillCut, cut));
+    //====   Truth variables
+    //====     Neutrinos
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNeutrinoTruthE, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthQ2, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthq0_lab, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthmodq_lab, spillCut, cut));
+    //====     Muon
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonTruthP, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonTruthCosineTheta, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonTruthNuMICosineTheta, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthMuonMatchedTrackChi2Muon, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthMuonMatchedTrackChi2Proton, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthMuonMatchedTrackScore, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthMuonMatchedTrackVertexDistance, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthMuonMatchedShowerScore, spillCut, cut));
+    //====     Proton
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonTruthP, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonTruthCosineTheta, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonTruthNuMICosineTheta, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthProtonMatchedTrackChi2Proton, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthProtonMatchedTrackChi2ProtonCollection, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthProtonMatchedTrackScore, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthProtonMatchedTrackVertexDistance, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthProtonMatchedShowerScore, spillCut, cut));
+    //====     Muon+Proton
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthMuonProtonCosineTheta, spillCut, cut));
+    //====   Reco variables
+    //====     Muon
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoP, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoCosineTheta, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoNuMICosineTheta, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonLength, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonChi2Muon, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonChi2Proton, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoStartX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoStartY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoStartZ, spillCut, cut));
+    //====     Proton
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNProtonCandTrack, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNProtonCandMatched, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonRecoP, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonRecoCosineTheta, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonRecoNuMICosineTheta, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonLength, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonChi2Proton, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonBestmatchPDG, spillCut, cut));
+    //====     Neutrino
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNeutrinoCombinedEnergy, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNeutrinoQE, spillCut, cut));
+    //====   Reco vs Truth
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoP, axMuonTruthP, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoCosineTheta, axMuonTruthCosineTheta, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoNuMICosineTheta, axMuonTruthNuMICosineTheta, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNeutrinoCombinedEnergy, axNeutrinoTruthE, spillCut, cut));
   }
 
   //==== Systematic
@@ -472,135 +388,104 @@ void HistoProducer::bookRecoPerformance(SpectrumLoader& loader, SpillCut spillCu
   //==== Spectrum
   //====   Truth variables
   //====     Neutrinos
-  Spectrum *sNeutrinoTruthE = new Spectrum(loader, axNeutrinoTruthE, spillCut, cut);
-  Spectrum *sTruthQ2 = new Spectrum(loader, axTruthQ2, spillCut, cut);
-  Spectrum *sTruthq0_lab = new Spectrum(loader, axTruthq0_lab, spillCut, cut);
-  Spectrum *sTruthmodq_lab = new Spectrum(loader, axTruthmodq_lab, spillCut, cut);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNeutrinoTruthE, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthQ2, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthq0_lab, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthmodq_lab, spillCut, cut));
   //====     Muon
-  Spectrum *sMuonTruthP = new Spectrum(loader, axMuonTruthP, spillCut, cut);
-  Spectrum *sMuonTruthCosineTheta = new Spectrum(loader, axMuonTruthCosineTheta, spillCut, cut);
-  Spectrum *sMuonTruthNuMICosineTheta = new Spectrum(loader, axMuonTruthNuMICosineTheta, spillCut, cut);
-  Spectrum *sTruthMuonMatchedTrackChi2Muon = new Spectrum(loader, axTruthMuonMatchedTrackChi2Muon, spillCut, cut);
-  Spectrum *sTruthMuonMatchedTrackChi2Proton = new Spectrum(loader, axTruthMuonMatchedTrackChi2Proton, spillCut, cut);
-  Spectrum *sTruthMuonMatchedTrackLength = new Spectrum(loader, axTruthMuonMatchedTrackLength, spillCut, cut);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonTruthP, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonTruthCosineTheta, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonTruthNuMICosineTheta, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthMuonMatchedTrackChi2Muon, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthMuonMatchedTrackChi2Proton, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthMuonMatchedTrackLength, spillCut, cut));
   //====     Proton
-  Spectrum *sProtonTruthP = new Spectrum(loader, axProtonTruthP, spillCut, cut);
-  Spectrum *sProtonTruthCosineTheta = new Spectrum(loader, axProtonTruthCosineTheta, spillCut, cut);
-  Spectrum *sProtonTruthNuMICosineTheta = new Spectrum(loader, axProtonTruthNuMICosineTheta, spillCut, cut);
-  Spectrum *sTruthProtonMatchedTrackChi2Proton = new Spectrum(loader, axTruthProtonMatchedTrackChi2Proton, spillCut, cut);
-  Spectrum *sTruthProtonMatchedTrackLength = new Spectrum(loader, axTruthProtonMatchedTrackLength, spillCut, cut);
-  //Spectrum *sTruthProtonMatchedStubE = new Spectrum(loader, axTruthProtonMatchedStubE, spillCut, cut);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonTruthP, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonTruthCosineTheta, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonTruthNuMICosineTheta, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthProtonMatchedTrackChi2Proton, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthProtonMatchedTrackLength, spillCut, cut));
+  //map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthProtonMatchedStubE, spillCut, cut));
   //====   Reco variables
   //====     Muon
-  Spectrum *sMuonRecoP = new Spectrum(loader, axMuonRecoP, spillCut, cut);
-  Spectrum *sMuonBestmatchP = new Spectrum(loader, axMuonBestmatchP, spillCut, cut);
-  Spectrum *sMuonBestmatchPDG = new Spectrum(loader, axMuonBestmatchPDG, spillCut, cut);
-  Spectrum *sMuonRecoCosineTheta = new Spectrum(loader, axMuonRecoCosineTheta, spillCut, cut);
-  Spectrum *sMuonRecoNuMICosineTheta = new Spectrum(loader, axMuonRecoNuMICosineTheta, spillCut, cut);
-  Spectrum *sMuonLength = new Spectrum(loader, axMuonLength, spillCut, cut);
-  Spectrum *sMuonChi2Muon = new Spectrum(loader, axMuonChi2Muon, spillCut, cut);
-  Spectrum *sMuonChi2Proton = new Spectrum(loader, axMuonChi2Proton, spillCut, cut);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoP, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonBestmatchP, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonBestmatchPDG, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoCosineTheta, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoNuMICosineTheta, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonLength, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonChi2Muon, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonChi2Proton, spillCut, cut));
   //====     Proton
-  Spectrum *sProtonRecoP = new Spectrum(loader, axProtonRecoP, spillCut, cut);
-  Spectrum *sProtonBestmatchP = new Spectrum(loader, axProtonBestmatchP, spillCut, cut);
-  Spectrum *sProtonBestmatchPDG = new Spectrum(loader, axProtonBestmatchPDG, spillCut, cut);
-  Spectrum *sProtonRecoCosineTheta = new Spectrum(loader, axProtonRecoCosineTheta, spillCut, cut);
-  Spectrum *sProtonRecoNuMICosineTheta = new Spectrum(loader, axProtonRecoNuMICosineTheta, spillCut, cut);
-  Spectrum *sProtonLength = new Spectrum(loader, axProtonLength, spillCut, cut);
-  Spectrum *sProtonChi2Proton = new Spectrum(loader, axProtonChi2Proton, spillCut, cut);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonRecoP, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonBestmatchP, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonBestmatchPDG, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonRecoCosineTheta, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonRecoNuMICosineTheta, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonLength, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonChi2Proton, spillCut, cut));
   //====     Neutrino
-  Spectrum *sNeutrinoCombinedEnergy = new Spectrum(loader, axNeutrinoCombinedEnergy, spillCut, cut);
-  Spectrum *sNeutrinoQE = new Spectrum(loader, axNeutrinoQE, spillCut, cut);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNeutrinoCombinedEnergy, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNeutrinoQE, spillCut, cut));
   //====   Reco vs Truth
-  Spectrum *sMuonRecoP_vs_MuonTruthP = new Spectrum(loader, axMuonRecoP, axMuonTruthP, spillCut, cut);
-  Spectrum *sMuonRecoCosineTheta_vs_MuonTruthCosineTheta = new Spectrum(loader, axMuonRecoCosineTheta, axMuonTruthCosineTheta, spillCut, cut);
-  Spectrum *sMuonRecoNuMICosineTheta_vs_MuonTruthNuMICosineTheta = new Spectrum(loader, axMuonRecoNuMICosineTheta, axMuonTruthNuMICosineTheta, spillCut, cut);
-  Spectrum *sNeutrinoCombinedEnergy_vs_NeutrinoTruthE = new Spectrum(loader, axNeutrinoCombinedEnergy, axNeutrinoTruthE, spillCut, cut);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoP, axMuonTruthP, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoCosineTheta, axMuonTruthCosineTheta, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoNuMICosineTheta, axMuonTruthNuMICosineTheta, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNeutrinoCombinedEnergy, axNeutrinoTruthE, spillCut, cut));
   //====   Residual
   //====     Muon
-  Spectrum *sMuonPResidualFraction = new Spectrum(loader, axMuonPResidualFraction, spillCut, cut);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonPResidualFraction, spillCut, cut));
   //====     Proton
-  Spectrum *sProtonPResidualFraction = new Spectrum(loader, axProtonPResidualFraction, spillCut, cut);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonPResidualFraction, spillCut, cut));
   //====   Extra
-  Spectrum *sMuonTruthP_vs_MuonBestmatchP = new Spectrum(loader, axMuonTruthP, axMuonBestmatchP, spillCut, cut);
-  Spectrum *sProtonTruthP_vs_ProtonBestmatchP = new Spectrum(loader, axProtonTruthP, axProtonBestmatchP, spillCut, cut);
-  Spectrum *sMuonRecoP_vs_MuonPResidualFraction = new Spectrum(loader, axMuonRecoP, axMuonPResidualFraction, spillCut, cut);
-  Spectrum *sMuonBestmatchP_vs_MuonPResidualFraction = new Spectrum(loader, axMuonBestmatchP, axMuonPResidualFraction, spillCut, cut);
-  Spectrum *sMuonTruthT_vs_TruthMuonMatchedTrackLength = new Spectrum(loader, axMuonTruthT, axTruthMuonMatchedTrackLength, spillCut, cut);
-  Spectrum *sProtonTruthT_vs_TruthProtonMatchedTrackLength = new Spectrum(loader, axProtonTruthT, axTruthProtonMatchedTrackLength, spillCut, cut);
-  Spectrum *sMuonTruthT_vs_MuonLength = new Spectrum(loader, axMuonTruthT, axMuonLength, spillCut, cut);
-  Spectrum *sProtonTruthT_vs_ProtonLength = new Spectrum(loader, axProtonTruthT, axProtonLength, spillCut, cut);
-
-
-  //==== Spectrum
-  //====   Truth variables
-  //====     Neutrinos
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sNeutrinoTruthE);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthQ2);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthq0_lab);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthmodq_lab);
-  //====     Muon
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonTruthP);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonTruthCosineTheta);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonTruthNuMICosineTheta);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthMuonMatchedTrackChi2Muon);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthMuonMatchedTrackChi2Proton);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthMuonMatchedTrackLength);
-  //====     Proton
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonTruthP);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonTruthCosineTheta);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonTruthNuMICosineTheta);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrackChi2Proton);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedTrackLength);
-  //map_cutName_to_vec_Spectrums[currentCutName].push_back(sTruthProtonMatchedStubE);
-  //====   Reco variables
-  //====     Muon
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoP);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonBestmatchP);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonBestmatchPDG);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoCosineTheta);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoNuMICosineTheta);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonLength);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonChi2Muon);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonChi2Proton);
-  //====     Proton
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonRecoP);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonBestmatchP);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonBestmatchPDG);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonRecoCosineTheta);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonRecoNuMICosineTheta);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonLength);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonChi2Proton);
-  //====     Neutrino
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sNeutrinoCombinedEnergy);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sNeutrinoQE);
-  //====   Reco vs Truth
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoP_vs_MuonTruthP);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoCosineTheta_vs_MuonTruthCosineTheta);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoNuMICosineTheta_vs_MuonTruthNuMICosineTheta);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sNeutrinoCombinedEnergy_vs_NeutrinoTruthE);
-  //====   Residual
-  //====     Muon
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonPResidualFraction);
-  //====     Proton
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonPResidualFraction);
-  //====   Extra
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonTruthP_vs_MuonBestmatchP);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonTruthP_vs_ProtonBestmatchP);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonRecoP_vs_MuonPResidualFraction);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonBestmatchP_vs_MuonPResidualFraction);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonTruthT_vs_TruthMuonMatchedTrackLength);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonTruthT_vs_TruthProtonMatchedTrackLength);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sMuonTruthT_vs_MuonLength);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sProtonTruthT_vs_ProtonLength);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonTruthP, axMuonBestmatchP, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonTruthP, axProtonBestmatchP, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoP, axMuonPResidualFraction, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonBestmatchP, axMuonPResidualFraction, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonTruthT, axTruthMuonMatchedTrackLength, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonTruthT, axTruthProtonMatchedTrackLength, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonTruthT, axMuonLength, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonTruthT, axProtonLength, spillCut, cut));
 
 }
 
 void HistoProducer::bookQuickCutEfficiency(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
   const HistAxis axCountSlice("CountSlice", Binning::Simple( 1, 0., 1.), varCountSlice);
-  Spectrum *sCountSlice = new Spectrum(loader, axCountSlice, spillCut, cut);
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(sCountSlice);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum(loader, axCountSlice, spillCut, cut) );
+
+}
+
+void HistoProducer::bookCRTStudy(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back( 
+    new Spectrum("CRTHitT0", Binning::Simple(400, -10, 30), loader, spillvarCRTHitT0, spillCut)
+  );
+
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("CRTHitXvsY", "",
+      loader,
+      Binning::Simple(120, -504, 504), spillvarCRTHitPosX,
+      Binning::Simple(100, -395, 435), spillvarCRTHitPosY,
+      spillCut)
+  );
+
+}
+
+void HistoProducer::bookTEMP(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  const Binning binsChi2 = Binning::Simple(400, 0., 400);
+
+  const HistAxis axMuonChi2Muon("MuonChi2Muon", binsChi2, varMuonChi2Muon);
+  const HistAxis axMuonChi2Proton("MuonChi2Proton", binsChi2, varMuonChi2Proton);
+  const HistAxis axMuonTrackFromVertex("MuonTrackFromVertex", Binning::Simple(300, 0., 30.), varMuonTrackFromVertex);
+  const HistAxis axSliceNuVertexY("SliceNuVertexY", Binning::Simple(400,-200,200), varSliceNuVertexY);
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonChi2Muon, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonChi2Proton, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonTrackFromVertex, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceNuVertexY, spillCut, cut));
 
 }
 
