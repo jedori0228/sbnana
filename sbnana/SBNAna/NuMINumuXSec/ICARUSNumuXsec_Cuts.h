@@ -14,8 +14,9 @@ using namespace std;
 
 namespace ICARUSNumuXsec{
 
-  //==== abs(Nu PID) = 14
+  //==== Neutrino flavor
   extern const Cut cutIsNuMu;
+  extern const Cut cutIsNuE;
 
   //==== GENIE Interaction code
   extern const Cut cutIsQE;
@@ -36,16 +37,26 @@ namespace ICARUSNumuXsec{
   extern const Cut cutIsUnknownInteractionType2;
   extern const Cut cutIsUnknownInteractionType3;
 
+  //==== CC vs NC
+
   extern const Cut cutIsCC;
   extern const Cut cutIsNC;
 
-  //==== Nue
+  //==== NuMu-CC categories
 
-  extern const Cut cutIsNuECC;
+  extern const Cut cutIsNuMuCC;
+  extern const Cut cutIsNuMuCCQE;
+  extern const Cut cutIsNuMuCCRes;
+  extern const Cut cutIsNuMuCCMEC;
+  extern const Cut cutIsNuMuCCDIS;
 
-  //==== NC
+  //==== NuMu-NC categories
 
   extern const Cut cutIsNuMuNC;
+
+  //==== NuE
+
+  extern const Cut cutIsNuECC;
 
   //==== Number of truth pios
 

@@ -5,8 +5,12 @@ using namespace std;
 
 namespace ICARUSNumuXsec{
 
+  //==== Neutrino flavor
   const Cut cutIsNuMu([](const caf::SRSliceProxy* slc) {
     return (kIsNuSlice(slc) && ( slc->truth.pdg == 14 || slc->truth.pdg == -14 ));
+    });
+  const Cut cutIsNuE([](const caf::SRSliceProxy* slc) {
+    return (kIsNuSlice(slc) && ( slc->truth.pdg == 12 || slc->truth.pdg == -12 ));
     });
 
   //==== GENIE Interaction code
@@ -62,6 +66,8 @@ namespace ICARUSNumuXsec{
     return varGENIEIntCode(slc)<-1;
     });
 
+  //==== CC vs NC
+
   const Cut cutIsCC([](const caf::SRSliceProxy* slc) {
       return ( kIsNuSlice(slc) && slc->truth.iscc );
     });
@@ -69,17 +75,38 @@ namespace ICARUSNumuXsec{
       return ( kIsNuSlice(slc) && slc->truth.isnc );
     });
 
-  //==== Nue
+  //==== NuMu-CC categories
 
-  const Cut cutIsNuECC([](const caf::SRSliceProxy* slc) {
-      return ( kIsNuSlice(slc) && slc->truth.iscc && ( slc->truth.pdg == 12 || slc->truth.pdg == -12 ) );
+  const Cut cutIsNuMuCC([](const caf::SRSliceProxy* slc) {
+      return ( cutIsNuMu(slc) && cutIsCC(slc) );
     });
 
-  //==== NC
+  const Cut cutIsNuMuCCQE([](const caf::SRSliceProxy* slc) {
+      return ( cutIsNuMuCC(slc) && cutIsQE(slc) );
+    });
+  const Cut cutIsNuMuCCRes([](const caf::SRSliceProxy* slc) {
+      return ( cutIsNuMuCC(slc) && cutIsRes(slc) );
+    });
+  const Cut cutIsNuMuCCMEC([](const caf::SRSliceProxy* slc) {
+      return ( cutIsNuMuCC(slc) && cutIsMEC(slc) );
+    });
+  const Cut cutIsNuMuCCDIS([](const caf::SRSliceProxy* slc) {
+      return ( cutIsNuMuCC(slc) && cutIsDIS(slc) );
+    });
+
+  //==== NuMu-NC categories
 
   const Cut cutIsNuMuNC([](const caf::SRSliceProxy* slc) {
       return ( kIsNuSlice(slc) && slc->truth.isnc && ( slc->truth.pdg == 14 || slc->truth.pdg == -14 ) );
     });
+
+  //==== NuE
+
+  const Cut cutIsNuECC([](const caf::SRSliceProxy* slc) {
+      return ( cutIsNuE(slc) && cutIsCC(slc) );
+    });
+
+  //==== NC
 
   const Cut cutTruthNoPiZero = (varTruthNPiZero==0);
   const Cut cutTruthNoChargedPion = (varTruthNChargedPion==0);
@@ -118,7 +145,7 @@ namespace ICARUSNumuXsec{
     //==== 3. Muon T cut
     //==== 4. Proton T cut
 
-    return ( kIsNuMuCC(slc) && cutTFiducial(slc) && cutTruthMuonTCut(slc) && cutTruthProtonTCut(slc) );
+    return ( cutIsNuMuCC(slc) && cutTFiducial(slc) && cutTruthMuonTCut(slc) && cutTruthProtonTCut(slc) );
 
     });
 
