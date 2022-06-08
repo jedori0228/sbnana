@@ -19,6 +19,9 @@ namespace ICARUSNumuXsec{
 
   //==== Spill variable
   extern const SpillMultiVar spillvarCRTHitTime;
+  extern const SpillMultiVar spillvarCRTHitT0;
+  extern const SpillMultiVar spillvarCRTHitPosX;
+  extern const SpillMultiVar spillvarCRTHitPosY;
 
   //==== Slice variables
 
@@ -161,6 +164,7 @@ namespace ICARUSNumuXsec{
   extern const Var varMuonRecoStartX;
   extern const Var varMuonRecoStartY;
   extern const Var varMuonRecoStartZ;
+  extern const Var varMuonTrackFromVertex;
 
   //==== Start from a reco Track, and look at its best match gen-particle.
   //==== This means that the get-particle may not be a true muon

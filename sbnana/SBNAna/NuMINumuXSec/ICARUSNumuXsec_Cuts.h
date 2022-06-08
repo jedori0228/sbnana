@@ -68,13 +68,16 @@ namespace ICARUSNumuXsec{
 
   extern const Cut cutRFiducial;
 
-  //==== FMScore
+  //==== Flash matching
 
   extern const Cut cutFMScore;
+  extern const Cut cutFMTime;
 
   //==== NuScore
 
   extern const Cut cutNuScore;
+  extern const Cut cutSliceCRLongestTrackDirY;
+  extern const Cut cutSliceNuVertexYTop;
 
   //==== Muon related
 
@@ -90,6 +93,7 @@ namespace ICARUSNumuXsec{
 
   extern const Cut cutHasProton;
   extern const Cut cutProtonContained;
+  extern const Cut cutProtonHighMomentum;
   extern const Cut cutProtonMatchedToMuon;
   extern const Cut cutProtonMatchedToProton;
 

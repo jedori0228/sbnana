@@ -15,6 +15,37 @@ namespace ICARUSNumuXsec{
     return times;
   });
 
+  const SpillMultiVar spillvarCRTHitT0([](const caf::SRSpillProxy *sr)
+  {
+    std::vector<double> times;
+    for(const auto& hit : sr->crt_hits){
+      times.push_back(hit.t0);
+    }
+    return times;
+  });
+
+  //==== only for south
+  const SpillMultiVar spillvarCRTHitPosX([](const caf::SRSpillProxy *sr)
+  {
+    std::vector<double> poses;
+    for(const auto& hit : sr->crt_hits){
+      if(hit.plane==46){
+        poses.push_back(hit.position.x);
+      }
+    }
+    return poses;
+  });
+  const SpillMultiVar spillvarCRTHitPosY([](const caf::SRSpillProxy *sr)
+  {
+    std::vector<double> poses;
+    for(const auto& hit : sr->crt_hits){
+      if(hit.plane==46){
+        poses.push_back(hit.position.y);
+      }
+    }
+    return poses;
+  });
+
   //==== Slice variables
 
   const Var varCountSlice([](const caf::SRSliceProxy* slc) ->int {
@@ -977,6 +1008,10 @@ namespace ICARUSNumuXsec{
       MaybeMuonExiting = ( !Contained && trk.len > 100);
       MaybeMuonContained = ( Contained && PassChi2 && trk.len > 50. );
 
+      //==== removing length cut here
+      MaybeMuonExiting = ( !Contained );
+      MaybeMuonContained = ( Contained && PassChi2 );
+
       if( AtSlice && ( MaybeMuonExiting || MaybeMuonContained ) && trk.len > Longest ){
         Longest = trk.len;
         PTrackInd = i;
@@ -1106,6 +1141,18 @@ namespace ICARUSNumuXsec{
     if( varMuonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
       return trk.start.z;
+    }
+    return -9999999999.;
+  });
+
+  const Var varMuonTrackFromVertex([](const caf::SRSliceProxy* slc) -> float {
+    if( varMuonTrackInd(slc) >= 0 ){
+
+      auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
+      return sqrt( pow( slc->vertex.x - trk.start.x, 2.0 ) +
+              pow( slc->vertex.y - trk.start.y, 2.0 ) +
+              pow( slc->vertex.z - trk.start.z, 2.0 ) );
+
     }
     return -9999999999.;
   });
@@ -1333,8 +1380,7 @@ namespace ICARUSNumuXsec{
       bool PassChi2 = Chi2Proton < 100;
 
       //==== TEST
-      AtSlice = true;
-      PassChi2 = true;
+      PassChi2 = true; // not appling chi2
 
       if( AtSlice && Contained && PassChi2 && trk.len > Longest ){
         Longest = trk.len;
