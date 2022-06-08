@@ -134,11 +134,12 @@ namespace ICARUSNumuXsec{
   //==== FMScore
 
   const Cut cutFMScore([](const caf::SRSliceProxy* slc) {
-      //return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 6.0 );
-      //return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 7.0 && (slc->fmatch.time>-0.2 && slc->fmatch.time<9.9) );
-      return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 12.0 && slc->fmatch.score >= 0 );
-      //return true;
-    });
+    return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 12.0 && slc->fmatch.score >= 0 );
+  });
+
+  const Cut cutFMTime([](const caf::SRSliceProxy* slc) {
+    return ( !isnan(slc->fmatch.time) && slc->fmatch.time>=0 && slc->fmatch.time<=16 );
+  });
 
   //==== NuScore
 
@@ -147,6 +148,25 @@ namespace ICARUSNumuXsec{
     //return ( !isnan(slc->nu_score) && slc->nu_score > 0.2 );
     return true;
   });
+
+  const Cut cutSliceCRLongestTrackDirY([](const caf::SRSliceProxy* slc) {
+    if(isnan(slc->nuid.crlongtrkdiry)){
+      return false;
+    }
+    else{
+      return slc->nuid.crlongtrkdiry>-0.9;
+    }
+  });
+
+  const Cut cutSliceNuVertexYTop([](const caf::SRSliceProxy* slc) {
+    if(isnan(slc->nuid.nuvtxy)){
+      return false;
+    }
+    else{
+      return slc->nuid.nuvtxy>80.;
+    }
+  });
+
 
   //==== Muon related
 
@@ -205,23 +225,6 @@ namespace ICARUSNumuXsec{
 
     if( varMuonTrackInd(slc) >= 0 ){
       return (varMuonRecoP(slc)==0.);
-/*
-      //TODO TEST
-      if(varMuonRecoP(slc)==0.){
-        auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
-        int trackStartCryo = fv.containedCryo(trk.start.x, trk.start.y, trk.start.z);
-        std::cout << "[cutZeroMomentum] ====================================" << std::endl;
-        std::cout << "[cutZeroMomentum] trackStartCryo = " << trackStartCryo << std::endl;
-        std::cout << "[cutZeroMomentum] Start = " << trk.start.x << ", " << trk.start.y << ", " << trk.start.z << std::endl;
-        std::cout << "[cutZeroMomentum] End = " <<  trk.end.x << ", " << trk.end.y << ", " << trk.end.z << std::endl;
-        return true;
-      }
-      else{
-        return false;
-      }
-*/
-
-
     }
     else{
       return false;
@@ -237,6 +240,7 @@ namespace ICARUSNumuXsec{
     return ( abs(varMuonBestmatchPDG(slc)) == 2212 );
   });
 
+  //==== Proton related
 
   const Cut cutHasProton([](const caf::SRSliceProxy* slc) {
     return (varProtonTrackInd(slc) >= 0);
@@ -247,14 +251,6 @@ namespace ICARUSNumuXsec{
     if( varProtonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varProtonTrackInd(slc));
       return fv.isContained(trk.end.x, trk.end.y, trk.end.z);
-/*
-      Contained = ( !isnan(trk.end.x) &&
-                  ( trk.end.x < -71.1 - 25 && trk.end.x > -369.33 + 25 ) &&
-                  !isnan(trk.end.y) &&
-                  ( trk.end.y > -181.7 + 25 && trk.end.y < 134.8 - 25 ) &&
-                  !isnan(trk.end.z) &&
-                  ( trk.end.z > -895.95 + 30 && trk.end.z < 895.95 - 50 ) );
-*/
     }
     else{
       return false;
@@ -262,6 +258,16 @@ namespace ICARUSNumuXsec{
 
   });
 
+  const Cut cutProtonHighMomentum([](const caf::SRSliceProxy* slc) {
+
+    if( varProtonTrackInd(slc) >= 0 ){
+      return (varProtonRecoP(slc)>1.);
+    }
+    else{
+      return false;
+    }
+
+  });
 
   const Cut cutProtonMatchedToMuon([](const caf::SRSliceProxy* slc) {
     return ( abs(varProtonBestmatchPDG(slc)) == 13 );
