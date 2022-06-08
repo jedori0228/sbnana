@@ -115,6 +115,29 @@ namespace ana
              const SystShifts& shift = kNoShift,
              const Var& wei = kUnweighted);
 
+    /// 2D Spectrum of two SpillVars
+    Spectrum(const std::string& label, SpectrumLoaderBase& loader,
+             const Binning& binsx, const SpillVar& varx,
+             const Binning& binsy, const SpillVar& vary,
+             const SpillCut& spillcut,
+             const SpillVar& wei = kSpillUnweighted);
+
+    /// 2D Spectrum of two MultiVars
+    Spectrum(const std::string& label, SpectrumLoaderBase& loader,
+             const Binning& binsx, const MultiVar& varx,
+             const Binning& binsy, const MultiVar& vary,
+             const SpillCut& spillcut,
+             const Cut& cut,
+             const SystShifts& shift = kNoShift,
+             const Var& wei = kUnweighted);
+
+    /// 2D Spectrum of two SpillMultiVars
+    Spectrum(const std::string& label, SpectrumLoaderBase& loader,
+             const Binning& binsx, const SpillMultiVar& varx,
+             const Binning& binsy, const SpillMultiVar& vary,
+             const SpillCut& spillcut,
+             const SpillVar& wei = kSpillUnweighted);
+
     /// 2D Spectrum taking 2 HistAxis
     Spectrum(SpectrumLoaderBase& loader,
              const HistAxis& xAxis,
@@ -125,14 +148,40 @@ namespace ana
              const Var& wei = kUnweighted);
 
     Spectrum(const std::string& xLabel,
-	     const std::string& yLabel,
-	     SpectrumLoaderBase& loader,
-	     const Binning& binsx, const Var& varx,
-	     const Binning& binsy, const Var& vary,
+             const std::string& yLabel,
+             SpectrumLoaderBase& loader,
+             const Binning& binsx, const Var& varx,
+             const Binning& binsy, const Var& vary,
              const SpillCut& spillcut,
-	     const Cut& cut,
-	     const SystShifts& shift = kNoShift,
-	     const Var& wei = kUnweighted);
+             const Cut& cut,
+             const SystShifts& shift = kNoShift,
+             const Var& wei = kUnweighted);
+
+    Spectrum(const std::string& xLabel,
+             const std::string& yLabel,
+             SpectrumLoaderBase& loader,
+             const Binning& binsx, const SpillVar& varx,
+             const Binning& binsy, const SpillVar& vary,
+             const SpillCut& spillcut,
+             const SpillVar& wei = kSpillUnweighted);
+
+    Spectrum(const std::string& xLabel,
+             const std::string& yLabel,
+             SpectrumLoaderBase& loader,
+             const Binning& binsx, const MultiVar& varx,
+             const Binning& binsy, const MultiVar& vary,
+             const SpillCut& spillcut,
+             const Cut& cut,
+             const SystShifts& shift = kNoShift,
+             const Var& wei = kUnweighted);
+
+    Spectrum(const std::string& xLabel,
+             const std::string& yLabel,
+             SpectrumLoaderBase& loader,
+             const Binning& binsx, const SpillMultiVar& varx,
+             const Binning& binsy, const SpillMultiVar& vary,
+             const SpillCut& spillcut,
+             const SpillVar& wei = kSpillUnweighted);
 
     /// 3D Spectrum of three Vars
     Spectrum(const std::string& label, SpectrumLoaderBase& loader,
@@ -273,6 +322,8 @@ namespace ana
     unsigned int NDimensions() const{return fLabels.size();}
     std::vector<std::string> GetLabels() const {return fLabels;}
     std::vector<Binning> GetBinnings() const {return fBins;}
+
+    void SetLabel(int idx, std::string newlabel);
 
   protected:
     Spectrum(const std::vector<std::string>& labels,

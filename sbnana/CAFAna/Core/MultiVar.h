@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "sbnana/CAFAna/Core/Binning.h"
+
 #include "sbnana/CAFAna/StandardRecord/Proxy/FwdDeclare.h"
 
 namespace ana
@@ -40,5 +42,9 @@ namespace ana
 
   typedef _MultiVar<caf::SRSliceProxy> MultiVar;
   typedef _MultiVar<caf::SRSpillProxy> SpillMultiVar;
+
+  template<class T> _MultiVar<T>
+  MultiVar2D(const _MultiVar<T>& a, const Binning& binsa,
+             const _MultiVar<T>& b, const Binning& binsb);
 
 } // namespace
