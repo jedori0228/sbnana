@@ -1141,7 +1141,7 @@ namespace ICARUSNumuXsec{
     return -9999999999.;
   });
 
-  const Var varMuonTrackFromVertex([](const caf::SRSliceProxy* slc) -> float {
+  const Var varMuonRecoTrackFromVertex([](const caf::SRSliceProxy* slc) -> float {
     if( varMuonTrackInd(slc) >= 0 ){
 
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
@@ -1149,6 +1149,28 @@ namespace ICARUSNumuXsec{
               pow( slc->vertex.y - trk.start.y, 2.0 ) +
               pow( slc->vertex.z - trk.start.z, 2.0 ) );
 
+    }
+    return -9999999999.;
+  });
+
+  const Var varMuonRecoDirX([](const caf::SRSliceProxy* slc) -> float {
+    if( varMuonTrackInd(slc) >= 0 ){
+      auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
+      return trk.dir.x;
+    }
+    return -9999999999.;
+  });
+  const Var varMuonRecoDirY([](const caf::SRSliceProxy* slc) -> float {
+    if( varMuonTrackInd(slc) >= 0 ){
+      auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
+      return trk.dir.y;
+    }
+    return -9999999999.;
+  });
+  const Var varMuonRecoDirZ([](const caf::SRSliceProxy* slc) -> float {
+    if( varMuonTrackInd(slc) >= 0 ){
+      auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
+      return trk.dir.z;
     }
     return -9999999999.;
   });
