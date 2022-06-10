@@ -75,6 +75,18 @@ namespace ICARUSNumuXsec{
       return ( kIsNuSlice(slc) && slc->truth.isnc );
     });
 
+  //==== Number of truth particles
+
+  const Cut cutHasTruthMuon([](const caf::SRSliceProxy* slc) {
+      return ( varMuonTruthIndex(slc)>=0 );
+    });
+  const Cut cutHasTruthProton([](const caf::SRSliceProxy* slc) {
+      return ( varProtonTruthIndex(slc)>=0 );
+    });
+  const Cut cutTruthNoPiZero = (varTruthNPiZero==0);
+  const Cut cutTruthNoChargedPion = (varTruthNChargedPion==0);
+  const Cut cutTruthNoNeutron = (varTruthNNeutron==0);
+
   //==== NuMu-CC categories
 
   const Cut cutIsNuMuCC([](const caf::SRSliceProxy* slc) {
@@ -106,11 +118,7 @@ namespace ICARUSNumuXsec{
       return ( cutIsNuE(slc) && cutIsCC(slc) );
     });
 
-  //==== NC
-
-  const Cut cutTruthNoPiZero = (varTruthNPiZero==0);
-  const Cut cutTruthNoChargedPion = (varTruthNChargedPion==0);
-  const Cut cutTruthNoNeutron = (varTruthNNeutron==0);
+  //==== Truth kinematic cuts
 
   const Cut cutTFiducial([](const caf::SRSliceProxy* slc) {
     if( !isnan(slc->truth.position.x) ) return fv.isContained(slc->truth.position.x, slc->truth.position.y, slc->truth.position.z);
@@ -123,6 +131,7 @@ namespace ICARUSNumuXsec{
     static const double truthMuonTThreshold_Contained = 0.150;
     static const double truthMuonTThreshold_Exiting = 0.250;
     bool passMuonTCut = cutTruthMuonContained(slc) ? (truthMuonT > truthMuonTThreshold_Contained) : (truthMuonT > truthMuonTThreshold_Exiting);
+
     return passMuonTCut;
 
     });
@@ -132,11 +141,12 @@ namespace ICARUSNumuXsec{
     double truthProtonT = varProtonTruthT(slc);
     static const double truthProtonTThreshold = 0.050;
     bool passProtonTCut = (truthProtonT > truthProtonTThreshold);
-    //passProtonTCut = true; //TODO
 
     return passProtonTCut;
 
     });
+
+  //==== NuMu+P signal signal definition using truth
 
   const Cut cutIsNuMuCCSignalDef([](const caf::SRSliceProxy* slc) {
 

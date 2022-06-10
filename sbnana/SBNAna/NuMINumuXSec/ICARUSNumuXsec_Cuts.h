@@ -37,6 +37,14 @@ namespace ICARUSNumuXsec{
   extern const Cut cutIsUnknownInteractionType2;
   extern const Cut cutIsUnknownInteractionType3;
 
+  //==== Number of truth particles
+
+  extern const Cut cutHasTruthMuon;
+  extern const Cut cutHasTruthProton;
+  extern const Cut cutTruthNoPiZero;
+  extern const Cut cutTruthNoChargedPion;
+  extern const Cut cutTruthNoNeutron;
+
   //==== CC vs NC
 
   extern const Cut cutIsCC;
@@ -58,17 +66,9 @@ namespace ICARUSNumuXsec{
 
   extern const Cut cutIsNuECC;
 
-  //==== Number of truth pios
-
-  extern const Cut cutTruthNoPiZero;
-  extern const Cut cutTruthNoChargedPion;
-  extern const Cut cutTruthNoNeutron;
-
-  //==== Truth Fiducial cut for the signal definition
+  //==== Truth kinematic cuts
 
   extern const Cut cutTFiducial;
-
-  //==== For CC, applying minimum kinetic energy cut on truth muon/proton
   extern const Cut cutTruthMuonTCut;
   extern const Cut cutTruthProtonTCut;
 

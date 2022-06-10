@@ -6,8 +6,8 @@ using namespace ICARUSNumuXsec;
 HistoProducer::HistoProducer(){
 
   cout << "[HistoProducer::HistoProducer] called" << endl;
-  TargetPOT = 6.6e20;
-  str_TargetPOT = "6.6e20 POT";
+  TargetPOT = 6.0e20;
+  str_TargetPOT = "6.0e20 POT";
   outputName = "output.root";
   currentCutName = "DefaultCutName";
   vec_cutNames.clear();
@@ -153,6 +153,9 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
   const HistAxis axMuonRecoStartX("MuonRecoStartX", binsXPosition, varMuonRecoStartX);
   const HistAxis axMuonRecoStartY("MuonRecoStartY", binsYPosition, varMuonRecoStartY);
   const HistAxis axMuonRecoStartZ("MuonRecoStartZ", binsZPosition, varMuonRecoStartZ);
+  const HistAxis axMuonRecoDirX("MuonRecoDirX", Binning::Simple(100,-1,1), varMuonRecoDirX);
+  const HistAxis axMuonRecoDirY("MuonRecoDirY", Binning::Simple(100,-1,1), varMuonRecoDirY);
+  const HistAxis axMuonRecoDirZ("MuonRecoDirZ", Binning::Simple(100,-1,1), varMuonRecoDirZ);
   //====     Proton
   const HistAxis axNProtonCandTrack("NProtonCandTrack", Binning::Simple(10, 0., 10.), varNProtonCandTrack);
   const HistAxis axNProtonCandMatched("NProtonCandMatched", Binning::Simple(10, 0., 10.), varNProtonCandMatched);
@@ -244,6 +247,9 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoStartX, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoStartY, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoStartZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoDirX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoDirY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoDirZ, spillCut, cut));
     //====     Proton
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNProtonCandTrack, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNProtonCandMatched, spillCut, cut));
@@ -479,12 +485,12 @@ void HistoProducer::bookTEMP(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
 
   const HistAxis axMuonChi2Muon("MuonChi2Muon", binsChi2, varMuonChi2Muon);
   const HistAxis axMuonChi2Proton("MuonChi2Proton", binsChi2, varMuonChi2Proton);
-  const HistAxis axMuonTrackFromVertex("MuonTrackFromVertex", Binning::Simple(300, 0., 30.), varMuonTrackFromVertex);
+  const HistAxis axMuonRecoTrackFromVertex("MuonRecoTrackFromVertex", Binning::Simple(300, 0., 30.), varMuonRecoTrackFromVertex);
   const HistAxis axSliceNuVertexY("SliceNuVertexY", Binning::Simple(400,-200,200), varSliceNuVertexY);
 
   map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonChi2Muon, spillCut, cut));
   map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonChi2Proton, spillCut, cut));
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonTrackFromVertex, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoTrackFromVertex, spillCut, cut));
   map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceNuVertexY, spillCut, cut));
 
 }
@@ -495,6 +501,9 @@ void HistoProducer::saveHistograms(){
 
   cout << "[HistoProducer::saveHistograms] Number of cuts = " << vec_cutNames.size() << endl;
   const unsigned int nCutName = vec_cutNames.size();
+  double inputSamplePOT(-1.);
+  double inputSampleLiveTime(-1.);
+  double histoNormPOT = TargetPOT;
   if(nCutName>0){
 
     TH1D *hist_CutNames = new TH1D("hist_CutNames", "", nCutName, 0., 1.*nCutName);
@@ -502,8 +511,7 @@ void HistoProducer::saveHistograms(){
     for(unsigned int ic=0; ic<nCutName; ic++){
 
       TString cutName = vec_cutNames.at(ic);
-      //TString dirName = "cutName"+TString::Itoa(ic,10);
-      TString dirName = cutName; // I'd rather make the cutName simpler and use it as dirName too
+      TString dirName = cutName;
       TDirectory *dir = outputfile->GetDirectory(dirName);
       if(!dir){
         outputfile->mkdir(dirName);
@@ -528,27 +536,24 @@ void HistoProducer::saveHistograms(){
 
         cout << "[HistoProducer::saveHistograms]   " << i << "-th Spectrum.." << endl;
 
-        if(i==0 && fillBeamInfo){
+        if(ic==0 && i==0 && fillBeamInfo){
           cout << "[HistoProducer::saveHistograms]     POT = " << vec_Spectrums.at(i)->POT() << endl;
           cout << "[HistoProducer::saveHistograms]     Livetime = " << vec_Spectrums.at(i)->Livetime() << endl;
-          TH1D *hist_POT = new TH1D("POT_"+dirName, "POT", 1, 0., 1.);
-          hist_POT->SetBinContent(1, vec_Spectrums.at(i)->POT());
-          TH1D *hist_Livetime = new TH1D("Livetime_"+dirName, "Livetime", 1, 0., 1.);
-          hist_Livetime->SetBinContent(1, vec_Spectrums.at(i)->Livetime());
-          hist_POT->Write();
-          hist_Livetime->Write();
+          inputSamplePOT = vec_Spectrums.at(i)->POT();
+          inputSampleLiveTime = vec_Spectrums.at(i)->Livetime();
+          histoNormPOT = inputSamplePOT;
         }
 
         TString hName = vec_Spectrums.at(i)->GetLabels()[0];
 
         if(vec_Spectrums.at(i)->GetBinnings().size()==1){
-          TH1 *h = vec_Spectrums.at(i)->ToTH1(TargetPOT);
+          TH1 *h = vec_Spectrums.at(i)->ToTH1(histoNormPOT);
           cout << "[HistoProducer::saveHistograms]     Writing TH1, \"" << hName << "\"" << endl;
           h->SetName(hName+"_"+dirName);
           h->Write();
         }
         else if(vec_Spectrums.at(i)->GetBinnings().size()==2){
-          TH2 *h = vec_Spectrums.at(i)->ToTH2(TargetPOT);
+          TH2 *h = vec_Spectrums.at(i)->ToTH2(histoNormPOT);
           cout << "[HistoProducer::saveHistograms]     Writing TH2, \"" << hName << "\"" << endl;
           h->SetName(hName+"_"+dirName);
           h->Write();
@@ -570,23 +575,23 @@ void HistoProducer::saveHistograms(){
 
         if(sNominal.GetBinnings().size()==1){
           TString newLabel = baseLabel+"_NominalFromES";
-          TH1 *h = sNominal.ToTH1(TargetPOT);
+          TH1 *h = sNominal.ToTH1(histoNormPOT);
           h->SetName(newLabel+"_"+dirName);
           h->Write();
           cout << "[HistoProducer::saveHistograms]     Nominal histogram = " << baseLabel << endl;
           for(unsigned int iu=0; iu<vec_SystEnsembleSpectrumPairs.at(i).second->NUniverses(); ++iu){
-            TH1 *hU = vec_SystEnsembleSpectrumPairs.at(i).second->Universe(iu).ToTH1(TargetPOT);
+            TH1 *hU = vec_SystEnsembleSpectrumPairs.at(i).second->Universe(iu).ToTH1(histoNormPOT);
             //TString systName = IGENIESysts.at(iu)->ShortName();
             hU->SetName(baseLabel+"_"+systematicName+"_Univ"+TString::Itoa(iu,10)+"_"+dirName);
             hU->Write();
           }
-          TGraphAsymmErrors *grErrorBand = vec_SystEnsembleSpectrumPairs.at(i).second->ErrorBand(1., TargetPOT);
+          TGraphAsymmErrors *grErrorBand = vec_SystEnsembleSpectrumPairs.at(i).second->ErrorBand(1., histoNormPOT);
           grErrorBand->SetName(baseLabel+"_"+systematicName+"_ErrorBandFromES_"+dirName);
           grErrorBand->Write();
         }
         else if(sNominal.GetBinnings().size()==2){
           for(unsigned int iu=0; iu<vec_SystEnsembleSpectrumPairs.at(i).second->NUniverses(); ++iu){
-            TH2 *hU = vec_SystEnsembleSpectrumPairs.at(i).second->Universe(iu).ToTH2(TargetPOT);
+            TH2 *hU = vec_SystEnsembleSpectrumPairs.at(i).second->Universe(iu).ToTH2(histoNormPOT);
             //TString systName = IGENIESysts.at(iu)->ShortName();
             hU->SetName(baseLabel+"_"+systematicName+"_Univ"+TString::Itoa(iu,10)+"_"+dirName);
             hU->Write();
@@ -607,7 +612,7 @@ void HistoProducer::saveHistograms(){
         cout << "[HistoProducer::saveHistograms]   " << i << "-th Systematic Spectrum; " << systematicName << endl;
 
         if(vec_SystSpectrumPairs.at(i).second->GetBinnings().size()==1){
-          TH1 *h = vec_SystSpectrumPairs.at(i).second->ToTH1(TargetPOT);
+          TH1 *h = vec_SystSpectrumPairs.at(i).second->ToTH1(histoNormPOT);
           TString baseLabel = vec_SystSpectrumPairs.at(i).second->GetLabels()[0];
           TString newLabel = baseLabel+"_"+systematicName;
           h->SetName(newLabel+"_"+dirName);
@@ -615,7 +620,7 @@ void HistoProducer::saveHistograms(){
           cout << "[HistoProducer::saveHistograms]     --> Done" << endl;
         }
         else if(vec_SystSpectrumPairs.at(i).second->GetBinnings().size()==2){
-          TH2 *h = vec_SystSpectrumPairs.at(i).second->ToTH2(TargetPOT);
+          TH2 *h = vec_SystSpectrumPairs.at(i).second->ToTH2(histoNormPOT);
           TString baseLabel = vec_SystSpectrumPairs.at(i).second->GetLabels()[0];
           TString newLabel = baseLabel+"_"+systematicName;
           h->SetName(newLabel+"_"+dirName);
@@ -634,11 +639,28 @@ void HistoProducer::saveHistograms(){
 
   } // END if nCutName>0
 
+  //==== This should not be added by hadd
   if(fillNominal){
     outputfile->cd();
+    outputfile->mkdir("JobInfo");
+    outputfile->cd("JobInfo");
     TH1D *hist_TargetPOT = new TH1D("hist_TargetPOT", "", 1, 0., 1.);
     hist_TargetPOT->SetBinContent(1, TargetPOT);
     hist_TargetPOT->Write();
+    outputfile->cd();
+  }
+  if(fillBeamInfo){
+    outputfile->cd();
+    outputfile->mkdir("BeamInfo");
+    outputfile->cd("BeamInfo");
+
+    TH1D *hist_POT = new TH1D("POT_BeamInfo", "POT", 1, 0., 1.);
+    hist_POT->SetBinContent(1, inputSamplePOT);
+    TH1D *hist_Livetime = new TH1D("Livetime_BeamInfo", "Livetime", 1, 0., 1.);
+    hist_Livetime->SetBinContent(1, inputSampleLiveTime);
+    hist_POT->Write();
+    hist_Livetime->Write();
+    outputfile->cd();
   }
 
 }
