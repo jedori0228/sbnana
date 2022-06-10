@@ -503,7 +503,6 @@ void HistoProducer::saveHistograms(){
   const unsigned int nCutName = vec_cutNames.size();
   double inputSamplePOT(-1.);
   double inputSampleLiveTime(-1.);
-  double histoNormPOT = TargetPOT;
   if(nCutName>0){
 
     TH1D *hist_CutNames = new TH1D("hist_CutNames", "", nCutName, 0., 1.*nCutName);
@@ -541,19 +540,18 @@ void HistoProducer::saveHistograms(){
           cout << "[HistoProducer::saveHistograms]     Livetime = " << vec_Spectrums.at(i)->Livetime() << endl;
           inputSamplePOT = vec_Spectrums.at(i)->POT();
           inputSampleLiveTime = vec_Spectrums.at(i)->Livetime();
-          histoNormPOT = inputSamplePOT;
         }
 
         TString hName = vec_Spectrums.at(i)->GetLabels()[0];
 
         if(vec_Spectrums.at(i)->GetBinnings().size()==1){
-          TH1 *h = vec_Spectrums.at(i)->ToTH1(histoNormPOT);
+          TH1 *h = vec_Spectrums.at(i)->ToTH1( vec_Spectrums.at(i)->POT() );
           cout << "[HistoProducer::saveHistograms]     Writing TH1, \"" << hName << "\"" << endl;
           h->SetName(hName+"_"+dirName);
           h->Write();
         }
         else if(vec_Spectrums.at(i)->GetBinnings().size()==2){
-          TH2 *h = vec_Spectrums.at(i)->ToTH2(histoNormPOT);
+          TH2 *h = vec_Spectrums.at(i)->ToTH2( vec_Spectrums.at(i)->POT() );
           cout << "[HistoProducer::saveHistograms]     Writing TH2, \"" << hName << "\"" << endl;
           h->SetName(hName+"_"+dirName);
           h->Write();
@@ -575,23 +573,23 @@ void HistoProducer::saveHistograms(){
 
         if(sNominal.GetBinnings().size()==1){
           TString newLabel = baseLabel+"_NominalFromES";
-          TH1 *h = sNominal.ToTH1(histoNormPOT);
+          TH1 *h = sNominal.ToTH1( sNominal.POT() );
           h->SetName(newLabel+"_"+dirName);
           h->Write();
           cout << "[HistoProducer::saveHistograms]     Nominal histogram = " << baseLabel << endl;
           for(unsigned int iu=0; iu<vec_SystEnsembleSpectrumPairs.at(i).second->NUniverses(); ++iu){
-            TH1 *hU = vec_SystEnsembleSpectrumPairs.at(i).second->Universe(iu).ToTH1(histoNormPOT);
+            TH1 *hU = vec_SystEnsembleSpectrumPairs.at(i).second->Universe(iu).ToTH1( vec_SystEnsembleSpectrumPairs.at(i).second->POT() );
             //TString systName = IGENIESysts.at(iu)->ShortName();
             hU->SetName(baseLabel+"_"+systematicName+"_Univ"+TString::Itoa(iu,10)+"_"+dirName);
             hU->Write();
           }
-          TGraphAsymmErrors *grErrorBand = vec_SystEnsembleSpectrumPairs.at(i).second->ErrorBand(1., histoNormPOT);
+          TGraphAsymmErrors *grErrorBand = vec_SystEnsembleSpectrumPairs.at(i).second->ErrorBand(1., vec_SystEnsembleSpectrumPairs.at(i).second->POT()  );
           grErrorBand->SetName(baseLabel+"_"+systematicName+"_ErrorBandFromES_"+dirName);
           grErrorBand->Write();
         }
         else if(sNominal.GetBinnings().size()==2){
           for(unsigned int iu=0; iu<vec_SystEnsembleSpectrumPairs.at(i).second->NUniverses(); ++iu){
-            TH2 *hU = vec_SystEnsembleSpectrumPairs.at(i).second->Universe(iu).ToTH2(histoNormPOT);
+            TH2 *hU = vec_SystEnsembleSpectrumPairs.at(i).second->Universe(iu).ToTH2( vec_SystEnsembleSpectrumPairs.at(i).second->POT() );
             //TString systName = IGENIESysts.at(iu)->ShortName();
             hU->SetName(baseLabel+"_"+systematicName+"_Univ"+TString::Itoa(iu,10)+"_"+dirName);
             hU->Write();
@@ -612,7 +610,7 @@ void HistoProducer::saveHistograms(){
         cout << "[HistoProducer::saveHistograms]   " << i << "-th Systematic Spectrum; " << systematicName << endl;
 
         if(vec_SystSpectrumPairs.at(i).second->GetBinnings().size()==1){
-          TH1 *h = vec_SystSpectrumPairs.at(i).second->ToTH1(histoNormPOT);
+          TH1 *h = vec_SystSpectrumPairs.at(i).second->ToTH1( vec_SystSpectrumPairs.at(i).second->POT()  );
           TString baseLabel = vec_SystSpectrumPairs.at(i).second->GetLabels()[0];
           TString newLabel = baseLabel+"_"+systematicName;
           h->SetName(newLabel+"_"+dirName);
@@ -620,7 +618,7 @@ void HistoProducer::saveHistograms(){
           cout << "[HistoProducer::saveHistograms]     --> Done" << endl;
         }
         else if(vec_SystSpectrumPairs.at(i).second->GetBinnings().size()==2){
-          TH2 *h = vec_SystSpectrumPairs.at(i).second->ToTH2(histoNormPOT);
+          TH2 *h = vec_SystSpectrumPairs.at(i).second->ToTH2( vec_SystSpectrumPairs.at(i).second->POT() );
           TString baseLabel = vec_SystSpectrumPairs.at(i).second->GetLabels()[0];
           TString newLabel = baseLabel+"_"+systematicName;
           h->SetName(newLabel+"_"+dirName);
