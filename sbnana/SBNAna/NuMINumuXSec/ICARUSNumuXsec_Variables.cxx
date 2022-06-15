@@ -1175,6 +1175,33 @@ namespace ICARUSNumuXsec{
     return -9999999999.;
   });
 
+  const Var varMuonRecoForceDownDirX([](const caf::SRSliceProxy* slc) -> float {
+    if( varMuonTrackInd(slc) >= 0 ){
+      auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
+      double flip = trk.dir.y>0 ? -1. : +1.; // if original track is upward(>0), flip it
+      return trk.dir.x*flip;
+    }
+    return -9999999999.;
+  });
+  const Var varMuonRecoForceDownDirY([](const caf::SRSliceProxy* slc) -> float {
+    if( varMuonTrackInd(slc) >= 0 ){
+      auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
+      double flip = trk.dir.y>0 ? -1. : +1.; // if original track is upward(>0), flip it
+      return trk.dir.y*flip;
+    }
+    return -9999999999.;
+  });
+  const Var varMuonRecoForceDownDirZ([](const caf::SRSliceProxy* slc) -> float {
+    if( varMuonTrackInd(slc) >= 0 ){
+      auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
+      double flip = trk.dir.y>0 ? -1. : +1.; // if original track is upward(>0), flip it
+      return trk.dir.z*flip;
+    }
+    return -9999999999.;
+  });
+
+
+
   //==== Start from a reco Track, and look at its best match gen-particle.
   //==== This means that the get-particle may not be a true muon
   const Var varMuonBestmatchP([](const caf::SRSliceProxy* slc) -> float {

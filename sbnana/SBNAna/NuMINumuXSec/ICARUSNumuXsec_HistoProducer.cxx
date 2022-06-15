@@ -156,6 +156,9 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
   const HistAxis axMuonRecoDirX("MuonRecoDirX", Binning::Simple(100,-1,1), varMuonRecoDirX);
   const HistAxis axMuonRecoDirY("MuonRecoDirY", Binning::Simple(100,-1,1), varMuonRecoDirY);
   const HistAxis axMuonRecoDirZ("MuonRecoDirZ", Binning::Simple(100,-1,1), varMuonRecoDirZ);
+  const HistAxis axMuonRecoForceDownDirX("MuonRecoForceDownDirX", Binning::Simple(100,-1,1), varMuonRecoForceDownDirX);
+  const HistAxis axMuonRecoForceDownDirY("MuonRecoForceDownDirY", Binning::Simple(100,-1,1), varMuonRecoForceDownDirY);
+  const HistAxis axMuonRecoForceDownDirZ("MuonRecoForceDownDirZ", Binning::Simple(100,-1,1), varMuonRecoForceDownDirZ);
   //====     Proton
   const HistAxis axNProtonCandTrack("NProtonCandTrack", Binning::Simple(10, 0., 10.), varNProtonCandTrack);
   const HistAxis axNProtonCandMatched("NProtonCandMatched", Binning::Simple(10, 0., 10.), varNProtonCandMatched);
@@ -198,7 +201,8 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceCRLongestTrackDeflection, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceCRFracHitsInLongestTrack, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceCRNHitsMax, spillCut, cut));
-
+    //====   NuScore vs Something
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNuScore, axSliceCRLongestTrackDirY, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackStartPositionX", binsXPosition, loader, varAllTrackStartPositionX, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackStartPositionY", binsYPosition, loader, varAllTrackStartPositionY, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackStartPositionZ", binsZPosition, loader, varAllTrackStartPositionZ, spillCut, cut));
@@ -250,6 +254,9 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoDirX, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoDirY, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoDirZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoForceDownDirX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoForceDownDirY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoForceDownDirZ, spillCut, cut));
     //====     Proton
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNProtonCandTrack, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNProtonCandMatched, spillCut, cut));
@@ -266,6 +273,7 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoP, axMuonTruthP, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoCosineTheta, axMuonTruthCosineTheta, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoNuMICosineTheta, axMuonTruthNuMICosineTheta, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonRecoP, axProtonTruthP, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNeutrinoCombinedEnergy, axNeutrinoTruthE, spillCut, cut));
   }
 

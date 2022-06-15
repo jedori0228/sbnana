@@ -168,6 +168,9 @@ namespace ICARUSNumuXsec{
   extern const Var varMuonRecoDirX;
   extern const Var varMuonRecoDirY;
   extern const Var varMuonRecoDirZ;
+  extern const Var varMuonRecoForceDownDirX;
+  extern const Var varMuonRecoForceDownDirY;
+  extern const Var varMuonRecoForceDownDirZ;
 
   //==== Start from a reco Track, and look at its best match gen-particle.
   //==== This means that the get-particle may not be a true muon
