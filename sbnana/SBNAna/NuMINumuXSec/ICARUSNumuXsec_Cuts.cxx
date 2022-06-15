@@ -181,9 +181,7 @@ namespace ICARUSNumuXsec{
   //==== NuScore
 
   const Cut cutNuScore([](const caf::SRSliceProxy* slc) {
-    //return ( !isnan(slc->nu_score) && slc->nu_score > 0.4 );
-    //return ( !isnan(slc->nu_score) && slc->nu_score > 0.2 );
-    return true;
+    return ( !isnan(slc->nu_score) && slc->nu_score > 0.4 );
   });
 
   const Cut cutSliceCRLongestTrackDirY([](const caf::SRSliceProxy* slc) {
