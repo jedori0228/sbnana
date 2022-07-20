@@ -40,7 +40,14 @@ namespace ICARUSNumuXsec{
   //==== Number of truth particles
 
   extern const Cut cutHasTruthMuon;
+  extern const Cut cutHasTruthMuonHasRecoTrack;
+
   extern const Cut cutHasTruthProton;
+  extern const Cut cutHasTruthProtonHasRecoTrack;
+
+  extern const Cut cutHasTruthChargedPion;
+  extern const Cut cutHasTruthChargedPionHasRecoTrack;
+
   extern const Cut cutTruthNoPiZero;
   extern const Cut cutTruthNoChargedPion;
   extern const Cut cutTruthNoNeutron;
@@ -97,16 +104,26 @@ namespace ICARUSNumuXsec{
   extern const Cut cutTruthMuonContained;
   extern const Cut cutRecoMuonTruthContained;
   //==== TEST
-  extern const Cut cutZeroMomentum;
+  extern const Cut cutTruthMuonMatchedTrackContained;
 
   extern const Cut cutMuonMatchedToMuon;
   extern const Cut cutMuonMatchedToProton;
 
+  //==== Proton related
+
   extern const Cut cutHasProton;
   extern const Cut cutProtonContained;
+  extern const Cut cutTruthProtonContained;
   extern const Cut cutProtonHighMomentum;
   extern const Cut cutProtonMatchedToMuon;
   extern const Cut cutProtonMatchedToProton;
+
+  extern const Cut cutTruthProtonLargePResidualFraction;
+
+  //==== Charged pion related
+
+  extern const Cut cutTruthChargedPionContained;
+  extern const Cut cutTruthChargedPionMatchedTrackContained;
 
   //==== CRT 
 
@@ -115,6 +132,13 @@ namespace ICARUSNumuXsec{
 
   extern const SpillCut spillcutFDTopCRTHitVetoTestMatching;
   extern const SpillCut spillcutFDSideCRTHitVetoTestMatching;
+
+  //==== combined
+
+  extern const Cut cutNominal_ContainedMuon;
+  extern const Cut cutNominal_ExitingMuon;
+
+  extern const Cut cutMuonProtonCosineTheta;
 
 }
 
