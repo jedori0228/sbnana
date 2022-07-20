@@ -22,9 +22,14 @@ namespace ICARUSNumuXsec{
   extern const SpillMultiVar spillvarCRTHitT0;
   extern const SpillMultiVar spillvarCRTHitPosX;
   extern const SpillMultiVar spillvarCRTHitPosY;
+  extern const SpillMultiVar spillvarMCNeutrinoE;
+  extern const SpillVar spillvarNSlice;
+  extern const SpillVar spillvarNTrack;
+  extern const SpillMultiVar spillNuDirectionX;
+  extern const SpillMultiVar spillNuDirectionY;
+  extern const SpillMultiVar spillNuDirectionZ;
 
   //==== Slice variables
-
   extern const Var varCountSlice;
 
   extern const Var varVertexRecoX;
@@ -59,6 +64,9 @@ namespace ICARUSNumuXsec{
   extern const MultiVar varAllTrackStartPositionX;
   extern const MultiVar varAllTrackStartPositionY;
   extern const MultiVar varAllTrackStartPositionZ;
+  extern const MultiVar varAllTrackEndPositionX;
+  extern const MultiVar varAllTrackEndPositionY;
+  extern const MultiVar varAllTrackEndPositionZ;
 
   extern const Var varNuScore;
   extern const Var varSliceNuNFinalStatePfos;
@@ -77,75 +85,122 @@ namespace ICARUSNumuXsec{
   extern const Var varGENIEIntCode;
 
   //==== Truth variables
-
+  //====   Scattering
   extern const Var varNeutrinoTruthE;
   extern const Var varTruthQ2;
   extern const Var varTruthq0_lab;
   extern const Var varTruthmodq_lab;
-
+  //====   Vertex
+  extern const Var varTruthVtxX;
+  extern const Var varTruthVtxY;
+  extern const Var varTruthVtxZ;
+  //====     Vertex residual
+  extern const Var varVtxResidualX;
+  extern const Var varVtxResidualY;
+  extern const Var varVtxResidualZ;
+  //====   Number of particles
   extern const Var varTruthNNeutron;
   extern const Var varTruthNPiMinus;
   extern const Var varTruthNPiPlus;
   extern const Var varTruthNChargedPion;
   extern const Var varTruthNPiZero;
   extern const Var varTruthNProton;
-
+  //====   Truth Muon
   extern const Var varMuonTruthIndex;
   extern const Var varMuonTruthP;
   extern const Var varMuonTruthT;
   extern const Var varMuonTruthCosineTheta;
   extern const Var varMuonTruthNuMICosineTheta;
-
+  //====   Truth Proton
   extern const Var varProtonTruthIndex;
   extern const Var varProtonTruthP;
   extern const Var varProtonTruthT;
   extern const Var varProtonTruthCosineTheta;
   extern const Var varProtonTruthNuMICosineTheta;
-
+  //====   Truth Charged Pion
+  extern const Var varChargedPionTruthIndex;
+  extern const Var varChargedPionTruthP;
+  //====   Truth Muon+Proton
   extern const Var varTruthMuonProtonCosineTheta;
 
-  //==== For a given truth, find the matching Reco track
-  //====   For a given true muon (truth_index), find a reco track whose best-matched is this muon
-
+  //==== For a given true muon (truth_index), find a reco track whose best-matched is this muon
   extern const Var varTruthMuonMatchedTrackIndex;
   extern const Var varTruthMuonMatchedTrackContainedness;
   extern const Var varTruthMuonMatchedTrackChi2Proton;
   extern const Var varTruthMuonMatchedTrackReducedChi2Proton;
   extern const Var varTruthMuonMatchedTrackChi2Muon;
   extern const Var varTruthMuonMatchedTrackReducedChi2Muon;
+  extern const Var varTruthMuonMatchedTrackChi2Pion;
+  extern const Var varTruthMuonMatchedTrackReducedChi2Pion;
+  //====   Matched reco track positions
+  extern const Var varTruthMuonMatchedTrackEndPositionX;
+  extern const Var varTruthMuonMatchedTrackEndPositionY;
+  extern const Var varTruthMuonMatchedTrackEndPositionZ;
+  //====   Matched reco angle
+  extern const Var varTruthMuonMatchedTrackNuMICosineTheta;
+  //====   Matched reco length
   extern const Var varTruthMuonMatchedTrackLength;
+  //====   Matched reco momentum
   extern const Var varTruthMuonMatchedTrackRangeP;
   extern const Var varTruthMuonMatchedTrackMCSP;
   extern const Var varTruthMuonMatchedTrackCombinedP;
+  //====   Matched reco momentum residual
+  extern const Var varTruthMuonMatchedTrackRangePResidual;
+  extern const Var varTruthMuonMatchedTrackMCSPResidual;
+  extern const Var varTruthMuonMatchedTrackCombinedPResidual;
+  //====   Matched reco momentum residual fraction
+  extern const Var varTruthMuonMatchedTrackRangePResidualFraction;
+  extern const Var varTruthMuonMatchedTrackMCSPResidualFraction;
+  extern const Var varTruthMuonMatchedTrackCombinedPResidualFraction;
+  //====   Matched reco track other properties
   extern const Var varTruthMuonMatchedTrackScore;
   extern const Var varTruthMuonMatchedTrackVertexDistance;
-
+  //====   Matched reco shower
   extern const Var varTruthMuonMatchedShowerIndex;
   extern const Var varTruthMuonMatchedShowerScore;
 
-  //====   For a given true proton (truth_index), find a reco track whose best-matched is this muon
-
+  //==== For a given true proton (truth_index), find a reco track whose best-matched is this proton
   extern const Var varTruthProtonMatchedTrackIndex;
   extern const Var varTruthProtonMatchedTrackContainedness;
   extern const Var varTruthProtonMatchedTrackChi2Proton;
-  extern const Var varTruthProtonMatchedTrackChi2ProtonCollection;
   extern const Var varTruthProtonMatchedTrackReducedChi2Proton;
   extern const Var varTruthProtonMatchedTrackChi2Muon;
   extern const Var varTruthProtonMatchedTrackReducedChi2Muon;
+  extern const Var varTruthProtonMatchedTrackChi2Pion;
+  extern const Var varTruthProtonMatchedTrackReducedChi2Pion;
+  //====   Matched reco length
+  extern const Var varTruthProtonMatchedTrackLength;
+  //====   Matched reco momentum
   extern const Var varTruthProtonMatchedTrackRangeP;
   extern const Var varTruthProtonMatchedTrackMCSP;
   extern const Var varTruthProtonMatchedTrackCombinedP;
-  extern const Var varTruthProtonMatchedTrackLength;
+  //====   Matched reco momentum residual
+  extern const Var varTruthProtonMatchedTrackRangePResidual;
+  extern const Var varTruthProtonMatchedTrackMCSPResidual;
+  extern const Var varTruthProtonMatchedTrackCombinedPResidual;
+  //====   Matched reco momentum residual fraction
+  extern const Var varTruthProtonMatchedTrackRangePResidualFraction;
+  extern const Var varTruthProtonMatchedTrackMCSPResidualFraction;
+  extern const Var varTruthProtonMatchedTrackCombinedPResidualFraction;
+  //====   Matched reco track other properties
   extern const Var varTruthProtonMatchedTrackScore;
   extern const Var varTruthProtonMatchedTrackVertexDistance;
-
+  //====   Matched reco shower
   extern const Var varTruthProtonMatchedShowerIndex;
   extern const Var varTruthProtonMatchedShowerScore;
-
-  //====   For a given true proton (truth_index), find a reco stub whose best-matched is this muon
-
+  //====   Matched stub
   extern const Var varTruthProtonMatchedStubIndex;
   extern const Var varTruthProtonMatchedStubE;
+
+  //==== For a given true charged pion (truth_index), find a reco track whose best-matched is this charged pion
+  extern const Var varTruthChargedPionMatchedTrackIndex;
+  extern const Var varTruthChargedPionMatchedTrackContainedness;
+  extern const Var varTruthChargedPionMatchedTrackChi2Proton;
+  extern const Var varTruthChargedPionMatchedTrackReducedChi2Proton;
+  extern const Var varTruthChargedPionMatchedTrackChi2Muon;
+  extern const Var varTruthChargedPionMatchedTrackReducedChi2Muon;
+  extern const Var varTruthChargedPionMatchedTrackChi2Pion;
+  extern const Var varTruthChargedPionMatchedTrackReducedChi2Pion;
 
   //==== Reco variables
 
@@ -176,16 +231,9 @@ namespace ICARUSNumuXsec{
   //==== This means that the get-particle may not be a true muon
   extern const Var varMuonBestmatchP;
   extern const Var varMuonBestmatchPDG;
-  extern const Var varMuonPResidual;
-  extern const Var varMuonPResidualFraction;
-  extern const Var varMuonCaloPlane0PResidualFraction;
-  extern const Var varMuonCaloPlane1PResidualFraction;
-  extern const Var varMuonCaloPlane2PResidualFraction;
   extern const Var varMuonRecoCosineTheta;
   extern const Var varMuonRecoNuMICosineTheta;
   extern const Var varMuonBestmatchCosineTheta;
-  extern const Var varMuonCosineThetaResidual;
-  extern const Var varMuonCosineThetaResidualFraction;
 
   //==== Proton
 
@@ -201,28 +249,24 @@ namespace ICARUSNumuXsec{
   extern const Var varProtonReducedChi2Proton;
   extern const Var varProtonBestmatchP;
   extern const Var varProtonBestmatchPDG;
-  extern const Var varProtonPResidual;
-  extern const Var varProtonPResidualFraction;
   extern const Var varProtonRecoCosineTheta;
   extern const Var varProtonRecoNuMICosineTheta;
   extern const Var varProtonBestmatchCosineTheta;
-  extern const Var varProtonCosineThetaResidual;
-  extern const Var varProtonCosineThetaResidualFraction;
 
   //====   Stub-based
 
   extern const Var varNStub;
 
+  //==== Muon+Proton
+
+  extern const Var varMuonProtonCosineTheta;
+
   //==== Neutrino
 
   extern const Var varNeutrinoCombinedEnergy;
-  extern const Var varNeutrinoCombinedEnergyResidual;
-  extern const Var varNeutrinoCombinedEnergyResidualFraction;
 
   //==== https://s3.cern.ch/inspire-prod-files-9/93642a13c46438d97680971700e2013c
   extern const Var varNeutrinoQE;
-  extern const Var varNeutrinoQEResidual;
-  extern const Var varNeutrinoQEResidualFraction;
   extern const Var varNeutrinoTestEnergy;
 
 

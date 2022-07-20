@@ -6,6 +6,7 @@ using namespace ana;
 namespace ICARUSNumuXsec{
 
   //==== Spill variable
+
   const SpillMultiVar spillvarCRTHitTime([](const caf::SRSpillProxy *sr)
   {
     std::vector<double> times;
@@ -14,7 +15,6 @@ namespace ICARUSNumuXsec{
     }
     return times;
   });
-
   const SpillMultiVar spillvarCRTHitT0([](const caf::SRSpillProxy *sr)
   {
     std::vector<double> times;
@@ -25,6 +25,7 @@ namespace ICARUSNumuXsec{
   });
 
   //==== only for south
+
   const SpillMultiVar spillvarCRTHitPosX([](const caf::SRSpillProxy *sr)
   {
     std::vector<double> poses;
@@ -44,6 +45,60 @@ namespace ICARUSNumuXsec{
       }
     }
     return poses;
+  });
+
+  const SpillMultiVar spillvarMCNeutrinoE([](const caf::SRSpillProxy *sr)
+  {
+    std::vector<double> rets;
+    for(const auto& _nu : sr->mc.nu){
+      rets.push_back(_nu.E);
+    }
+    return rets;
+  });
+
+  const SpillVar spillvarNSlice([](const caf::SRSpillProxy *sr)
+  {
+    return sr->nslc;
+  });
+  const SpillVar spillvarNTrack([](const caf::SRSpillProxy *sr)
+  { 
+    return sr->reco.ntrk;
+  });
+  const SpillMultiVar spillNuDirectionX([](const caf::SRSpillProxy *sr)
+  {
+    std::vector<double> rets;
+    for(const auto& _nu : sr->mc.nu){
+      double this_x = _nu.prod_vtx.x/100.;
+      double this_y = _nu.prod_vtx.y/100.;
+      double this_z = _nu.prod_vtx.z/100.;
+      TVector3 this_coord = nct.GetICARUSCoord(this_x, this_y, this_z);
+      rets.push_back(this_coord.X());
+    }
+    return rets;
+  });
+  const SpillMultiVar spillNuDirectionY([](const caf::SRSpillProxy *sr)
+  {
+    std::vector<double> rets;
+    for(const auto& _nu : sr->mc.nu){
+      double this_x = _nu.prod_vtx.x/100.;
+      double this_y = _nu.prod_vtx.y/100.;
+      double this_z = _nu.prod_vtx.z/100.;
+      TVector3 this_coord = nct.GetICARUSCoord(this_x, this_y, this_z);
+      rets.push_back(this_coord.Y());
+    }
+    return rets;
+  });
+  const SpillMultiVar spillNuDirectionZ([](const caf::SRSpillProxy *sr)
+  {
+    std::vector<double> rets;
+    for(const auto& _nu : sr->mc.nu){
+      double this_x = _nu.prod_vtx.x/100.;
+      double this_y = _nu.prod_vtx.y/100.;
+      double this_z = _nu.prod_vtx.z/100.;
+      TVector3 this_coord = nct.GetICARUSCoord(this_x, this_y, this_z);
+      rets.push_back(this_coord.Z());
+    }
+    return rets;
   });
 
   //==== Slice variables
@@ -225,6 +280,30 @@ namespace ICARUSNumuXsec{
     return out;
   });
 
+  const MultiVar varAllTrackEndPositionX([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      out.push_back(trk.end.x);
+    }
+    return out;
+  });
+
+  const MultiVar varAllTrackEndPositionY([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      out.push_back(trk.end.y);
+    }
+    return out;
+  });
+
+  const MultiVar varAllTrackEndPositionZ([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      out.push_back(trk.end.z);
+    }
+    return out;
+  });
+
   const Var varNuScore([](const caf::SRSliceProxy* slc) -> double {
     if(isnan(slc->nu_score)) return -0.1;
     else if(slc->nu_score<0) return -0.2;
@@ -264,7 +343,6 @@ namespace ICARUSNumuXsec{
   //==== GENIE interaction code
   //==== https://internal.dunescience.org/doxygen/namespacesimb.html#a2cce734d1b71408bbc7d98d148ac4360
   const Var varGENIEIntCode([](const caf::SRSliceProxy* slc) -> int {
-    //if(!isnan(slc->truth.genie_mode)){
     if(slc->truth.index >= 0.f){
       if(slc->truth.genie_mode<0) return -1;
       else if(slc->truth.genie_mode>13) return 14;
@@ -276,7 +354,7 @@ namespace ICARUSNumuXsec{
   });
 
   //==== Truth variables
-
+  //====   Scattering
   const Var varNeutrinoTruthE([](const caf::SRSliceProxy* slc) -> double {
     if(isnan(slc->truth.E)) return -999.;
     else return slc->truth.E;
@@ -297,7 +375,53 @@ namespace ICARUSNumuXsec{
       return sqrt(Q2*Q2+q0_lab*q0_lab);
     }
   });
+  //====   Vertex
+  const Var varTruthVtxX([](const caf::SRSliceProxy* slc) -> double {
+    if(isnan(slc->truth.position.x)) return -999999.;
+    else{
+      return slc->truth.position.x;
+    }
+  });
+  const Var varTruthVtxY([](const caf::SRSliceProxy* slc) -> double {
+    if(isnan(slc->truth.position.y)) return -999999.;
+    else{
+      return slc->truth.position.y;
+    }
+  });
+  const Var varTruthVtxZ([](const caf::SRSliceProxy* slc) -> double {
+    if(isnan(slc->truth.position.z)) return -999999.;
+    else{
+      return slc->truth.position.z;
+    }
+  });
+  //====     Vertex residual
+  const Var varVtxResidualX([](const caf::SRSliceProxy* slc) -> double {
+    if(isnan(slc->vertex.x) || isnan(slc->truth.position.x)){
+      return -999999999.;
+    }
+    else{
+      return slc->vertex.x-slc->truth.position.x;
+    }
+  });
+  const Var varVtxResidualY([](const caf::SRSliceProxy* slc) -> double {
+    if(isnan(slc->vertex.y) || isnan(slc->truth.position.y)){
+      return -999999999.;
+    }
+    else{
+      return slc->vertex.y-slc->truth.position.y;
+    }
+  });
+  const Var varVtxResidualZ([](const caf::SRSliceProxy* slc) -> double {
+    if(isnan(slc->vertex.z) || isnan(slc->truth.position.z)){
+      return -999999999.;
+    }
+    else{
+      return slc->vertex.z-slc->truth.position.z;
+    }
+  });
 
+
+  //====   Number of particles
   const Var varTruthNNeutron = SIMPLEVAR(truth.nneutron);
   const Var varTruthNPiMinus = SIMPLEVAR(truth.npiminus);
   const Var varTruthNPiPlus = SIMPLEVAR(truth.npiplus);
@@ -305,8 +429,9 @@ namespace ICARUSNumuXsec{
   const Var varTruthNPiZero = SIMPLEVAR(truth.npizero);
   const Var varTruthNProton = SIMPLEVAR(truth.nproton);
 
-  const Var varMuonTruthIndex([](const caf::SRSliceProxy* slc) -> double {
+  //====   Truth Muon
 
+  const Var varMuonTruthIndex([](const caf::SRSliceProxy* slc) -> int {
     double max_E(-999);
     int truth_idx(-1);
     for(std::size_t i(0); i < slc->truth.prim.size(); ++i){
@@ -320,7 +445,6 @@ namespace ICARUSNumuXsec{
       }
     }
     return truth_idx;
-
   });
 
   const Var varMuonTruthP([](const caf::SRSliceProxy* slc) -> double {
@@ -378,7 +502,9 @@ namespace ICARUSNumuXsec{
 
   });
 
-  const Var varProtonTruthIndex([](const caf::SRSliceProxy* slc) -> double {
+  //====   Truth Proton
+
+  const Var varProtonTruthIndex([](const caf::SRSliceProxy* slc) -> int {
 
     double max_E(-999);
     int truth_idx(-1);
@@ -453,6 +579,43 @@ namespace ICARUSNumuXsec{
 
   });
 
+  //====   Truth Charged Pion
+
+  const Var varChargedPionTruthIndex([](const caf::SRSliceProxy* slc) -> int {
+
+    double max_E(-999);
+    int truth_idx(-1);
+    for(std::size_t i(0); i < slc->truth.prim.size(); ++i){
+      if( abs(slc->truth.prim.at(i).pdg)== 211 ){
+        if(isnan(slc->truth.prim.at(i).genE)) continue;
+        double this_E = slc->truth.prim.at(i).genE;
+        if(this_E>max_E){
+          max_E = this_E;
+          truth_idx = i;
+        }
+      }
+    }
+    return truth_idx;
+
+  });
+
+  const Var varChargedPionTruthP([](const caf::SRSliceProxy* slc) -> double {
+
+    int truth_idx = varChargedPionTruthIndex(slc);
+    if(truth_idx>=0){
+      double genE = slc->truth.prim.at(truth_idx).genE;
+      double genP2 = genE*genE-M_CHARGEDPION*M_CHARGEDPION;
+      if(genP2>=0) return sqrt(genP2);
+      else return 0;
+    }
+    else{
+      return -999.;
+    }
+
+  });
+
+  //====   Truth Muon+Proton
+
   const Var varTruthMuonProtonCosineTheta([](const caf::SRSliceProxy* slc) -> double {
 
     int truth_muon_idx = varMuonTruthIndex(slc);
@@ -469,11 +632,9 @@ namespace ICARUSNumuXsec{
 
   });
 
-  //==== For a given truth, find the matching Reco track
+  //==== For a given true muon (truth_index), find a reco whose best-matched is this muon
 
-  //====   For a given true muon (truth_index), find a reco track whose best-matched is this muon
-
-  const Var varTruthMuonMatchedTrackIndex([](const caf::SRSliceProxy* slc) -> double {
+  const Var varTruthMuonMatchedTrackIndex([](const caf::SRSliceProxy* slc) -> int {
 
     int truth_idx = varMuonTruthIndex(slc);
 
@@ -569,6 +730,93 @@ namespace ICARUSNumuXsec{
 
   });
 
+  const Var varTruthMuonMatchedTrackChi2Pion([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+    if(muonTrackIndex>=0){
+
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      int bp = trk.bestplane;
+      float Chi2Pion = trk.chi2pid[bp].chi2_pion;
+      if(isnan(Chi2Pion)) return -999.;
+      else return Chi2Pion;
+
+    }
+    else{
+      return 999999;
+    }
+
+  });
+
+  const Var varTruthMuonMatchedTrackReducedChi2Pion([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+    if(muonTrackIndex>=0){
+
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      int bp = trk.bestplane;
+      float Chi2Pion = trk.chi2pid[bp].chi2_pion;
+      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
+      if(isnan(Chi2Pion)) return -999.;
+      else if(Chi2Ndof==0) return -999.;
+      else return Chi2Pion/double(Chi2Ndof);
+
+    }
+    else{
+      return 999999;
+    }
+
+  });
+
+  //====   Matched reco track positions
+  const Var varTruthMuonMatchedTrackEndPositionX([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      return trk.end.x;
+    }
+    else{
+      return -999;
+    }
+
+  });
+  const Var varTruthMuonMatchedTrackEndPositionY([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      return trk.end.y;
+    }
+    else{
+      return -999;
+    }
+
+  });
+  const Var varTruthMuonMatchedTrackEndPositionZ([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      return trk.end.z;
+    }
+    else{
+      return -999;
+    }
+
+  });
+
+  //====   Matched reco angle
+
+  const Var varTruthMuonMatchedTrackNuMICosineTheta([](const caf::SRSliceProxy* slc) -> double {
+    float costh(-5.f);
+    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      TVector3 v3(trk.dir.x, trk.dir.y, trk.dir.z);
+      double angleNuMI = v3.Angle(NuDirection_NuMI);
+      costh = TMath::Cos(angleNuMI);
+    }
+    return costh;
+  });
+
+  //====   Matched reco length
+
   const Var varTruthMuonMatchedTrackLength([](const caf::SRSliceProxy* slc) -> double {
     int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
     if(muonTrackIndex>=0){
@@ -580,6 +828,8 @@ namespace ICARUSNumuXsec{
     }
 
   });
+
+  //====   Matched reco momentum
 
   const Var varTruthMuonMatchedTrackRangeP([](const caf::SRSliceProxy* slc) -> double {
     int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
@@ -625,6 +875,89 @@ namespace ICARUSNumuXsec{
 
   });
 
+  //====   Matched reco momentum residual
+
+  const Var varTruthMuonMatchedTrackRangePResidual([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      double TruthP = varMuonTruthP(slc);
+      double RecoP = varTruthMuonMatchedTrackRangeP(slc);
+      return (RecoP-TruthP);
+    }
+    else{
+      return -999;
+    }
+
+  });
+
+  const Var varTruthMuonMatchedTrackMCSPResidual([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      double TruthP = varMuonTruthP(slc);
+      double RecoP = varTruthMuonMatchedTrackMCSP(slc);
+      return (RecoP-TruthP);
+    }
+    else{
+      return -999;
+    }
+
+  });
+  const Var varTruthMuonMatchedTrackCombinedPResidual([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      double TruthP = varMuonTruthP(slc);
+      double RecoP = varTruthMuonMatchedTrackCombinedP(slc);
+      return (RecoP-TruthP);
+    }
+    else{
+      return -999;
+    }
+
+  });
+
+  //====   Matched reco momentum residual fraction
+
+  const Var varTruthMuonMatchedTrackRangePResidualFraction([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      double TruthP = varMuonTruthP(slc);
+      double RecoP = varTruthMuonMatchedTrackRangeP(slc);
+      return (RecoP-TruthP)/TruthP;
+    }
+    else{
+      return -999;
+    }
+
+  });
+
+  const Var varTruthMuonMatchedTrackMCSPResidualFraction([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      double TruthP = varMuonTruthP(slc);
+      double RecoP = varTruthMuonMatchedTrackMCSP(slc);
+      return (RecoP-TruthP)/TruthP;
+    }
+    else{
+      return -999;
+    }
+
+  });
+
+  const Var varTruthMuonMatchedTrackCombinedPResidualFraction([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      double TruthP = varMuonTruthP(slc);
+      double RecoP = varTruthMuonMatchedTrackCombinedP(slc);
+      return (RecoP-TruthP)/TruthP;
+    }
+    else{
+      return -999;
+    }
+
+  });
+
+  //====   Matched reco track other properties
+
   const Var varTruthMuonMatchedTrackScore([](const caf::SRSliceProxy* slc) -> double {
     int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
     if(muonTrackIndex>=0){
@@ -651,7 +984,9 @@ namespace ICARUSNumuXsec{
 
   });
 
-  const Var varTruthMuonMatchedShowerIndex([](const caf::SRSliceProxy* slc) -> double {
+  //====   Matched reco shower
+
+  const Var varTruthMuonMatchedShowerIndex([](const caf::SRSliceProxy* slc) -> int {
 
     int truth_idx = varMuonTruthIndex(slc);
 
@@ -670,54 +1005,9 @@ namespace ICARUSNumuXsec{
 
   });
 
-  const Var varTruthProtonMatchedTrackScore([](const caf::SRSliceProxy* slc) -> double {
-    int protonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
-    if(protonTrackIndex>=0){
-      return slc->reco.trk.at(protonTrackIndex).pfp.trackScore;
-    }
-    else{
-      return -999;
-    }
+  //==== For a given true proton (truth_index), find a reco whose best-matched is this proton
 
-  });
-
-  const Var varTruthProtonMatchedTrackVertexDistance([](const caf::SRSliceProxy* slc) -> double {
-    int protonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
-    if(protonTrackIndex>=0){
-      auto const& trk = slc->reco.trk.at(protonTrackIndex);
-      return sqrt( pow( slc->vertex.x - trk.start.x, 2.0 ) +
-              pow( slc->vertex.y - trk.start.y, 2.0 ) +
-              pow( slc->vertex.z - trk.start.z, 2.0 ) );
-
-    }
-    else{
-      return -999;
-    }
-
-  });
-
-  const Var varTruthProtonMatchedShowerIndex([](const caf::SRSliceProxy* slc) -> double {
-
-    int truth_idx = varProtonTruthIndex(slc);
-
-    return GetMatchedRecoShowerIndex(slc, truth_idx);
-
-  });
-
-  const Var varTruthProtonMatchedShowerScore([](const caf::SRSliceProxy* slc) -> double {
-    int protonShowerIndex = varTruthProtonMatchedShowerIndex(slc);
-    if(protonShowerIndex>=0){
-      return slc->reco.shw.at(protonShowerIndex).pfp.trackScore;
-    }
-    else{
-      return -999;
-    }
-
-  });
-
-  //====   For a given true proton (truth_index), find a reco track whose best-matched is this muon
-
-  const Var varTruthProtonMatchedTrackIndex([](const caf::SRSliceProxy* slc) -> double {
+  const Var varTruthProtonMatchedTrackIndex([](const caf::SRSliceProxy* slc) -> int {
 
     int truth_idx = varProtonTruthIndex(slc);
 
@@ -758,27 +1048,6 @@ namespace ICARUSNumuXsec{
       else{
         Chi2Proton = trk.chi2pid[2].chi2_proton;
       }
-      if(isnan(Chi2Proton)) return -999.;
-      else return Chi2Proton;
-/*
-      auto const& trk = slc->reco.trk.at(protonTrackIndex);
-      int bp = trk.bestplane;
-      float Chi2Proton = trk.chi2pid[bp].chi2_proton;
-      if(isnan(Chi2Proton)) return -999.;
-      else return Chi2Proton;
-*/
-    }
-    else{
-      return 999999;
-    }
-  });
-
-  const Var varTruthProtonMatchedTrackChi2ProtonCollection([](const caf::SRSliceProxy* slc) -> double {
-    int protonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
-    if(protonTrackIndex>=0){
-
-      auto const& trk = slc->reco.trk.at(protonTrackIndex);
-      float Chi2Proton = trk.chi2pid[2].chi2_proton;
       if(isnan(Chi2Proton)) return -999.;
       else return Chi2Proton;
 /*
@@ -848,6 +1117,58 @@ namespace ICARUSNumuXsec{
 
   });
 
+  const Var varTruthProtonMatchedTrackChi2Pion([](const caf::SRSliceProxy* slc) -> double {
+    int protonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
+    if(protonTrackIndex>=0){
+
+      auto const& trk = slc->reco.trk.at(protonTrackIndex);
+      int bp = trk.bestplane;
+      float Chi2Pion = trk.chi2pid[bp].chi2_pion;
+      if(isnan(Chi2Pion)) return -999.;
+      else return Chi2Pion;
+
+    }
+    else{
+      return 999999;
+    }
+
+  });
+
+  const Var varTruthProtonMatchedTrackReducedChi2Pion([](const caf::SRSliceProxy* slc) -> double {
+    int protonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
+    if(protonTrackIndex>=0){
+
+      auto const& trk = slc->reco.trk.at(protonTrackIndex);
+      int bp = trk.bestplane;
+      float Chi2Pion = trk.chi2pid[bp].chi2_pion;
+      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
+      if(isnan(Chi2Pion)) return -999.;
+      else if(Chi2Ndof==0) return -999.;
+      else return Chi2Pion/double(Chi2Ndof);
+
+    }
+    else{
+      return 999999;
+    }
+
+  });
+
+  //====   Matched reco length
+
+  const Var varTruthProtonMatchedTrackLength([](const caf::SRSliceProxy* slc) -> double {
+    int ProtonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
+    if(ProtonTrackIndex>=0){
+      auto const& trk_Proton = slc->reco.trk.at(ProtonTrackIndex);
+      return trk_Proton.len;
+    }
+    else{
+      return -999;
+    }
+
+  });
+
+  //====   Matched reco momentum
+
   const Var varTruthProtonMatchedTrackRangeP([](const caf::SRSliceProxy* slc) -> double {
     int ProtonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
     if(ProtonTrackIndex>=0){
@@ -889,11 +1210,14 @@ namespace ICARUSNumuXsec{
 
   });
 
-  const Var varTruthProtonMatchedTrackLength([](const caf::SRSliceProxy* slc) -> double {
+  //====   Matched reco momentum residual
+
+  const Var varTruthProtonMatchedTrackRangePResidual([](const caf::SRSliceProxy* slc) -> double {
     int ProtonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
     if(ProtonTrackIndex>=0){
-      auto const& trk_Proton = slc->reco.trk.at(ProtonTrackIndex);
-      return trk_Proton.len;
+      double TruthP = varProtonTruthP(slc);
+      double RecoP = varTruthProtonMatchedTrackRangeP(slc);
+      return (RecoP-TruthP);
     }
     else{
       return -999;
@@ -901,11 +1225,124 @@ namespace ICARUSNumuXsec{
 
   });
 
+  const Var varTruthProtonMatchedTrackMCSPResidual([](const caf::SRSliceProxy* slc) -> double {
+    int ProtonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
+    if(ProtonTrackIndex>=0){
+      double TruthP = varProtonTruthP(slc);
+      double RecoP = varTruthProtonMatchedTrackMCSP(slc);
+      return (RecoP-TruthP);
+    }
+    else{
+      return -999;
+    }
 
+  });
+  const Var varTruthProtonMatchedTrackCombinedPResidual([](const caf::SRSliceProxy* slc) -> double {
+    int ProtonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
+    if(ProtonTrackIndex>=0){
+      double TruthP = varProtonTruthP(slc);
+      double RecoP = varTruthProtonMatchedTrackCombinedP(slc);
+      return (RecoP-TruthP);
+    }
+    else{
+      return -999;
+    }
 
-  //====   For a given true proton (truth_index), find a reco stub whose best-matched is this muon
+  });
 
-  const Var varTruthProtonMatchedStubIndex([](const caf::SRSliceProxy* slc) -> double {
+  //====   Matched reco momentum residual fraction
+
+  const Var varTruthProtonMatchedTrackRangePResidualFraction([](const caf::SRSliceProxy* slc) -> double {
+    int ProtonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
+    if(ProtonTrackIndex>=0){
+      double TruthP = varProtonTruthP(slc);
+      double RecoP = varTruthProtonMatchedTrackRangeP(slc);
+      return (RecoP-TruthP)/TruthP;
+    }
+    else{
+      return -999;
+    }
+
+  });
+
+  const Var varTruthProtonMatchedTrackMCSPResidualFraction([](const caf::SRSliceProxy* slc) -> double {
+    int ProtonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
+    if(ProtonTrackIndex>=0){
+      double TruthP = varProtonTruthP(slc);
+      double RecoP = varTruthProtonMatchedTrackMCSP(slc);
+      return (RecoP-TruthP)/TruthP;
+    }
+    else{
+      return -999;
+    }
+
+  });
+
+  const Var varTruthProtonMatchedTrackCombinedPResidualFraction([](const caf::SRSliceProxy* slc) -> double {
+    int ProtonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
+    if(ProtonTrackIndex>=0){
+      double TruthP = varProtonTruthP(slc);
+      double RecoP = varTruthProtonMatchedTrackCombinedP(slc);
+      return (RecoP-TruthP)/TruthP;
+    }
+    else{
+      return -999;
+    }
+
+  });
+
+  //====   Matched reco track other properties
+
+  const Var varTruthProtonMatchedTrackScore([](const caf::SRSliceProxy* slc) -> double {
+    int protonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
+    if(protonTrackIndex>=0){
+      return slc->reco.trk.at(protonTrackIndex).pfp.trackScore;
+    }
+    else{
+      return -999;
+    }
+
+  });
+
+  const Var varTruthProtonMatchedTrackVertexDistance([](const caf::SRSliceProxy* slc) -> double {
+    int protonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
+    if(protonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(protonTrackIndex);
+      return sqrt( pow( slc->vertex.x - trk.start.x, 2.0 ) +
+              pow( slc->vertex.y - trk.start.y, 2.0 ) +
+              pow( slc->vertex.z - trk.start.z, 2.0 ) );
+
+    }
+    else{
+      return -999;
+    }
+
+  });
+
+  //====   Matched reco shower
+
+  const Var varTruthProtonMatchedShowerIndex([](const caf::SRSliceProxy* slc) -> int {
+
+    int truth_idx = varProtonTruthIndex(slc);
+
+    return GetMatchedRecoShowerIndex(slc, truth_idx);
+
+  });
+
+  const Var varTruthProtonMatchedShowerScore([](const caf::SRSliceProxy* slc) -> double {
+    int protonShowerIndex = varTruthProtonMatchedShowerIndex(slc);
+    if(protonShowerIndex>=0){
+      return slc->reco.shw.at(protonShowerIndex).pfp.trackScore;
+    }
+    else{
+      return -999;
+    }
+
+  });
+
+  //====   Matched stub
+
+  const Var varTruthProtonMatchedStubIndex([](const caf::SRSliceProxy* slc) -> int {
 
     int truth_idx = varProtonTruthIndex(slc);
 
@@ -932,11 +1369,139 @@ namespace ICARUSNumuXsec{
 
   });
 
+  //==== For a given true charged pion (truth_index), find a reco track whose best-matched is this charged pion
+
+  const Var varTruthChargedPionMatchedTrackIndex([](const caf::SRSliceProxy* slc) -> int {
+
+    int truth_idx = varChargedPionTruthIndex(slc);
+
+    return GetMatchedRecoTrackIndex(slc, truth_idx);
+
+  });
+
+  const Var varTruthChargedPionMatchedTrackContainedness([](const caf::SRSliceProxy* slc) -> int {
+    int cpionTrackIndex = varTruthChargedPionMatchedTrackIndex(slc);
+    //==== -1 : No track found
+    //==== 0 : Exiting
+    //==== 1 : Contained
+    if(cpionTrackIndex>=0){
+
+      auto const& trk = slc->reco.trk.at(cpionTrackIndex);
+      bool isContained = fv.isContained(trk.end.x, trk.end.y, trk.end.z);
+      if(isContained) return 1;
+      else return 0;
+    }
+    else{
+      return -1;
+    }
+
+  });
+
+  const Var varTruthChargedPionMatchedTrackChi2Proton([](const caf::SRSliceProxy* slc) -> double {
+    int cpionTrackIndex = varTruthChargedPionMatchedTrackIndex(slc);
+    if(cpionTrackIndex>=0){
+
+      auto const& trk = slc->reco.trk.at(cpionTrackIndex);
+      int bp = trk.bestplane;
+      float Chi2Proton = trk.chi2pid[bp].chi2_proton;
+      if(isnan(Chi2Proton)) return -999.;
+      else return Chi2Proton;
+
+    }
+    else{
+      return 999999;
+    }
+  });
+
+  const Var varTruthChargedPionMatchedTrackReducedChi2Proton([](const caf::SRSliceProxy* slc) -> double {
+    int cpionTrackIndex = varTruthChargedPionMatchedTrackIndex(slc);
+    if(cpionTrackIndex>=0){
+
+      auto const& trk = slc->reco.trk.at(cpionTrackIndex);
+      int bp = trk.bestplane;
+      float Chi2Proton = trk.chi2pid[bp].chi2_proton;
+      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
+      if(isnan(Chi2Proton)) return -999.;
+      else if(Chi2Ndof==0) return -999.;
+      else return Chi2Proton/double(Chi2Ndof);
+
+    }
+    else{
+      return 999999;
+    }
+  });
+
+  const Var varTruthChargedPionMatchedTrackChi2Muon([](const caf::SRSliceProxy* slc) -> double {
+    int cpionTrackIndex = varTruthChargedPionMatchedTrackIndex(slc);
+    if(cpionTrackIndex>=0){
+
+      auto const& trk = slc->reco.trk.at(cpionTrackIndex);
+      int bp = trk.bestplane;
+      float Chi2Muon = trk.chi2pid[bp].chi2_muon;
+      if(isnan(Chi2Muon)) return -999.;
+      else return Chi2Muon;
+
+    }
+    else{
+      return 999999;
+    }
+  });
+
+  const Var varTruthChargedPionMatchedTrackReducedChi2Muon([](const caf::SRSliceProxy* slc) -> double {
+    int cpionTrackIndex = varTruthChargedPionMatchedTrackIndex(slc);
+    if(cpionTrackIndex>=0){
+
+      auto const& trk = slc->reco.trk.at(cpionTrackIndex);
+      int bp = trk.bestplane;
+      float Chi2Muon = trk.chi2pid[bp].chi2_muon;
+      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
+      if(isnan(Chi2Muon)) return -999.;
+      else if(Chi2Ndof==0) return -999.;
+      else return Chi2Muon/double(Chi2Ndof);
+
+    }
+    else{
+      return 999999;
+    }
+  });
+
+  const Var varTruthChargedPionMatchedTrackChi2Pion([](const caf::SRSliceProxy* slc) -> double {
+    int cpionTrackIndex = varTruthChargedPionMatchedTrackIndex(slc);
+    if(cpionTrackIndex>=0){
+
+      auto const& trk = slc->reco.trk.at(cpionTrackIndex);
+      int bp = trk.bestplane;
+      float Chi2Pion = trk.chi2pid[bp].chi2_pion;
+      if(isnan(Chi2Pion)) return -999.;
+      else return Chi2Pion;
+
+    }
+    else{
+      return 999999;
+    }
+  });
+
+  const Var varTruthChargedPionMatchedTrackReducedChi2Pion([](const caf::SRSliceProxy* slc) -> double {
+    int cpionTrackIndex = varTruthChargedPionMatchedTrackIndex(slc);
+    if(cpionTrackIndex>=0){
+
+      auto const& trk = slc->reco.trk.at(cpionTrackIndex);
+      int bp = trk.bestplane;
+      float Chi2Pion = trk.chi2pid[bp].chi2_pion;
+      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
+      if(isnan(Chi2Pion)) return -999.;
+      else if(Chi2Ndof==0) return -999.;
+      else return Chi2Pion/double(Chi2Ndof);
+
+    }
+    else{
+      return 999999;
+    }
+  });
 
   //==== Reco variables
 
   //====   Muon
-
 
   //====   All muon-like tracks
   const MultiVar varAllMuonTrackIndices([](const caf::SRSliceProxy* slc) -> std::vector<double> {
@@ -1200,8 +1765,6 @@ namespace ICARUSNumuXsec{
     return -9999999999.;
   });
 
-
-
   //==== Start from a reco Track, and look at its best match gen-particle.
   //==== This means that the get-particle may not be a true muon
   const Var varMuonBestmatchP([](const caf::SRSliceProxy* slc) -> float {
@@ -1224,69 +1787,6 @@ namespace ICARUSNumuXsec{
       pdg = trk.truth.p.pdg;
     }
     return pdg;
-  });
-
-  const Var varMuonPResidual([](const caf::SRSliceProxy* slc) -> float {
-    float pr(-999);
-
-    if( varMuonTrackInd(slc) >= 0 ){
-      double RecoP = varMuonRecoP(slc);
-      double TrueP = varMuonBestmatchP(slc);
-      pr = RecoP-TrueP;
-    }
-    return pr;
-  });
-
-  const Var varMuonPResidualFraction([](const caf::SRSliceProxy* slc) -> float {
-    float prf(-999);
-
-    if( varMuonTrackInd(slc) >= 0 ){
-      double RecoP = varMuonRecoP(slc);
-      double TrueP = varMuonBestmatchP(slc);
-      if(TrueP>0.){
-        prf = (RecoP-TrueP)/TrueP;
-      }
-    }
-    return prf;
-  });
-
-  const Var varMuonCaloPlane0PResidualFraction([](const caf::SRSliceProxy* slc) -> float {
-    float prf(-999);
-
-    if( varMuonTrackInd(slc) >= 0 ){
-      double RecoP = varMuonCaloPlane0P(slc);
-      double TrueP = varMuonBestmatchP(slc);
-      if(TrueP>0.){
-        prf = (RecoP-TrueP)/TrueP;
-      }
-    }
-    return prf;
-  });
-
-  const Var varMuonCaloPlane1PResidualFraction([](const caf::SRSliceProxy* slc) -> float {
-    float prf(-999);
-
-    if( varMuonTrackInd(slc) >= 0 ){
-      double RecoP = varMuonCaloPlane1P(slc);
-      double TrueP = varMuonBestmatchP(slc);
-      if(TrueP>0.){
-        prf = (RecoP-TrueP)/TrueP;
-      }
-    }
-    return prf;
-  });
-
-  const Var varMuonCaloPlane2PResidualFraction([](const caf::SRSliceProxy* slc) -> float {
-    float prf(-999);
-
-    if( varMuonTrackInd(slc) >= 0 ){
-      double RecoP = varMuonCaloPlane2P(slc);
-      double TrueP = varMuonBestmatchP(slc);
-      if(TrueP>0.){
-        prf = (RecoP-TrueP)/TrueP;
-      }
-    }
-    return prf;
   });
 
   const Var varMuonRecoCosineTheta([](const caf::SRSliceProxy* slc) -> float {
@@ -1320,28 +1820,6 @@ namespace ICARUSNumuXsec{
       costh = v3.CosTheta();
     }
     return costh;
-  });
-
-  const Var varMuonCosineThetaResidual([](const caf::SRSliceProxy* slc) -> float {
-    float costhr(-999);
-
-    if( varMuonTrackInd(slc) >= 0 ){
-      double RecoCosineTheta = varMuonRecoCosineTheta(slc);
-      double TrueCosineTheta = varMuonBestmatchCosineTheta(slc);
-      costhr = RecoCosineTheta-TrueCosineTheta;
-    }
-    return costhr;
-  });
-
-  const Var varMuonCosineThetaResidualFraction([](const caf::SRSliceProxy* slc) -> float {
-    float costhrf(-999);
-
-    if( varMuonTrackInd(slc) >= 0 ){
-      double RecoCosineTheta = varMuonRecoCosineTheta(slc);
-      double TrueCosineTheta = varMuonBestmatchCosineTheta(slc);
-      costhrf = (RecoCosineTheta-TrueCosineTheta)/TrueCosineTheta;
-    }
-    return costhrf;
   });
 
   //==== Proton
@@ -1423,9 +1901,6 @@ namespace ICARUSNumuXsec{
       Chi2Proton = trk.chi2pid[bp].chi2_proton;
       //Chi2Muon = trk.chi2pid[bp].chi2_muon;
       bool PassChi2 = Chi2Proton < 100;
-
-      //==== TEST
-      PassChi2 = true; // not appling chi2
 
       if( AtSlice && Contained && PassChi2 && trk.len > Longest ){
         Longest = trk.len;
@@ -1532,30 +2007,6 @@ namespace ICARUSNumuXsec{
     return pdg;
   });
 
-  const Var varProtonPResidual([](const caf::SRSliceProxy* slc) -> float {
-    float pr(-999);
-
-    if( varProtonTrackInd(slc) >= 0 ){
-      double RecoP = varProtonRecoP(slc);
-      double TrueP = varProtonBestmatchP(slc);
-      pr = RecoP-TrueP;
-    }
-    return pr;
-  });
-
-  const Var varProtonPResidualFraction([](const caf::SRSliceProxy* slc) -> float {
-    float prf(-999);
-
-    if( varProtonTrackInd(slc) >= 0 ){
-      double RecoP = varProtonRecoP(slc);
-      double TrueP = varProtonBestmatchP(slc);
-      if(TrueP>0.){
-        prf = (RecoP-TrueP)/TrueP;
-      }
-    }
-    return prf;
-  });
-
   const Var varProtonRecoCosineTheta([](const caf::SRSliceProxy* slc) -> float {
     float costh(-5.f);
 
@@ -1591,35 +2042,32 @@ namespace ICARUSNumuXsec{
     return costh;
   });
 
-  const Var varProtonCosineThetaResidual([](const caf::SRSliceProxy* slc) -> float {
-
-    float costhr(-999);
-
-    if( varProtonTrackInd(slc) >= 0 ){
-      double RecoCosineTheta = varProtonRecoCosineTheta(slc);
-      double TrueCosineTheta = varProtonBestmatchCosineTheta(slc);
-      costhr = RecoCosineTheta-TrueCosineTheta;
-    }
-    return costhr;
-  });
-
-  const Var varProtonCosineThetaResidualFraction([](const caf::SRSliceProxy* slc) -> float {
-
-    float costhrf(-999);
-
-    if( varProtonTrackInd(slc) >= 0 ){
-      double RecoCosineTheta = varProtonRecoCosineTheta(slc);
-      double TrueCosineTheta = varProtonBestmatchCosineTheta(slc);
-      costhrf = (RecoCosineTheta-TrueCosineTheta)/TrueCosineTheta;
-    }
-    return costhrf;
-  });
-
   //====   Stub-based
 
   const Var varNStub([](const caf::SRSliceProxy* slc) -> int {
 
     return slc->reco.stub.size();
+
+  });
+
+  //==== Muon+Proton
+
+  const Var varMuonProtonCosineTheta([](const caf::SRSliceProxy* slc) -> double {
+
+    if( varMuonTrackInd(slc) >= 0 && varProtonTrackInd(slc) >= 0 ){
+
+      auto const& trk_Muon = slc->reco.trk.at(varMuonTrackInd(slc));
+      auto const& trk_Proton = slc->reco.trk.at(varProtonTrackInd(slc));
+
+      TVector3 v3_Muon(trk_Muon.dir.x, trk_Muon.dir.y, trk_Muon.dir.z);
+      TVector3 v3_Proton(trk_Proton.dir.x, trk_Proton.dir.y, trk_Proton.dir.z);
+
+      return v3_Muon.Unit().Dot( v3_Proton.Unit() );
+
+    }
+    else{
+      return -9999.;
+    }
 
   });
 
@@ -1644,37 +2092,6 @@ namespace ICARUSNumuXsec{
 
   });
 
-  const Var varNeutrinoCombinedEnergyResidual([](const caf::SRSliceProxy* slc) -> double {
-
-    double E_Nur(-999);
-    if( varMuonTrackInd(slc) >= 0 && varProtonTrackInd(slc) >= 0 ){
-
-      double RecoE = varNeutrinoCombinedEnergy(slc);
-      double TrueE = varNeutrinoTruthE(slc);
-
-      E_Nur = RecoE-TrueE;
-
-    }
-    return E_Nur;
-
-  });
-
-  const Var varNeutrinoCombinedEnergyResidualFraction([](const caf::SRSliceProxy* slc) -> double {
-
-    double E_Nurf(-999);
-    if( varMuonTrackInd(slc) >= 0 && varProtonTrackInd(slc) >= 0 ){
-
-      double RecoE = varNeutrinoCombinedEnergy(slc);
-      double TrueE = varNeutrinoTruthE(slc);
-      if(TrueE>0.){
-        E_Nurf = (RecoE-TrueE)/TrueE;
-      }
-
-    }
-    return E_Nurf;
-
-  });
-
   //==== https://s3.cern.ch/inspire-prod-files-9/93642a13c46438d97680971700e2013c
   const Var varNeutrinoQE([](const caf::SRSliceProxy* slc) -> double {
 
@@ -1695,43 +2112,6 @@ namespace ICARUSNumuXsec{
     else{
       return -999.;
     }
-
-  });
-
-  const Var varNeutrinoQEResidual([](const caf::SRSliceProxy* slc) -> double {
-
-    int muonTrackIndex = varMuonTrackInd(slc);
-    if(muonTrackIndex>=0){
-
-      double RecoE = varNeutrinoQE(slc);
-      double TrueE = varNeutrinoTruthE(slc);
-
-      double E_Nur = RecoE-TrueE;
-
-      return E_Nur;
-
-    }
-    else{
-      return -999.;
-    }
-
-  });
-
-  const Var varNeutrinoQEResidualFraction([](const caf::SRSliceProxy* slc) -> double {
-
-    int muonTrackIndex = varMuonTrackInd(slc);
-    double E_Nurf(-999.);
-    if(muonTrackIndex>=0){
-
-      double RecoE = varNeutrinoQE(slc);
-      double TrueE = varNeutrinoTruthE(slc);
-      if(TrueE>0.){
-        E_Nurf = (RecoE-TrueE)/TrueE;
-      }
-
-    }
-
-    return E_Nurf;
 
   });
 

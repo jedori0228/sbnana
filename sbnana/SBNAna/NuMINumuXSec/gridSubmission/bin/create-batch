@@ -470,7 +470,7 @@ try:
 
     AllSampleFinished = True
 
-    lines_JobStatus = GetJobStatus.GetJobStatusByUser(USER)
+    lines_JobStatus = GetJobStatus.GetJobStatusByUser(USER, str_RandomNumber)
 
     for it_sample in range(0,len(InputSamples)):
 
@@ -531,11 +531,11 @@ try:
           this_status = GetJobStatus.GetJobStatusByJobID(lines_JobStatus ,this_jobID)
 
           if "ERROR" in this_status:
-            GotError = True
-            statuslog.write("#### ERROR OCCURED ####\n")
-            statuslog.write(this_status+'\n')
-            ErrorLog = this_status
-            break
+            #GotError = True
+            statuslog.write("#Job hold for %s, resubmitting\n"%(this_jobID))
+            os.system('jobsub_release --jobid=%s'%(this_jobID))
+            #ErrorLog = this_status
+            #break
 
           if "FINISHED" not in this_status:
             ThisSampleFinished = False

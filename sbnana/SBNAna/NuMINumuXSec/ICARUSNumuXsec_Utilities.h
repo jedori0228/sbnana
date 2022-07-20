@@ -8,6 +8,7 @@
 
 #include "sbnana/SBNAna/Cuts/NumuCutsIcarus202106.h"
 #include "TVector3.h"
+#include "TMatrixD.h"
 #include <iostream>
 
 using namespace std;
@@ -42,9 +43,24 @@ namespace ICARUSNumuXsec{
 
   }; // END Class FiducialVolumeTool
 
+  //==== For a given truth particle, find the reco object
   int GetMatchedRecoTrackIndex(const caf::SRSliceProxy* slc, int truth_idx);
   int GetMatchedRecoShowerIndex(const caf::SRSliceProxy* slc, int truth_idx);
   int GetMatchedRecoStubIndex(const caf::SRSliceProxy* slc, int truth_idx);
 
+  class NuMICoordinateTool{
+
+  public:
+
+    NuMICoordinateTool();
+
+    TVector3 GetICARUSCoord(double x, double y, double z) const;
+
+  protected:
+
+    TMatrixD rotMatNtoI = TMatrixD(3,3);
+    TMatrixD tranVecNtoI = TMatrixD(3,1);
+
+  }; // END Class NuMICoordinateTool
 
 }

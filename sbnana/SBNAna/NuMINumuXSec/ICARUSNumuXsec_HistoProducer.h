@@ -12,6 +12,7 @@ using namespace ana;
 #include "TCanvas.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TH3.h"
 #include "TFile.h"
 #include "TString.h"
 #include "TLegend.h"
@@ -49,7 +50,11 @@ namespace ICARUSNumuXsec{
     void bookRecoPerformance(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     void bookQuickCutEfficiency(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     void bookCRTStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
-    void bookTEMP(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    void GetSmearMat(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+
+    void GetChi2Eff(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+
+    void bookTEST(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
     void saveHistograms();
 

@@ -1,8 +1,8 @@
 import os
 
-def GetJobStatusByUser(user):
-  os.system('jobsub_q -G icarus --user %s &> /tmp/jobstatus_%s.log'%(user,user))
-  return open('/tmp/jobstatus_%s.log'%(user)).readlines()
+def GetJobStatusByUser(user, randStr):
+  os.system('jobsub_q -G icarus --user %s &> /tmp/jobstatus_%s_%s.log'%(user, randStr, user))
+  return open('/tmp/jobstatus_%s_%s.log'%(randStr, user)).readlines()
 
 def GetJobStatusByJobID(lines_JobStatus, this_jobID):
   for line in lines_JobStatus:
@@ -24,7 +24,7 @@ def GetJobStatusByJobID(lines_JobStatus, this_jobID):
     if words[0]==this_jobID:
       jobFlag = words[5]
       if jobFlag=="H":
-        return "ERROR"
+        return "HOLD"
       elif jobFlag=="R":
         return "RUNNING::%s"%(words[4])
       elif jobFlag=="I":
