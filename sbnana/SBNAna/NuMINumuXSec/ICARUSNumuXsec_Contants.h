@@ -6,7 +6,6 @@
 
 #include "sbnanaobj/StandardRecord/Proxy/SRProxy.h"
 
-#include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Contants.h"
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Utilities.h"
 #include "sbnana/SBNAna/Cuts/NumuCutsIcarus202106.h"
 #include "TVector3.h"
@@ -23,11 +22,15 @@ using namespace ana;
 
 namespace ICARUSNumuXsec{
 
-  const TVector3 NuDirection_NuMI(3.94583e-01, 4.26067e-02, 9.17677e-01);
+  static const TVector3 NuDirection_NuMI(3.94583e-01, 4.26067e-02, 9.17677e-01);
 
-  const FiducialVolumeTool fv = FiducialVolumeTool();
-  const FiducialVolumeTool fv_track = FiducialVolumeTool();
+  static const VertexContained& fv = VertexContained::Instance();
+  static const TrackContained& fv_track = TrackContained::Instance();
 
-  const NuMICoordinateTool nct = NuMICoordinateTool();
+  static const NuMICoordinateTool& nct = NuMICoordinateTool::Instance();
+
+  static const dEdXTemplateTool& dedxtempt = dEdXTemplateTool::Instance();
+
+  static const SterileNuTool snt = SterileNuTool::Instance();
 
 }

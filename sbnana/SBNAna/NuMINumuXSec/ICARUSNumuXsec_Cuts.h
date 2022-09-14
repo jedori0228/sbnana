@@ -89,6 +89,7 @@ namespace ICARUSNumuXsec{
   //==== Flash matching
 
   extern const Cut cutFMScore;
+  extern const Cut kSlcFlashMatchDataCut;
   extern const Cut cutFMTime;
 
   //==== NuScore
@@ -96,6 +97,10 @@ namespace ICARUSNumuXsec{
   extern const Cut cutNuScore;
   extern const Cut cutSliceCRLongestTrackDirY;
   extern const Cut cutSliceNuVertexYTop;
+
+  //==== 220811 Vertex test
+  extern const Cut cutVertexYPos;
+  extern const Cut cutVertexYNeg;
 
   //==== Muon related
 
@@ -105,9 +110,18 @@ namespace ICARUSNumuXsec{
   extern const Cut cutRecoMuonTruthContained;
   //==== TEST
   extern const Cut cutTruthMuonMatchedTrackContained;
-
   extern const Cut cutMuonMatchedToMuon;
   extern const Cut cutMuonMatchedToProton;
+  //==== Michel study
+  extern const Cut cutTruthMuonMatchedTrackHasStitchedTrack;
+  extern const Cut cutTruthMuonMatchedTrackStitchedTrackMatched;
+  extern const Cut cutTruthMuonMatchedTrackHasStitchedShower;
+  extern const Cut cutTruthMuonMatchedTrackStitchedShowerMatched;
+  extern const Cut cutTruthMuonMatchedTrackIsMichelTagged;
+  //==== Michel tagging for muon
+  extern const Cut cutMuonIsMichelTagged;
+  //==== Pion tagging for muon
+  extern const Cut cutMuonIsPionTagged;
 
   //==== Proton related
 
@@ -124,6 +138,11 @@ namespace ICARUSNumuXsec{
 
   extern const Cut cutTruthChargedPionContained;
   extern const Cut cutTruthChargedPionMatchedTrackContained;
+  //==== Michel study
+  extern const Cut cutTruthChargedPionMatchedTrackHasStitchedTrack;
+  extern const Cut cutTruthChargedPionMatchedTrackStitchedTrackMatched;
+  extern const Cut cutTruthChargedPionMatchedTrackHasStitchedShower;
+  extern const Cut cutTruthChargedPionMatchedTrackStitchedShowerMatched;
 
   //==== CRT 
 
