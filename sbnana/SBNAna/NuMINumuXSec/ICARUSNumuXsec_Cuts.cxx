@@ -185,11 +185,23 @@ namespace ICARUSNumuXsec{
   //==== FMScore
 
   const Cut cutFMScore([](const caf::SRSliceProxy* slc) {
+/*
+    bool passCut = !isnan(slc->fmatch.score) && slc->fmatch.score < 12.0 && slc->fmatch.score >= 0;
+    std::cout << "slc->fmatch.score = " << slc->fmatch.score;
+    if(passCut) std::cout << " -> Pass" << std::endl;
+    else std::cout << " -> Fail" << std::endl;
+*/
     return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 12.0 && slc->fmatch.score >= 0 );
   });
 
+  const Cut kSlcFlashMatchDataCut([](const caf::SRSliceProxy *slc)
+				{
+				  return (kSlcHasFlashMatch(slc) && slc->fmatch.score>0. && slc->fmatch.score<12.);
+				});
+
   const Cut cutFMTime([](const caf::SRSliceProxy* slc) {
-    return ( !isnan(slc->fmatch.time) && slc->fmatch.time>=0 && slc->fmatch.time<=16 );
+    //return ( !isnan(slc->fmatch.time) && slc->fmatch.time>=0 && slc->fmatch.time<=16 );
+    return ( !isnan(slc->fmatch.time) && slc->fmatch.time>=-0.2 && slc->fmatch.time<=9.9 );
   });
 
   //==== NuScore
@@ -217,6 +229,16 @@ namespace ICARUSNumuXsec{
   });
 
 
+  //==== 220811 Vertex test
+  const Cut cutVertexYPos([](const caf::SRSliceProxy* slc) {
+    double vtxy = varVertexRecoY(slc);
+    return ( vtxy > 0.1 && vtxy < 60. );
+  });
+  const Cut cutVertexYNeg([](const caf::SRSliceProxy* slc) {
+    double vtxy = varVertexRecoY(slc);
+    return ( vtxy < -0.1 && vtxy > -60. );
+  });
+
   //==== Muon related
 
   const Cut cutHasMuon([](const caf::SRSliceProxy* slc) {
@@ -227,7 +249,7 @@ namespace ICARUSNumuXsec{
 
     if( varMuonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
-      return fv.isContained(trk.end.x, trk.end.y, trk.end.z);
+      return fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
     }
     else{
       return false;
@@ -288,6 +310,115 @@ namespace ICARUSNumuXsec{
     return ( abs(varMuonBestmatchPDG(slc)) == 2212 );
   });
 
+  //==== Michel study
+
+  const Cut cutTruthMuonMatchedTrackHasStitchedTrack([](const caf::SRSliceProxy* slc) {
+    return ( varTruthMuonMatchedTrackStitchedTrackIndex(slc) >= 0 );
+  });
+
+  const Cut cutTruthMuonMatchedTrackStitchedTrackMatched([](const caf::SRSliceProxy* slc) {
+    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+    int muonStitchedTrackIndex = varTruthMuonMatchedTrackStitchedTrackIndex(slc);
+    if(muonStitchedTrackIndex>=0){
+
+      auto const& motherTrack = slc->reco.trk.at(muonTrackIndex);
+      int motherTrack_G4ID = motherTrack.truth.p.G4ID;
+
+      auto const& stTrack = slc->reco.trk.at(muonStitchedTrackIndex);
+      int stTrack_parent_G4ID = stTrack.truth.p.parent;
+
+      if(motherTrack_G4ID==stTrack_parent_G4ID){
+        return true;
+      }
+      else{
+        return false;
+      }
+
+    }
+    else{
+      return false;
+    }
+  });
+
+  const Cut cutTruthMuonMatchedTrackHasStitchedShower([](const caf::SRSliceProxy* slc) {
+    return ( varTruthMuonMatchedTrackStitchedShowerIndex(slc) >= 0 );
+  });
+
+  const Cut cutTruthMuonMatchedTrackStitchedShowerMatched([](const caf::SRSliceProxy* slc) {
+    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+    int muonStitchedShowerIndex = varTruthMuonMatchedTrackStitchedShowerIndex(slc);
+    if(muonStitchedShowerIndex>=0){
+
+      auto const& motherTrack = slc->reco.trk.at(muonTrackIndex);
+      int motherTrack_G4ID = motherTrack.truth.p.G4ID;
+  
+      auto const& stShower = slc->reco.shw.at(muonStitchedShowerIndex);
+      int stShower_parent_G4ID = stShower.truth.p.parent;
+  
+      if(motherTrack_G4ID==stShower_parent_G4ID){
+        return true;
+      }
+      else{
+        return false;
+      }
+
+    }
+    else{
+      return false;
+    }
+  });
+
+  //==== Michel tagging for muon
+
+  const Cut cutTruthMuonMatchedTrackIsMichelTagged([](const caf::SRSliceProxy* slc) {
+
+    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+    if( muonTrackIndex >= 0 ){
+      int shwind = GetMichelShowerIndex(slc, muonTrackIndex);
+      return (shwind>=0);
+    }
+    else{
+      return false;
+    }
+
+  });
+
+ //==== Michel tagging for muon
+
+  const Cut cutMuonIsMichelTagged([](const caf::SRSliceProxy* slc) {
+
+    int muonTrackIndex = varMuonTrackInd(slc);
+    if( muonTrackIndex >= 0 ){
+      int shwind = GetMichelShowerIndex(slc, muonTrackIndex);
+      return (shwind>=0);
+    }
+    else{
+      return false;
+    }
+
+  });
+
+  //==== Pion tagging for muon
+
+  const Cut cutMuonIsPionTagged([](const caf::SRSliceProxy* slc) {
+
+    int muonTrackIndex = varMuonTrackInd(slc);
+    if( muonTrackIndex >= 0 ){
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      if( fv_track.isContained(trk.end.x, trk.end.y, trk.end.z) ){
+        return IsPionTagged(slc, muonTrackIndex);
+      }
+      else{
+        return false;
+      }
+    }
+    else{
+      return false;
+    }
+
+  });
+
+
   //==== Proton related
 
   const Cut cutHasProton([](const caf::SRSliceProxy* slc) {
@@ -298,7 +429,7 @@ namespace ICARUSNumuXsec{
 
     if( varProtonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varProtonTrackInd(slc));
-      return fv.isContained(trk.end.x, trk.end.y, trk.end.z);
+      return fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
     }
     else{
       return false;
@@ -385,6 +516,64 @@ namespace ICARUSNumuXsec{
       return false;
     }
 
+  });
+
+  //==== Michel study
+
+  const Cut cutTruthChargedPionMatchedTrackHasStitchedTrack([](const caf::SRSliceProxy* slc) {
+    return ( varTruthChargedPionMatchedTrackStitchedTrackIndex(slc) >= 0 );
+  });
+
+  const Cut cutTruthChargedPionMatchedTrackStitchedTrackMatched([](const caf::SRSliceProxy* slc) {
+    int cpionTrackIndex = varTruthChargedPionMatchedTrackIndex(slc);
+    int cpionStitchedTrackIndex = varTruthChargedPionMatchedTrackStitchedTrackIndex(slc);
+    if(cpionStitchedTrackIndex>=0){
+
+      auto const& motherTrack = slc->reco.trk.at(cpionTrackIndex);
+      int motherTrack_G4ID = motherTrack.truth.p.G4ID;
+
+      auto const& stTrack = slc->reco.trk.at(cpionStitchedTrackIndex);
+      int stTrack_parent_G4ID = stTrack.truth.p.parent;
+
+      if(motherTrack_G4ID==stTrack_parent_G4ID){
+        return true;
+      }
+      else{
+        return false;
+      }
+
+    }
+    else{
+      return false;
+    }
+  });
+
+  const Cut cutTruthChargedPionMatchedTrackHasStitchedShower([](const caf::SRSliceProxy* slc) {
+    return ( varTruthChargedPionMatchedTrackStitchedShowerIndex(slc) >= 0 );
+  });
+
+  const Cut cutTruthChargedPionMatchedTrackStitchedShowerMatched([](const caf::SRSliceProxy* slc) {
+    int cpionTrackIndex = varTruthChargedPionMatchedTrackIndex(slc);
+    int cpionStitchedShowerIndex = varTruthChargedPionMatchedTrackStitchedShowerIndex(slc);
+    if(cpionStitchedShowerIndex>=0){
+
+      auto const& motherTrack = slc->reco.trk.at(cpionTrackIndex);
+      int motherTrack_G4ID = motherTrack.truth.p.G4ID;
+  
+      auto const& stShower = slc->reco.shw.at(cpionStitchedShowerIndex);
+      int stShower_parent_G4ID = stShower.truth.p.parent;
+  
+      if(motherTrack_G4ID==stShower_parent_G4ID){
+        return true;
+      }
+      else{
+        return false;
+      }
+
+    }
+    else{
+      return false;
+    }
   });
 
   //==== CRT 

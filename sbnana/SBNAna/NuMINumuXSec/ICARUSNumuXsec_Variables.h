@@ -18,6 +18,7 @@ using namespace ana;
 namespace ICARUSNumuXsec{
 
   //==== Spill variable
+  extern const SpillVar spillvarCountSpill;
   extern const SpillMultiVar spillvarCRTHitTime;
   extern const SpillMultiVar spillvarCRTHitT0;
   extern const SpillMultiVar spillvarCRTHitPosX;
@@ -28,6 +29,10 @@ namespace ICARUSNumuXsec{
   extern const SpillMultiVar spillNuDirectionX;
   extern const SpillMultiVar spillNuDirectionY;
   extern const SpillMultiVar spillNuDirectionZ;
+  //====   Spill-based Truth neutrino information
+  extern const SpillMultiVar spillvarNeutrinoQEEnergyResidual;
+
+  extern const SpillVar spillTEST;
 
   //==== Slice variables
   extern const Var varCountSlice;
@@ -67,6 +72,9 @@ namespace ICARUSNumuXsec{
   extern const MultiVar varAllTrackEndPositionX;
   extern const MultiVar varAllTrackEndPositionY;
   extern const MultiVar varAllTrackEndPositionZ;
+  extern const MultiVar varAllTrackDirectionX;
+  extern const MultiVar varAllTrackDirectionY;
+  extern const MultiVar varAllTrackDirectionZ;
 
   extern const Var varNuScore;
   extern const Var varSliceNuNFinalStatePfos;
@@ -111,6 +119,7 @@ namespace ICARUSNumuXsec{
   extern const Var varMuonTruthT;
   extern const Var varMuonTruthCosineTheta;
   extern const Var varMuonTruthNuMICosineTheta;
+  extern const Var varMuonTruthLength;
   //====   Truth Proton
   extern const Var varProtonTruthIndex;
   extern const Var varProtonTruthP;
@@ -120,6 +129,8 @@ namespace ICARUSNumuXsec{
   //====   Truth Charged Pion
   extern const Var varChargedPionTruthIndex;
   extern const Var varChargedPionTruthP;
+  extern const Var varChargedPionTruthT;
+  extern const Var varChargedPionTruthLength;
   //====   Truth Muon+Proton
   extern const Var varTruthMuonProtonCosineTheta;
 
@@ -155,6 +166,30 @@ namespace ICARUSNumuXsec{
   //====   Matched reco track other properties
   extern const Var varTruthMuonMatchedTrackScore;
   extern const Var varTruthMuonMatchedTrackVertexDistance;
+  //====   dEdX vs rr
+  extern const MultiVar varTruthMuonMatchedTrackEnddedx;
+  extern const MultiVar varTruthMuonMatchedTrackEndrr;
+  extern const MultiVar varTruthMuonMatchedTrackFrontdedx;
+  extern const MultiVar varTruthMuonMatchedTrackFrontdedxTemplate;
+  extern const MultiVar varTruthMuonMatchedTrackFrontdedxDiff;
+  extern const MultiVar varTruthMuonMatchedTrackFrontrr;
+  //====   Michel study (closest)
+  extern const Var varTruthMuonMatchedTrackStitchedTrackIndex;
+  extern const Var varTruthMuonMatchedTrackStitchedTrackDistance;
+  extern const Var varTruthMuonMatchedTrackStitchedTrackPDG;
+  extern const Var varTruthMuonMatchedTrackStitchedTrackLength;
+  extern const Var varTruthMuonMatchedTrackStitchedTrackCosine;
+  extern const Var varTruthMuonMatchedTrackStitchedTrackChi2Muon;
+  extern const Var varTruthMuonMatchedTrackStitchedTrackChi2Proton;
+  extern const Var varTruthMuonMatchedTrackStitchedTrackChi2Pion;
+  extern const Var varTruthMuonMatchedTrackStitchedShowerIndex;
+  extern const Var varTruthMuonMatchedTrackStitchedShowerDistance;
+  extern const Var varTruthMuonMatchedTrackStitchedShowerPDG;
+  extern const Var varTruthMuonMatchedTrackStitchedShowerEnergy;
+  extern const Var varTruthMuonMatchedTrackStitchedShowerCosine;
+  //====   Count all close-enought track/shower daughters
+  extern const Var varTruthMuonMatchedTrackNDaughterTracks;
+  extern const Var varTruthMuonMatchedTrackNDaughterShowers;
   //====   Matched reco shower
   extern const Var varTruthMuonMatchedShowerIndex;
   extern const Var varTruthMuonMatchedShowerScore;
@@ -185,6 +220,9 @@ namespace ICARUSNumuXsec{
   //====   Matched reco track other properties
   extern const Var varTruthProtonMatchedTrackScore;
   extern const Var varTruthProtonMatchedTrackVertexDistance;
+  //====   dEdX vs rr
+  extern const MultiVar varTruthProtonMatchedTrackEnddedx;
+  extern const MultiVar varTruthProtonMatchedTrackEndrr;
   //====   Matched reco shower
   extern const Var varTruthProtonMatchedShowerIndex;
   extern const Var varTruthProtonMatchedShowerScore;
@@ -201,12 +239,43 @@ namespace ICARUSNumuXsec{
   extern const Var varTruthChargedPionMatchedTrackReducedChi2Muon;
   extern const Var varTruthChargedPionMatchedTrackChi2Pion;
   extern const Var varTruthChargedPionMatchedTrackReducedChi2Pion;
+  //====   Matched reco length
+  extern const Var varTruthChargedPionMatchedTrackLength;
+  //====   Matched reco momentum
+  extern const Var varTruthChargedPionMatchedTrackRangeP;
+  //====   Matched reco momentum residual fraction
+  extern const Var varTruthChargedPionMatchedTrackRangePResidualFraction;
+  //====   dEdX vs rr
+  extern const MultiVar varTruthChargedPionMatchedTrackEnddedx;
+  extern const MultiVar varTruthChargedPionMatchedTrackEndrr;
+  extern const MultiVar varTruthChargedPionMatchedTrackFrontdedx;
+  extern const MultiVar varTruthChargedPionMatchedTrackFrontdedxTemplate;
+  extern const MultiVar varTruthChargedPionMatchedTrackFrontdedxDiff;
+  extern const MultiVar varTruthChargedPionMatchedTrackFrontrr;
+  //====   Decay study
+  extern const Var varTruthChargedPionMatchedTrackStitchedTrackIndex;
+  extern const Var varTruthChargedPionMatchedTrackStitchedTrackDistance;
+  extern const Var varTruthChargedPionMatchedTrackStitchedTrackPDG;
+  extern const Var varTruthChargedPionMatchedTrackStitchedTrackLength;
+  extern const Var varTruthChargedPionMatchedTrackStitchedTrackCosine;
+  extern const Var varTruthChargedPionMatchedTrackStitchedTrackChi2Muon;
+  extern const Var varTruthChargedPionMatchedTrackStitchedTrackChi2Proton;
+  extern const Var varTruthChargedPionMatchedTrackStitchedTrackChi2Pion;
+  extern const Var varTruthChargedPionMatchedTrackStitchedShowerIndex;
+  extern const Var varTruthChargedPionMatchedTrackStitchedShowerDistance;
+  extern const Var varTruthChargedPionMatchedTrackStitchedShowerPDG;
+  extern const Var varTruthChargedPionMatchedTrackStitchedShowerEnergy;
+  extern const Var varTruthChargedPionMatchedTrackStitchedShowerCosine;
+  //====   Count all close-enought track/shower daughters
+  extern const Var varTruthChargedPionMatchedTrackNDaughterTracks;
+  extern const Var varTruthChargedPionMatchedTrackNDaughterShowers;
 
   //==== Reco variables
 
   //====   Muon
 
   extern const MultiVar varAllMuonTrackIndices;
+  extern const Var varNMuonCandTrack;
   extern const Var varMuonTrackInd;
   extern const Var varMuonRecoP;
   extern const Var varMuonCaloPlane0P;
@@ -215,10 +284,15 @@ namespace ICARUSNumuXsec{
   extern const Var varMuonLength;
   extern const Var varMuonChi2Muon;
   extern const Var varMuonChi2Proton;
+  extern const Var varMuonChi2Pion;
+  extern const Var varMuonChi2MuonReEval;
   extern const Var varMuonReducedChi2Muon;
   extern const Var varMuonRecoStartX;
   extern const Var varMuonRecoStartY;
   extern const Var varMuonRecoStartZ;
+  extern const Var varMuonRecoEndX;
+  extern const Var varMuonRecoEndY;
+  extern const Var varMuonRecoEndZ;
   extern const Var varMuonRecoTrackFromVertex;
   extern const Var varMuonRecoDirX;
   extern const Var varMuonRecoDirY;
@@ -226,7 +300,9 @@ namespace ICARUSNumuXsec{
   extern const Var varMuonRecoForceDownDirX;
   extern const Var varMuonRecoForceDownDirY;
   extern const Var varMuonRecoForceDownDirZ;
-
+  //==== dedx 
+  extern const MultiVar varMuonTrackCalodedx;
+  extern const MultiVar varMuonTrackCalorr;
   //==== Start from a reco Track, and look at its best match gen-particle.
   //==== This means that the get-particle may not be a true muon
   extern const Var varMuonBestmatchP;
@@ -263,10 +339,15 @@ namespace ICARUSNumuXsec{
 
   //==== Neutrino
 
+  //====   Energy by Emu+Kp+Eb
   extern const Var varNeutrinoCombinedEnergy;
+  //====   Matched residual
+  extern const Var varNeutrinoCombinedEnergyResidual;
+  extern const Var varNeutrinoCombinedEnergyResidualFraction;
 
   //==== https://s3.cern.ch/inspire-prod-files-9/93642a13c46438d97680971700e2013c
-  extern const Var varNeutrinoQE;
+  extern const Var varNeutrinoQEEnergy;
+  extern const Var varNeutrinoQEEnergyResidual;
   extern const Var varNeutrinoTestEnergy;
 
 

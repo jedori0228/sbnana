@@ -22,6 +22,7 @@ using namespace ana;
 
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Contants.h"
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Variables.h"
+#include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Weight.h"
 
 #include "TObject.h"
 #include <iostream>
@@ -55,6 +56,11 @@ namespace ICARUSNumuXsec{
     void GetChi2Eff(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
     void bookTEST(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+
+    void MichelStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+
+    void bookTEMP(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+
 
     void saveHistograms();
 
