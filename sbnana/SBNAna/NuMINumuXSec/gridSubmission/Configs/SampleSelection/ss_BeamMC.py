@@ -35,6 +35,14 @@ SampleSelectionInfos.append(
 
 SampleSelectionInfos.append(
   SelectionInfo(
+    Name = "NuMuCC1muTruthCut",
+    Cut = "cutIsNuMuCC && cutTFiducial && cutHasTruthMuon && cutTruthMuonTCut",
+    Comment = "NuMu-CC (+FV), 1mu, truthcut"
+  )
+)
+
+SampleSelectionInfos.append(
+  SelectionInfo(
     Name = "NuMuCC1mu1p",
     Cut = "cutIsNuMuCC && cutTFiducial && (cutHasTruthMuon && cutHasTruthProton)",
     Comment = "NuMu-CC (+FV), 1mu1p"

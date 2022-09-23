@@ -226,6 +226,14 @@ EventSelectionInfos.append(
   )
 )
 
+EventSelectionInfos.append(
+  SelectionInfo(
+    Name = "NoCRT_MuonTrackNotPionTagged",
+    Cut = "kNoCut && cutRFiducial && cutFMScore && cutFMTime && cutSliceCRLongestTrackDirY && cutHasMuon && cutHasProton && cutMuonProtonCosineTheta && !cutMuonIsPionTagged",
+    Comment = "8. Pion-tagged rejection",
+  )
+)
+
 ## Muon contained and exiting separately
 
 EventSelectionInfos.append(
