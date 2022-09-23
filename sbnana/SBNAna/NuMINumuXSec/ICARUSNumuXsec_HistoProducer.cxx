@@ -705,6 +705,56 @@ void HistoProducer::GetChi2Eff(SpectrumLoader& loader, SpillCut spillCut, Cut cu
 
 void HistoProducer::bookTEST(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
+  //====     Proton
+  const HistAxis axProtonTruthT("ProtonTruthT", Binning::Simple(100., 0., 0.05), varProtonTruthT);
+  const HistAxis axTruthProtonMatchedStubE("TruthProtonMatchedStubE", Binning::Simple(100, 0., 0.05), varTruthProtonMatchedStubE);
+  const HistAxis axTruthProtonMatchedStubLength("TruthProtonMatchedStubLength", Binning::Simple(100, 0., 10.) ,varTruthProtonMatchedStubLength);
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("ProtonTruthT",
+      Binning::Simple(500, 0., 1.0),
+      loader,
+      varProtonTruthT,
+      spillCut, cut
+    )
+  );
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("TruthProtonMatchedStubE",
+      Binning::Simple(100, 0., 0.05),
+      loader,
+      varTruthProtonMatchedStubE,
+      spillCut, cut
+    )
+  );
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("TruthProtonMatchedStubLength",
+      Binning::Simple(100, 0., 10.),
+      loader,
+      varTruthProtonMatchedStubLength,
+      spillCut, cut
+    )
+  );
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("ProtonTruthT_vs_TruthProtonMatchedStubLength", loader,
+      Binning::Simple(50, 0., 0.2), varProtonTruthT,
+      Binning::Simple(100, 0., 10.), varTruthProtonMatchedStubLength,
+      spillCut, cut
+    )
+  );
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("ProtonTruthT_vs_TruthProtonMatchedStubE", loader,
+      Binning::Simple(50, 0., 0.2), varProtonTruthT,
+      Binning::Simple(100, 0., 0.04), varTruthProtonMatchedStubE,
+      spillCut, cut
+    )
+  );
+
+/*
+  //==== Test GENIE syst
   double xEnergyMin = 0.; // GeV
   double xEnergyMax = 10.;
   double dxEnergy = 0.1;
@@ -717,6 +767,11 @@ void HistoProducer::bookTEST(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
     const ISyst* s = IGENIESysts.at(i_syst);
     addUpDownSystematic(loader, axNeutrinoTruthE, spillCut, cut, currentCutName, s);
   }
+
+  if(vec_UniverseWeightsForEachGENIESource.size()==1){
+    addEnsembleSpectrum(loader, axNeutrinoTruthE, spillCut, cut, currentCutName, vec_UniverseWeightsForEachGENIESource.at(0), "multisim");
+  }
+*/
 
 /*
   Var thisWeight = wSterileOscProb;
@@ -755,8 +810,9 @@ void HistoProducer::MichelStudy(SpectrumLoader& loader, SpillCut spillCut, Cut c
 
   const Binning binsChi2 = Binning::Simple(400, 0., 400);
 
-  static vector<double> bins_LargedEdX = {1., 10., 50., 100., 200., 300., 500., 1000., 2000., 5000.};
-  const Binning LargedEdXBinning = Binning::Custom(bins_LargedEdX);
+  static vector<double> bins_LargedEdX = {0.01, 0.1, 0.5, 1., 10., 50., 100., 200., 300., 400, 500., 600, 700, 800, 900, 1000.};
+  //const Binning LargedEdXBinning = Binning::Custom(bins_LargedEdX);
+  const Binning LargedEdXBinning = Binning::Simple(300, 0., 300);
 
   //==== Muon
 
@@ -784,6 +840,11 @@ void HistoProducer::MichelStudy(SpectrumLoader& loader, SpillCut spillCut, Cut c
     "TruthMuonMatchedTrackNDaughterShowers",
     Binning::Simple(10, 0., 10.),
     varTruthMuonMatchedTrackNDaughterShowers
+  );
+  const HistAxis axTruthMuonMatchedTrackFrontLargedEdX(
+    "TruthMuonMatchedTrackFrontLargedEdX",
+    Binning::Simple(100, 0., 100.),
+    varTruthMuonMatchedTrackFrontLargedEdX
   );
 
   const HistAxis axTruthMuonMatchedTrackStitchedTrackDistance(
@@ -858,6 +919,8 @@ void HistoProducer::MichelStudy(SpectrumLoader& loader, SpillCut spillCut, Cut c
   map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthMuonMatchedTrackLength, spillCut, cut));
   map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthMuonMatchedTrackNDaughterTracks, spillCut, cut));
   map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthMuonMatchedTrackNDaughterShowers, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthMuonMatchedTrackFrontLargedEdX, spillCut, cut));
+
   map_cutName_to_vec_Spectrums[currentCutName].push_back(
     new Spectrum("TruthMuonMatchedTrackFront_rr_vs_dedx", loader,
       Binning::Simple(30, 0., 30.), varTruthMuonMatchedTrackFrontrr,
@@ -927,6 +990,12 @@ void HistoProducer::MichelStudy(SpectrumLoader& loader, SpillCut spillCut, Cut c
     Binning::Simple(10, 0., 10.),
     varTruthChargedPionMatchedTrackNDaughterShowers
   );
+  const HistAxis axTruthChargedPionMatchedTrackFrontLargedEdX(
+    "TruthChargedPionMatchedTrackFrontLargedEdX",
+    Binning::Simple(100, 0., 100.),
+    varTruthChargedPionMatchedTrackFrontLargedEdX
+  );
+
 
   const HistAxis axTruthChargedPionMatchedTrackStitchedTrackDistance(
     "TruthChargedPionMatchedTrackStitchedTrackDistance",
@@ -1000,6 +1069,7 @@ void HistoProducer::MichelStudy(SpectrumLoader& loader, SpillCut spillCut, Cut c
   map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthChargedPionMatchedTrackLength, spillCut, cut));
   map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthChargedPionMatchedTrackNDaughterTracks, spillCut, cut));
   map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthChargedPionMatchedTrackNDaughterShowers, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthChargedPionMatchedTrackFrontLargedEdX, spillCut, cut));
   map_cutName_to_vec_Spectrums[currentCutName].push_back(
     new Spectrum("TruthChargedPionMatchedTrackFront_rr_vs_dedx", loader,
       Binning::Simple(30, 0., 30.), varTruthChargedPionMatchedTrackFrontrr,
@@ -1275,7 +1345,7 @@ void HistoProducer::saveHistograms(){
             hU->SetName(baseLabel+"_"+systematicName+"_Univ"+TString::Itoa(iu,10)+"_"+dirName);
             hU->Write();
           }
-          TGraphAsymmErrors *grErrorBand = vec_SystEnsembleSpectrumPairs.at(i).second->ErrorBand(1., vec_SystEnsembleSpectrumPairs.at(i).second->POT()  );
+          TGraphAsymmErrors *grErrorBand = vec_SystEnsembleSpectrumPairs.at(i).second->ErrorBand(1., vec_SystEnsembleSpectrumPairs.at(i).second->POT() );
           grErrorBand->SetName(baseLabel+"_"+systematicName+"_ErrorBandFromES_"+dirName);
           grErrorBand->Write();
         }
@@ -1364,6 +1434,12 @@ void HistoProducer::setSystematicWeights(){
     std::string psetname(name);
     IGENIESysts.push_back( new SBNWeightSyst(name) );
   }
+
+  std::vector<Var> weis;
+  weis.reserve(1000);
+  for(int i = 0; i < 1000; ++i) weis.push_back(GetUniverseWeight("multisim_Genie", i));
+  vec_UniverseWeightsForEachGENIESource.push_back( weis );
+
 /*
   //==== For EnsembleSpectrum
   for(unsigned int i=0; i<IGENIESysts.size(); ++i){
@@ -1381,6 +1457,9 @@ void HistoProducer::setSystematicWeights(){
 
   }
 */
+
+  
+
   cout << "[HistoProducer::setSystematicWeights] Setting flux systematics" << endl;
   IFluxSysts = GetAllNuMIFluxSysts(5);
   for(unsigned int i=0; i<IFluxSysts.size(); i++){

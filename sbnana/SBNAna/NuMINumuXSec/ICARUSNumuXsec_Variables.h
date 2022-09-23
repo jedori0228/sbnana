@@ -173,6 +173,7 @@ namespace ICARUSNumuXsec{
   extern const MultiVar varTruthMuonMatchedTrackFrontdedxTemplate;
   extern const MultiVar varTruthMuonMatchedTrackFrontdedxDiff;
   extern const MultiVar varTruthMuonMatchedTrackFrontrr;
+  extern const Var varTruthMuonMatchedTrackFrontLargedEdX;
   //====   Michel study (closest)
   extern const Var varTruthMuonMatchedTrackStitchedTrackIndex;
   extern const Var varTruthMuonMatchedTrackStitchedTrackDistance;
@@ -229,6 +230,7 @@ namespace ICARUSNumuXsec{
   //====   Matched stub
   extern const Var varTruthProtonMatchedStubIndex;
   extern const Var varTruthProtonMatchedStubE;
+  extern const Var varTruthProtonMatchedStubLength;
 
   //==== For a given true charged pion (truth_index), find a reco track whose best-matched is this charged pion
   extern const Var varTruthChargedPionMatchedTrackIndex;
@@ -252,6 +254,7 @@ namespace ICARUSNumuXsec{
   extern const MultiVar varTruthChargedPionMatchedTrackFrontdedxTemplate;
   extern const MultiVar varTruthChargedPionMatchedTrackFrontdedxDiff;
   extern const MultiVar varTruthChargedPionMatchedTrackFrontrr;
+  extern const Var varTruthChargedPionMatchedTrackFrontLargedEdX;
   //====   Decay study
   extern const Var varTruthChargedPionMatchedTrackStitchedTrackIndex;
   extern const Var varTruthChargedPionMatchedTrackStitchedTrackDistance;

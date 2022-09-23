@@ -252,7 +252,7 @@ void run_%d(){
       cafeScriptFile.write('  vec_inputs.push_back("'+thisfilename+'");\n')
 
     if IsDATA:
-      cafeScriptFile.write('  bool isDataInput = false;\n')
+      cafeScriptFile.write('  bool isDataInput = true;\n')
 
 
     cafeScriptFile.write('''  SpectrumLoader loader(vec_inputs);
@@ -276,6 +276,7 @@ void run_%d(){
 
   HistoProducer m;
   m.outputDir = "./";
+  m.outputName = "output.root";
   m.fillNominal = true;
   m.fillBeamInfo = true;
 
@@ -471,6 +472,8 @@ try:
     AllSampleFinished = True
 
     lines_JobStatus = GetJobStatus.GetJobStatusByUser(USER, str_RandomNumber)
+    if "JOBSUBJOBID" not in lines_JobStatus[0]:
+      continue
 
     for it_sample in range(0,len(InputSamples)):
 
@@ -609,15 +612,18 @@ try:
                 if nhadd<4:
                   break
                 os.system('echo "Too many hadd currently (nhadd='+str(nhadd)+'). Sleep 60s" >> JobStatus.log')
-                time.sleep(60)                  
+                time.sleep(60)
               os.system('hadd -f '+outputname+'.root output/*.root >> PostJob.log')
+              print("@@@@ Jobstatus")
+              print(lines_JobStatus)
               #os.system('rm output/*.root') ## TODO enable this
 
             ## Final Outputpath
 
             #os.system('mv '+outputname+'.root '+FinalOutputPath)
             os.system('ifdh rm %s/%s.root &> /dev/null'%(FinalOutputPath,outputname))
-            os.system('ifdh cp %s.root %s/'%(outputname,FinalOutputPath))
+            #os.system('ifdh cp %s.root %s/'%(outputname,FinalOutputPath))
+            os.system('cp %s.root %s/'%(outputname,FinalOutputPath))
             os.chdir(cwd)
 
           PostJobFinishedForEachSample[it_sample] = True

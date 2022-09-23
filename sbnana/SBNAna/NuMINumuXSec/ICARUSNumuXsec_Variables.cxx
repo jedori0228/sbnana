@@ -1191,6 +1191,37 @@ namespace ICARUSNumuXsec{
 
   });
 
+  const Var varTruthMuonMatchedTrackFrontLargedEdX([](const caf::SRSliceProxy* slc) -> int {
+    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
+    if(muonTrackIndex>=0){
+
+      int nLargedEdX(0);
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      int bp = trk.bestplane;
+      vector<float> rrs, dedxs;
+      for( auto const& pt : trk.calo[bp].points ){
+        rrs.push_back(pt.rr);
+        dedxs.push_back(pt.dedx);
+      }
+      float rrmax = !rrs.empty() ? *std::max_element(rrs.begin(), rrs.end()) : 0.;
+      for(unsigned int i=0; i<rrs.size(); i++){
+        float dedx = dedxs.at(i);
+        double this_frontrr = rrmax-rrs.at(i);
+        if(this_frontrr>1. && this_frontrr<25.){
+          if(dedx>100.){
+            nLargedEdX++;
+          }
+        }
+      }
+      return nLargedEdX;
+    }
+    else{
+      return 0.;
+    }
+
+  });
+
+
   //====   Michel study
 
   const Var varTruthMuonMatchedTrackStitchedTrackIndex([](const caf::SRSliceProxy* slc) -> int {
@@ -1803,18 +1834,49 @@ namespace ICARUSNumuXsec{
     if(ProtonStubIndex>=0){
       auto const& stub_Proton = slc->reco.stub.at(ProtonStubIndex);
 
+      int nHitMax(-999);
+      double ret(-999.);
       for(unsigned ip=0; ip<stub_Proton.planes.size(); ip++){
+
         double sumQ(0.);
+
+        if(stub_Proton.planes[ip].p!=2) continue;
+
         for(unsigned ih=0; ih<stub_Proton.planes[ip].hits.size(); ih++){
           sumQ += stub_Proton.planes[ip].hits.at(ih).charge;
         }
+
+        if((int)stub_Proton.planes[ip].hits.size() >= nHitMax){
+          nHitMax = stub_Proton.planes[ip].hits.size();
+          ret = sumQ;
+        }
+
       }
-      return 1.;
+      //std::cout << "[varTruthProtonMatchedStubE] nHitMax = " << nHitMax << ", sumQ = " << ret << std::endl;
+      static double p0 = -0.00236892;
+      static double p1 = 0.383538;
+      if(ret<=0.) return -999.;
+      else return (ret*23.6e-9-p0)/p1; // to GeV
     }
     else{
       return -999;
     }
 
+  });
+
+  const Var varTruthProtonMatchedStubLength([](const caf::SRSliceProxy* slc) -> double {
+    int ProtonStubIndex = varTruthProtonMatchedStubIndex(slc);
+    if(ProtonStubIndex>=0){
+      auto const& stub_Proton = slc->reco.stub.at(ProtonStubIndex);
+      TVector3 v3_Pos_start(stub_Proton.vtx.x, stub_Proton.vtx.y, stub_Proton.vtx.z);
+      TVector3 v3_Pos_end(stub_Proton.end.x, stub_Proton.end.y, stub_Proton.end.z);
+
+      return (v3_Pos_start-v3_Pos_end).Mag();
+
+    }
+    else{
+      return -999;
+    }
   });
 
   //==== For a given true charged pion (truth_index), find a reco track whose best-matched is this charged pion
@@ -2073,6 +2135,37 @@ namespace ICARUSNumuXsec{
       }
     }
     return ret;
+
+  });
+
+  const Var varTruthChargedPionMatchedTrackFrontLargedEdX([](const caf::SRSliceProxy* slc) -> int {
+    int cpionTrackIndex = varTruthChargedPionMatchedTrackIndex(slc);
+    if(cpionTrackIndex>=0){
+      
+      int nLargedEdX(0);
+      auto const& trk = slc->reco.trk.at(cpionTrackIndex);
+      int bp = trk.bestplane;
+      vector<float> rrs, dedxs;
+      for( auto const& pt : trk.calo[bp].points ){
+        rrs.push_back(pt.rr);
+        dedxs.push_back(pt.dedx);
+      }
+      float rrmax = !rrs.empty() ? *std::max_element(rrs.begin(), rrs.end()) : 0.;
+      for(unsigned int i=0; i<rrs.size(); i++){
+        float dedx = dedxs.at(i);
+        double this_frontrr = rrmax-rrs.at(i);
+        if(this_frontrr>1. && this_frontrr<25.){
+          if(dedx>100.){
+            nLargedEdX++;
+          }
+        }
+      }
+      return nLargedEdX;
+
+    }
+    else{
+      return 0.;
+    }
 
   });
 
