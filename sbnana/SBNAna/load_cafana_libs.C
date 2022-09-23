@@ -17,6 +17,15 @@ void load_cafana_libs()
   // uncaught exceptions immediately show a useful backtrace under gdb.
   //  G__SetCatchException(0);
 
+  string newpath = string(gROOT->GetMacroPath()) + ":" + string("${PLOTUTILSROOT}/../bin");
+  gROOT->SetMacroPath( newpath.c_str() );
+  gInterpreter->AddIncludePath( "${PLOTUTILSROOT}/../include" );
+  gInterpreter->AddIncludePath( "${PLOTUTILSROOT}/../include/PlotUtils" );
+  std::vector<std::string> packages = { "MAT" };
+  for(const std::string& package: packages){
+    gSystem->Load( gSystem->ExpandPathName(("$PLOTUTILSROOT/lib" + package + ".so").c_str()) );
+  }
+
   TString qmrb = gSystem->Getenv("MRB_QUALS");
   // Mirror the optimization settings in use elsewhere
   if(qmrb.Contains("debug")) {

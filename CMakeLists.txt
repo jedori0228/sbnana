@@ -36,7 +36,7 @@ cet_set_compiler_flags(DIAGS CAUTIOUS
   WERROR
   NO_UNDEFINED
   ALLOW_DEPRECATIONS
-  EXTRA_FLAGS -pedantic -Wno-unused-local-typedefs -Wno-undefined-var-template -I $ENV{CLANG_FQ_DIR}/include/c++/v1
+  EXTRA_FLAGS -pedantic -Wno-unused-local-typedefs -Wno-undefined-var-template -I $ENV{CLANG_FQ_DIR}/include/c++/v1 -I/icarus/app/users/jskim/MATDev/opt/include/ -L/icarus/app/users/jskim/MATDev/opt/lib/ -lMAT
 )
 
 cet_report_compiler_flags()
@@ -53,7 +53,7 @@ find_ups_product( pygccxml )
 
 #ifdhc
 cet_find_library( IFDH    NAMES ifdh    PATHS ENV IFDHC_LIB   NO_DEFAULT_PATH )
-
+cet_find_library( MAT     NAMES MAT     PATHS ENV MATlib      NO_DEFAULT_PATH )
 
 add_subdirectory(sbnana)
 add_subdirectory(ups)
