@@ -41,12 +41,14 @@ namespace ICARUSNumuXsec{
 
   extern const Cut cutHasTruthMuon;
   extern const Cut cutHasTruthMuonHasRecoTrack;
+  extern const Cut cutHasTruthMuonHasRecoTrackLongEnough;
 
   extern const Cut cutHasTruthProton;
   extern const Cut cutHasTruthProtonHasRecoTrack;
 
   extern const Cut cutHasTruthChargedPion;
   extern const Cut cutHasTruthChargedPionHasRecoTrack;
+  extern const Cut cutHasTruthChargedPionHasRecoTrackLongEnough;
 
   extern const Cut cutTruthNoPiZero;
   extern const Cut cutTruthNoChargedPion;

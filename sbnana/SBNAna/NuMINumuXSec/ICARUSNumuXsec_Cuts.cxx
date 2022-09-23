@@ -83,6 +83,15 @@ namespace ICARUSNumuXsec{
   const Cut cutHasTruthMuonHasRecoTrack([](const caf::SRSliceProxy* slc) {
     return ( varTruthMuonMatchedTrackIndex(slc)>=0 );
     });
+  const Cut cutHasTruthMuonHasRecoTrackLongEnough([](const caf::SRSliceProxy* slc) {
+    int trkIndex = varTruthMuonMatchedTrackIndex(slc);
+    if(trkIndex>=0){
+      if( slc->reco.trk.at(trkIndex).len>=50 ){
+        return true;
+      }
+    }
+    return false;
+    });
 
   const Cut cutHasTruthProton([](const caf::SRSliceProxy* slc) {
       return ( varProtonTruthIndex(slc)>=0 );
@@ -90,11 +99,21 @@ namespace ICARUSNumuXsec{
   const Cut cutHasTruthProtonHasRecoTrack([](const caf::SRSliceProxy* slc) {
     return ( varTruthProtonMatchedTrackIndex(slc)>=0 );
     });
+
   const Cut cutHasTruthChargedPion([](const caf::SRSliceProxy* slc) {
       return ( varChargedPionTruthIndex(slc)>=0 );
     });
   const Cut cutHasTruthChargedPionHasRecoTrack([](const caf::SRSliceProxy* slc) {
     return ( varTruthChargedPionMatchedTrackIndex(slc)>=0 );
+    });
+  const Cut cutHasTruthChargedPionHasRecoTrackLongEnough([](const caf::SRSliceProxy* slc) {
+    int trkIndex = varTruthChargedPionMatchedTrackIndex(slc);
+    if(trkIndex>=0){
+      if( slc->reco.trk.at(trkIndex).len>=50 ){
+        return true;
+      }
+    }
+    return false;
     });
 
   const Cut cutTruthNoPiZero = (varTruthNPiZero==0);
