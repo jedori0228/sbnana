@@ -228,6 +228,7 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackDirectionX", Binning::Simple(40, -1., 1.), loader, varAllTrackDirectionX, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackDirectionY", Binning::Simple(40, -1., 1.), loader, varAllTrackDirectionY, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackDirectionZ", Binning::Simple(40, -1., 1.), loader, varAllTrackDirectionZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackLength", Binning::Simple(90, 0., 900.), loader, varAllTrackLength, spillCut, cut));
 
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("FMChargeQ", binsFMChargeQ, loader, varFMChargeQ, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("FMChargeCenterX", binsXPosition, loader, varFMChargeCenterX, spillCut, cut));
