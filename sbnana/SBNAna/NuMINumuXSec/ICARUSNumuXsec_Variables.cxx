@@ -384,6 +384,14 @@ namespace ICARUSNumuXsec{
     return out;
   });
 
+  const MultiVar varAllTrackLength([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      out.push_back(trk.len);
+    }
+    return out;
+  });
+
 
   const Var varNuScore([](const caf::SRSliceProxy* slc) -> double {
     if(isnan(slc->nu_score)) return -0.1;
@@ -1207,7 +1215,7 @@ namespace ICARUSNumuXsec{
       for(unsigned int i=0; i<rrs.size(); i++){
         float dedx = dedxs.at(i);
         double this_frontrr = rrmax-rrs.at(i);
-        if(this_frontrr>1. && this_frontrr<25.){
+        if(this_frontrr>0. && this_frontrr<25.){
           if(dedx>100.){
             nLargedEdX++;
           }
@@ -2154,7 +2162,7 @@ namespace ICARUSNumuXsec{
       for(unsigned int i=0; i<rrs.size(); i++){
         float dedx = dedxs.at(i);
         double this_frontrr = rrmax-rrs.at(i);
-        if(this_frontrr>1. && this_frontrr<25.){
+        if(this_frontrr>0. && this_frontrr<25.){
           if(dedx>100.){
             nLargedEdX++;
           }

@@ -75,6 +75,7 @@ namespace ICARUSNumuXsec{
   extern const MultiVar varAllTrackDirectionX;
   extern const MultiVar varAllTrackDirectionY;
   extern const MultiVar varAllTrackDirectionZ;
+  extern const MultiVar varAllTrackLength;
 
   extern const Var varNuScore;
   extern const Var varSliceNuNFinalStatePfos;
