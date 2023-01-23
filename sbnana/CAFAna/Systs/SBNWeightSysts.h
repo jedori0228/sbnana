@@ -15,20 +15,26 @@ namespace ana
   {
   public:
     UniverseWeight(const std::string& psetName, int univIdx);
+    UniverseWeight(const std::string& psetName, double x);
 
     double operator()(const caf::SRSliceProxy* sr) const;
+    double operator()(const caf::SRSpillProxy* sr) const;
 
   protected:
     std::string fPSetName;
     mutable int fPSetIdx;
     int fUnivIdx;
+    double fSigma;
   };
 
   Var GetUniverseWeight(const std::string& psetName, int univIdx)
   {
     return Var(UniverseWeight(psetName, univIdx));
   }
-
+  SpillVar GetUniverseFirstNeutrinoWeight(const std::string& psetName, double x)
+  {
+    return SpillVar(UniverseWeight(psetName, x));
+  }
 
   class SBNWeightSyst: public ISyst
   {

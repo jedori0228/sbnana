@@ -20,6 +20,43 @@ EventSelectionInfos.append(
   )
 )
 
+## TEST ###
+
+EventSelectionInfos.append(
+  SelectionInfo(
+    Name = "ClearCosmic",
+    Cut = "!kNotClearCosmic",
+    SpillCut = "kNoSpillCut",
+  )
+)
+
+EventSelectionInfos.append(
+  SelectionInfo(
+    Name = "NotClearCosmic",
+    Cut = "kNotClearCosmic",
+    SpillCut = "kNoSpillCut",
+  )
+)
+
+EventSelectionInfos.append(
+  SelectionInfo(
+    Name = "NotClearCosmic_FMTime",
+    Cut = "kNotClearCosmic && cutFMTime",
+    SpillCut = "kNoSpillCut",
+  )
+)
+
+EventSelectionInfos.append(
+  SelectionInfo(
+    Name = "RecoFiducial_NotClearCosmic",
+    Cut = "kNoCut && cutRFiducial && kNotClearCosmic",
+    SpillCut = "kNoSpillCut",
+    Comment = "1. Reco fiducial volume cut",
+  )
+)
+
+#####################
+
 EventSelectionInfos.append(
   SelectionInfo(
     Name = "FMScore",

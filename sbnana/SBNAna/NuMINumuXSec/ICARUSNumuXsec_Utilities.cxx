@@ -46,6 +46,18 @@ int FiducialVolumeTool::containedCryo(double x, double y, double z) const {
 
 }
 
+int FiducialVolumeTool::TPCIndex(double x, double y, double z) const {
+
+  double x_cath = x<=0 ? (fvCryo0.xmax+fvCryo0.xmin)/2. : (fvCryo1.xmax+fvCryo1.xmin)/2.;
+  double x_from_cath = x-x_cath;
+  if(x_from_cath<0 && z<0) return 0;
+  else if(x_from_cath<0 && z>0) return 1;
+  else if(x_from_cath>0 && z<0) return 2;
+  else if(x_from_cath>0 && z>0) return 3;
+  else return 4;
+
+}
+
 //==== For a given truth particle, find the reco object
 //====   Track : return the longest matched track
 int ICARUSNumuXsec::GetMatchedRecoTrackIndex(const caf::SRSliceProxy* slc, int truth_idx){
@@ -244,6 +256,13 @@ bool ICARUSNumuXsec::IsPionTagged(const caf::SRSliceProxy* slc, int track_idx){
 
 }
 
+double ICARUSNumuXsec::GetEnergyFromStubCharge(double q){
+  static double p0 = -0.00236892;
+  static double p1 = 0.383538;
+  if(q<=0.) return -999.;
+  else return (q*23.6e-9-p0)/p1; // to GeV
+}
+
 NuMICoordinateTool::NuMICoordinateTool(){
 
   TMatrixDRow(rotMatNtoI,0) = {0.921035925, 0.022715103, 0.388814672};
@@ -397,5 +416,221 @@ SterileNuTool& SterileNuTool::Instance(){
   return snt;
 }
 
+TrackStitchingTool& TrackStitchingTool::Instance(){
+  static TrackStitchingTool tst;
+  return tst;
+}
 
+TrackStitchingTool::StichOutput TrackStitchingTool::GetStitchedTrack(
+  const caf::Proxy<caf::SRTrack>& motherTrack,
+  const caf::Proxy<caf::SRSlice>& motherSlice,
+  const caf::SRSpillProxy *sr) const
+  {
+
+  TrackStitchingTool::StichOutput ret;
+  ret.isFound = false;
+
+  TVector3 trk_start(motherTrack.start.x, motherTrack.start.y, motherTrack.start.z);
+  TVector3 trk_end(motherTrack.end.x, motherTrack.end.y, motherTrack.end.z);
+  TVector3 trk_dir(motherTrack.dir.x, motherTrack.dir.y, motherTrack.dir.z);
+
+  double MinDist = 999999.;
+
+  int sliceCounter = -1;
+  for(const auto& slc2: sr->slc){
+    sliceCounter++;
+    bool currentIsSameSlice = (&motherSlice==&slc2);
+
+    int trackCounter = -1;
+    for(const auto& trk2: slc2.reco.trk){
+      trackCounter++;
+
+      if(&motherTrack==&trk2) continue;
+
+      TVector3 trk2_start(trk2.start.x, trk2.start.y, trk2.start.z);
+      TVector3 trk2_end(trk2.end.x, trk2.end.y, trk2.end.z);
+      TVector3 trk2_dir(trk2.dir.x, trk2.dir.y, trk2.dir.z);
+
+      double dist_start_to_start = (trk_start-trk2_start).Mag();
+      double dist_start_to_end = (trk_start-trk2_end).Mag();
+      double dist_end_to_start = (trk_end-trk2_start).Mag();
+      double dist_end_to_end = (trk_end-trk2_end).Mag();
+
+      vector<double> tmp_dists = {dist_start_to_start, dist_start_to_end, dist_end_to_start, dist_end_to_end};
+      std::vector<double>::iterator smallest_it = std::min_element(std::begin(tmp_dists), std::end(tmp_dists));
+      int smallest_index = std::distance(tmp_dists.begin(), smallest_it);
+
+      double cosDir = trk_dir.Dot(trk2_dir);
+
+      bool DirectionMatched = false;
+      double this_dist = +9999999.;
+      if(smallest_index==0){
+        DirectionMatched = cosDir<0;
+        this_dist = dist_start_to_start;
+      }
+      else if(smallest_index==1){
+        DirectionMatched = cosDir>0;
+        this_dist = dist_start_to_end;
+      }
+      else if(smallest_index==2){
+        DirectionMatched = cosDir>0;
+        this_dist = dist_end_to_start;
+      }
+      else if(smallest_index==3){
+        DirectionMatched = cosDir<0;
+        this_dist = dist_end_to_end;
+      }
+
+      //if(motherTracktruth.bestmatch.G4ID==trk2.truth.bestmatch.G4ID){
+
+        if(DirectionMatched && this_dist < MinDist){
+          MinDist = this_dist;
+          ret.isFound = true;
+          ret.isSameSlice = currentIsSameSlice;
+          ret.minDist = this_dist;
+          ret.foundSliceIdx = sliceCounter;
+          ret.foundTrackIdx = trackCounter;
+          ret.closestMode = smallest_index;
+        }
+
+      //}
+/*
+      std::cout << "[TrackStitchingTool::GetStitchedTrack] Slice index : " << sliceCounter << std::endl;
+      std::cout << "[TrackStitchingTool::GetStitchedTrack] - MinDist = " << MinDist << std::endl;
+*/
+    }
+  }
+
+  return ret;
+
+}
+
+CRTPMTMatchingTool::CRTPMTMatchingTool(){
+  std::cout << "[CRTPMTMatchingTool::CRTPMTMatchingTool] called" << std::endl;
+}
+
+CRTPMTMatchingTool& CRTPMTMatchingTool::Instance(){
+  static CRTPMTMatchingTool cpmt;
+  return cpmt;
+}
+
+void CRTPMTMatchingTool::SetGateType(GateType gt) const {
+  GT = gt;
+  if(abs(GT)==1){
+    timecut_min = 0.;
+    timecut_max = 2.2;
+  }
+  else if(abs(GT)==2){
+    timecut_min = 0.;
+    timecut_max = 10.1;
+  }
+  else{
+    std::cout << "[CRTPMTMatchingTool] Wrong gate type = " << gt << std::endl;
+    abort();
+  }
+
+  std::cout << "[CRTPMTMatchingTool::SetGateType] GT = " << GT << ", timecut_min = " << timecut_min << ", timecut_max = " << timecut_max << std::endl;
+
+}
+
+void CRTPMTMatchingTool::SetInTimeRange(double t_min, double t_max) const {
+  timecut_min = t_min;
+  timecut_max = t_max;
+  std::cout << "[CRTPMTMatchingTool::SetInTimeRange] timecut_min = " << timecut_min << ", timecut_max = " << timecut_max << std::endl;
+}
+
+bool CRTPMTMatchingTool::IsInTime(double t_gate) const{
+  //std::cout << "timecut_min = " << timecut_min << ", t_gate = " << t_gate << ", timecut_max = " << timecut_max << std::endl;
+  return ( timecut_min<=t_gate && t_gate<=timecut_max );
+}
+
+int CRTPMTMatchingTool::GetMatchedCRTHitIndex(
+  double opt,
+  const caf::Proxy<std::vector<caf::SRCRTHit> >& crt_hits,
+  int mode) const{
+
+  double mindiff = std::numeric_limits<double>::max();
+  int ret=-1;
+  for(size_t i=0; i<crt_hits.size(); i++){
+    const auto& hit = crt_hits.at(i);
+    if(hit.plane>=30 && hit.plane<=34){
+      double crtt = hit.t1;
+      double this_diff = crtt-opt;
+      if(fabs(this_diff)<fabs(mindiff)){
+        mindiff = this_diff;
+        ret = i;
+      }
+    }
+  }
+
+  return ret;
+
+}
+
+int CRTPMTMatchingTool::GetMatchID(
+  double opt,
+  const caf::Proxy<std::vector<caf::SRCRTHit> >& crt_hits) const{
+
+  int hasCRTHit = 0;
+  static double interval = 0.1;
+  int topen = 0, topex = 0, sideen = 0, sideex = 0;
+  for(size_t i=0; i<crt_hits.size(); i++){
+    const auto& crtHit = crt_hits.at(i);
+    double tof = crtHit.t1 - opt;
+
+    if(tof<0 && abs(tof)<interval){
+      if(crtHit.plane > 36){
+        sideen++;
+      }
+      else{
+        topen++;
+      }
+    }
+    else if(tof>=0 && abs(tof)<interval){
+      if(crtHit.plane > 36){
+        sideex++;
+      }
+      else{
+        topex++;
+      }
+    }
+
+  }
+
+  // hasCRTHit = 0, no matched CRT
+  // hasCRTHit = 1, 1 entering from Top CRT
+  // hasCRTHit = 2, 1 entering from Side CRT
+  // hasCRTHit = 3, 1 entering from Top and exiting to Side CRT
+  // hasCRTHit = 4, No entering; 1 exiting to top
+  // hasCRTHit = 5, No entering, 1 exiting to side
+  // hasCRTHit = 6, Multiple entering
+  // hasCRTHit = 7, Multiple entering and exiting to side
+  // hasCRTHit = 8, all other cases
+
+  if (topen == 0 && sideen == 0 && topex == 0 && sideex == 0)
+    hasCRTHit = 0;
+  else if (topen == 1 && sideen == 0 && topex == 0 && sideex == 0)
+    hasCRTHit = 1;
+  else if (topen == 0 && sideen == 1 && topex == 0 && sideex == 0)
+    hasCRTHit = 2;
+  else if (topen == 1 && sideen == 0 && topex == 0 && sideex == 1)
+    hasCRTHit = 3;
+  else if (topen == 0 && sideen == 0 && topex == 1 && sideex == 0)
+    hasCRTHit = 4;
+  else if (topen == 0 && sideen == 0 && topex == 0 && sideex == 1)
+    hasCRTHit = 5;
+  else if (topen >= 1 && sideen >= 1 && topex == 0 && sideex == 0)
+    hasCRTHit = 6;
+  else if (topen >= 1 && sideen >= 1 && topex == 0 && sideex >= 1)
+    hasCRTHit = 7;
+  else
+    hasCRTHit = 8;
+
+  return hasCRTHit;
+
+}
+
+bool CRTPMTMatchingTool::IsNegativeTOF(double timediff) const{
+  return (timediff>-0.1 && timediff<0.);
+}
 

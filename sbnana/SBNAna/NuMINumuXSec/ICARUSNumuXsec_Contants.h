@@ -31,6 +31,14 @@ namespace ICARUSNumuXsec{
 
   static const dEdXTemplateTool& dedxtempt = dEdXTemplateTool::Instance();
 
-  static const SterileNuTool snt = SterileNuTool::Instance();
+  static const SterileNuTool& snt = SterileNuTool::Instance();
+
+  static const TrackStitchingTool& tst = TrackStitchingTool::Instance();
+
+  static const CRTPMTMatchingTool& cpmt = CRTPMTMatchingTool::Instance();
+
+  //extern const CRTPMTMatchingTool cpmt;// = CRTPMTMatchingTool::Instance();
+  //extern const CRTPMTMatchingTool cpmt = CRTPMTMatchingTool::Instance();
 
 }
+

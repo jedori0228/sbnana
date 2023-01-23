@@ -28,8 +28,8 @@ args = parser.parse_args()
 
 ## Parse sample and cuts
 
-exec('from %s import *'%(args.SampleSelectionConfigFileName.strip('.py').replace('/','.')))
-exec('from %s import *'%(args.EventSelectionConfigFileName.strip('.py').replace('/','.')))
+exec('from %s import *'%(args.SampleSelectionConfigFileName.removesuffix('.py').replace('/','.')))
+exec('from %s import *'%(args.EventSelectionConfigFileName.removesuffix('.py').replace('/','.')))
 
 ssDefLines = ""
 for SampleSelectionInfo in SampleSelectionInfos:
@@ -253,6 +253,8 @@ void run_%d(){
 
     if IsDATA:
       cafeScriptFile.write('  bool isDataInput = true;\n')
+    else:
+      cafeScriptFile.write('  bool isDataInput = false;\n')
 
 
     cafeScriptFile.write('''  SpectrumLoader loader(vec_inputs);
@@ -277,14 +279,16 @@ void run_%d(){
   HistoProducer m;
   m.outputDir = "./";
   m.outputName = "output.root";
+  m.sampleName = "%s";
   m.fillNominal = true;
   m.fillBeamInfo = true;
+  m.IsData = isDataInput;
 
   m.initialize();
   //if(fillSystematic){
   //  m.setSystematicWeights();
   //}
-'''%(ssDefLines, esDefLines))
+'''%(ssDefLines, esDefLines,InputSample))
 
     cafeScriptFile.write('''  for(unsigned int is=0; is<baseSampleNames.size(); is++){
 

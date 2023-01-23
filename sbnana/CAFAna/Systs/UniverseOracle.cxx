@@ -86,12 +86,14 @@ namespace ana
 
       // Only save the remaining fields in parameter sets where only a single
       // knob is shifted
-      if(pset.map.size() != 1) continue;
+      //if(pset.map.size() != 1) continue;
+
+      //std::cout << "[UniverseOracle::UniverseOracle()] pset.name = " << pset.name << " is saved with a key: " << pset.map[0].param.name << std::endl;
 
       // Save which position in the vector this was
-      fSystIdxs[pset.map[0].param.name] = i;
+      fSystIdxs[pset.name] = i;
       // Save all the knob values
-      fShiftVals[pset.map[0].param.name] = pset.map[0].vals;
+      fShiftVals[pset.name] = pset.map[0].vals;
     }
   }
 

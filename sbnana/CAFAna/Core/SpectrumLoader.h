@@ -28,6 +28,7 @@ namespace ana
 					 int fileLimit = -1);
     virtual ~SpectrumLoader();
 
+    void CheckDuplicatedEvents(bool b);
     virtual void Go() override;
 
   protected:
@@ -53,5 +54,12 @@ namespace ana
     //    std::vector<double> fLivetimeByCut; ///< Indexing matches fAllCuts
     //    std::vector<double> fPOTByCut;      ///< Indexing matches fAllCuts
     int max_entries;
+
+    //==== Check duplicated events
+    bool b_CheckDuplicatedEvents;
+    std::vector<unsigned int> vec_eventNumber;
+    virtual bool AddEventNumber(int e);
+    std::string temp_FileName;
+
   };
 }

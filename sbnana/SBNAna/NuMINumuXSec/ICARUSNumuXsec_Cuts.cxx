@@ -99,6 +99,9 @@ namespace ICARUSNumuXsec{
   const Cut cutHasTruthProtonHasRecoTrack([](const caf::SRSliceProxy* slc) {
     return ( varTruthProtonMatchedTrackIndex(slc)>=0 );
     });
+  const Cut cutHasTruthProtonHasRecoStub([](const caf::SRSliceProxy* slc) {
+    return ( varTruthProtonMatchedStubIndex(slc)>=0 );
+    });
 
   const Cut cutHasTruthChargedPion([](const caf::SRSliceProxy* slc) {
       return ( varChargedPionTruthIndex(slc)>=0 );
@@ -201,26 +204,60 @@ namespace ICARUSNumuXsec{
 
   });
 
+  const Cut cutVertexCryoE([](const caf::SRSliceProxy* slc) {
+    if( !isnan(slc->vertex.x) ) return fv.containedCryo(slc->vertex.x, slc->vertex.y, slc->vertex.z)==0;
+    else return false;
+  });
+  const Cut cutVertexCryoW([](const caf::SRSliceProxy* slc) {
+    if( !isnan(slc->vertex.x) ) return fv.containedCryo(slc->vertex.x, slc->vertex.y, slc->vertex.z)==1;
+    else return false;
+  });
+  const Cut cutVertexTPCEE([](const caf::SRSliceProxy* slc) {
+    if( !isnan(slc->vertex.x) ){
+      bool isCryoE = cutVertexCryoE(slc);
+      bool isTPCE = ( fv.TPCIndex(slc->vertex.x, slc->vertex.y, slc->vertex.z)==0 ) && ( fv.TPCIndex(slc->vertex.x, slc->vertex.y, slc->vertex.z)==1 );
+      return isCryoE && isTPCE;
+    }
+    else return false;
+  });
+  const Cut cutVertexTPCEW([](const caf::SRSliceProxy* slc) {
+    if( !isnan(slc->vertex.x) ){
+      bool isCryoE = cutVertexCryoE(slc);
+      bool isTPCW = ( fv.TPCIndex(slc->vertex.x, slc->vertex.y, slc->vertex.z)==2 ) && ( fv.TPCIndex(slc->vertex.x, slc->vertex.y, slc->vertex.z)==3 );
+      return isCryoE && isTPCW;
+    }
+    else return false;
+  });
+  const Cut cutVertexTPCWE([](const caf::SRSliceProxy* slc) {
+    if( !isnan(slc->vertex.x) ){
+      bool isCryoW = cutVertexCryoW(slc);
+      bool isTPCE = ( fv.TPCIndex(slc->vertex.x, slc->vertex.y, slc->vertex.z)==0 ) && ( fv.TPCIndex(slc->vertex.x, slc->vertex.y, slc->vertex.z)==1 );
+      return isCryoW && isTPCE;
+    }
+    else return false;
+  });
+  const Cut cutVertexTPCWW([](const caf::SRSliceProxy* slc) {
+    if( !isnan(slc->vertex.x) ){
+      bool isCryoW = cutVertexCryoW(slc);
+      bool isTPCW = ( fv.TPCIndex(slc->vertex.x, slc->vertex.y, slc->vertex.z)==2 ) && ( fv.TPCIndex(slc->vertex.x, slc->vertex.y, slc->vertex.z)==3 );
+      return isCryoW && isTPCW;
+    }
+    else return false;
+  });
+
   //==== FMScore
 
   const Cut cutFMScore([](const caf::SRSliceProxy* slc) {
-/*
-    bool passCut = !isnan(slc->fmatch.score) && slc->fmatch.score < 12.0 && slc->fmatch.score >= 0;
-    std::cout << "slc->fmatch.score = " << slc->fmatch.score;
-    if(passCut) std::cout << " -> Pass" << std::endl;
-    else std::cout << " -> Fail" << std::endl;
-*/
     return ( !isnan(slc->fmatch.score) && slc->fmatch.score < 12.0 && slc->fmatch.score >= 0 );
   });
-
-  const Cut kSlcFlashMatchDataCut([](const caf::SRSliceProxy *slc)
-				{
-				  return (kSlcHasFlashMatch(slc) && slc->fmatch.score>0. && slc->fmatch.score<12.);
-				});
 
   const Cut cutFMTime([](const caf::SRSliceProxy* slc) {
     //return ( !isnan(slc->fmatch.time) && slc->fmatch.time>=0 && slc->fmatch.time<=16 );
     return ( !isnan(slc->fmatch.time) && slc->fmatch.time>=-0.2 && slc->fmatch.time<=9.9 );
+  });
+  //==== TODO temporary
+  const Cut cutFMTimeDataTemp([](const caf::SRSliceProxy* slc) {
+    return ( !isnan(slc->fmatch.time_beam) && slc->fmatch.time_beam>=-0.2+4. && slc->fmatch.time_beam<=9.9+4. );
   });
 
   //==== NuScore
@@ -256,6 +293,51 @@ namespace ICARUSNumuXsec{
   const Cut cutVertexYNeg([](const caf::SRSliceProxy* slc) {
     double vtxy = varVertexRecoY(slc);
     return ( vtxy < -0.1 && vtxy > -60. );
+  });
+
+  //==== Longest track
+  const Cut cutHasLongestTrack([](const caf::SRSliceProxy* slc) {
+    int ltidx = varLongestTrackIndex(slc);
+    return (ltidx>=0);
+  });
+
+  const Cut cutSmallDirX([](const caf::SRSliceProxy* slc) {
+    double dirX = varLongestTrackDirectionX(slc);
+    return (fabs(dirX)<0.1);
+  });
+  const Cut cutLargeDirX([](const caf::SRSliceProxy* slc) {
+    double dirX = varLongestTrackDirectionX(slc);
+    return (fabs(dirX)>0.4 && fabs(dirX)<=1.0);
+  });
+  const Cut cutLongestTrackShort([](const caf::SRSliceProxy* slc) {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){
+      const auto& trk = slc->reco.trk.at(ltidx);
+      return trk.len<100.;
+    }
+    else{
+      return false;
+    }
+  });
+  const Cut cutLongestTrackContained([](const caf::SRSliceProxy* slc) {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){ 
+      const auto& trk = slc->reco.trk.at(ltidx);
+      return fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
+    }
+    else{
+      return false;
+    }
+  });
+  const Cut cutLongestTrackExiting([](const caf::SRSliceProxy* slc) {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){ 
+      const auto& trk = slc->reco.trk.at(ltidx);
+      return !(fv_track.isContained(trk.end.x, trk.end.y, trk.end.z));
+    }
+    else{
+      return false;
+    }
   });
 
   //==== Muon related
@@ -730,6 +812,72 @@ namespace ICARUSNumuXsec{
       }
       );
 
+  const SpillCut spillcutHasValidFlash([](const caf::SRSpillProxy* sr){
+    vector<double> validTimes = spillvarValidOpFlashTime(sr);
+    return validTimes.size()>0;
+  });
+
+
+  const SpillCut spillcutHasInTimeFlash([](const caf::SRSpillProxy* sr){
+    vector<double> intimeTimes = spillvarInTimeOpFlashTime(sr); // Valid and InTime
+    return intimeTimes.size()>0;
+  });
+
+  const SpillCut spillcutCRTPMTCosmicByID([](const caf::SRSpillProxy* sr){
+
+    //==== A spill is considered as "Cosmic" when all intime flahses are entering
+    //==== If a spill has anything not entering, that shuold not be considered as a cosmic
+
+    vector<double> intimeTimes = spillvarInTimeOpFlashTime(sr);
+    if(intimeTimes.size()>0){
+
+      bool IsAllEnteringInThisSpill = true;
+      for(const auto& opt : intimeTimes){
+        int crtHitIdx = cpmt.GetMatchID(opt, sr->crt_hits);
+        bool IsThisFlashEntering = (crtHitIdx==1 || crtHitIdx==2 || crtHitIdx==3 || crtHitIdx==6 || crtHitIdx==7);
+        if(!IsThisFlashEntering) IsAllEnteringInThisSpill = false;
+      }
+      return IsAllEnteringInThisSpill;
+
+    }
+    else{
+      return false;
+    }
+  });
+
+  const SpillCut spillcutCRTPMTHasNegativeTOF([](const caf::SRSpillProxy* sr){
+    vector<double> intimeTimes = spillvarInTimeOpFlashTime(sr);
+    if(intimeTimes.size()>0){
+      for(const auto& opt : intimeTimes){
+        int crtHitIdx = cpmt.GetMatchedCRTHitIndex(opt, sr->crt_hits, 0);
+        if(crtHitIdx>=0){
+          bool IsNegativeTOF = cpmt.IsNegativeTOF( sr->crt_hits.at(crtHitIdx).t1 - opt );
+          if(IsNegativeTOF) return true;
+        }
+      }
+      return false;
+    }
+    else{
+      return false;
+    }
+  });
+  const SpillCut spillcutCRTPMTAllNegativeTOF([](const caf::SRSpillProxy* sr){
+    vector<double> intimeTimes = spillvarInTimeOpFlashTime(sr);
+    if(intimeTimes.size()>0){
+      for(const auto& opt : intimeTimes){
+        int crtHitIdx = cpmt.GetMatchedCRTHitIndex(opt, sr->crt_hits, 0);
+        if(crtHitIdx>=0){
+          bool IsNegativeTOF = cpmt.IsNegativeTOF( sr->crt_hits.at(crtHitIdx).t1 - opt );
+          if(!IsNegativeTOF) return false;
+        }
+      }
+      return true;
+    }
+    else{
+      return false;
+    }
+  });
+
   const Cut cutNominal_ContainedMuon([](const caf::SRSliceProxy* slc) {
     return ( cutRFiducial(slc) && 
              cutFMScore(slc) && 
@@ -754,6 +902,38 @@ namespace ICARUSNumuXsec{
     return ( varMuonProtonCosineTheta(slc)>-0.9 );
     });
 
+
+  //==== Village
+const Cut kGraysProposedSampleCut([](const caf::SRSliceProxy* slc) {
+    if (slc->is_clear_cosmic) return false;
+    if (slc->reco.trk.size() < 3) return false;
+
+    unsigned int nPrimTracks = 0;
+    bool oneIsProton = false;
+
+    for ( auto const& trk : slc->reco.trk ) {
+      const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
+                                     slc->vertex.y - trk.start.y,
+                                     slc->vertex.z - trk.start.z);
+
+      if (Atslc < 10.) nPrimTracks+=1;
+
+      const bool Contained = ( !isnan(trk.end.x) &&
+                               ((trk.end.x < -61.94 - 10 && trk.end.x > -358.49 + 10) ||
+                                (trk.end.x >  61.94 + 10 && trk.end.x <  358.49 - 10)) &&
+                               !isnan(trk.end.y) &&
+                               ( trk.end.y > -181.86 + 10 && trk.end.y < 134.96 - 10 ) &&
+                               !isnan(trk.end.z) &&
+                               ( trk.end.z > -894.95 + 10 && trk.end.z < 894.95 - 10 ) );
+      const float Chi2Proton = trk.chi2pid[trk.bestplane].chi2_proton;
+      const float Chi2Muon = trk.chi2pid[trk.bestplane].chi2_muon;
+
+      if ( Contained && Chi2Proton < 60. && Chi2Muon > 40. ) oneIsProton = true;
+    }
+
+    if ( oneIsProton && nPrimTracks >= 3 ) return true;
+    return false;
+  });
 
 
 }

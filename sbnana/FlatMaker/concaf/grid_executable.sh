@@ -29,6 +29,13 @@ echo "@@ source run_"${nProcess}".sh "${thisOutputCreationDir}
 source run_${nProcess}.sh ${thisOutputCreationDir}
 echo "@@ Check output : "${thisOutputCreationDir}"/flatcaf_"${nProcess}".root"
 ls -alh ${thisOutputCreationDir}"/flatcaf_"${nProcess}".root"
-echo "ifdh cp "${thisOutputCreationDir}"/flatcaf_"${nProcess}".root "${outDir}"/flatcaf_"${nProcess}".root"
-ifdh cp ${thisOutputCreationDir}/flatcaf_${nProcess}.root ${outDir}/flatcaf_${nProcess}.root
-echo "@@ Done!"
+
+outFILE=${thisOutputCreationDir}/flatcaf_${nProcess}.root
+if [ -f "$outFILE" ]; then
+  echo "ifdh cp "${thisOutputCreationDir}"/flatcaf_"${nProcess}".root "${outDir}"/flatcaf_"${nProcess}".root"
+  ifdh cp ${thisOutputCreationDir}/flatcaf_${nProcess}.root ${outDir}/flatcaf_${nProcess}.root
+  echo "@@ Done!"
+else
+  echo "File not exist"
+fi
+

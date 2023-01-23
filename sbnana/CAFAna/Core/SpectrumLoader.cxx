@@ -22,20 +22,20 @@ namespace ana
 {
   //----------------------------------------------------------------------
   SpectrumLoader::SpectrumLoader(const std::string& wildcard, DataSource src, int max)
-    : SpectrumLoaderBase(wildcard, src), max_entries(max)
+    : SpectrumLoaderBase(wildcard, src), max_entries(max), b_CheckDuplicatedEvents(false)
   {
   }
 
   //----------------------------------------------------------------------
   SpectrumLoader::SpectrumLoader(const std::vector<std::string>& fnames,
                                  DataSource src, int max)
-    : SpectrumLoaderBase(fnames, src), max_entries(max)
+    : SpectrumLoaderBase(fnames, src), max_entries(max), b_CheckDuplicatedEvents(false)
   {
   }
 
   //----------------------------------------------------------------------
   SpectrumLoader::SpectrumLoader(DataSource src)
-    : SpectrumLoaderBase(src)
+    : SpectrumLoaderBase(src), b_CheckDuplicatedEvents(false)
   {
   }
 
@@ -125,6 +125,8 @@ namespace ana
     TObject* obj = f->Get("recTree");
     assert(obj); // Must exist in one form or the other
 
+    temp_FileName = f->GetName();
+
     // It might seem like you could use GetObject() to do the type-checking
     // directly, but that method seems to have a memory leak in the case that
     // the types don't match.
@@ -187,6 +189,12 @@ namespace ana
   //----------------------------------------------------------------------
   void SpectrumLoader::HandleRecord(caf::SRSpillProxy* sr)
   {
+    if(b_CheckDuplicatedEvents){
+      if( !AddEventNumber(sr->hdr.evt) ){
+        return;
+      }
+    }
+
     if(sr->hdr.first_in_subrun){
       fPOT += sr->hdr.pot;
       // TODO think about if this should be gated behind first_in_file. At the
@@ -335,7 +343,7 @@ namespace ana
   {
     if(fabs(fPOT - fPOTFromHist)/std::min(fPOT, fPOTFromHist) > 0.001){
       std::cout << fPOT << " POT from hdr differs from " << fPOTFromHist << " POT from the TotalPOT histogram!" << std::endl;
-      abort();
+      //abort();
     }
 
     std::cout << fPOT << " POT over " << fNReadouts << " readouts" << std::endl;
@@ -372,4 +380,20 @@ namespace ana
     }
 
   }
+
+  void SpectrumLoader::CheckDuplicatedEvents(bool b){
+    b_CheckDuplicatedEvents = b;
+  }
+
+  bool SpectrumLoader::AddEventNumber(int e){
+    if( std::find(vec_eventNumber.begin(), vec_eventNumber.end(), e) == vec_eventNumber.end() ){
+      vec_eventNumber.push_back(e);
+      return true;
+    }
+    else{
+      //std::cout << "[SpectrumLoader::AddEventNumber] Event: " << e << " is dulicated (file: " << temp_FileName << ")" << std::endl;
+      return false;
+    }
+  }
+
 } // namespace

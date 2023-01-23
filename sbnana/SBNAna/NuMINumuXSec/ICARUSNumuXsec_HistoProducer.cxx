@@ -95,6 +95,7 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
   const HistAxis axVertexRecoZ("VertexRecoZ", binsZPosition, varVertexRecoZ);
   const HistAxis axFMScore("FMScore", binsFMScore, varFMScore);
   const HistAxis axFMTime("FMTime", binsFMTime, varFMTime);
+  const HistAxis axFMTimeDataTemp("FMTime", binsFMTime, varFMTimeDataTemp);
   const HistAxis axNuScore("NuScore", binsNuScore, varNuScore);
   const HistAxis axCountSlice("CountSlice", binsOne, varCountSlice);
   const HistAxis axSliceTrackNhitsPlane0("SliceTrackNhitsPlane0", binsNhits, varSliceTrackNhitsPlane0);
@@ -150,12 +151,12 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
   const HistAxis axMuonRecoStartX("MuonRecoStartX", binsXPosition, varMuonRecoStartX);
   const HistAxis axMuonRecoStartY("MuonRecoStartY", binsYPosition, varMuonRecoStartY);
   const HistAxis axMuonRecoStartZ("MuonRecoStartZ", binsZPosition, varMuonRecoStartZ);
-  const HistAxis axMuonRecoDirX("MuonRecoDirX", Binning::Simple(100,-1,1), varMuonRecoDirX);
-  const HistAxis axMuonRecoDirY("MuonRecoDirY", Binning::Simple(100,-1,1), varMuonRecoDirY);
-  const HistAxis axMuonRecoDirZ("MuonRecoDirZ", Binning::Simple(100,-1,1), varMuonRecoDirZ);
-  const HistAxis axMuonRecoForceDownDirX("MuonRecoForceDownDirX", Binning::Simple(100,-1,1), varMuonRecoForceDownDirX);
-  const HistAxis axMuonRecoForceDownDirY("MuonRecoForceDownDirY", Binning::Simple(100,-1,1), varMuonRecoForceDownDirY);
-  const HistAxis axMuonRecoForceDownDirZ("MuonRecoForceDownDirZ", Binning::Simple(100,-1,1), varMuonRecoForceDownDirZ);
+  const HistAxis axMuonRecoDirectionX("MuonRecoDirectionX", Binning::Simple(100,-1,1), varMuonRecoDirectionX);
+  const HistAxis axMuonRecoDirectionY("MuonRecoDirectionY", Binning::Simple(100,-1,1), varMuonRecoDirectionY);
+  const HistAxis axMuonRecoDirectionZ("MuonRecoDirectionZ", Binning::Simple(100,-1,1), varMuonRecoDirectionZ);
+  const HistAxis axMuonRecoForceDownDirectionX("MuonRecoForceDownDirectionX", Binning::Simple(100,-1,1), varMuonRecoForceDownDirectionX);
+  const HistAxis axMuonRecoForceDownDirectionY("MuonRecoForceDownDirectionY", Binning::Simple(100,-1,1), varMuonRecoForceDownDirectionY);
+  const HistAxis axMuonRecoForceDownDirectionZ("MuonRecoForceDownDirectionZ", Binning::Simple(100,-1,1), varMuonRecoForceDownDirectionZ);
   const HistAxis axMuonBestmatchPDG("MuonBestmatchPDG", binsPDG, varMuonBestmatchPDG);
   //====     Proton
   const HistAxis axNProtonCandTrack("NProtonCandTrack", Binning::Simple(10, 0., 10.), varNProtonCandTrack);
@@ -182,9 +183,6 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
       new Spectrum("SpillMCNeutrinoE", binsEnergy, loader, spillvarMCNeutrinoE, spillCut)
     );
     map_cutName_to_vec_Spectrums[currentCutName].push_back(
-      new Spectrum("CRTHitT0", Binning::Simple(6200, -3100, 3100), loader, spillvarCRTHitT0, spillCut)
-    );
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(
       new Spectrum("CountSpill", Binning::Simple(1, 0., 1.), loader, spillvarCountSpill, spillCut)
     );
 
@@ -193,7 +191,12 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axVertexRecoY, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axVertexRecoZ, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axFMScore, spillCut, cut));
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axFMTime, spillCut, cut));
+    if(IsData && sampleName!="NUMI:1" && sampleName!="NUMI:8515"){
+      map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axFMTimeDataTemp, spillCut, cut));
+    }
+    else{
+      map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axFMTime, spillCut, cut));
+    }
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNuScore, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axCountSlice, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceTrackNhitsPlane0, spillCut, cut));
@@ -205,10 +208,12 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceTrackChargePlane0, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceTrackChargePlane1, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceTrackChargePlane2, spillCut, cut));
+/*
     //====   Vertex
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axVtxResidualX, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axVtxResidualY, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axVtxResidualZ, spillCut, cut));
+*/
     //====   NuScore vars
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceNuNFinalStatePfos, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceNuNHitsTotal, spillCut, cut));
@@ -222,14 +227,77 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceCRNHitsMax, spillCut, cut));
     //====   NuScore vs Something
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNuScore, axSliceCRLongestTrackDirY, spillCut, cut));
+/*
+    //====   All track
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackStartPositionX", binsXPosition, loader, varAllTrackStartPositionX, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackStartPositionY", binsYPosition, loader, varAllTrackStartPositionY, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackStartPositionZ", binsZPosition, loader, varAllTrackStartPositionZ, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackDirectionX", Binning::Simple(40, -1., 1.), loader, varAllTrackDirectionX, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackDirectionY", Binning::Simple(40, -1., 1.), loader, varAllTrackDirectionY, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackDirectionZ", Binning::Simple(40, -1., 1.), loader, varAllTrackDirectionZ, spillCut, cut));
+*/
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackLength", Binning::Simple(90, 0., 900.), loader, varAllTrackLength, spillCut, cut));
+/*
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackMatchedTruthDirectionX", Binning::Simple(40, -1., 1.), loader, varAllTrackMatchedTruthDirectionX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackMatchedTruthDirectionY", Binning::Simple(40, -1., 1.), loader, varAllTrackMatchedTruthDirectionY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackMatchedTruthDirectionZ", Binning::Simple(40, -1., 1.), loader, varAllTrackMatchedTruthDirectionZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("AllTrackMatchedTruthLength", Binning::Simple(90, 0., 900.), loader, varAllTrackMatchedTruthLength, spillCut, cut));
+    //==== TODO test
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackStartPositionX", binsXPosition, loader, varTestSelectedTrackStartPositionX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackStartPositionY", binsYPosition, loader, varTestSelectedTrackStartPositionY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackStartPositionZ", binsZPosition, loader, varTestSelectedTrackStartPositionZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(
+      new Spectrum(
+        "TestSelectedTrackStartPositionZvsY", loader,
+        Binning::Simple(180, -900., 900.), varTestSelectedTrackStartPositionZ,
+        Binning::Simple(36, -180., 180.), varTestSelectedTrackStartPositionY,
+        spillCut, cut
+      )
+    );
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackEndPositionX", binsXPosition, loader, varTestSelectedTrackEndPositionX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackEndPositionY", binsYPosition, loader, varTestSelectedTrackEndPositionY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackEndPositionZ", binsZPosition, loader, varTestSelectedTrackEndPositionZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackDirectionX", Binning::Simple(40, -1., 1.), loader, varTestSelectedTrackDirectionX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackDirectionY", Binning::Simple(40, -1., 1.), loader, varTestSelectedTrackDirectionY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackDirectionZ", Binning::Simple(40, -1., 1.), loader, varTestSelectedTrackDirectionZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackLength", Binning::Simple(90, 0., 900.), loader, varTestSelectedTrackLength, spillCut, cut));
+    //==== its matched version
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackMatchedTruthStartPositionX", binsXPosition, loader, varTestSelectedTrackMatchedTruthStartPositionX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackMatchedTruthStartPositionY", binsYPosition, loader, varTestSelectedTrackMatchedTruthStartPositionY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackMatchedTruthStartPositionZ", binsZPosition, loader, varTestSelectedTrackMatchedTruthStartPositionZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackMatchedTruthEndPositionX", binsXPosition, loader, varTestSelectedTrackMatchedTruthEndPositionX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackMatchedTruthEndPositionY", binsYPosition, loader, varTestSelectedTrackMatchedTruthEndPositionY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackMatchedTruthEndPositionZ", binsZPosition, loader, varTestSelectedTrackMatchedTruthEndPositionZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackMatchedTruthDirectionX", Binning::Simple(40, -1., 1.), loader, varTestSelectedTrackMatchedTruthDirectionX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackMatchedTruthDirectionY", Binning::Simple(40, -1., 1.), loader, varTestSelectedTrackMatchedTruthDirectionY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackMatchedTruthDirectionZ", Binning::Simple(40, -1., 1.), loader, varTestSelectedTrackMatchedTruthDirectionZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TestSelectedTrackMatchedTruthLength", Binning::Simple(90, 0., 900.), loader, varTestSelectedTrackMatchedTruthLength, spillCut, cut));
+*/
+    //==== Longest track
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackDirectionX", Binning::Simple(40, -1., 1.), loader, varLongestTrackDirectionX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackDirectionY", Binning::Simple(40, -1., 1.), loader, varLongestTrackDirectionY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackDirectionZ", Binning::Simple(40, -1., 1.), loader, varLongestTrackDirectionZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackDirectionXZ", Binning::Simple(40, 0., 1.), loader, varLongestTrackDirectionXZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackLength", Binning::Simple(90, 0., 900.), loader, varLongestTrackLength, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackChi2Muon", Binning::Simple(50, 0., 100.), loader, varLongestTrackChi2Muon, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackChi2Proton", Binning::Simple(40, 0., 400.), loader, varLongestTrackChi2Proton, spillCut, cut));
 
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackForceDownDirectionX", Binning::Simple(40, -1., 1.), loader, varLongestTrackForceDownDirectionX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackForceDownDirectionY", Binning::Simple(40, -1., 1.), loader, varLongestTrackForceDownDirectionY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackForceDownDirectionZ", Binning::Simple(40, -1., 1.), loader, varLongestTrackForceDownDirectionZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackForceDownStartPositionX", Binning::Simple(40, -1., 1.), loader, varLongestTrackForceDownStartPositionX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackForceDownStartPositionY", Binning::Simple(40, -1., 1.), loader, varLongestTrackForceDownStartPositionY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackForceDownStartPositionZ", Binning::Simple(40, -1., 1.), loader, varLongestTrackForceDownStartPositionZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackForceDownEndPositionX", Binning::Simple(40, -1., 1.), loader, varLongestTrackForceDownEndPositionX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackForceDownEndPositionY", Binning::Simple(40, -1., 1.), loader, varLongestTrackForceDownEndPositionY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackForceDownEndPositionZ", Binning::Simple(40, -1., 1.), loader, varLongestTrackForceDownEndPositionZ, spillCut, cut));
+
+  if(!IsData){
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackMatchedTruthDirectionX", Binning::Simple(40, -1., 1.), loader, varLongestTrackMatchedTruthDirectionX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackMatchedTruthDirectionY", Binning::Simple(40, -1., 1.), loader, varLongestTrackMatchedTruthDirectionY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("LongestTrackMatchedTruthDirectionZ", Binning::Simple(40, -1., 1.), loader, varLongestTrackMatchedTruthDirectionZ, spillCut, cut));
+  }
+/*
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("FMChargeQ", binsFMChargeQ, loader, varFMChargeQ, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("FMChargeCenterX", binsXPosition, loader, varFMChargeCenterX, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("FMChargeCenterY", binsYPosition, loader, varFMChargeCenterY, spillCut, cut));
@@ -238,22 +306,29 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("FMLightCenterY", binsYPosition, loader, varFMLightCenterY, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("FMLightCenterZ", binsZPosition, loader, varFMLightCenterZ, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("FMLightPE", binsFMLightPE, loader, varFMLightPE, spillCut, cut));
+*/
+
     //====   Truth variables
-    //====     Neutrinos
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNeutrinoTruthE, spillCut, cut));
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthQ2, spillCut, cut));
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthq0_lab, spillCut, cut));
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthmodq_lab, spillCut, cut));
-    //====     Muon
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonTruthP, spillCut, cut));
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonTruthCosineTheta, spillCut, cut));
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonTruthNuMICosineTheta, spillCut, cut));
-    //====     Proton
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonTruthP, spillCut, cut));
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonTruthCosineTheta, spillCut, cut));
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonTruthNuMICosineTheta, spillCut, cut));
-    //====     Muon+Proton
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthMuonProtonCosineTheta, spillCut, cut));
+    if(!IsData){
+      //====     Neutrinos
+      map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNeutrinoTruthE, spillCut, cut));
+      map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthQ2, spillCut, cut));
+      map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthq0_lab, spillCut, cut));
+      map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthmodq_lab, spillCut, cut));
+      //====     Muon
+      map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonTruthP, spillCut, cut));
+      map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonTruthCosineTheta, spillCut, cut));
+      map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonTruthNuMICosineTheta, spillCut, cut));
+      map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("MuonTruthDirectionX", Binning::Simple(100, -1., 1.), loader, varMuonTruthDirectionX, spillCut, cut));
+      map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("MuonTruthDirectionY", Binning::Simple(100, -1., 1.), loader, varMuonTruthDirectionY, spillCut, cut));
+      map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("MuonTruthDirectionZ", Binning::Simple(100, -1., 1.), loader, varMuonTruthDirectionZ, spillCut, cut));
+      //====     Proton
+      map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonTruthP, spillCut, cut));
+      map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonTruthCosineTheta, spillCut, cut));
+      map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonTruthNuMICosineTheta, spillCut, cut));
+      //====     Muon+Proton
+      map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axTruthMuonProtonCosineTheta, spillCut, cut));
+    }
     //====   Reco variables
     //====     Muon
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNMuonCandTrack, spillCut, cut));
@@ -267,12 +342,12 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoStartX, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoStartY, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoStartZ, spillCut, cut));
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoDirX, spillCut, cut));
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoDirY, spillCut, cut));
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoDirZ, spillCut, cut));
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoForceDownDirX, spillCut, cut));
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoForceDownDirY, spillCut, cut));
-    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoForceDownDirZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoDirectionX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoDirectionY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoDirectionZ, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoForceDownDirectionX, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoForceDownDirectionY, spillCut, cut));
+    map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoForceDownDirectionZ, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonBestmatchPDG, spillCut, cut));
     //====     Proton
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNProtonCandTrack, spillCut, cut));
@@ -290,14 +365,15 @@ void HistoProducer::bookSpectrums(SpectrumLoader& loader, SpillCut spillCut, Cut
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNeutrinoCombinedEnergy, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNeutrinoCombinedEnergyResidual, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNeutrinoCombinedEnergyResidualFraction, spillCut, cut));
-
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNeutrinoQEEnergy, spillCut, cut));
+/*
     //====   Reco vs Truth
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoP, axMuonTruthP, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoCosineTheta, axMuonTruthCosineTheta, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axMuonRecoNuMICosineTheta, axMuonTruthNuMICosineTheta, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axProtonRecoP, axProtonTruthP, spillCut, cut));
     map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axNeutrinoCombinedEnergy, axNeutrinoTruthE, spillCut, cut));
+*/
   }
 
   //==== Systematic
@@ -706,53 +782,14 @@ void HistoProducer::GetChi2Eff(SpectrumLoader& loader, SpillCut spillCut, Cut cu
 
 void HistoProducer::bookTEST(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
-  //====     Proton
-  const HistAxis axProtonTruthT("ProtonTruthT", Binning::Simple(100., 0., 0.05), varProtonTruthT);
-  const HistAxis axTruthProtonMatchedStubE("TruthProtonMatchedStubE", Binning::Simple(100, 0., 0.05), varTruthProtonMatchedStubE);
-  const HistAxis axTruthProtonMatchedStubLength("TruthProtonMatchedStubLength", Binning::Simple(100, 0., 10.) ,varTruthProtonMatchedStubLength);
+  //====  Proton
+  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("ProtonTruthT", Binning::Simple(500, 0., 1.0), loader, varProtonTruthT, spillCut, cut) );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("TruthProtonMatchedStubE", Binning::Simple(100, 0., 0.05), loader, varTruthProtonMatchedStubE, spillCut, cut) );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("TruthProtonMatchedStubLength", Binning::Simple(100, 0., 10.), loader, varTruthProtonMatchedStubLength, spillCut, cut) );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("ProtonTruthT_vs_TruthProtonMatchedStubLength", loader, Binning::Simple(50, 0., 0.2), varProtonTruthT, Binning::Simple(100, 0., 10.), varTruthProtonMatchedStubLength, spillCut, cut) );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("ProtonTruthT_vs_TruthProtonMatchedStubE", loader, Binning::Simple(50, 0., 0.2), varProtonTruthT, Binning::Simple(100, 0., 0.04), varTruthProtonMatchedStubE, spillCut, cut) );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("TruthProtonMatchedObjectType", Binning::Simple(8, 0., 8.), loader, varTruthProtonMatchedObjectType, spillCut, cut));
 
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(
-    new Spectrum("ProtonTruthT",
-      Binning::Simple(500, 0., 1.0),
-      loader,
-      varProtonTruthT,
-      spillCut, cut
-    )
-  );
-
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(
-    new Spectrum("TruthProtonMatchedStubE",
-      Binning::Simple(100, 0., 0.05),
-      loader,
-      varTruthProtonMatchedStubE,
-      spillCut, cut
-    )
-  );
-
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(
-    new Spectrum("TruthProtonMatchedStubLength",
-      Binning::Simple(100, 0., 10.),
-      loader,
-      varTruthProtonMatchedStubLength,
-      spillCut, cut
-    )
-  );
-
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(
-    new Spectrum("ProtonTruthT_vs_TruthProtonMatchedStubLength", loader,
-      Binning::Simple(50, 0., 0.2), varProtonTruthT,
-      Binning::Simple(100, 0., 10.), varTruthProtonMatchedStubLength,
-      spillCut, cut
-    )
-  );
-
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(
-    new Spectrum("ProtonTruthT_vs_TruthProtonMatchedStubE", loader,
-      Binning::Simple(50, 0., 0.2), varProtonTruthT,
-      Binning::Simple(100, 0., 0.04), varTruthProtonMatchedStubE,
-      spillCut, cut
-    )
-  );
 
 /*
   //==== Test GENIE syst
@@ -1114,6 +1151,142 @@ void HistoProducer::MichelStudy(SpectrumLoader& loader, SpillCut spillCut, Cut c
 
 }
 
+//==== 221014_PandoraCosmicTest
+void HistoProducer::PandoraClearCosmicTest(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("VertexRecoX", Binning::Simple(1000, -500., 500.), loader, varVertexRecoX, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("VertexRecoY", Binning::Simple(400, -200., 200.), loader, varVertexRecoY, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("VertexRecoZ", Binning::Simple(2000, -1000., 1000.), loader, varVertexRecoZ, spillCut, cut));
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("NeutrinoTruthE", Binning::Simple(100, 0., 10.), loader, varNeutrinoTruthE, spillCut, cut));
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("MuonTruthP", Binning::Simple(100, 0., 5.), loader, varMuonTruthP, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("MuonTruthCosineTheta", Binning::Simple(100, -1., 1.), loader, varMuonTruthCosineTheta, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("MuonTruthNuMICosineTheta", Binning::Simple(100, -1., 1.), loader, varMuonTruthNuMICosineTheta, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("MuonTruthDirectionX", Binning::Simple(100, -1., 1.), loader, varMuonTruthDirectionX, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("MuonTruthDirectionY", Binning::Simple(100, -1., 1.), loader, varMuonTruthDirectionY, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("MuonTruthDirectionZ", Binning::Simple(100, -1., 1.), loader, varMuonTruthDirectionZ, spillCut, cut));
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("MuonBestmatchDirectionX", Binning::Simple(100, -1., 1.), loader, varMuonBestmatchDirectionX, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("MuonBestmatchDirectionY", Binning::Simple(100, -1., 1.), loader, varMuonBestmatchDirectionY, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("MuonBestmatchDirectionZ", Binning::Simple(100, -1., 1.), loader, varMuonBestmatchDirectionZ, spillCut, cut));
+
+  double xNuScoreMin = -0.2;
+  double xNuScoreMax = 1.;
+  double dxNuScore = 0.01;
+  const Binning binsNuScore = Binning::Simple( int( (xNuScoreMax-xNuScoreMin)/dxNuScore ), xNuScoreMin, xNuScoreMax );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("NuScore", binsNuScore, loader, varNuScore, spillCut, cut));
+
+  const HistAxis axSliceNuNFinalStatePfos("SliceNuNFinalStatePfos", Binning::Simple(20,0.,20.), varSliceNuNFinalStatePfos);
+  const HistAxis axSliceNuNHitsTotal("SliceNuNHitsTotal", Binning::Simple(500,0.,5000.), varSliceNuNHitsTotal);
+  const HistAxis axSliceNuVertexY("SliceNuVertexY", Binning::Simple(400, -200., 200.), varSliceNuVertexY);
+  const HistAxis axSliceNuWeightedDirZ("SliceNuWeightedDirZ", Binning::Simple(100,-1,1), varSliceNuWeightedDirZ);
+  const HistAxis axSliceNuNSpacePointsInSphere("SliceNuNSpacePointsInSphere", Binning::Simple(300,0.,300.), varSliceNuNSpacePointsInSphere);
+  const HistAxis axSliceNuEigenRatioInSphere("SliceNuEigenRatioInSphere", Binning::Simple(100,0.,1.), varSliceNuEigenRatioInSphere);
+  const HistAxis axSliceCRLongestTrackDirY("SliceCRLongestTrackDirY", Binning::Simple(100,-1,1), varSliceCRLongestTrackDirY);
+  const HistAxis axSliceCRLongestTrackDeflection("SliceCRLongestTrackDeflection", Binning::Simple(40,0.,2.), varSliceCRLongestTrackDeflection);
+  const HistAxis axSliceCRFracHitsInLongestTrack("SliceCRFracHitsInLongestTrack", Binning::Simple(50,0.,1.), varSliceCRFracHitsInLongestTrack);
+  const HistAxis axSliceCRNHitsMax("SliceCRNHitsMax", Binning::Simple(1000,0.,1000.), varSliceCRNHitsMax);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceNuNFinalStatePfos, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceNuNHitsTotal, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceNuVertexY, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceNuWeightedDirZ, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceNuNSpacePointsInSphere, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceNuEigenRatioInSphere, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceCRLongestTrackDirY, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceCRLongestTrackDeflection, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceCRFracHitsInLongestTrack, spillCut, cut));
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum(loader, axSliceCRNHitsMax, spillCut, cut));
+
+
+}
+
+//==== 221027_PandoraCosmicVertexTest
+void HistoProducer::PandoraCosmicVertexTest(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+/*
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("spillTEST", Binning::Simple(1, 0., 1.), loader, spillTEST, spillCut)
+  );
+*/
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(new Spectrum("NuScore", Binning::Simple(100, -1., 1.), loader, varNuScore, spillCut, cut));
+
+
+}
+
+//==== 221121_CRTPMTMatching
+void HistoProducer::CRTPMTMatchingStudy(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("SpillCount", Binning::Simple(1, 0.,1.), loader, spillvarCountSpill, spillCut)
+  );
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("OpFlashTime", Binning::Simple(2500, -5.,20.), loader, spillvarOpFlashTime, spillCut)
+  );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("InTimeOpFlashTime", Binning::Simple(2500, -5.,20.), loader, spillvarInTimeOpFlashTime, spillCut)
+  );
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("TopCRTTime", Binning::Simple(2500, -5.,20.), loader, spillvarTopCRTTime, spillCut)
+  );
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("CRTPMTTime", Binning::Simple(1500, -0.1, 0.05), loader, spillvarCRTPMTTime, spillCut)
+  );
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("OpFlashTimeAllRange", Binning::Simple(6000, -3000.,3000.), loader, spillvarOpFlashTime, spillCut)
+  );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("TopCRTTimeAllRange", Binning::Simple(6000, -3000.,3000.), loader, spillvarTopCRTTime, spillCut)
+  );
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("CRTPMTMatchingID", Binning::Simple(10, 0.,10.), loader, spillvarCRTPMTMatchingID, spillCut)
+  );
+
+}
+
+//==== 221129_TrackBreakingTest
+void HistoProducer::TrackBreakingTest(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("spillLongestTrackStitchedTrackLength", Binning::Simple(1000, 0., 1000.), loader, spillLongestTrackStitchedTrackLength, spillCut)
+  );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("spillLongestTrackStitchedTrackDistance", Binning::Simple(1000, 0., 1000.), loader, spillLongestTrackStitchedTrackDistance, spillCut)
+  );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("spillLongestTrackStitchedTrackClosestMode", Binning::Simple(4, 0., 4.), loader, spillLongestTrackStitchedTrackClosestMode, spillCut)
+  );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("spillLongestTrackStitchedTrackDistanceSameCryo", Binning::Simple(1000, 0., 1000.), loader, spillLongestTrackStitchedTrackDistanceSameCryo, spillCut)
+  );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("spillLongestTrackStitchedTrackDistanceOtherCryo", Binning::Simple(1000, 0., 1000.), loader, spillLongestTrackStitchedTrackDistanceOtherCryo, spillCut)
+  );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("spillLongestTrackStitchedTrackDistanceSameTruthG4ID", Binning::Simple(1000, 0., 1000.), loader, spillLongestTrackStitchedTrackDistanceSameTruthG4ID, spillCut)
+  );
+
+
+}
+
+//==== 221201_Cosmic_to_ClearCosmicTest
+void HistoProducer::Cosmic_to_ClearCosmicTest(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum("IsTrueCosmic_vs_IsClearCosmic", loader,
+      Binning::Simple(2, 0., 2.), varIsTrueCosmic,
+      Binning::Simple(2, 0., 2.), varIsClearCosmic,
+      spillCut, cut)
+  );
+
+
+}
+
 void HistoProducer::bookTEMP(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
 /*
@@ -1243,8 +1416,8 @@ void HistoProducer::bookTEMP(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
 
   map_cutName_to_vec_Spectrums[currentCutName].push_back(
     new Spectrum(
-      "MuonRecoDirY_vs_CRLongestTrackDirY", loader,
-      Binning::Simple(40, -1, 1.), varMuonRecoDirY,
+      "MuonRecoDirectionY_vs_CRLongestTrackDirY", loader,
+      Binning::Simple(40, -1, 1.), varMuonRecoDirectionY,
       Binning::Simple(40, -1, 1.), varSliceCRLongestTrackDirY,
       spillCut, cut
     )

@@ -68,6 +68,46 @@ namespace ICARUSNumuXsec{
   { 
     return sr->reco.ntrk;
   });
+
+  const SpillMultiVar spillNuEnergy([](const caf::SRSpillProxy *sr)
+  {
+    std::vector<double> rets;
+    for(const auto& _nu : sr->mc.nu){
+      rets.push_back(_nu.E);
+    }
+    return rets;
+  });
+  const SpillMultiVar spillMuonMomentum([](const caf::SRSpillProxy *sr)
+  {
+    std::vector<double> rets;
+    for(const auto& _nu : sr->mc.nu){
+
+      double max_E(-999);
+      int truth_idx(-1);
+      for(std::size_t i(0); i < _nu.prim.size(); ++i){
+        if( abs(_nu.prim.at(i).pdg)== 13 ){
+          if(isnan(_nu.prim.at(i).genE)) continue;
+          double this_E = _nu.prim.at(i).genE;
+          if(this_E>max_E){
+            max_E = this_E;
+            truth_idx = i;
+          }
+        }
+      }
+
+      if(truth_idx>=0){
+
+        auto const& pMuon = _nu.prim.at(truth_idx);
+        TVector3 pMuon_Momentum(pMuon.genp.x, pMuon.genp.y, pMuon.genp.z);
+        rets.push_back( pMuon_Momentum.Mag() );
+
+      }
+
+
+    }
+    return rets;
+  });
+
   const SpillMultiVar spillNuDirectionX([](const caf::SRSpillProxy *sr)
   {
     std::vector<double> rets;
@@ -75,7 +115,8 @@ namespace ICARUSNumuXsec{
       double this_x = _nu.prod_vtx.x/100.;
       double this_y = _nu.prod_vtx.y/100.;
       double this_z = _nu.prod_vtx.z/100.;
-      TVector3 this_coord = nct.GetICARUSCoord(this_x, this_y, this_z);
+      TVector3 this_coord = nct.GetICARUSCoord(this_x, this_y, this_z).Unit();
+      this_coord *= -1.;
       rets.push_back(this_coord.X());
     }
     return rets;
@@ -87,7 +128,8 @@ namespace ICARUSNumuXsec{
       double this_x = _nu.prod_vtx.x/100.;
       double this_y = _nu.prod_vtx.y/100.;
       double this_z = _nu.prod_vtx.z/100.;
-      TVector3 this_coord = nct.GetICARUSCoord(this_x, this_y, this_z);
+      TVector3 this_coord = nct.GetICARUSCoord(this_x, this_y, this_z).Unit();
+      this_coord *= -1.;
       rets.push_back(this_coord.Y());
     }
     return rets;
@@ -99,11 +141,125 @@ namespace ICARUSNumuXsec{
       double this_x = _nu.prod_vtx.x/100.;
       double this_y = _nu.prod_vtx.y/100.;
       double this_z = _nu.prod_vtx.z/100.;
-      TVector3 this_coord = nct.GetICARUSCoord(this_x, this_y, this_z);
+      TVector3 this_coord = nct.GetICARUSCoord(this_x, this_y, this_z).Unit();
+      this_coord *= -1.;
       rets.push_back(this_coord.Z());
     }
     return rets;
   });
+
+  const SpillVar spillvarNTracksWithFVCut([](const caf::SRSpillProxy *sr)
+  {
+    int sumNTrack = 0;
+    for(const auto& slc : sr->slc){
+      int NTrack = slc.reco.trk.size();
+      sumNTrack += NTrack;
+    }
+    return sumNTrack;
+  });
+
+  //==== PMT-CRT matching
+
+  const SpillMultiVar spillvarOpFlashTime([](const caf::SRSpillProxy *sr)
+  {
+    std::vector<double> rets;
+    for(const auto& opflash : sr->opflashes){
+      rets.push_back(opflash.firsttime);
+    }
+    return rets;
+  });
+
+  const SpillMultiVar spillvarValidOpFlashTime([](const caf::SRSpillProxy *sr)
+  {
+    std::vector<double> rets;
+    for(const auto& opflash : sr->opflashes){
+      if(opflash.onbeamtime) rets.push_back(opflash.firsttime); // TODO I'm using a hacked version of onbeamtime..
+    }
+    return rets;
+  });
+  const SpillMultiVar spillvarInTimeOpFlashTime([](const caf::SRSpillProxy *sr)
+  {
+    vector<double> validTimes = spillvarValidOpFlashTime(sr);
+    std::vector<double> rets;
+    for(const auto& opt : validTimes){
+      if( cpmt.IsInTime(opt) ) rets.push_back(opt);
+    }
+    return rets;
+  });
+
+
+  const SpillMultiVar spillvarTopCRTTime([](const caf::SRSpillProxy *sr)
+  {
+    std::vector<double> rets;
+    //std::cout << "@@ Number of CRTHits = " << sr->crt_hits.size() << std::endl;
+    for(const auto& hit : sr->crt_hits){
+      if(hit.plane>=30 && hit.plane<=35){
+        //printf("Top CRT t1 = %1.3f us\n", hit.t1.GetValue());
+        rets.push_back(hit.t1);
+      }
+    }
+    return rets;
+  });
+  const SpillMultiVar spillvarCRTPMTTime([](const caf::SRSpillProxy *sr)
+  {
+    vector<double> intimeTimes = spillvarInTimeOpFlashTime(sr);
+    std::vector<double> rets;
+    for(const auto& opt : intimeTimes){
+      int crtHitIdx = cpmt.GetMatchedCRTHitIndex(opt, sr->crt_hits, 0);
+      if(crtHitIdx>=0){
+        rets.push_back( sr->crt_hits.at(crtHitIdx).t1 - opt );
+      }
+    }
+    return rets;
+  });
+  const SpillMultiVar spillvarCRTPMTMatchingID([](const caf::SRSpillProxy *sr)
+  {
+    vector<double> intimeTimes = spillvarInTimeOpFlashTime(sr);
+    std::vector<double> rets;
+    if(intimeTimes.size()>0){
+      for(const auto& opt : intimeTimes){
+        rets.push_back( cpmt.GetMatchID(opt, sr->crt_hits) );
+      }
+    }
+    return rets;
+  });
+
+  const SpillVar spillvarCRTPMTMatchingEventID([](const caf::SRSpillProxy *sr)
+  {
+/*
+    vector<double> intimeTimes = spillvarInTimeOpFlashTime(sr);
+    if(intimeTimes.size()>0){
+      int CountNoMatching = 0;
+      int CountEnteringTrack = 0;
+      int CountExitingTrack = 0;
+      int CountUnknown = 0
+      for(const auto& opt : intimeTimes){
+        int this_ID = cpmt.GetMatchID(opt, sr->crt_hits);
+        if(this_ID==0) CountNoMatching++;
+        if(this_ID==1 || this_ID==2 || this_ID==3 || this_ID==6 || this_ID==7) CountEnteringTrack++;
+        if(this_ID==4 || this_ID==5) CountExitingTrack++;
+        if(this_ID==8) CountUnknown++;
+      }
+
+      //TODO
+
+    
+    else{
+      return 9;
+    }
+*/
+return 0;
+  });
+
+  const SpillMultiVar spillNuPositionX([](const caf::SRSpillProxy *sr)
+  {
+    std::vector<double> rets;
+    for(const auto& _nu : sr->mc.nu){
+      rets.push_back(_nu.position.x);
+    }
+    return rets;
+  });
+
 
   //====   Spill-based Truth neutrino information
   const SpillMultiVar spillvarNeutrinoQEEnergyResidual([](const caf::SRSpillProxy *sr)
@@ -146,24 +302,209 @@ namespace ICARUSNumuXsec{
     return rets;
   });
 
-  const SpillVar spillTEST([](const caf::SRSpillProxy *sr)
+  const SpillMultiVar spillTEST([](const caf::SRSpillProxy *sr)
   {
 /*
     double twg = sr->hdr.triggerinfo.trigger_within_gate;
     std::cout << "[spillTEST] twg = " << twg << std::endl;
     return twg;
 */
+/*
     double a(1.);
     for(const auto& it: sr->hdr.triggerinfo){
       std::cout << "[spillTEST] time = " << it.global_trigger_det_time << std::endl;
     }
     return a;
+*/
+/*
+    for(const auto& slc: sr->slc){
+      double vtx_x = slc.vertex.x;
+      double vtx_y = slc.vertex.y;
+      double vtx_z = slc.vertex.z;
+
+      int nShw = slc.reco.nshw;
+      int nTrk = slc.reco.ntrk;
+
+      if(slc.is_clear_cosmic){
+        printf("ClearCosmic Vertex, npfo = %d+%d, vertex = (X, Y, Z) = (%1.1f, %1.1f, %1.1f)\n", nShw, nTrk, vtx_x, vtx_y, vtx_z);
+      }
+      else{
+        printf("Neutrino Vertex, npfo = %d+%d, vertex = (X, Y, Z) = (%1.1f, %1.1f, %1.1f)\n", nShw, nTrk, vtx_x, vtx_y, vtx_z);
+      }
+    }
+    return 0.;
+*/
+
+    vector<double> ret;
+    int sliceIndex = -1;
+    for(const auto& slc: sr->slc){
+      sliceIndex++;
+      // slc : const          caf::Proxy<caf::SRSlice>
+      // using SRSliceProxy = caf::Proxy<caf::SRSlice>;
+      int longestTrkIdx = varLongestTrackIndex(&slc);
+      if(longestTrkIdx<0) continue;
+      const auto& trk = slc.reco.trk.at(longestTrkIdx);
+      TrackStitchingTool::StichOutput output = tst.GetStitchedTrack(trk, slc, sr);
+      if(output.isFound){
+
+        TVector3 trk_start(trk.start.x, trk.start.y, trk.start.z);
+        TVector3 trk_end(trk.end.x, trk.end.y, trk.end.z);
+        TVector3 trk_dir(trk.dir.x, trk.dir.y, trk.dir.z);
+
+        const auto& trk2 = sr->slc.at(output.foundSliceIdx).reco.trk.at(output.foundTrackIdx);
+        TVector3 trk2_start(trk2.start.x, trk2.start.y, trk2.start.z);
+        TVector3 trk2_end(trk2.end.x, trk2.end.y, trk2.end.z);
+        TVector3 trk2_dir(trk2.dir.x, trk2.dir.y, trk2.dir.z);
+
+        //double dist_start_to_start = (trk_start-trk2_start).Mag();
+        //double dist_start_to_end = (trk_start-trk2_end).Mag();
+        double dist_end_to_start = (trk_end-trk2_start).Mag();
+        //double dist_end_to_end = (trk_end-trk2_end).Mag();
+
+        //double cosDir = trk_dir.Dot(trk2_dir);
+
+        ret.push_back(dist_end_to_start);
+
+      } // END If found
+
+    } // END Loop over slices
+    return ret;
+
   });
 
+  //==== 221129_TrackBreakingTest
+  const SpillMultiVar spillLongestTrackStitchedTrackLength([](const caf::SRSpillProxy *sr){
+    vector<double> ret;
+    int sliceIndex = -1;
+    for(const auto& slc: sr->slc){
+      sliceIndex++;
+      // slc : const          caf::Proxy<caf::SRSlice>
+      // using SRSliceProxy = caf::Proxy<caf::SRSlice>;
+      int longestTrkIdx = varLongestTrackIndex(&slc);
+      if(longestTrkIdx<0) continue;
+      const auto& trk = slc.reco.trk.at(longestTrkIdx);
+      TrackStitchingTool::StichOutput output = tst.GetStitchedTrack(trk, slc, sr);
+      if(output.isFound){
+        const auto& trk2 = sr->slc.at(output.foundSliceIdx).reco.trk.at(output.foundTrackIdx);
+        ret.push_back(trk2.len);
+      } // END If found
+
+    } // END Loop over slices
+    return ret;
+  });
+  const SpillMultiVar spillLongestTrackStitchedTrackDistance([](const caf::SRSpillProxy *sr){
+    vector<double> ret;
+    int sliceIndex = -1;
+    for(const auto& slc: sr->slc){
+      sliceIndex++;
+      // slc : const          caf::Proxy<caf::SRSlice>
+      // using SRSliceProxy = caf::Proxy<caf::SRSlice>;
+      int longestTrkIdx = varLongestTrackIndex(&slc);
+      if(longestTrkIdx<0) continue;
+      const auto& trk = slc.reco.trk.at(longestTrkIdx);
+      TrackStitchingTool::StichOutput output = tst.GetStitchedTrack(trk, slc, sr);
+      if(output.isFound){
+        ret.push_back(output.minDist);
+      } // END If found
+
+    } // END Loop over slices
+    return ret;
+  });
+  const SpillMultiVar spillLongestTrackStitchedTrackClosestMode([](const caf::SRSpillProxy *sr){
+    vector<double> ret;
+    int sliceIndex = -1;
+    for(const auto& slc: sr->slc){
+      sliceIndex++;
+      // slc : const          caf::Proxy<caf::SRSlice>
+      // using SRSliceProxy = caf::Proxy<caf::SRSlice>;
+      int longestTrkIdx = varLongestTrackIndex(&slc);
+      if(longestTrkIdx<0) continue;
+      const auto& trk = slc.reco.trk.at(longestTrkIdx);
+      TrackStitchingTool::StichOutput output = tst.GetStitchedTrack(trk, slc, sr);
+      if(output.isFound){
+        ret.push_back(output.closestMode);
+      } // END If found
+
+    } // END Loop over slices
+    return ret;
+  });
+  const SpillMultiVar spillLongestTrackStitchedTrackDistanceSameCryo([](const caf::SRSpillProxy *sr){
+    vector<double> ret;
+    int sliceIndex = -1;
+    for(const auto& slc: sr->slc){
+      sliceIndex++;
+      // slc : const          caf::Proxy<caf::SRSlice>
+      // using SRSliceProxy = caf::Proxy<caf::SRSlice>;
+      int longestTrkIdx = varLongestTrackIndex(&slc);
+      if(longestTrkIdx<0) continue;
+      const auto& trk = slc.reco.trk.at(longestTrkIdx);
+      TrackStitchingTool::StichOutput output = tst.GetStitchedTrack(trk, slc, sr);
+      if(output.isFound){
+        const auto& trk2 = sr->slc.at(output.foundSliceIdx).reco.trk.at(output.foundTrackIdx);
+        if(trk.end.x * trk2.start.x > 0){
+          ret.push_back(output.minDist);
+        }
+      } // END If found
+
+    } // END Loop over slices
+    return ret;
+  });
+  const SpillMultiVar spillLongestTrackStitchedTrackDistanceOtherCryo([](const caf::SRSpillProxy *sr){
+    vector<double> ret;
+    int sliceIndex = -1;
+    for(const auto& slc: sr->slc){
+      sliceIndex++;
+      // slc : const          caf::Proxy<caf::SRSlice>
+      // using SRSliceProxy = caf::Proxy<caf::SRSlice>;
+      int longestTrkIdx = varLongestTrackIndex(&slc);
+      if(longestTrkIdx<0) continue;
+      const auto& trk = slc.reco.trk.at(longestTrkIdx);
+      TrackStitchingTool::StichOutput output = tst.GetStitchedTrack(trk, slc, sr);
+      if(output.isFound){
+        const auto& trk2 = sr->slc.at(output.foundSliceIdx).reco.trk.at(output.foundTrackIdx);
+        if(trk.end.x * trk2.start.x < 0){
+          ret.push_back(output.minDist);
+        }
+
+      } // END If found
+
+    } // END Loop over slices
+    return ret;
+  });
+  const SpillMultiVar spillLongestTrackStitchedTrackDistanceSameTruthG4ID([](const caf::SRSpillProxy *sr){
+    vector<double> ret;
+    int sliceIndex = -1;
+    for(const auto& slc: sr->slc){
+      sliceIndex++;
+      // slc : const          caf::Proxy<caf::SRSlice>
+      // using SRSliceProxy = caf::Proxy<caf::SRSlice>;
+      int longestTrkIdx = varLongestTrackIndex(&slc);
+      if(longestTrkIdx<0) continue;
+      const auto& trk = slc.reco.trk.at(longestTrkIdx);
+      TrackStitchingTool::StichOutput output = tst.GetStitchedTrack(trk, slc, sr);
+      if(output.isFound){
+        const auto& trk2 = sr->slc.at(output.foundSliceIdx).reco.trk.at(output.foundTrackIdx);
+        if(trk.truth.bestmatch.G4ID==trk2.truth.bestmatch.G4ID){
+          ret.push_back(output.minDist);
+        }
+      } // END If found
+
+    } // END Loop over slices
+    return ret;
+  });
   //==== Slice variables
 
   const Var varCountSlice([](const caf::SRSliceProxy* slc) ->int {
     return 0.;
+  });
+
+  const Var varIsTrueCosmic([](const caf::SRSliceProxy* slc) ->int {
+    if(kIsCosmic(slc)) return 1.;
+    else return 0.;
+  });
+  const Var varIsClearCosmic([](const caf::SRSliceProxy* slc) ->int {
+    if(kNotClearCosmic(slc)) return 0.;
+    else return 1.;
   });
 
   const Var varVertexRecoX([](const caf::SRSliceProxy* slc) -> double {
@@ -233,6 +574,12 @@ namespace ICARUSNumuXsec{
     if(isnan(slc->fmatch.time)) return -62.;
     else if(slc->fmatch.time<-50) return -61.;
     else return slc->fmatch.time;
+  });
+  //==== TODO temporary fix
+  const Var varFMTimeDataTemp([](const caf::SRSliceProxy* slc) -> double {
+    if(isnan(slc->fmatch.time_beam)) return -62.;
+    else if(slc->fmatch.time_beam<-50) return -61.;
+    else return slc->fmatch.time_beam-4.0;
   });
 
   const Var varTruthTime([](const caf::SRSliceProxy* slc) -> double {
@@ -392,6 +739,495 @@ namespace ICARUSNumuXsec{
     return out;
   });
 
+  //==== it's matched version
+  const MultiVar varAllTrackMatchedTruthDirectionX([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      TVector3 truth_pos_start(trk.truth.p.start.x, trk.truth.p.start.y, trk.truth.p.start.z);
+      TVector3 truth_pos_end(trk.truth.p.end.x, trk.truth.p.end.y, trk.truth.p.end.z);
+      TVector3 thuth_dir = (truth_pos_end-truth_pos_start).Unit();
+      out.push_back(thuth_dir.X());
+    }
+    return out;
+  });
+  const MultiVar varAllTrackMatchedTruthDirectionY([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      TVector3 truth_pos_start(trk.truth.p.start.x, trk.truth.p.start.y, trk.truth.p.start.z);
+      TVector3 truth_pos_end(trk.truth.p.end.x, trk.truth.p.end.y, trk.truth.p.end.z);
+      TVector3 thuth_dir = (truth_pos_end-truth_pos_start).Unit();
+      out.push_back(thuth_dir.Y());
+    }
+    return out;
+  });
+  const MultiVar varAllTrackMatchedTruthDirectionZ([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      TVector3 truth_pos_start(trk.truth.p.start.x, trk.truth.p.start.y, trk.truth.p.start.z);
+      TVector3 truth_pos_end(trk.truth.p.end.x, trk.truth.p.end.y, trk.truth.p.end.z);
+      TVector3 thuth_dir = (truth_pos_end-truth_pos_start).Unit();
+      out.push_back(thuth_dir.Z());
+    }
+    return out;
+  });
+
+  const MultiVar varAllTrackMatchedTruthLength([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      TVector3 truth_pos_start(trk.truth.p.start.x, trk.truth.p.start.y, trk.truth.p.start.z);
+      TVector3 truth_pos_end(trk.truth.p.end.x, trk.truth.p.end.y, trk.truth.p.end.z);
+      TVector3 thuth_dir = (truth_pos_end-truth_pos_start);
+      out.push_back(thuth_dir.Mag());
+    }
+    return out;
+  });
+
+  //==== TODO test
+
+bool IsTestSelectedTrack(const caf::SRTrackProxy& trk)
+{
+/*
+  if( fv_track.isContained(trk.end.x, trk.end.y, trk.end.z) ){
+    return trk.len>50.;
+  }
+  else{
+    return trk.len>100.;
+  }
+*/
+
+  double xdir = trk.dir.x;
+  return fabs(xdir)<0.1;
+
+}
+
+  const MultiVar varTestSelectedTrackStartPositionX([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)) out.push_back(trk.start.x);
+    }
+    return out;
+  });
+
+  const MultiVar varTestSelectedTrackStartPositionY([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)) out.push_back(trk.start.y);
+    }
+    return out;
+  });
+
+  const MultiVar varTestSelectedTrackStartPositionZ([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)) out.push_back(trk.start.z);
+    }
+    return out;
+  });
+
+  const MultiVar varTestSelectedTrackEndPositionX([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)) out.push_back(trk.end.x);
+    }
+    return out;
+  });
+
+  const MultiVar varTestSelectedTrackEndPositionY([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)) out.push_back(trk.end.y);
+    }
+    return out;
+  });
+
+  const MultiVar varTestSelectedTrackEndPositionZ([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)) out.push_back(trk.end.z);
+    }
+    return out;
+  });
+  const MultiVar varTestSelectedTrackDirectionX([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)) out.push_back(trk.dir.x);
+    }
+    return out;
+  });
+  const MultiVar varTestSelectedTrackDirectionY([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)) out.push_back(trk.dir.y);
+    }
+    return out;
+  });
+  const MultiVar varTestSelectedTrackDirectionZ([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)) out.push_back(trk.dir.z);
+    }
+    return out;
+  });
+  const MultiVar varTestSelectedTrackLength([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)) out.push_back(trk.len);
+    }
+    return out;
+  });
+  //==== its matched version
+  const MultiVar varTestSelectedTrackMatchedTruthStartPositionX([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)){
+        out.push_back(trk.truth.p.start.x);
+      }
+    }
+    return out;
+  });
+  const MultiVar varTestSelectedTrackMatchedTruthStartPositionY([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)){
+        out.push_back(trk.truth.p.start.y);
+      }
+    }
+    return out;
+  });
+  const MultiVar varTestSelectedTrackMatchedTruthStartPositionZ([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)){
+        out.push_back(trk.truth.p.start.z);
+      }
+    }
+    return out;
+  });
+  const MultiVar varTestSelectedTrackMatchedTruthEndPositionX([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)){
+        out.push_back(trk.truth.p.end.x);
+      }
+    }
+    return out;
+  });
+  const MultiVar varTestSelectedTrackMatchedTruthEndPositionY([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)){
+        out.push_back(trk.truth.p.end.y);
+      }
+    }
+    return out;
+  });
+  const MultiVar varTestSelectedTrackMatchedTruthEndPositionZ([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)){
+        out.push_back(trk.truth.p.end.z);
+      }
+    }
+    return out;
+  });
+  const MultiVar varTestSelectedTrackMatchedTruthDirectionX([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)){
+        TVector3 truth_pos_start(trk.truth.p.start.x, trk.truth.p.start.y, trk.truth.p.start.z);
+        TVector3 truth_pos_end(trk.truth.p.end.x, trk.truth.p.end.y, trk.truth.p.end.z);
+        TVector3 thuth_dir = (truth_pos_end-truth_pos_start).Unit();
+        out.push_back(thuth_dir.X());
+      }
+    }
+    return out;
+  });
+  const MultiVar varTestSelectedTrackMatchedTruthDirectionY([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)){
+        TVector3 truth_pos_start(trk.truth.p.start.x, trk.truth.p.start.y, trk.truth.p.start.z);
+        TVector3 truth_pos_end(trk.truth.p.end.x, trk.truth.p.end.y, trk.truth.p.end.z);
+        TVector3 thuth_dir = (truth_pos_end-truth_pos_start).Unit();
+        out.push_back(thuth_dir.Y());
+      }
+    }
+    return out;
+  });
+  const MultiVar varTestSelectedTrackMatchedTruthDirectionZ([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)){
+        TVector3 truth_pos_start(trk.truth.p.start.x, trk.truth.p.start.y, trk.truth.p.start.z);
+        TVector3 truth_pos_end(trk.truth.p.end.x, trk.truth.p.end.y, trk.truth.p.end.z);
+        TVector3 thuth_dir = (truth_pos_end-truth_pos_start).Unit();
+        out.push_back(thuth_dir.Z());
+      }
+    }
+    return out;
+  });
+  const MultiVar varTestSelectedTrackMatchedTruthLength([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> out;
+    for (auto const& trk : slc->reco.trk) {
+      if(IsTestSelectedTrack(trk)){
+        out.push_back(trk.truth.p.length);
+      }
+    }
+    return out;
+  });
+
+  //==== Longest track
+  const Var varLongestTrackIndex([](const caf::SRSliceProxy* slc) -> int {
+    int ret(-1);
+    double lmax(-999.);
+
+    for(std::size_t i(0); i < slc->reco.trk.size(); ++i){
+
+      const auto& trk = slc->reco.trk.at(i);
+
+      bool pass(false);
+      if( fv_track.isContained(trk.end.x, trk.end.y, trk.end.z) ){
+        pass = trk.len>50.;
+      }
+      else{
+        pass = trk.len>100.;
+      }
+      if(!pass) continue;
+
+      if(trk.len>lmax){
+        lmax = trk.len;
+        ret = i;
+      }
+    }
+
+    return ret;
+  });
+
+  const Var varLongestTrackDirectionX([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){
+      const auto& trk = slc->reco.trk.at(ltidx);
+      return trk.dir.x;
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var varLongestTrackDirectionY([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){
+      const auto& trk = slc->reco.trk.at(ltidx);
+      return trk.dir.y;
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var varLongestTrackDirectionZ([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){
+      const auto& trk = slc->reco.trk.at(ltidx);
+      return trk.dir.z;
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var varLongestTrackDirectionXZ([](const caf::SRSliceProxy* slc) -> double { 
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){
+      const auto& trk = slc->reco.trk.at(ltidx);
+      return sqrt(trk.dir.x*trk.dir.x+trk.dir.z*trk.dir.z);
+    }
+    else{
+      return -999.;
+    }
+  });
+
+  const Var varLongestTrackForceDownDirectionX([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){
+      const auto& trk = slc->reco.trk.at(ltidx);
+      double flip = trk.dir.y>0 ? -1. : +1.; // if original track is upward(>0), flip it
+      return trk.dir.x*flip;
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var varLongestTrackForceDownDirectionY([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){
+      const auto& trk = slc->reco.trk.at(ltidx);
+      double flip = trk.dir.y>0 ? -1. : +1.; // if original track is upward(>0), flip it
+      return trk.dir.y*flip;
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var varLongestTrackForceDownDirectionZ([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){
+      const auto& trk = slc->reco.trk.at(ltidx);
+      double flip = trk.dir.y>0 ? -1. : +1.; // if original track is upward(>0), flip it
+      return trk.dir.z*flip;
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var varLongestTrackForceDownStartPositionX([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){
+      const auto& trk = slc->reco.trk.at(ltidx);
+      //==== when down going, we don't flip
+      if(trk.dir.y<0) return trk.start.x;
+      else return trk.end.x;
+    }
+    else{
+      return -9999.;
+    }
+  });
+  const Var varLongestTrackForceDownStartPositionY([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){ 
+      const auto& trk = slc->reco.trk.at(ltidx);
+      //==== when down going, we don't flip
+      if(trk.dir.y<0) return trk.start.y;
+      else return trk.end.y;
+    }
+    else{
+      return -9999.;
+    }
+  });
+  const Var varLongestTrackForceDownStartPositionZ([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){ 
+      const auto& trk = slc->reco.trk.at(ltidx);
+      //==== when down going, we don't flip
+      if(trk.dir.y<0) return trk.start.z;
+      else return trk.end.z;
+    }
+    else{
+      return -9999.;
+    }
+  });
+  const Var varLongestTrackForceDownEndPositionX([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){ 
+      const auto& trk = slc->reco.trk.at(ltidx);
+      //==== when down going, we don't flip
+      if(trk.dir.y<0) return trk.end.x;
+      else return trk.start.x;
+    }
+    else{
+      return -9999.;
+    }
+  });
+  const Var varLongestTrackForceDownEndPositionY([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){
+      const auto& trk = slc->reco.trk.at(ltidx);
+      //==== when down going, we don't flip
+      if(trk.dir.y<0) return trk.end.y;
+      else return trk.start.y;
+    }
+    else{
+      return -9999.;
+    }
+  });
+  const Var varLongestTrackForceDownEndPositionZ([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){
+      const auto& trk = slc->reco.trk.at(ltidx);
+      //==== when down going, we don't flip
+      if(trk.dir.y<0) return trk.end.z;
+      else return trk.start.z;
+    }
+    else{
+      return -9999.;
+    }
+  });
+  const Var varLongestTrackLength([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){
+      const auto& trk = slc->reco.trk.at(ltidx);
+      return trk.len;
+    }
+    else{
+      return -999.;
+    }
+  });
+  //==== chi2
+  const Var varLongestTrackChi2Muon([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){
+      const auto& trk = slc->reco.trk.at(ltidx);
+      int bp = trk.bestplane;
+      float Chi2Muon = trk.chi2pid[bp].chi2_muon;
+      if(isnan(Chi2Muon)) return -999.;
+      else return Chi2Muon;
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var varLongestTrackChi2Proton([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){
+      const auto& trk = slc->reco.trk.at(ltidx);
+      int bp = trk.bestplane;
+      float Chi2Proton = trk.chi2pid[bp].chi2_proton;
+      if(isnan(Chi2Proton)) return -999.;
+      else return Chi2Proton;
+    }
+    else{
+      return -999.;
+    }
+  });
+
+  //==== its matched version
+  const Var varLongestTrackMatchedTruthDirectionX([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){
+      const auto& trk = slc->reco.trk.at(ltidx);
+      TVector3 truth_pos_start(trk.truth.p.start.x, trk.truth.p.start.y, trk.truth.p.start.z);
+      TVector3 truth_pos_end(trk.truth.p.end.x, trk.truth.p.end.y, trk.truth.p.end.z);
+      TVector3 thuth_dir = (truth_pos_end-truth_pos_start).Unit();
+      return thuth_dir.X();
+    }
+    else{
+      return -9999.;
+    }
+  });
+  const Var varLongestTrackMatchedTruthDirectionY([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){ 
+      const auto& trk = slc->reco.trk.at(ltidx);
+      TVector3 truth_pos_start(trk.truth.p.start.x, trk.truth.p.start.y, trk.truth.p.start.z);
+      TVector3 truth_pos_end(trk.truth.p.end.x, trk.truth.p.end.y, trk.truth.p.end.z);
+      TVector3 thuth_dir = (truth_pos_end-truth_pos_start).Unit();
+      return thuth_dir.Y();
+    }
+    else{
+      return -9999.;
+    }
+  });
+  const Var varLongestTrackMatchedTruthDirectionZ([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = varLongestTrackIndex(slc);
+    if(ltidx>=0){ 
+      const auto& trk = slc->reco.trk.at(ltidx);
+      TVector3 truth_pos_start(trk.truth.p.start.x, trk.truth.p.start.y, trk.truth.p.start.z);
+      TVector3 truth_pos_end(trk.truth.p.end.x, trk.truth.p.end.y, trk.truth.p.end.z);
+      TVector3 thuth_dir = (truth_pos_end-truth_pos_start).Unit();
+      return thuth_dir.Z();
+    }
+    else{
+      return -9999.;
+    }
+  });
+
 
   const Var varNuScore([](const caf::SRSliceProxy* slc) -> double {
     if(isnan(slc->nu_score)) return -0.1;
@@ -448,6 +1284,33 @@ namespace ICARUSNumuXsec{
     if(isnan(slc->truth.E)) return -999.;
     else return slc->truth.E;
   });
+
+  const Var varNuDirectionX([](const caf::SRSliceProxy* slc) ->int {
+      double this_x = slc->truth.prod_vtx.x/100.;
+      double this_y = slc->truth.prod_vtx.y/100.;
+      double this_z = slc->truth.prod_vtx.z/100.;
+      TVector3 this_coord = nct.GetICARUSCoord(this_x, this_y, this_z).Unit();
+      this_coord *= -1.;
+      return this_coord.X();
+  });
+  const Var varNuDirectionY([](const caf::SRSliceProxy* slc) ->int {
+      double this_x = slc->truth.prod_vtx.x/100.;
+      double this_y = slc->truth.prod_vtx.y/100.;
+      double this_z = slc->truth.prod_vtx.z/100.;
+      TVector3 this_coord = nct.GetICARUSCoord(this_x, this_y, this_z).Unit();
+      this_coord *= -1.;
+      return this_coord.Y();
+  });
+  const Var varNuDirectionZ([](const caf::SRSliceProxy* slc) ->int {
+      double this_x = slc->truth.prod_vtx.x/100.;
+      double this_y = slc->truth.prod_vtx.y/100.;
+      double this_z = slc->truth.prod_vtx.z/100.;
+      TVector3 this_coord = nct.GetICARUSCoord(this_x, this_y, this_z).Unit();
+      this_coord *= -1.;
+      return this_coord.Z();
+  });
+
+
   const Var varTruthQ2([](const caf::SRSliceProxy* slc) -> double {
     if(isnan(slc->truth.Q2)) return -999.;
     else return slc->truth.Q2;
@@ -590,6 +1453,43 @@ namespace ICARUSNumuXsec{
     }
 
   });
+  const Var varMuonTruthDirectionX([](const caf::SRSliceProxy* slc) -> double {
+
+    int truth_idx = varMuonTruthIndex(slc);
+    if(truth_idx>=0){
+      TVector3 v3(slc->truth.prim.at(truth_idx).genp.x, slc->truth.prim.at(truth_idx).genp.y, slc->truth.prim.at(truth_idx).genp.z);
+      return v3.Unit().X();
+    }
+    else{
+      return -999.;
+    }
+
+  });
+  const Var varMuonTruthDirectionY([](const caf::SRSliceProxy* slc) -> double {
+
+    int truth_idx = varMuonTruthIndex(slc);
+    if(truth_idx>=0){
+      TVector3 v3(slc->truth.prim.at(truth_idx).genp.x, slc->truth.prim.at(truth_idx).genp.y, slc->truth.prim.at(truth_idx).genp.z);
+      return v3.Unit().Y();
+    }
+    else{
+      return -999.;
+    }
+
+  });
+  const Var varMuonTruthDirectionZ([](const caf::SRSliceProxy* slc) -> double {
+
+    int truth_idx = varMuonTruthIndex(slc);
+    if(truth_idx>=0){
+      TVector3 v3(slc->truth.prim.at(truth_idx).genp.x, slc->truth.prim.at(truth_idx).genp.y, slc->truth.prim.at(truth_idx).genp.z);
+      return v3.Unit().Z();
+    }
+    else{
+      return -999.;
+    }
+
+  });
+
 
   const Var varMuonTruthLength([](const caf::SRSliceProxy* slc) -> double {
 
@@ -1836,7 +2736,6 @@ namespace ICARUSNumuXsec{
     return GetMatchedRecoStubIndex(slc, truth_idx);
 
   });
-
   const Var varTruthProtonMatchedStubE([](const caf::SRSliceProxy* slc) -> double {
     int ProtonStubIndex = varTruthProtonMatchedStubIndex(slc);
     if(ProtonStubIndex>=0){
@@ -1861,17 +2760,13 @@ namespace ICARUSNumuXsec{
 
       }
       //std::cout << "[varTruthProtonMatchedStubE] nHitMax = " << nHitMax << ", sumQ = " << ret << std::endl;
-      static double p0 = -0.00236892;
-      static double p1 = 0.383538;
-      if(ret<=0.) return -999.;
-      else return (ret*23.6e-9-p0)/p1; // to GeV
+      return GetEnergyFromStubCharge(ret);
     }
     else{
       return -999;
     }
 
   });
-
   const Var varTruthProtonMatchedStubLength([](const caf::SRSliceProxy* slc) -> double {
     int ProtonStubIndex = varTruthProtonMatchedStubIndex(slc);
     if(ProtonStubIndex>=0){
@@ -1885,6 +2780,28 @@ namespace ICARUSNumuXsec{
     else{
       return -999;
     }
+  });
+  //====     test
+  const Var varTruthProtonMatchedObjectType([](const caf::SRSliceProxy* slc) -> int {
+
+    int truth_idx = varProtonTruthIndex(slc);
+
+    int TrackIdx = GetMatchedRecoTrackIndex(slc, truth_idx);
+    int ShowerIdx = GetMatchedRecoShowerIndex(slc, truth_idx);
+    int StubIdx = GetMatchedRecoStubIndex(slc, truth_idx);
+
+    int ret = 0;
+    if(TrackIdx>=0) ret |= (1<<0);
+    else ret &= ~(1<<0);
+
+    if(ShowerIdx>=0) ret |= (1<<1);
+    else ret &= ~(1<<1);
+
+    if(StubIdx>=0) ret |= (1<<2);
+    else ret &= ~(1<<2);
+
+    return ret;
+
   });
 
   //==== For a given true charged pion (truth_index), find a reco track whose best-matched is this charged pion
@@ -2489,10 +3406,10 @@ namespace ICARUSNumuXsec{
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
       Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
       if(Contained){
-        p = trk.rangeP.p_muon;
+        if(!isnan(trk.rangeP.p_muon)) p = trk.rangeP.p_muon;
       }
       else{
-        p = trk.mcsP.fwdP_muon;
+        if(!isnan(trk.mcsP.fwdP_muon)) p = trk.mcsP.fwdP_muon;
       }
     }
     return p;
@@ -2676,21 +3593,21 @@ namespace ICARUSNumuXsec{
     return -9999999999.;
   });
 
-  const Var varMuonRecoDirX([](const caf::SRSliceProxy* slc) -> float {
+  const Var varMuonRecoDirectionX([](const caf::SRSliceProxy* slc) -> float {
     if( varMuonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
       return trk.dir.x;
     }
     return -9999999999.;
   });
-  const Var varMuonRecoDirY([](const caf::SRSliceProxy* slc) -> float {
+  const Var varMuonRecoDirectionY([](const caf::SRSliceProxy* slc) -> float {
     if( varMuonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
       return trk.dir.y;
     }
     return -9999999999.;
   });
-  const Var varMuonRecoDirZ([](const caf::SRSliceProxy* slc) -> float {
+  const Var varMuonRecoDirectionZ([](const caf::SRSliceProxy* slc) -> float {
     if( varMuonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
       return trk.dir.z;
@@ -2698,7 +3615,7 @@ namespace ICARUSNumuXsec{
     return -9999999999.;
   });
 
-  const Var varMuonRecoForceDownDirX([](const caf::SRSliceProxy* slc) -> float {
+  const Var varMuonRecoForceDownDirectionX([](const caf::SRSliceProxy* slc) -> float {
     if( varMuonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
       double flip = trk.dir.y>0 ? -1. : +1.; // if original track is upward(>0), flip it
@@ -2706,7 +3623,7 @@ namespace ICARUSNumuXsec{
     }
     return -9999999999.;
   });
-  const Var varMuonRecoForceDownDirY([](const caf::SRSliceProxy* slc) -> float {
+  const Var varMuonRecoForceDownDirectionY([](const caf::SRSliceProxy* slc) -> float {
     if( varMuonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
       double flip = trk.dir.y>0 ? -1. : +1.; // if original track is upward(>0), flip it
@@ -2714,13 +3631,34 @@ namespace ICARUSNumuXsec{
     }
     return -9999999999.;
   });
-  const Var varMuonRecoForceDownDirZ([](const caf::SRSliceProxy* slc) -> float {
+  const Var varMuonRecoForceDownDirectionZ([](const caf::SRSliceProxy* slc) -> float {
     if( varMuonTrackInd(slc) >= 0 ){
       auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
       double flip = trk.dir.y>0 ? -1. : +1.; // if original track is upward(>0), flip it
       return trk.dir.z*flip;
     }
     return -9999999999.;
+  });
+  const Var varMuonRecoCosineTheta([](const caf::SRSliceProxy* slc) -> float {
+    float costh(-5.f);
+
+    if( varMuonTrackInd(slc) >= 0 ){
+      auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
+      costh = trk.costh;
+    }
+    return costh;
+  });
+
+  const Var varMuonRecoNuMICosineTheta([](const caf::SRSliceProxy* slc) -> float {
+    float costh(-5.f);
+
+    if( varMuonTrackInd(slc) >= 0 ){
+      auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
+      TVector3 v3(trk.dir.x, trk.dir.y, trk.dir.z);
+      double angleNuMI = v3.Angle(NuDirection_NuMI);
+      costh = TMath::Cos(angleNuMI);
+    }
+    return costh;
   });
   //==== dedx 
   const MultiVar varMuonTrackCalodedx([](const caf::SRSliceProxy* slc) -> std::vector<double> {
@@ -2779,28 +3717,6 @@ namespace ICARUSNumuXsec{
     return pdg;
   });
 
-  const Var varMuonRecoCosineTheta([](const caf::SRSliceProxy* slc) -> float {
-    float costh(-5.f);
-
-    if( varMuonTrackInd(slc) >= 0 ){
-      auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
-      costh = trk.costh;
-    }
-    return costh;
-  });
-
-  const Var varMuonRecoNuMICosineTheta([](const caf::SRSliceProxy* slc) -> float {
-    float costh(-5.f);
-
-    if( varMuonTrackInd(slc) >= 0 ){
-      auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
-      TVector3 v3(trk.dir.x, trk.dir.y, trk.dir.z);
-      double angleNuMI = v3.Angle(NuDirection_NuMI);
-      costh = TMath::Cos(angleNuMI);
-    }
-    return costh;
-  });
-
   const Var varMuonBestmatchCosineTheta([](const caf::SRSliceProxy* slc) -> float {
     float costh(-5.f);
 
@@ -2810,6 +3726,31 @@ namespace ICARUSNumuXsec{
       costh = v3.CosTheta();
     }
     return costh;
+  });
+
+  const Var varMuonBestmatchDirectionX([](const caf::SRSliceProxy* slc) -> float {
+    if( varMuonTrackInd(slc) >= 0 ){
+      auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
+      TVector3 v3(trk.truth.p.genp.x, trk.truth.p.genp.y, trk.truth.p.genp.z);
+      return v3.Unit().X();
+    }
+    return -999.;;
+  });
+  const Var varMuonBestmatchDirectionY([](const caf::SRSliceProxy* slc) -> float {
+    if( varMuonTrackInd(slc) >= 0 ){
+      auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
+      TVector3 v3(trk.truth.p.genp.x, trk.truth.p.genp.y, trk.truth.p.genp.z);
+      return v3.Unit().Y();
+    }
+    return -999.;;
+  });
+  const Var varMuonBestmatchDirectionZ([](const caf::SRSliceProxy* slc) -> float {
+    if( varMuonTrackInd(slc) >= 0 ){
+      auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
+      TVector3 v3(trk.truth.p.genp.x, trk.truth.p.genp.y, trk.truth.p.genp.z);
+      return v3.Unit().Z();
+    }
+    return -999.;;
   });
 
   //==== Proton

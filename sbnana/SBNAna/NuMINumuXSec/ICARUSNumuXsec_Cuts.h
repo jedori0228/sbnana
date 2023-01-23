@@ -45,6 +45,7 @@ namespace ICARUSNumuXsec{
 
   extern const Cut cutHasTruthProton;
   extern const Cut cutHasTruthProtonHasRecoTrack;
+  extern const Cut cutHasTruthProtonHasRecoStub;
 
   extern const Cut cutHasTruthChargedPion;
   extern const Cut cutHasTruthChargedPionHasRecoTrack;
@@ -88,11 +89,18 @@ namespace ICARUSNumuXsec{
 
   extern const Cut cutRFiducial;
 
+  extern const Cut cutVertexCryoE;
+  extern const Cut cutVertexCryoW;
+  extern const Cut cutVertexTPCEE;
+  extern const Cut cutVertexTPCEW;
+  extern const Cut cutVertexTPCWE;
+  extern const Cut cutVertexTPCWW;
+
   //==== Flash matching
 
   extern const Cut cutFMScore;
-  extern const Cut kSlcFlashMatchDataCut;
   extern const Cut cutFMTime;
+  extern const Cut cutFMTimeDataTemp;
 
   //==== NuScore
 
@@ -103,6 +111,14 @@ namespace ICARUSNumuXsec{
   //==== 220811 Vertex test
   extern const Cut cutVertexYPos;
   extern const Cut cutVertexYNeg;
+
+  //==== Longest track
+  extern const Cut cutHasLongestTrack;
+  extern const Cut cutSmallDirX;
+  extern const Cut cutLargeDirX;
+  extern const Cut cutLongestTrackShort;
+  extern const Cut cutLongestTrackContained;
+  extern const Cut cutLongestTrackExiting;
 
   //==== Muon related
 
@@ -154,12 +170,23 @@ namespace ICARUSNumuXsec{
   extern const SpillCut spillcutFDTopCRTHitVetoTestMatching;
   extern const SpillCut spillcutFDSideCRTHitVetoTestMatching;
 
+  //==== CRTPMT matching
+
+  extern const SpillCut spillcutHasValidFlash;
+  extern const SpillCut spillcutHasInTimeFlash;
+  extern const SpillCut spillcutCRTPMTCosmicByID;
+  extern const SpillCut spillcutCRTPMTHasNegativeTOF;
+  extern const SpillCut spillcutCRTPMTAllNegativeTOF;
+
   //==== combined
 
   extern const Cut cutNominal_ContainedMuon;
   extern const Cut cutNominal_ExitingMuon;
 
   extern const Cut cutMuonProtonCosineTheta;
+
+  //==== Village
+  extern const Cut kGraysProposedSampleCut;
 
 }
 

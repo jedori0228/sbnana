@@ -26,16 +26,40 @@ namespace ICARUSNumuXsec{
   extern const SpillMultiVar spillvarMCNeutrinoE;
   extern const SpillVar spillvarNSlice;
   extern const SpillVar spillvarNTrack;
+  extern const SpillMultiVar spillNuEnergy;
+  extern const SpillMultiVar spillMuonMomentum;
   extern const SpillMultiVar spillNuDirectionX;
   extern const SpillMultiVar spillNuDirectionY;
   extern const SpillMultiVar spillNuDirectionZ;
+  extern const SpillVar spillvarNTracksWithFVCut;
+
+  //==== PMT-CRT matching
+  extern const SpillMultiVar spillvarOpFlashTime;
+  extern const SpillMultiVar spillvarValidOpFlashTime;
+  extern const SpillMultiVar spillvarInTimeOpFlashTime; // Valid AND InTime
+  extern const SpillMultiVar spillvarTopCRTTime;
+  extern const SpillMultiVar spillvarCRTPMTTime;
+  extern const SpillMultiVar spillvarCRTPMTMatchingID;
+  extern const SpillVar spillvarCRTPMTMatchingEventID;
+
   //====   Spill-based Truth neutrino information
   extern const SpillMultiVar spillvarNeutrinoQEEnergyResidual;
 
-  extern const SpillVar spillTEST;
+  extern const SpillMultiVar spillTEST;
+
+  //==== 221129_TrackBreakingTest
+  extern const SpillMultiVar spillLongestTrackStitchedTrackLength;
+  extern const SpillMultiVar spillLongestTrackStitchedTrackClosestMode;
+  extern const SpillMultiVar spillLongestTrackStitchedTrackDistance;
+  extern const SpillMultiVar spillLongestTrackStitchedTrackDistanceSameCryo;
+  extern const SpillMultiVar spillLongestTrackStitchedTrackDistanceOtherCryo;
+  extern const SpillMultiVar spillLongestTrackStitchedTrackDistanceSameTruthG4ID;
 
   //==== Slice variables
   extern const Var varCountSlice;
+
+  extern const Var varIsTrueCosmic;
+  extern const Var varIsClearCosmic;
 
   extern const Var varVertexRecoX;
   extern const Var varVertexRecoY;
@@ -54,6 +78,7 @@ namespace ICARUSNumuXsec{
   extern const Var varFMLightCenterZ;
 
   extern const Var varFMTime;
+  extern const Var varFMTimeDataTemp;
   extern const Var varTruthTime;
 
   extern const Var varSliceTrackNhitsPlane0;
@@ -76,7 +101,68 @@ namespace ICARUSNumuXsec{
   extern const MultiVar varAllTrackDirectionY;
   extern const MultiVar varAllTrackDirectionZ;
   extern const MultiVar varAllTrackLength;
+  //==== its matched version
+  extern const MultiVar varAllTrackMatchedTruthDirectionX;
+  extern const MultiVar varAllTrackMatchedTruthDirectionY;
+  extern const MultiVar varAllTrackMatchedTruthDirectionZ;
+  extern const MultiVar varAllTrackMatchedTruthLength;
 
+  //==== TODO TEST
+  extern const MultiVar varTestSelectedTrackStartPositionX;
+  extern const MultiVar varTestSelectedTrackStartPositionY;
+  extern const MultiVar varTestSelectedTrackStartPositionZ;
+  extern const MultiVar varTestSelectedTrackEndPositionX;
+  extern const MultiVar varTestSelectedTrackEndPositionY;
+  extern const MultiVar varTestSelectedTrackEndPositionZ;
+  extern const MultiVar varTestSelectedTrackDirectionX;
+  extern const MultiVar varTestSelectedTrackDirectionY;
+  extern const MultiVar varTestSelectedTrackDirectionZ;
+  extern const MultiVar varTestSelectedTrackLength;
+  //==== its matched version
+  extern const MultiVar varTestSelectedTrackMatchedTruthStartPositionX;
+  extern const MultiVar varTestSelectedTrackMatchedTruthStartPositionY;
+  extern const MultiVar varTestSelectedTrackMatchedTruthStartPositionZ;
+  extern const MultiVar varTestSelectedTrackMatchedTruthEndPositionX;
+  extern const MultiVar varTestSelectedTrackMatchedTruthEndPositionY;
+  extern const MultiVar varTestSelectedTrackMatchedTruthEndPositionZ;
+  extern const MultiVar varTestSelectedTrackMatchedTruthDirectionX;
+  extern const MultiVar varTestSelectedTrackMatchedTruthDirectionY;
+  extern const MultiVar varTestSelectedTrackMatchedTruthDirectionZ;
+  extern const MultiVar varTestSelectedTrackMatchedTruthLength;
+
+  //==== Longest track
+  extern const Var varLongestTrackIndex;
+/*
+  extern const Var varLongestTrackStartPositionX;
+  extern const Var varLongestTrackStartPositionY;
+  extern const Var varLongestTrackStartPositionZ;
+  extern const Var varLongestTrackEndPositionX;
+  extern const Var varLongestTrackEndPositionY;
+  extern const Var varLongestTrackEndPositionZ;
+*/
+  extern const Var varLongestTrackDirectionX;
+  extern const Var varLongestTrackDirectionY;
+  extern const Var varLongestTrackDirectionZ;
+  extern const Var varLongestTrackDirectionXZ;
+  extern const Var varLongestTrackForceDownDirectionX;
+  extern const Var varLongestTrackForceDownDirectionY;
+  extern const Var varLongestTrackForceDownDirectionZ;
+  extern const Var varLongestTrackForceDownStartPositionX;
+  extern const Var varLongestTrackForceDownStartPositionY;
+  extern const Var varLongestTrackForceDownStartPositionZ;
+  extern const Var varLongestTrackForceDownEndPositionX;
+  extern const Var varLongestTrackForceDownEndPositionY;
+  extern const Var varLongestTrackForceDownEndPositionZ;
+  extern const Var varLongestTrackLength;
+  //==== chi2
+  extern const Var varLongestTrackChi2Muon;
+  extern const Var varLongestTrackChi2Proton;
+  //==== its matched version
+  extern const Var varLongestTrackMatchedTruthDirectionX;
+  extern const Var varLongestTrackMatchedTruthDirectionY;
+  extern const Var varLongestTrackMatchedTruthDirectionZ;
+
+  //==== NuScore
   extern const Var varNuScore;
   extern const Var varSliceNuNFinalStatePfos;
   extern const Var varSliceNuNHitsTotal;
@@ -96,6 +182,9 @@ namespace ICARUSNumuXsec{
   //==== Truth variables
   //====   Scattering
   extern const Var varNeutrinoTruthE;
+  extern const Var varNuDirectionX;
+  extern const Var varNuDirectionY;
+  extern const Var varNuDirectionZ;
   extern const Var varTruthQ2;
   extern const Var varTruthq0_lab;
   extern const Var varTruthmodq_lab;
@@ -120,6 +209,9 @@ namespace ICARUSNumuXsec{
   extern const Var varMuonTruthT;
   extern const Var varMuonTruthCosineTheta;
   extern const Var varMuonTruthNuMICosineTheta;
+  extern const Var varMuonTruthDirectionX;
+  extern const Var varMuonTruthDirectionY;
+  extern const Var varMuonTruthDirectionZ;
   extern const Var varMuonTruthLength;
   //====   Truth Proton
   extern const Var varProtonTruthIndex;
@@ -232,6 +324,8 @@ namespace ICARUSNumuXsec{
   extern const Var varTruthProtonMatchedStubIndex;
   extern const Var varTruthProtonMatchedStubE;
   extern const Var varTruthProtonMatchedStubLength;
+  //====     Teset
+  extern const Var varTruthProtonMatchedObjectType;
 
   //==== For a given true charged pion (truth_index), find a reco track whose best-matched is this charged pion
   extern const Var varTruthChargedPionMatchedTrackIndex;
@@ -298,12 +392,14 @@ namespace ICARUSNumuXsec{
   extern const Var varMuonRecoEndY;
   extern const Var varMuonRecoEndZ;
   extern const Var varMuonRecoTrackFromVertex;
-  extern const Var varMuonRecoDirX;
-  extern const Var varMuonRecoDirY;
-  extern const Var varMuonRecoDirZ;
-  extern const Var varMuonRecoForceDownDirX;
-  extern const Var varMuonRecoForceDownDirY;
-  extern const Var varMuonRecoForceDownDirZ;
+  extern const Var varMuonRecoDirectionX;
+  extern const Var varMuonRecoDirectionY;
+  extern const Var varMuonRecoDirectionZ;
+  extern const Var varMuonRecoForceDownDirectionX;
+  extern const Var varMuonRecoForceDownDirectionY;
+  extern const Var varMuonRecoForceDownDirectionZ;
+  extern const Var varMuonRecoCosineTheta;
+  extern const Var varMuonRecoNuMICosineTheta;
   //==== dedx 
   extern const MultiVar varMuonTrackCalodedx;
   extern const MultiVar varMuonTrackCalorr;
@@ -311,9 +407,10 @@ namespace ICARUSNumuXsec{
   //==== This means that the get-particle may not be a true muon
   extern const Var varMuonBestmatchP;
   extern const Var varMuonBestmatchPDG;
-  extern const Var varMuonRecoCosineTheta;
-  extern const Var varMuonRecoNuMICosineTheta;
   extern const Var varMuonBestmatchCosineTheta;
+  extern const Var varMuonBestmatchDirectionX;
+  extern const Var varMuonBestmatchDirectionY;
+  extern const Var varMuonBestmatchDirectionZ;
 
   //==== Proton
 

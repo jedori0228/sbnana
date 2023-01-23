@@ -59,6 +59,21 @@ namespace ICARUSNumuXsec{
 
     void MichelStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
+    //==== 221014_PandoraCosmicTest
+    void PandoraClearCosmicTest(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+
+    //==== 221027_PandoraCosmicVertexTest
+    void PandoraCosmicVertexTest(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+
+    //==== 221121_CRTPMTMatching
+    void CRTPMTMatchingStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+
+    //==== 221129_TrackBreakingTest
+    void TrackBreakingTest(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+
+    //==== 221201_Cosmic_to_ClearCosmicTest
+    void Cosmic_to_ClearCosmicTest(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+
     void bookTEMP(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
 
@@ -80,6 +95,7 @@ namespace ICARUSNumuXsec{
     TString outputDir;
     TFile *outputfile;
     TString outputName;
+    TString sampleName;
 
     TString currentCutName;
     vector<TString> vec_cutNames;
@@ -95,6 +111,7 @@ namespace ICARUSNumuXsec{
     void addUpDownSystematic(SpectrumLoader& loader, const HistAxis& axX, const HistAxis& axY, SpillCut spillCut, Cut cut, TString currentCutName, const ISyst* s);
 
     //==== booleans
+    bool IsData;
     bool doTruthMatch;
     bool doPerformanceStudy;
     bool fillBeamInfo;

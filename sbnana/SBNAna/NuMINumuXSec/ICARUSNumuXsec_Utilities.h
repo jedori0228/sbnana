@@ -20,6 +20,16 @@ using namespace ana;
 
 namespace ICARUSNumuXsec{
 
+  //==== TODO Use spill info in the future..
+  enum GateType
+  {
+    UNKNOWN = 0,
+    BNB = +1,
+    BNBOffBeam = -1,
+    NUMI = +2,
+    NUMIOffBeam = -2,
+  };
+
   class FiducialVolumeTool{
 
   public:
@@ -34,11 +44,15 @@ namespace ICARUSNumuXsec{
                  -894.95, +894.85};
     }
 
+    //==== FidVol defined at sbnana/SBNAna/Cuts/VolumeDefinitions.h
     FidVol fvCryo0, fvCryo1;
     double XMargin, YMargin, ZMarginUp, ZMarginDown;
 
     bool isContained(double x, double y, double z) const;
     int containedCryo(double x, double y, double z) const;
+
+    int TPCIndex(double x, double y, double z) const;
+
 
   }; // END Class FiducialVolumeTool
 
@@ -83,6 +97,9 @@ namespace ICARUSNumuXsec{
   int GetMichelShowerIndex(const caf::SRSliceProxy* slc, int track_idx);
   //==== Pion tagging
   bool IsPionTagged(const caf::SRSliceProxy* slc, int track_idx);
+
+  //==== Stub calib
+  double GetEnergyFromStubCharge(double q);
 
   class NuMICoordinateTool{
 
@@ -134,6 +151,66 @@ namespace ICARUSNumuXsec{
 
     double sin2th;
     double m2;
+
+  };
+
+  class TrackStitchingTool{
+
+  public:
+
+    struct StichOutput{
+      bool isFound;
+      bool isSameSlice;
+      double minDist;
+      int foundSliceIdx;
+      int foundTrackIdx;
+      //==== mode
+      //==== 0 : start-to-start
+      //==== 1 : start-to-end
+      //==== 2 : end-to-start
+      //==== 3 : end-to-end
+      int closestMode;
+    };
+
+    TrackStitchingTool(){
+
+    };
+
+    static TrackStitchingTool& Instance();
+
+    StichOutput GetStitchedTrack(
+      const caf::Proxy<caf::SRTrack>& motherTrack,
+      const caf::Proxy<caf::SRSlice>& motherSlice,
+      const caf::SRSpillProxy *sr
+    ) const;
+
+  };
+
+  class CRTPMTMatchingTool{
+
+    public:
+
+    CRTPMTMatchingTool();
+
+    static CRTPMTMatchingTool& Instance();
+
+    void SetGateType(GateType gt) const;
+    void SetInTimeRange(double t_min, double t_max) const;
+    bool IsInTime(double t_gate) const;
+    int GetMatchedCRTHitIndex(
+      double opt,
+      const caf::Proxy<std::vector<caf::SRCRTHit> >& crt_hits,
+      int mode
+    ) const;
+    int GetMatchID(
+      double opt,
+      const caf::Proxy<std::vector<caf::SRCRTHit> >& crt_hits
+    ) const;
+
+    bool IsNegativeTOF(double timediff) const;
+
+    mutable GateType GT;
+    mutable double timecut_min, timecut_max;
 
   };
 
