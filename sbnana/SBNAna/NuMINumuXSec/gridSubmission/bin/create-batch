@@ -19,7 +19,7 @@ parser.add_argument('-n', dest='NJobs', default=1, type=int)
 parser.add_argument('-o', dest='Outputdir', default="")
 parser.add_argument('--userflags', dest='Userflags', default="")
 parser.add_argument('--args', dest='ArgsToPass', default="")
-parser.add_argument('--memory', dest='Memory', default="5GB")
+#parser.add_argument('--memory', dest='Memory', default="5GB")
 parser.add_argument('--no_exec', action='store_true')
 parser.add_argument('--batchname',dest='BatchName', default="")
 parser.add_argument('--lifetime',dest='Lifetime',default="1h")
@@ -398,11 +398,12 @@ echo "@@ Done!"
   submitcmd = 'jobsub_submit -G icarus --role=Analysis \\\n'
   submitcmd += '--resource-provides="usage_model=DEDICATED,OPPORTUNISTIC" \\\n'
   submitcmd += '''-l '+SingularityImage=\\\"/cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest\\\"' \\\n'''
+  submitcmd += '''--lines '+FERMIHTC_AutoRelease=True' --lines '+FERMIHTC_GraceMemory=1000' --lines '+FERMIHTC_GraceLifetime=3600' \\\n'''
   submitcmd += '''--append_condor_requirements='(TARGET.HAS_SINGULARITY=?=true)' \\\n'''
   submitcmd += '''--tar_file_name "dropbox://$(pwd)/ToGrid.tar" \\\n'''
   submitcmd += '''--email-to jae.sung.kim.3426@gmail.com \\\n'''
-  submitcmd += '''--expected-lifetime %s \\\n'''%(args.Lifetime)
-  submitcmd += '''--memory %s \\\n'''%(args.Memory)
+  #submitcmd += '''--expected-lifetime %s \\\n'''%(args.Lifetime)
+  #submitcmd += '''--memory %s \\\n'''%(args.Memory)
   submitcmd += '''-N %d \\\n'''%(NJobs)
   if args.Server!="":
     submitcmd += '''--jobsub-server %s \\\n'''%(args.Server)

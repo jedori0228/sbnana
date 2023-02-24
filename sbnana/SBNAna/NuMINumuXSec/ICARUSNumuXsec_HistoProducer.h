@@ -74,6 +74,12 @@ namespace ICARUSNumuXsec{
     //==== 221201_Cosmic_to_ClearCosmicTest
     void Cosmic_to_ClearCosmicTest(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
+    //==== 230123_ThreeTrackAnalysis
+    void ThreeTrackAnalysis(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+
+    //==== 230207_TwoTrackAnalysis
+    void TwoTrackAnalysis(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+
     void bookTEMP(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
 

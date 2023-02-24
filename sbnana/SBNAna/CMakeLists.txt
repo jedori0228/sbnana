@@ -23,6 +23,7 @@ add_definitions(-Wno-vla)
 # add_subdirectory(Analysis)
 # add_subdirectory(Systs)
 add_subdirectory(NuMINumuXSec)
+add_subdirectory(ThreeTrackAnalysis)
 
 cet_script(cafe)
 # same place as cafe script so we can find it

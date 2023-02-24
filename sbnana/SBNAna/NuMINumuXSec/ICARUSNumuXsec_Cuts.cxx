@@ -141,6 +141,12 @@ namespace ICARUSNumuXsec{
   const Cut cutIsNuMuCCDIS([](const caf::SRSliceProxy* slc) {
       return ( cutIsNuMuCC(slc) && cutIsDIS(slc) );
     });
+  const Cut cutIsNuMuCCCoh([](const caf::SRSliceProxy* slc) {
+      return ( cutIsNuMuCC(slc) && cutIsCoh(slc) );
+    });
+  const Cut cutIsNuMuCCCohElastic([](const caf::SRSliceProxy* slc) {
+      return ( cutIsNuMuCC(slc) && cutIsCohElastic(slc) );
+    });
 
   //==== NuMu-NC categories
 
@@ -935,6 +941,50 @@ const Cut kGraysProposedSampleCut([](const caf::SRSliceProxy* slc) {
     return false;
   });
 
+  const Cut TTACUT_HasThreePrimaryTracks([](const caf::SRSliceProxy* slc) {
+    return TTAVAR_PrimaryTrackIndices(slc).size()>=3;
+  });
+  const Cut TTACUT_HasMuonTrack([](const caf::SRSliceProxy* slc) {
+    return TTAVAR_MuonTrackIndex(slc)>=0.;
+  });
+
+  const Cut TTACUT_HasProtonTrack([](const caf::SRSliceProxy* slc) {
+    return TTAVAR_ProtonTrackIndex(slc)>=0;
+  });
+
+  const Cut TTACUT_HasMuonProtonPion([](const caf::SRSliceProxy* slc) {
+
+    //==== 1. NuMu-CC
+    //==== 2. Truth fiducial
+    //==== 3. Muon T cut
+    //==== 4. Proton T cut
+
+    return ( cutIsNuMuCC(slc) && cutTFiducial(slc) && cutTruthMuonTCut(slc) && cutTruthProtonTCut(slc) && (varChargedPionTruthIndex(slc)>=0) );
+
+    });
+
+  const Cut TTACUT_MuonContained([](const caf::SRSliceProxy* slc) {
+    int longerMuonTrackIndex = TTAVAR_MuonTrackIndex(slc);
+    if(longerMuonTrackIndex>=0){
+      const auto& trk = slc->reco.trk.at(longerMuonTrackIndex);
+      bool isContained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
+      return isContained;
+    }
+    else{
+      return false;
+    }
+  });
+  const Cut TTACUT_MuonExiting([](const caf::SRSliceProxy* slc) {
+    int longerMuonTrackIndex = TTAVAR_MuonTrackIndex(slc);
+    if(longerMuonTrackIndex>=0){
+      const auto& trk = slc->reco.trk.at(longerMuonTrackIndex);
+      bool isContained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
+      return !isContained;
+    }
+    else{
+      return false;
+    }
+  });
 
 }
 

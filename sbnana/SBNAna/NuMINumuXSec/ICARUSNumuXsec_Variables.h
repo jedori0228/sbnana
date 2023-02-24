@@ -27,6 +27,10 @@ namespace ICARUSNumuXsec{
   extern const SpillVar spillvarNSlice;
   extern const SpillVar spillvarNTrack;
   extern const SpillMultiVar spillNuEnergy;
+  //==== numucc
+  extern const SpillMultiVar spillNuMuCCEnergy;
+  extern const SpillMultiVar spillNMatchedNuMuCCSlice;
+
   extern const SpillMultiVar spillMuonMomentum;
   extern const SpillMultiVar spillNuDirectionX;
   extern const SpillMultiVar spillNuDirectionY;
@@ -188,6 +192,7 @@ namespace ICARUSNumuXsec{
   extern const Var varTruthQ2;
   extern const Var varTruthq0_lab;
   extern const Var varTruthmodq_lab;
+  extern const Var varTruthW;
   //====   Vertex
   extern const Var varTruthVtxX;
   extern const Var varTruthVtxY;
@@ -231,11 +236,8 @@ namespace ICARUSNumuXsec{
   extern const Var varTruthMuonMatchedTrackIndex;
   extern const Var varTruthMuonMatchedTrackContainedness;
   extern const Var varTruthMuonMatchedTrackChi2Proton;
-  extern const Var varTruthMuonMatchedTrackReducedChi2Proton;
   extern const Var varTruthMuonMatchedTrackChi2Muon;
-  extern const Var varTruthMuonMatchedTrackReducedChi2Muon;
   extern const Var varTruthMuonMatchedTrackChi2Pion;
-  extern const Var varTruthMuonMatchedTrackReducedChi2Pion;
   //====   Matched reco track positions
   extern const Var varTruthMuonMatchedTrackEndPositionX;
   extern const Var varTruthMuonMatchedTrackEndPositionY;
@@ -292,11 +294,8 @@ namespace ICARUSNumuXsec{
   extern const Var varTruthProtonMatchedTrackIndex;
   extern const Var varTruthProtonMatchedTrackContainedness;
   extern const Var varTruthProtonMatchedTrackChi2Proton;
-  extern const Var varTruthProtonMatchedTrackReducedChi2Proton;
   extern const Var varTruthProtonMatchedTrackChi2Muon;
-  extern const Var varTruthProtonMatchedTrackReducedChi2Muon;
   extern const Var varTruthProtonMatchedTrackChi2Pion;
-  extern const Var varTruthProtonMatchedTrackReducedChi2Pion;
   //====   Matched reco length
   extern const Var varTruthProtonMatchedTrackLength;
   //====   Matched reco momentum
@@ -331,11 +330,8 @@ namespace ICARUSNumuXsec{
   extern const Var varTruthChargedPionMatchedTrackIndex;
   extern const Var varTruthChargedPionMatchedTrackContainedness;
   extern const Var varTruthChargedPionMatchedTrackChi2Proton;
-  extern const Var varTruthChargedPionMatchedTrackReducedChi2Proton;
   extern const Var varTruthChargedPionMatchedTrackChi2Muon;
-  extern const Var varTruthChargedPionMatchedTrackReducedChi2Muon;
   extern const Var varTruthChargedPionMatchedTrackChi2Pion;
-  extern const Var varTruthChargedPionMatchedTrackReducedChi2Pion;
   //====   Matched reco length
   extern const Var varTruthChargedPionMatchedTrackLength;
   //====   Matched reco momentum
@@ -384,7 +380,6 @@ namespace ICARUSNumuXsec{
   extern const Var varMuonChi2Proton;
   extern const Var varMuonChi2Pion;
   extern const Var varMuonChi2MuonReEval;
-  extern const Var varMuonReducedChi2Muon;
   extern const Var varMuonRecoStartX;
   extern const Var varMuonRecoStartY;
   extern const Var varMuonRecoStartZ;
@@ -423,7 +418,6 @@ namespace ICARUSNumuXsec{
   extern const Var varProtonRecoP;
   extern const Var varProtonLength;
   extern const Var varProtonChi2Proton;
-  extern const Var varProtonReducedChi2Proton;
   extern const Var varProtonBestmatchP;
   extern const Var varProtonBestmatchPDG;
   extern const Var varProtonRecoCosineTheta;
@@ -451,6 +445,46 @@ namespace ICARUSNumuXsec{
   extern const Var varNeutrinoQEEnergyResidual;
   extern const Var varNeutrinoTestEnergy;
 
+
+  //==== Village
+  extern const MultiVar TTAVAR_PrimaryTrackIndices;
+  extern const Var TTAVAR_NPrimaryTracks;
+
+  extern const Var TTAVAR_MuonTrackIndex;
+  extern const Var TTAVAR_MuonTrackLength;
+  extern const Var TTAVAR_MuonTrackLengthMatchMuon;
+  extern const Var TTAVAR_MuonTrackLengthMatchPionPlus;
+  extern const Var TTAVAR_MuonTrackLengthMatchPionMinus;
+  extern const Var TTAVAR_MuonTrackLengthMatchProton;
+  extern const Var TTAVAR_MuonTrackLengthMatchElse;
+  extern const Var TTAVAR_MuonTrackP;
+  extern const Var TTAVAR_MuonTrackPMatchMuon;
+  extern const Var TTAVAR_MuonTrackPMatchPionPlus;
+  extern const Var TTAVAR_MuonTrackPMatchPionMinus;
+  extern const Var TTAVAR_MuonTrackPMatchProton;
+  extern const Var TTAVAR_MuonTrackPMatchElse;
+
+  extern const Var TTAVAR_ProtonTrackIndex;
+  extern const Var TTAVAR_ProtonTrackP;
+  extern const Var TTAVAR_ProtonTrackPMatchMuon;
+  extern const Var TTAVAR_ProtonTrackPMatchPionPlus;
+  extern const Var TTAVAR_ProtonTrackPMatchPionMinus;
+  extern const Var TTAVAR_ProtonTrackPMatchProton;
+  extern const Var TTAVAR_ProtonTrackPMatchElse;
+
+  extern const Var TTAVAR_ThirdTrackIndex;
+  extern const Var TTAVAR_ThirdTrackLength;
+  extern const Var TTAVAR_ThirdTrackLengthMatchMuon;
+  extern const Var TTAVAR_ThirdTrackLengthMatchPionPlus;
+  extern const Var TTAVAR_ThirdTrackLengthMatchPionMinus;
+  extern const Var TTAVAR_ThirdTrackLengthMatchProton;
+  extern const Var TTAVAR_ThirdTrackLengthMatchElse;
+  extern const Var TTAVAR_ThirdTrackP;
+  extern const Var TTAVAR_ThirdTrackPMatchMuon;
+  extern const Var TTAVAR_ThirdTrackPMatchPionPlus;
+  extern const Var TTAVAR_ThirdTrackPMatchPionMinus;
+  extern const Var TTAVAR_ThirdTrackPMatchProton;
+  extern const Var TTAVAR_ThirdTrackPMatchElse;
 
 }
 

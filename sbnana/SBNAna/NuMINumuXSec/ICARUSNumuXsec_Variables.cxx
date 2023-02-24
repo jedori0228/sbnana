@@ -77,6 +77,37 @@ namespace ICARUSNumuXsec{
     }
     return rets;
   });
+  const SpillMultiVar spillNuMuCCEnergy([](const caf::SRSpillProxy *sr)
+  {
+    std::vector<double> rets;
+    for(unsigned int i_nu=0; i_nu<sr->mc.nu.size(); i_nu++){
+      int nupdg = sr->mc.nu[i_nu].pdg;
+      bool IsNuMuCC = (sr->mc.nu[i_nu].iscc) && (abs(nupdg)==14);
+      if(!IsNuMuCC) continue;
+      rets.push_back(sr->mc.nu[i_nu].E);
+    }
+    return rets;
+  });
+
+  const SpillMultiVar spillNMatchedNuMuCCSlice([](const caf::SRSpillProxy *sr)
+  {
+    std::vector<double> rets;
+    for(unsigned int i_nu=0; i_nu<sr->mc.nu.size(); i_nu++){
+
+      int nupdg = sr->mc.nu[i_nu].pdg;
+      bool IsNuMuCC = (sr->mc.nu[i_nu].iscc) && (abs(nupdg)==14);
+      if(!IsNuMuCC) continue;
+      int n_match = 0;
+      for(const auto& slc: sr->slc){
+        if(slc.truth.index==(int)i_nu){
+          n_match++;
+        }
+      }
+      rets.push_back(n_match);
+
+    }
+    return rets;
+  });
   const SpillMultiVar spillMuonMomentum([](const caf::SRSpillProxy *sr)
   {
     std::vector<double> rets;
@@ -1327,6 +1358,10 @@ bool IsTestSelectedTrack(const caf::SRTrackProxy& trk)
       return sqrt(Q2*Q2+q0_lab*q0_lab);
     }
   });
+  const Var varTruthW([](const caf::SRSliceProxy* slc) -> double {
+    if(isnan(slc->truth.w)) return -999.;
+    else return slc->truth.w;
+  });
   //====   Vertex
   const Var varTruthVtxX([](const caf::SRSliceProxy* slc) -> double {
     if(isnan(slc->truth.position.x)) return -999999.;
@@ -1702,24 +1737,6 @@ bool IsTestSelectedTrack(const caf::SRTrackProxy& trk)
     }
   });
 
-  const Var varTruthMuonMatchedTrackReducedChi2Proton([](const caf::SRSliceProxy* slc) -> double {
-    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
-    if(muonTrackIndex>=0){
-
-      auto const& trk = slc->reco.trk.at(muonTrackIndex);
-      int bp = trk.bestplane;
-      float Chi2Proton = trk.chi2pid[bp].chi2_proton;
-      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
-      if(isnan(Chi2Proton)) return -999.;
-      else if(Chi2Ndof==0) return -999.;
-      else return Chi2Proton/double(Chi2Ndof);
-
-    }
-    else{
-      return 999999;
-    }
-  });
-
   const Var varTruthMuonMatchedTrackChi2Muon([](const caf::SRSliceProxy* slc) -> double {
     int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
     if(muonTrackIndex>=0){
@@ -1737,25 +1754,6 @@ bool IsTestSelectedTrack(const caf::SRTrackProxy& trk)
 
   });
 
-  const Var varTruthMuonMatchedTrackReducedChi2Muon([](const caf::SRSliceProxy* slc) -> double {
-    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
-    if(muonTrackIndex>=0){
-
-      auto const& trk = slc->reco.trk.at(muonTrackIndex);
-      int bp = trk.bestplane;
-      float Chi2Muon = trk.chi2pid[bp].chi2_muon;
-      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
-      if(isnan(Chi2Muon)) return -999.;
-      else if(Chi2Ndof==0) return -999.;
-      else return Chi2Muon/double(Chi2Ndof);
-
-    }
-    else{
-      return 999999;
-    }
-
-  });
-
   const Var varTruthMuonMatchedTrackChi2Pion([](const caf::SRSliceProxy* slc) -> double {
     int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
     if(muonTrackIndex>=0){
@@ -1765,25 +1763,6 @@ bool IsTestSelectedTrack(const caf::SRTrackProxy& trk)
       float Chi2Pion = trk.chi2pid[bp].chi2_pion;
       if(isnan(Chi2Pion)) return -999.;
       else return Chi2Pion;
-
-    }
-    else{
-      return 999999;
-    }
-
-  });
-
-  const Var varTruthMuonMatchedTrackReducedChi2Pion([](const caf::SRSliceProxy* slc) -> double {
-    int muonTrackIndex = varTruthMuonMatchedTrackIndex(slc);
-    if(muonTrackIndex>=0){
-
-      auto const& trk = slc->reco.trk.at(muonTrackIndex);
-      int bp = trk.bestplane;
-      float Chi2Pion = trk.chi2pid[bp].chi2_pion;
-      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
-      if(isnan(Chi2Pion)) return -999.;
-      else if(Chi2Ndof==0) return -999.;
-      else return Chi2Pion/double(Chi2Ndof);
 
     }
     else{
@@ -2418,24 +2397,6 @@ bool IsTestSelectedTrack(const caf::SRTrackProxy& trk)
     }
   });
 
-  const Var varTruthProtonMatchedTrackReducedChi2Proton([](const caf::SRSliceProxy* slc) -> double {
-    int protonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
-    if(protonTrackIndex>=0){
-
-      auto const& trk = slc->reco.trk.at(protonTrackIndex);
-      int bp = trk.bestplane;
-      float Chi2Proton = trk.chi2pid[bp].chi2_proton;
-      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
-      if( isnan(Chi2Proton) || isnan(Chi2Ndof) ) return -999.;
-      else if(Chi2Ndof==0) return -999.;
-      else return Chi2Proton/double(Chi2Ndof);
-
-    }
-    else{
-      return 999999;
-    }
-  });
-
   const Var varTruthProtonMatchedTrackChi2Muon([](const caf::SRSliceProxy* slc) -> double {
     int protonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
     if(protonTrackIndex>=0){
@@ -2453,25 +2414,6 @@ bool IsTestSelectedTrack(const caf::SRTrackProxy& trk)
 
   });
 
-  const Var varTruthProtonMatchedTrackReducedChi2Muon([](const caf::SRSliceProxy* slc) -> double {
-    int protonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
-    if(protonTrackIndex>=0){
-
-      auto const& trk = slc->reco.trk.at(protonTrackIndex);
-      int bp = trk.bestplane;
-      float Chi2Muon = trk.chi2pid[bp].chi2_muon;
-      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
-      if(isnan(Chi2Muon)) return -999.;
-      else if(Chi2Ndof==0) return -999.;
-      else return Chi2Muon/double(Chi2Ndof);
-
-    }
-    else{
-      return 999999;
-    }
-
-  });
-
   const Var varTruthProtonMatchedTrackChi2Pion([](const caf::SRSliceProxy* slc) -> double {
     int protonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
     if(protonTrackIndex>=0){
@@ -2481,25 +2423,6 @@ bool IsTestSelectedTrack(const caf::SRTrackProxy& trk)
       float Chi2Pion = trk.chi2pid[bp].chi2_pion;
       if(isnan(Chi2Pion)) return -999.;
       else return Chi2Pion;
-
-    }
-    else{
-      return 999999;
-    }
-
-  });
-
-  const Var varTruthProtonMatchedTrackReducedChi2Pion([](const caf::SRSliceProxy* slc) -> double {
-    int protonTrackIndex = varTruthProtonMatchedTrackIndex(slc);
-    if(protonTrackIndex>=0){
-
-      auto const& trk = slc->reco.trk.at(protonTrackIndex);
-      int bp = trk.bestplane;
-      float Chi2Pion = trk.chi2pid[bp].chi2_pion;
-      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
-      if(isnan(Chi2Pion)) return -999.;
-      else if(Chi2Ndof==0) return -999.;
-      else return Chi2Pion/double(Chi2Ndof);
 
     }
     else{
@@ -2848,24 +2771,6 @@ bool IsTestSelectedTrack(const caf::SRTrackProxy& trk)
     }
   });
 
-  const Var varTruthChargedPionMatchedTrackReducedChi2Proton([](const caf::SRSliceProxy* slc) -> double {
-    int cpionTrackIndex = varTruthChargedPionMatchedTrackIndex(slc);
-    if(cpionTrackIndex>=0){
-
-      auto const& trk = slc->reco.trk.at(cpionTrackIndex);
-      int bp = trk.bestplane;
-      float Chi2Proton = trk.chi2pid[bp].chi2_proton;
-      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
-      if(isnan(Chi2Proton)) return -999.;
-      else if(Chi2Ndof==0) return -999.;
-      else return Chi2Proton/double(Chi2Ndof);
-
-    }
-    else{
-      return 999999;
-    }
-  });
-
   const Var varTruthChargedPionMatchedTrackChi2Muon([](const caf::SRSliceProxy* slc) -> double {
     int cpionTrackIndex = varTruthChargedPionMatchedTrackIndex(slc);
     if(cpionTrackIndex>=0){
@@ -2882,24 +2787,6 @@ bool IsTestSelectedTrack(const caf::SRTrackProxy& trk)
     }
   });
 
-  const Var varTruthChargedPionMatchedTrackReducedChi2Muon([](const caf::SRSliceProxy* slc) -> double {
-    int cpionTrackIndex = varTruthChargedPionMatchedTrackIndex(slc);
-    if(cpionTrackIndex>=0){
-
-      auto const& trk = slc->reco.trk.at(cpionTrackIndex);
-      int bp = trk.bestplane;
-      float Chi2Muon = trk.chi2pid[bp].chi2_muon;
-      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
-      if(isnan(Chi2Muon)) return -999.;
-      else if(Chi2Ndof==0) return -999.;
-      else return Chi2Muon/double(Chi2Ndof);
-
-    }
-    else{
-      return 999999;
-    }
-  });
-
   const Var varTruthChargedPionMatchedTrackChi2Pion([](const caf::SRSliceProxy* slc) -> double {
     int cpionTrackIndex = varTruthChargedPionMatchedTrackIndex(slc);
     if(cpionTrackIndex>=0){
@@ -2909,24 +2796,6 @@ bool IsTestSelectedTrack(const caf::SRTrackProxy& trk)
       float Chi2Pion = trk.chi2pid[bp].chi2_pion;
       if(isnan(Chi2Pion)) return -999.;
       else return Chi2Pion;
-
-    }
-    else{
-      return 999999;
-    }
-  });
-
-  const Var varTruthChargedPionMatchedTrackReducedChi2Pion([](const caf::SRSliceProxy* slc) -> double {
-    int cpionTrackIndex = varTruthChargedPionMatchedTrackIndex(slc);
-    if(cpionTrackIndex>=0){
-
-      auto const& trk = slc->reco.trk.at(cpionTrackIndex);
-      int bp = trk.bestplane;
-      float Chi2Pion = trk.chi2pid[bp].chi2_pion;
-      int Chi2Ndof = trk.chi2pid[bp].pid_ndof;
-      if(isnan(Chi2Pion)) return -999.;
-      else if(Chi2Ndof==0) return -999.;
-      else return Chi2Pion/double(Chi2Ndof);
 
     }
     else{
@@ -3374,7 +3243,7 @@ bool IsTestSelectedTrack(const caf::SRTrackProxy& trk)
               pow( slc->vertex.z - trk.start.z, 2.0 ) );
       //===== We require that the distance of the track from the slice is less than
       //==== 10 cm and that the parent of the track has been marked as the primary.
-      AtSlice = ( Atslc < 10.0 );//&& trk.parent_is_primary);
+      AtSlice = ( Atslc < 10.0 && trk.pfp.parent_is_primary);
 
       int bp = trk.bestplane;
       Chi2Proton = trk.chi2pid[bp].chi2_proton;
@@ -3518,20 +3387,6 @@ bool IsTestSelectedTrack(const caf::SRTrackProxy& trk)
       }
       std::cout << "[JSKIMDEBUG] -> chi2mu = " << chi2mu << ", chi2mu/ndf = " << chi2mu/(double)npt << std::endl;
       return chi2mu/(double)npt;
-    }
-    else{
-      return -999.;
-    }
-  });
-
-  const Var varMuonReducedChi2Muon([](const caf::SRSliceProxy* slc) -> float {
-    if( varMuonTrackInd(slc) >= 0 ){
-      auto const& trk = slc->reco.trk.at(varMuonTrackInd(slc));
-      int bp = trk.bestplane;
-      double Chi2Muon = trk.chi2pid[bp].chi2_muon;
-      int ndof = trk.chi2pid[bp].pid_ndof;
-      if(ndof==0) return -999.;
-      else return Chi2Muon/double(ndof);
     }
     else{
       return -999.;
@@ -3824,7 +3679,7 @@ bool IsTestSelectedTrack(const caf::SRTrackProxy& trk)
               pow( slc->vertex.z - trk.start.z, 2.0 ) );
       //===== We require that the distance of the track from the slice is less than
       //==== 10 cm and that the parent of the track has been marked as the primary.
-      AtSlice = ( Atslc < 10.0 );//&& trk.parent_is_primary);
+      AtSlice = ( Atslc < 10.0 && trk.pfp.parent_is_primary);
 
       Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
 
@@ -3893,21 +3748,6 @@ bool IsTestSelectedTrack(const caf::SRTrackProxy& trk)
       auto const& trk = slc->reco.trk.at(varProtonTrackInd(slc));
       int bp = trk.bestplane;
       return trk.chi2pid[bp].chi2_proton;
-    }
-    else{
-      return -999.;
-    }
-  });
-
-  const Var varProtonReducedChi2Proton([](const caf::SRSliceProxy* slc) -> float {
-    if( varProtonTrackInd(slc) >= 0 ){
-      auto const& trk = slc->reco.trk.at(varProtonTrackInd(slc));
-      int bp = trk.bestplane;
-      double Chi2Proton = trk.chi2pid[bp].chi2_proton;
-      int ndof = trk.chi2pid[bp].pid_ndof;
-      if(ndof==0) return -999.;
-      else return Chi2Proton/double(ndof);
-
     }
     else{
       return -999.;
@@ -4100,6 +3940,528 @@ bool IsTestSelectedTrack(const caf::SRTrackProxy& trk)
 
   });
 
+  //==== Village
+  const MultiVar TTAVAR_PrimaryTrackIndices([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> rets;
+    for(unsigned int i_trk=0; i_trk<slc->reco.trk.size(); i_trk++){
+      const auto& trk = slc->reco.trk.at(i_trk);
+      const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
+                                     slc->vertex.y - trk.start.y,
+                                     slc->vertex.z - trk.start.z);
+      if (Atslc < 10. && trk.pfp.parent_is_primary){
+        rets.push_back(i_trk);
+      }
+    }
+    return rets;
+  });
 
+  const Var TTAVAR_NPrimaryTracks([](const caf::SRSliceProxy* slc) -> double {
+    return TTAVAR_PrimaryTrackIndices(slc).size();
+  });
+
+  const Var TTAVAR_MuonTrackIndex([](const caf::SRSliceProxy* slc) -> double {
+    vector<double> primTrackIndices = TTAVAR_PrimaryTrackIndices(slc);
+    if(primTrackIndices.size()==0){
+      return -999.;
+    }
+    else{
+      float Longest(0);
+      int PTrackInd(-1);
+      for(const auto& trkIdx: primTrackIndices){
+        const auto& trk = slc->reco.trk.at(trkIdx);
+
+        if(trk.bestplane == -1) continue;
+
+        // First we calculate the distance of each track to the slice vertex.
+        const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
+                                       slc->vertex.y - trk.start.y,
+                                       slc->vertex.z - trk.start.z);
+
+        // We require that the distance of the track from the slice is less than
+        // 10 cm and that the parent of the track has been marked as the primary.
+        const bool AtSlice = ( Atslc < 10.0 && trk.pfp.parent_is_primary);
+
+        const float Chi2Proton = trk.chi2pid[trk.bestplane].chi2_proton;
+        const float Chi2Muon = trk.chi2pid[trk.bestplane].chi2_muon;
+
+        const bool Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
+
+        const bool MaybeMuonExiting = ( !Contained && trk.len > 100);
+        const bool MaybeMuonContained = ( Contained && Chi2Proton > 60 && Chi2Muon < 30 && trk.len > 50 );
+        if ( AtSlice && ( MaybeMuonExiting || MaybeMuonContained ) && trk.len > Longest )
+        {
+          Longest = trk.len;
+          PTrackInd = trkIdx;
+        }
+
+      }
+
+      return PTrackInd;
+
+    }
+  });
+  const Var TTAVAR_MuonTrackLength([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = TTAVAR_MuonTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      return trk.len;
+    }
+    else{
+      return -999.;
+    }
+
+  });
+  const Var TTAVAR_MuonTrackLengthMatchMuon([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = TTAVAR_MuonTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(abs(this_pdg)!=13) return -999.;
+      return TTAVAR_MuonTrackLength(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_MuonTrackLengthMatchPionPlus([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = TTAVAR_MuonTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(this_pdg!=+211) return -999.;
+      return TTAVAR_MuonTrackLength(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_MuonTrackLengthMatchPionMinus([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = TTAVAR_MuonTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(this_pdg!=-211) return -999.;
+      return TTAVAR_MuonTrackLength(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_MuonTrackLengthMatchProton([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = TTAVAR_MuonTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(this_pdg!=2212) return -999.;
+      return TTAVAR_MuonTrackLength(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_MuonTrackLengthMatchElse([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = TTAVAR_MuonTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(abs(this_pdg)==13 || abs(this_pdg)==211 || this_pdg==2212) return -999;
+      return TTAVAR_MuonTrackLength(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_MuonTrackP([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = TTAVAR_MuonTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      bool Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
+      if(Contained){
+        if(trk.len>50.) return trk.rangeP.p_muon;
+        else return -999.;
+      }
+      else{
+        if(trk.len>100.) return trk.mcsP.fwdP_muon;
+        else return -999.;
+      }
+    }
+    else{
+      return -999.;
+    }
+
+  });
+  const Var TTAVAR_MuonTrackPMatchMuon([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = TTAVAR_MuonTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(abs(this_pdg)!=13) return -999.;
+      return TTAVAR_MuonTrackP(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_MuonTrackPMatchPionPlus([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = TTAVAR_MuonTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(this_pdg!=+211) return -999.;
+      return TTAVAR_MuonTrackP(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_MuonTrackPMatchPionMinus([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = TTAVAR_MuonTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(this_pdg!=-211) return -999.;
+      return TTAVAR_MuonTrackP(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_MuonTrackPMatchProton([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = TTAVAR_MuonTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(this_pdg!=2212) return -999.;
+      return TTAVAR_MuonTrackP(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_MuonTrackPMatchElse([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = TTAVAR_MuonTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(muonTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(abs(this_pdg)==13 || abs(this_pdg)==211 || this_pdg==2212) return -999;
+      return TTAVAR_MuonTrackP(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+
+  const Var TTAVAR_ProtonTrackIndex([](const caf::SRSliceProxy* slc) -> double {
+    vector<double> primTrackIndices = TTAVAR_PrimaryTrackIndices(slc);
+    if(primTrackIndices.size()==0){
+      return -999.;
+    }
+    else{
+      float Longest(0);
+      int PTrackInd(-1);
+      int muonTrackIndex = TTAVAR_MuonTrackIndex(slc);
+      for(const auto& trkIdx: primTrackIndices){
+        const auto& trk = slc->reco.trk.at(trkIdx);
+
+        if(trkIdx==muonTrackIndex) continue;
+        if(trk.bestplane == -1) continue;
+
+        // First we calculate the distance of each track to the slice vertex.
+        const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
+                                       slc->vertex.y - trk.start.y,
+                                       slc->vertex.z - trk.start.z);
+
+        // We require that the distance of the track from the slice is less than
+        // 10 cm and that the parent of the track has been marked as the primary.
+        const bool AtSlice = ( Atslc < 10.0 && trk.pfp.parent_is_primary);
+
+        const float Chi2Proton = trk.chi2pid[trk.bestplane].chi2_proton;
+        const float Chi2Muon = trk.chi2pid[trk.bestplane].chi2_muon;
+
+        const bool Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
+
+        float angle = -5.0;
+        if ( muonTrackIndex >= 0 ) {
+          const unsigned int idxPrim = (unsigned int)muonTrackIndex;
+          TVector3 muDir( slc->reco.trk[idxPrim].dir.x, slc->reco.trk[idxPrim].dir.y, slc->reco.trk[idxPrim].dir.z );
+          TVector3 pDir( slc->reco.trk[trkIdx].dir.x, slc->reco.trk[trkIdx].dir.y, slc->reco.trk[trkIdx].dir.z );
+          angle = TMath::Cos(muDir.Angle(pDir));
+        }
+
+        if ( AtSlice && Contained && Chi2Proton <= 100 && Chi2Muon >= 30 && angle >= -0.9 && trk.len > Longest ) {
+          Longest = trk.len;
+          PTrackInd = trkIdx;
+        }
+
+      }
+
+      return PTrackInd;
+
+    }
+  });
+
+
+  const Var TTAVAR_ProtonTrackP([](const caf::SRSliceProxy* slc) -> double {
+    int protonTrackIndex = TTAVAR_ProtonTrackIndex(slc);
+    if(protonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(protonTrackIndex);
+      bool Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
+      if(Contained) return trk.rangeP.p_proton;
+      else return -999.;
+    }
+    else{
+      return -999.;
+    }
+
+  });
+  const Var TTAVAR_ProtonTrackPMatchMuon([](const caf::SRSliceProxy* slc) -> double {
+    int protonTrackIndex = TTAVAR_ProtonTrackIndex(slc);
+    if(protonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(protonTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(abs(this_pdg)!=13) return -999.;
+      return TTAVAR_ProtonTrackP(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_ProtonTrackPMatchPionPlus([](const caf::SRSliceProxy* slc) -> double {
+    int protonTrackIndex = TTAVAR_ProtonTrackIndex(slc);
+    if(protonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(protonTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(this_pdg!=+211) return -999.;
+      return TTAVAR_ProtonTrackP(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_ProtonTrackPMatchPionMinus([](const caf::SRSliceProxy* slc) -> double {
+    int protonTrackIndex = TTAVAR_ProtonTrackIndex(slc);
+    if(protonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(protonTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(this_pdg!=-211) return -999.;
+      return TTAVAR_ProtonTrackP(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_ProtonTrackPMatchProton([](const caf::SRSliceProxy* slc) -> double {
+    int protonTrackIndex = TTAVAR_ProtonTrackIndex(slc);
+    if(protonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(protonTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(this_pdg!=2212) return -999.;
+      return TTAVAR_ProtonTrackP(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_ProtonTrackPMatchElse([](const caf::SRSliceProxy* slc) -> double {
+    int protonTrackIndex = TTAVAR_ProtonTrackIndex(slc);
+    if(protonTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(protonTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(abs(this_pdg)==13 || abs(this_pdg)==211 || this_pdg==2212) return -999.;
+      return TTAVAR_ProtonTrackP(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+
+  const Var TTAVAR_ThirdTrackIndex([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = TTAVAR_MuonTrackIndex(slc);
+    int protonTrackIndex = TTAVAR_ProtonTrackIndex(slc);
+    if(muonTrackIndex>=0 && protonTrackIndex>=0){
+
+      float Longest(0);
+      int PTrackInd(-1);
+      int muonTrackIndex = TTAVAR_MuonTrackIndex(slc);
+      vector<double> primTrackIndices = TTAVAR_PrimaryTrackIndices(slc);
+      for(const auto& trkIdx: primTrackIndices){
+        const auto& trk = slc->reco.trk.at(trkIdx);
+
+        if(trkIdx==muonTrackIndex) continue;
+        if(trkIdx==protonTrackIndex) continue;
+        if(trk.bestplane == -1) continue;
+
+        // First we calculate the distance of each track to the slice vertex.
+        const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
+                                       slc->vertex.y - trk.start.y,
+                                       slc->vertex.z - trk.start.z);
+
+        // We require that the distance of the track from the slice is less than
+        // 10 cm and that the parent of the track has been marked as the primary.
+        const bool AtSlice = ( Atslc < 10.0 && trk.pfp.parent_is_primary);
+
+        //const float Chi2Proton = trk.chi2pid[trk.bestplane].chi2_proton;
+        //const float Chi2Muon = trk.chi2pid[trk.bestplane].chi2_muon;
+
+        const bool Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
+
+        if ( AtSlice && Contained && trk.len > Longest ) {
+          Longest = trk.len;
+          PTrackInd = trkIdx;
+        }
+
+      }
+
+      return PTrackInd;
+
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_ThirdTrackP([](const caf::SRSliceProxy* slc) -> double {
+    int thirdTrackIndex = TTAVAR_ThirdTrackIndex(slc);
+    if(thirdTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(thirdTrackIndex);
+      bool Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
+      if(Contained) return trk.rangeP.p_muon;
+      else return -999.;
+    }
+    else{
+      return -999.;
+    }
+
+  });
+  const Var TTAVAR_ThirdTrackPMatchMuon([](const caf::SRSliceProxy* slc) -> double {
+    int thirdTrackIndex = TTAVAR_ThirdTrackIndex(slc);
+    if(thirdTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(thirdTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(abs(this_pdg)!=13) return -999.;
+      return TTAVAR_ThirdTrackP(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_ThirdTrackPMatchPionPlus([](const caf::SRSliceProxy* slc) -> double {
+    int thirdTrackIndex = TTAVAR_ThirdTrackIndex(slc);
+    if(thirdTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(thirdTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(this_pdg!=+211) return -999.;
+      return TTAVAR_ThirdTrackP(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_ThirdTrackPMatchPionMinus([](const caf::SRSliceProxy* slc) -> double {
+    int thirdTrackIndex = TTAVAR_ThirdTrackIndex(slc);
+    if(thirdTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(thirdTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(this_pdg!=-211) return -999.;
+      return TTAVAR_ThirdTrackP(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_ThirdTrackPMatchProton([](const caf::SRSliceProxy* slc) -> double {
+    int thirdTrackIndex = TTAVAR_ThirdTrackIndex(slc);
+    if(thirdTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(thirdTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(this_pdg!=2212) return -999.;
+      return TTAVAR_ThirdTrackP(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_ThirdTrackPMatchElse([](const caf::SRSliceProxy* slc) -> double {
+    int thirdTrackIndex = TTAVAR_ThirdTrackIndex(slc);
+    if(thirdTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(thirdTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(abs(this_pdg)==13 || abs(this_pdg)==211 || this_pdg==2212) return -999.;
+      return TTAVAR_ThirdTrackP(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_ThirdTrackLength([](const caf::SRSliceProxy* slc) -> double {
+    int thirdTrackIndex = TTAVAR_ThirdTrackIndex(slc);
+    if(thirdTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(thirdTrackIndex);
+      return trk.len;
+    }
+    else{
+      return -999.;
+    }
+
+  });
+  const Var TTAVAR_ThirdTrackLengthMatchMuon([](const caf::SRSliceProxy* slc) -> double {
+    int thirdTrackIndex = TTAVAR_ThirdTrackIndex(slc);
+    if(thirdTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(thirdTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(abs(this_pdg)!=13) return -999.;
+      return TTAVAR_ThirdTrackLength(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_ThirdTrackLengthMatchPionPlus([](const caf::SRSliceProxy* slc) -> double {
+    int thirdTrackIndex = TTAVAR_ThirdTrackIndex(slc);
+    if(thirdTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(thirdTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(this_pdg!=+211) return -999.;
+      return TTAVAR_ThirdTrackLength(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_ThirdTrackLengthMatchPionMinus([](const caf::SRSliceProxy* slc) -> double {
+    int thirdTrackIndex = TTAVAR_ThirdTrackIndex(slc);
+    if(thirdTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(thirdTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(this_pdg!=-211) return -999.;
+      return TTAVAR_ThirdTrackLength(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_ThirdTrackLengthMatchProton([](const caf::SRSliceProxy* slc) -> double {
+    int thirdTrackIndex = TTAVAR_ThirdTrackIndex(slc);
+    if(thirdTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(thirdTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(this_pdg!=2212) return -999.;
+      return TTAVAR_ThirdTrackLength(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var TTAVAR_ThirdTrackLengthMatchElse([](const caf::SRSliceProxy* slc) -> double {
+    int thirdTrackIndex = TTAVAR_ThirdTrackIndex(slc);
+    if(thirdTrackIndex>=0){
+      auto const& trk = slc->reco.trk.at(thirdTrackIndex);
+      int this_pdg = trk.truth.p.pdg;
+      if(abs(this_pdg)==13 || abs(this_pdg)==211 || this_pdg==2212) return -999.;
+      return TTAVAR_ThirdTrackLength(slc);
+    }
+    else{
+      return -999.;
+    }
+  });
 }
 

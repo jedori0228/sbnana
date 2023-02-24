@@ -67,6 +67,8 @@ namespace ICARUSNumuXsec{
   extern const Cut cutIsNuMuCCRes;
   extern const Cut cutIsNuMuCCMEC;
   extern const Cut cutIsNuMuCCDIS;
+  extern const Cut cutIsNuMuCCCoh;
+  extern const Cut cutIsNuMuCCCohElastic;
 
   //==== NuMu-NC categories
 
@@ -187,6 +189,12 @@ namespace ICARUSNumuXsec{
 
   //==== Village
   extern const Cut kGraysProposedSampleCut;
+  extern const Cut TTACUT_HasThreePrimaryTracks;
+  extern const Cut TTACUT_HasMuonTrack;
+  extern const Cut TTACUT_HasProtonTrack;
+  extern const Cut TTACUT_HasMuonProtonPion;
+  extern const Cut TTACUT_MuonContained;
+  extern const Cut TTACUT_MuonExiting;
 
 }
 
