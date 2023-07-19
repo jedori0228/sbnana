@@ -7,6 +7,16 @@ namespace ICARUSNumuXsec{
 
   // SpillCut
 
+  // - Trigger emul
+  const SpillCut HasTrigger([](const caf::SRSpillProxy* sr){
+    if(sr->hdr.ismc){
+      return ( fabs(sr->hdr.triggerinfo.trigger_within_gate) != std::numeric_limits<double>::max() );
+    }
+    else{
+      return true;
+    }
+  });
+
   // - CRTPMT matching
 
   const SpillCut spillcutHasValidFlash([](const caf::SRSpillProxy* sr){
@@ -115,6 +125,9 @@ namespace ICARUSNumuXsec{
   });
 
   // - Spill nu
+  const SpillCut SingleTruthNu([](const caf::SRSpillProxy* sr){
+    return (sr->mc.nu.size()==1);
+  });
   const SpillCut spillcutHasTrueMuContained([](const caf::SRSpillProxy* sr){
 
     for(const auto& _nu : sr->mc.nu){
@@ -283,6 +296,7 @@ namespace ICARUSNumuXsec{
   const Cut cutIsUnknownInteractionType3([](const caf::SRSliceProxy* slc) {
     return varGENIEIntCode(slc)<-1;
   });
+
   //   - NuMu-CC categories
   const Cut cutIsNuMuCC([](const caf::SRSliceProxy* slc) {
       return ( cutIsNuMu(slc) && cutIsCC(slc) );
@@ -312,6 +326,21 @@ namespace ICARUSNumuXsec{
   //   - NuE
   const Cut cutIsNuECC([](const caf::SRSliceProxy* slc) {
       return ( cutIsNuE(slc) && cutIsCC(slc) );
+  });
+
+  //   - Topologies
+  const Cut cutIsQELike([](const caf::SRSliceProxy* slc) {
+
+
+    ICARUSNumuXsec::InteractionTool::NParticles nptls = intt.GetNParticles(slc);
+
+    //printf("(mu, p, n, pi+, pi-, pi0) = (%d, %d, %d, %d, %d, %d)\n", nptls.NMuon, nptls.NProton, nptls.NNeutron, nptls.NPip, nptls.NPim, nptls.NPi0);
+
+    //bool isCCQELike = (nptls.NMuon==1) && (nptls.NProton==1) && (nptls.NPip+nptls.NPim+nptls.NPi0==0);
+    bool isCCQELike = (nptls.NPip+nptls.NPim+nptls.NPi0==0);
+
+    return isCCQELike;
+
   });
 
   // - FV
@@ -354,5 +383,6 @@ namespace ICARUSNumuXsec{
   const Cut cutFMTime([](const caf::SRSliceProxy* slc) {
     return ( !isnan(slc->fmatch.time) && slc->fmatch.time>=-0.2 && slc->fmatch.time<=9.9 );
   });
+
 
 }

@@ -6,15 +6,68 @@ using namespace ana;
 namespace ICARUSNumuXsec{
 
   // SpillVar
-  const SpillVar spillvarCountSpill([](const caf::SRSpillProxy *sr) ->int {
+  const SpillVar spillvarCountSpill([](const caf::SRSpillProxy *sr) -> double {
     return 0.;
+  });
+  // Trigger
+  const SpillVar TriggerWithinGate([](const caf::SRSpillProxy *sr) -> double {
+    if(sr->hdr.ismc){
+      return sr->hdr.triggerinfo.trigger_within_gate;
+    }
+    else{
+      return sr->hdr.triggerinfo.trigger_within_gate-4.;
+    }
   });
   // - Test
-  const SpillVar spillvarTest([](const caf::SRSpillProxy *sr) ->int {
-    std::cout << "[spillvarTest] trigger_within_gate = " << sr->hdr.triggerinfo.trigger_within_gate << std::endl;
-    return 0.;
+  const SpillMultiVar spillvarTest([](const caf::SRSpillProxy *sr) -> vector<double> {
+
+    std::vector<double> rets;
+
+    for(std::size_t i(0); i < sr->slc.size(); ++i){
+      const auto& slc = sr->slc.at(i);
+      int michel_index = ICARUSNumuXsec::TruthMatch::TruthMuonMichelIndex(&slc);
+      if(michel_index>=0){
+
+        double vertexDiff = 0.;
+        vertexDiff += pow(slc.truth.position.x - slc.vertex.x, 2);
+        vertexDiff += pow(slc.truth.position.y - slc.vertex.y, 2);
+        vertexDiff += pow(slc.truth.position.z - slc.vertex.z, 2);
+        vertexDiff = sqrt(vertexDiff);
+        if(vertexDiff>3.) continue;
+
+        int nmuontrack = 0;
+        for(const auto& pfp: slc.reco.pfp){
+          if(abs(pfp.trk.truth.p.pdg)==13) nmuontrack++;
+        }
+        if(nmuontrack!=1) continue;
+
+        std::cout << "[spillvarTest] Muon michel event" << std::endl;
+        printf("[spillvarTest] Muon michel event: (run, subrun, event) = (%d, %d, %d), nSlice = %ld\n", sr->hdr.run.GetValue(), sr->hdr.subrun.GetValue(), sr->hdr.evt.GetValue(),sr->slc.size());
+
+        printf("[spillvarTest] True vertex: (%1.3f, %1.3f, %1.3f)\n", slc.truth.position.x.GetValue(), slc.truth.position.y.GetValue(), slc.truth.position.z.GetValue());
+        printf("[spillvarTest] Reco vertex: (%1.3f, %1.3f, %1.3f)\n", slc.vertex.x.GetValue(), slc.vertex.y.GetValue(), slc.vertex.z.GetValue());
+        printf("[spillvarTest] -> Vertex diff = %1.3f\n", vertexDiff);
+
+        const auto& michel_prim = slc.truth.prim[michel_index];
+        printf("[spillvarTest] Michel electron start: (%1.3f, %1.3f, %1.3f)\n", michel_prim.start.x.GetValue(), michel_prim.start.y.GetValue(), michel_prim.start.z.GetValue());
+        printf("[spillvarTest] Michel electron end: (%1.3f, %1.3f, %1.3f)\n", michel_prim.end.x.GetValue(), michel_prim.end.y.GetValue(), michel_prim.end.z.GetValue());
+
+        std::cout << "[spillvarTest] Printing all reco pfps.." << std::endl;
+        for(const auto& pfp: slc.reco.pfp){
+          printf("[spillvarTest] - pfp id = %d\n",pfp.id.GetValue());
+          printf("[spillvarTest] - pfp.track start = (%1.3f, %1.3f, %1.3f)\n", pfp.trk.start.x.GetValue(), pfp.trk.start.y.GetValue(), pfp.trk.start.z.GetValue());
+          printf("[spillvarTest] - pfp.track end = (%1.3f, %1.3f, %1.3f)\n", pfp.trk.end.x.GetValue(), pfp.trk.end.y.GetValue(), pfp.trk.end.z.GetValue());
+          printf("[spillvarTest] - pfp.track match pdg = %d\n", pfp.trk.truth.p.pdg.GetValue());
+        }
+
+      }
+    }
+
+    return rets;
+
+
   });
-  const SpillVar spillvarNTrack([](const caf::SRSpillProxy *sr) ->int {
+  const SpillVar spillvarNTrack([](const caf::SRSpillProxy *sr) -> double {
     int nTrk=0;
     for(std::size_t i(0); i < sr->slc.size(); ++i){
       const auto& slc = sr->slc.at(i);
@@ -134,54 +187,6 @@ namespace ICARUSNumuXsec{
     return rets;
   });
 
-  // - WW test
-  const SpillMultiVar spillvarWWTPCTrackEndX([](const caf::SRSpillProxy *sr){
-    vector<double> rets;
-    for(const auto& slc: sr->slc){
-      for(const auto& pfp: slc.reco.pfp){
-        const auto& trk = pfp.trk;
-        if( !isnan(trk.start.x) && !isnan(trk.start.y) && !isnan(trk.start.z)
-            && !isnan(trk.end.x) && !isnan(trk.end.x) && !isnan(trk.end.x) ){
-          rets.push_back( trk.start.x );
-          rets.push_back( trk.end.x );
-        }
-      }
-    }
-    return rets;
-  });
-  const SpillMultiVar spillvarWWTPCTrackEndY([](const caf::SRSpillProxy *sr){
-    vector<double> rets;
-    for(const auto& slc: sr->slc){
-      for(const auto& pfp: slc.reco.pfp){
-        const auto& trk = pfp.trk;
-        if( !isnan(trk.start.x) && !isnan(trk.start.y) && !isnan(trk.start.z)
-            && !isnan(trk.end.x) && !isnan(trk.end.x) && !isnan(trk.end.x) ){
-          if( trk.start.x>220. && trk.start.x<340. ){
-            rets.push_back( trk.start.y );
-            rets.push_back( trk.end.y );
-          }
-        }
-      }
-    }
-    return rets;
-  });
-  const SpillMultiVar spillvarWWTPCTrackEndZ([](const caf::SRSpillProxy *sr){
-    vector<double> rets;
-    for(const auto& slc: sr->slc){
-      for(const auto& pfp: slc.reco.pfp){
-        const auto& trk = pfp.trk;
-        if( !isnan(trk.start.x) && !isnan(trk.start.y) && !isnan(trk.start.z)
-            && !isnan(trk.end.x) && !isnan(trk.end.x) && !isnan(trk.end.x) ){
-          if( trk.start.x>220. && trk.start.x<340. ){
-            rets.push_back( trk.start.z );
-            rets.push_back( trk.end.z );
-          }
-        }
-      }
-    }
-    return rets;
-  });
-
   // Var
   // - GENIE interaction code
   // - https://internal.dunescience.org/doxygen/namespacesimb.html#a2cce734d1b71408bbc7d98d148ac4360
@@ -244,6 +249,28 @@ namespace ICARUSNumuXsec{
     if(isnan(slc->truth.w)) return -999.;
     else return slc->truth.w;
   });
+  // - Truth n particle
+  const Var varTruthNProton([](const caf::SRSliceProxy* slc) -> double {
+    ICARUSNumuXsec::InteractionTool::NParticles nptls = intt.GetNParticles(slc);
+    return nptls.NProton;
+  });
+  const Var varTruthNNeutron([](const caf::SRSliceProxy* slc) -> double {
+    ICARUSNumuXsec::InteractionTool::NParticles nptls = intt.GetNParticles(slc);
+    return nptls.NNeutron;
+  });
+  const Var varTruthNPip([](const caf::SRSliceProxy* slc) -> double {
+    ICARUSNumuXsec::InteractionTool::NParticles nptls = intt.GetNParticles(slc);
+    return nptls.NPip;
+  });
+  const Var varTruthNPim([](const caf::SRSliceProxy* slc) -> double {
+    ICARUSNumuXsec::InteractionTool::NParticles nptls = intt.GetNParticles(slc);
+    return nptls.NPim;
+  });
+  const Var varTruthNPi0([](const caf::SRSliceProxy* slc) -> double {
+    ICARUSNumuXsec::InteractionTool::NParticles nptls = intt.GetNParticles(slc);
+    return nptls.NPi0;
+  });
+
   // - Slice var
   const Var varCountSlice([](const caf::SRSliceProxy* slc) ->int {
     return 0.;
@@ -304,7 +331,7 @@ namespace ICARUSNumuXsec{
 
   // - Longest track
   //   - index
-  const Var varLongestTrackIndex([](const caf::SRSliceProxy* slc) -> int {
+  const Var LongestTrackIndex([](const caf::SRSliceProxy* slc) -> int {
     int ret(-1);
     double lmax(-999.);
 
@@ -336,8 +363,8 @@ namespace ICARUSNumuXsec{
     return ret;
   });
   //   - length
-  const Var varLongestTrackLength([](const caf::SRSliceProxy* slc) -> double {
-    int ltidx = varLongestTrackIndex(slc);
+  const Var LongestTrackLength([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = LongestTrackIndex(slc);
     if(ltidx>=0){
       const auto& trk = slc->reco.pfp.at(ltidx).trk;
       return trk.len;
@@ -347,8 +374,8 @@ namespace ICARUSNumuXsec{
     }
   });
   //   - direction
-  const Var varLongestTrackDirectionX([](const caf::SRSliceProxy* slc) -> double {
-    int ltidx = varLongestTrackIndex(slc);
+  const Var LongestTrackDirectionX([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = LongestTrackIndex(slc);
     if(ltidx>=0){
       const auto& trk = slc->reco.pfp.at(ltidx).trk;
       return trk.dir.x;
@@ -357,8 +384,8 @@ namespace ICARUSNumuXsec{
       return -999.;
     }
   });
-  const Var varLongestTrackDirectionY([](const caf::SRSliceProxy* slc) -> double {
-    int ltidx = varLongestTrackIndex(slc);
+  const Var LongestTrackDirectionY([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = LongestTrackIndex(slc);
     if(ltidx>=0){
       const auto& trk = slc->reco.pfp.at(ltidx).trk;
       return trk.dir.y;
@@ -367,8 +394,8 @@ namespace ICARUSNumuXsec{
       return -999.;
     }
   });
-  const Var varLongestTrackDirectionZ([](const caf::SRSliceProxy* slc) -> double {
-    int ltidx = varLongestTrackIndex(slc);
+  const Var LongestTrackDirectionZ([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = LongestTrackIndex(slc);
     if(ltidx>=0){
       const auto& trk = slc->reco.pfp.at(ltidx).trk;
       return trk.dir.z;
@@ -377,8 +404,8 @@ namespace ICARUSNumuXsec{
       return -999.;
     }
   });
-  const Var varLongestTrackDirectionXZ([](const caf::SRSliceProxy* slc) -> double {
-    int ltidx = varLongestTrackIndex(slc);
+  const Var LongestTrackDirectionXZ([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = LongestTrackIndex(slc);
     if(ltidx>=0){
       const auto& trk = slc->reco.pfp.at(ltidx).trk;
       return sqrt(trk.dir.x*trk.dir.x+trk.dir.z*trk.dir.z);
@@ -387,8 +414,8 @@ namespace ICARUSNumuXsec{
       return -999.;
     }
   });
-  const Var varLongestTrackForceDownDirectionX([](const caf::SRSliceProxy* slc) -> double {
-    int ltidx = varLongestTrackIndex(slc);
+  const Var LongestTrackForceDownDirectionX([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = LongestTrackIndex(slc);
     if(ltidx>=0){
       const auto& trk = slc->reco.pfp.at(ltidx).trk;
       double flip = trk.dir.y>0 ? -1. : +1.; // if original track is upward(>0), flip it
@@ -398,8 +425,8 @@ namespace ICARUSNumuXsec{
       return -999.;
     }
   });
-  const Var varLongestTrackForceDownDirectionY([](const caf::SRSliceProxy* slc) -> double {
-    int ltidx = varLongestTrackIndex(slc);
+  const Var LongestTrackForceDownDirectionY([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = LongestTrackIndex(slc);
     if(ltidx>=0){
       const auto& trk = slc->reco.pfp.at(ltidx).trk;
       double flip = trk.dir.y>0 ? -1. : +1.; // if original track is upward(>0), flip it
@@ -409,8 +436,8 @@ namespace ICARUSNumuXsec{
       return -999.;
     }
   });
-  const Var varLongestTrackForceDownDirectionZ([](const caf::SRSliceProxy* slc) -> double {
-    int ltidx = varLongestTrackIndex(slc);
+  const Var LongestTrackForceDownDirectionZ([](const caf::SRSliceProxy* slc) -> double {
+    int ltidx = LongestTrackIndex(slc);
     if(ltidx>=0){
       const auto& trk = slc->reco.pfp.at(ltidx).trk;
       double flip = trk.dir.y>0 ? -1. : +1.; // if original track is upward(>0), flip it
@@ -420,4 +447,158 @@ namespace ICARUSNumuXsec{
       return -999.;
     }
   });
+  // - Reco muon
+  // - Stub
+  const Var NStubs([](const caf::SRSliceProxy* slc) -> double {
+    return slc->reco.stub.size();
+  });
+  const MultiVar StubCollectionCharges([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    vector<double> rets;
+    for(const auto& stub: slc->reco.stub){
+      double ret = 0.;
+      for(const auto& stub_plane: stub.planes){
+        if(stub_plane.p==caf::kCollection){
+          for(const auto& stub_hit: stub_plane.hits){
+            ret += stub_hit.charge/1e5;
+          }
+        }
+      }
+      if(ret>0.) rets.push_back(ret);
+      else rets.push_back(-999.);
+
+    }
+    return rets;
+  });
+
+  // - In case of neutrino overlapped with cosmic
+  const Var NNuPFP([](const caf::SRSliceProxy* slc) -> double {
+    int ret = 0;
+    for(const auto& pfp: slc->reco.pfp){
+      if(pfp.trk.truth.p.interaction_id!=-1 && pfp.trk.truth.p.interaction_id!=INT_MIN){
+        ret++;
+/*
+        if(kIsCosmic(slc)){
+          std::cout << "[JSKIIMDEBUG][NNuPFP] This is a cosmic slice, but I found a pfp with in_id = " << pfp.trk.truth.p.interaction_id << std::endl;
+          std::cout << "[JSKIIMDEBUG][NNuPFP] - pdg = " << (pfp.trk.truth.p.pdg) << std::endl;
+        }
+*/
+      }
+    }
+    return ret;
+  });
+  const Var NCosmicPFP([](const caf::SRSliceProxy* slc) -> double {
+    int ret = 0;
+    for(const auto& pfp: slc->reco.pfp){
+      if(pfp.trk.truth.p.interaction_id==-1) ret++;
+    }
+    return ret;
+  });
+
+  // - Test
+  const Var SliceTestVar([](const caf::SRSliceProxy* slc) -> double {
+/*
+    std::cout << "[JSKIMDEBUG][cutIsQELike] called" << std::endl;
+    printf("- genie_mode: %d\n",slc->truth.genie_mode.GetValue());
+    int n_proton=0;
+    int n_neutron=0;
+    int n_pip=0;
+    int n_pim=0;
+    int n_pi0=0;
+    for(unsigned i=0; i<slc->truth.ghepptl.size(); i++){
+      const auto& ghepptl = slc->truth.ghepptl.at(i);
+      if(ghepptl.gstatus!=1) continue;
+      const int& pdg = ghepptl.pdg;
+      if( pdg==2212 ) n_proton++;
+      else if( pdg==2112 ) n_neutron++;
+      else if( pdg==211 ) n_pip++;
+      else if( pdg==-211 ) n_pim++;
+      else if( pdg==111 ) n_pi0++;
+      else{
+
+      }
+
+    } // END ghep loop
+
+    printf("(p, n, pi+, pi-, pi0) = (%d, %d, %d, %d, %d)\n", n_proton, n_neutron, n_pip, n_pim, n_pi0);
+*/
+
+    std::cout << "[JSKIMDEBUG][cutIsQELike] called" << std::endl;
+    printf("- genie_mode: %d\n",slc->truth.genie_mode.GetValue());
+    int n_muon=0;
+    int n_proton=0;
+    int n_neutron=0;
+    int n_pip=0;
+    int n_pim=0;
+    int n_pi0=0;
+
+    for(const auto& prm: slc->truth.prim){
+      const int pdg = prm.pdg;
+      const int apdg = abs(pdg);
+      if(apdg==13) n_muon++;
+
+      if( pdg==2212 ) n_proton++;
+      else if( pdg==2112 ) n_neutron++;
+      else if( pdg==211 ) n_pip++;
+      else if( pdg==-211 ) n_pim++;
+      else if( pdg==111 ) n_pi0++;
+
+    } // END prim loop
+
+    printf("(mu, p, n, pi+, pi-, pi0) = (%d, %d, %d, %d, %d, %d)\n", n_muon, n_proton, n_neutron, n_pip, n_pim, n_pi0);
+
+
+    return 0;
+  });
+
+  // - For trigger eff study
+  const SpillVar NuMuSliceLongestTrackLenForTriggerEff([](const caf::SRSpillProxy *sr) -> double {
+
+    int nNuMuCCSlice = 0;
+    // Require a single NuMuCC matched slice
+    for(std::size_t i(0); i < sr->slc.size(); ++i){
+      const auto& slc = sr->slc.at(i);
+
+      // NuMuCC matched slice
+      bool isNuMu = kIsNuSlice(&slc) && ( slc.truth.pdg == 14 || slc.truth.pdg == -14 );
+      bool isCC = kIsNuSlice(&slc) && slc.truth.iscc;
+      bool isNuMuCC = isNuMu && isCC;
+      if(!isNuMuCC) continue;
+      nNuMuCCSlice += 1;
+
+      if(nNuMuCCSlice==2) return -999.;
+      else return LongestTrackLength(&slc);
+
+    } // END loop slice
+
+    return -999.;
+
+  });
+  const SpillVar InTimeCosmicSliceLongestTrackLenForTriggerEff([](const caf::SRSpillProxy *sr) -> double {
+
+    int nIntimeCosmicMuSlice = 0;
+    // Require a single NuMuCC matched slice
+    for(std::size_t i(0); i < sr->slc.size(); ++i){
+      const auto& slc = sr->slc.at(i);
+
+      int ltidx = LongestTrackIndex(&slc);
+      if(ltidx<0) continue;
+
+      const auto& trk = slc.reco.pfp.at(ltidx).trk;
+      bool isCosmicMatch = (trk.truth.p.interaction_id == -1);
+      if(!isCosmicMatch) continue;
+
+      bool isInTime = (0.1<trk.truth.p.genT) && (trk.truth.p.genT<9.5);
+      if(!isInTime) continue;
+
+      nIntimeCosmicMuSlice += 1;
+
+      if(nIntimeCosmicMuSlice==2) return -999.;
+      else return trk.len;
+
+    } // END loop slice
+
+    return -999.;
+
+  });
+
 }

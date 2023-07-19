@@ -2,6 +2,9 @@
 
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Contants.h"
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Variables.h"
+
+#include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_TruthMatch_Variables.h"
+
 #include "sbnana/SBNAna/Vars/Vars.h"
 #include "sbnana/CAFAna/Core/Cut.h"
 #include "sbnana/CAFAna/Core/MultiVar.h"
@@ -14,9 +17,13 @@ namespace ICARUSNumuXsec{
 
 namespace TwoTrack{
 
+  // Muon
   extern const Var MuonTrackIndex;
   extern const Var MuonTrackLength;
   extern const Var MuonTrackP;
+  extern const Var MuonTrackDirX;
+  extern const Var MuonTrackDirY;
+  extern const Var MuonTrackDirZ;
   extern const Var MuonTrackNuMICosineTheta;
   extern const Var MuonTrackNuMIToVtxCosineTheta;
   // truth match
@@ -24,23 +31,59 @@ namespace TwoTrack{
   extern const Var MuonTrackTruthP;
   extern const Var MuonTrackTruthNuMICosineTheta;
 
+  // Proton
   extern const Var ProtonTrackIndex;
   extern const Var ProtonTrackLength;
   extern const Var ProtonTrackP;
+  extern const Var ProtonTrackDirX;
+  extern const Var ProtonTrackDirY;
+  extern const Var ProtonTrackDirZ;
   extern const Var ProtonTrackNuMICosineTheta;
   extern const Var ProtonTrackNuMIToVtxCosineTheta;
+  extern const Var ProtonTrackNHitsCollection;
+  extern const Var ProtonTrackChi2MuonCollection;
+  extern const Var ProtonTrackChi2ProtonCollection;
   // truth match
   extern const Var ProtonTrackTruthLength;
   extern const Var ProtonTrackTruthP;
   extern const Var ProtonTrackTruthNuMICosineTheta;
 
+  // Muon+Proton
   extern const Var MuonProtonCosineTheta;
 
+  namespace TKI{
+    extern const Var deltaPT;
+    extern const Var deltaPTx;
+    extern const Var deltaPTy;
+  }
+
+  // All non-muon track indices, i.e. hadron candiates
+  extern const MultiVar NonMuonTrackIndecies;
+
+  // Charged pion
+  extern const Var ChargedPionTrackIndex;
+  // Charged pion, stopped
+  extern const Var StoppedChargedPionTrackIndex;
+  extern const Var StoppedChargedPionTrackLength;
+  extern const Var StoppedChargedPionTrackNuMICosineTheta;
+  extern const Var StoppedChargedPionTrackChi2MuonCollection;
+  extern const Var StoppedChargedPionTrackChi2ProtonCollection;
+  // Charged pion, inelastic
+  extern const Var InelasticChargedPionTrackIndex;
+  extern const Var InelasticChargedPionTrackLength;
+  extern const Var InelasticChargedPionTrackNuMICosineTheta;
+  extern const Var InelasticChargedPionTrackChi2MIPCollection;
+
   namespace Aux{
+
+    extern const SpillMultiVar TestSpillVar;
+    extern const SpillMultiVar ForPrintingTruthInfos;
+
     extern const Var RelaxedMuonTrackIndex;
     extern const Var RelaxedMuonTrackLength;
     extern const Var RelaxedMuonTrackP;
     extern const Var RelaxedMuonTrackNuMICosineTheta;
+    extern const Var RelaxedMuonTrackPosAbsX;
     extern const Var RelaxedMuonTrackDirX;
     extern const Var RelaxedMuonTrackDirY;
     extern const Var RelaxedMuonTrackDirZ;
@@ -90,7 +133,27 @@ namespace TwoTrack{
     extern const Var RelaxedProtonTrackTruthStartProcess;
     extern const Var RelaxedProtonTrackTruthEndProcess;
 
+    // Pion
     extern const Var RelaxedChargedPionTrackIndex;
+    extern const Var RelaxedChargedPionTrackLength;
+    extern const Var RelaxedChargedPionTrackP;
+    extern const Var RelaxedChargedPionTrackTrackScore;
+    extern const Var RelaxedChargedPionTrackNuMICosineTheta;
+    extern const Var RelaxedChargedPionTrackCustomChi2MuonCollection;
+    extern const Var RelaxedChargedPionTrackCustomChi2ProtonCollection;
+    extern const Var RelaxedChargedPionTrackCustomChi2InelasticPionCollection;
+    extern const Var RelaxedChargedPionTrackFromVertex;
+    extern const Var RelaxedChargedPionTrackNDaughter;
+    extern const MultiVar RelaxedChargedPionTrackCollectionRR;
+    extern const MultiVar RelaxedChargedPionTrackCollectiondEdX;
+    extern const MultiVar RelaxedChargedPionTrackCollectiondQdX;
+    extern const MultiVar RelaxedChargedPionTrackCollectionFrontRR;
+    // truth match
+    extern const Var RelaxedChargedPionTrackTruthLength;
+    extern const Var RelaxedChargedPionTrackTruthP;
+    extern const Var RelaxedChargedPionTrackTruthPDG;
+    extern const Var RelaxedChargedPionTrackTruthStartProcess;
+    extern const Var RelaxedChargedPionTrackTruthEndProcess;
 
   }
 

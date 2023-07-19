@@ -9,6 +9,9 @@ namespace ICARUSNumuXsec{
 
   // SpillCut
 
+  // - Trigger emul
+  extern const SpillCut HasTrigger;
+
   // - CRTPMT matching
 
   extern const SpillCut spillcutHasValidFlash;
@@ -18,6 +21,7 @@ namespace ICARUSNumuXsec{
   extern const SpillCut spillcutHasCRTPMTDirtByID;
 
   // - Spill nu
+  extern const SpillCut SingleTruthNu;
   extern const SpillCut spillcutHasTrueMuContained;
   extern const SpillCut spillcutHasTrueMuExiting;
   // - Spill with CC neutrino
@@ -65,6 +69,12 @@ namespace ICARUSNumuXsec{
   extern const Cut cutIsNuMuNC;
   //   - NuE
   extern const Cut cutIsNuECC;
+
+  // - Topologies using ghep particle
+  extern const Cut cutIsQELike;
+
+  // - In case of neutrino overlapped with cosmic
+  //extern const Cut EFracCosmicButNu;
 
   // - FV
 

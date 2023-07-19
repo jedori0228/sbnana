@@ -20,13 +20,14 @@ parser.add_argument('-n', dest='NJobs', default=1, type=int)
 parser.add_argument('-o', dest='Outputdir', default="")
 parser.add_argument('--userflags', dest='Userflags', default="")
 parser.add_argument('--args', dest='ArgsToPass', default="")
-#parser.add_argument('--memory', dest='Memory', default="5GB")
+parser.add_argument('--memory', dest='Memory', default="2GB")
 parser.add_argument('--no_exec', action='store_true')
 parser.add_argument('--batchname',dest='BatchName', default="")
 parser.add_argument('--lifetime',dest='Lifetime',default="1h")
 parser.add_argument('--server',dest='Server',default="")
 parser.add_argument('--syst',action='store_true')
 parser.add_argument('--verbos',dest="Verbos",default="INFO")
+parser.add_argument('--extra_lines',dest="ExtraLines",default="")
 args = parser.parse_args()
 
 logger = Logger.Logger("create-batch", args.Verbos)
@@ -129,10 +130,6 @@ MasterJobDir += '__'+HOSTNAME+'/'
 ## Copy libray
 
 logger.LOG("INFO", "Creating MasterJobDir: %s"%(MasterJobDir))
-#os.system('mkdir -p '+MasterJobDir+'/lib/')
-#logger.LOG("INFO", "Copying local.tar to MasterJobDir")
-#os.system('ifdh cp '+gridLibDir+'/local.tar '+MasterJobDir+'/lib/local.tar')
-#os.system('cp '+gridLibDir+'/local.tar '+MasterJobDir+'/lib/')
 
 ## Set Output directory
 ## if args.Outputdir is not set, go to default setting
@@ -145,7 +142,6 @@ if args.Outputdir=="":
 
 logger.LOG("INFO", "Creating FinalOutputPath: %s"%(FinalOutputPath))
 os.system('mkdir -p %s'%(FinalOutputPath))
-#os.system('chmod 777 -R %s'%(FinalOutputPath)) ## do we need this?
 
 ## Loop over samples
 
@@ -153,6 +149,8 @@ gridJobInfos = []
 baseRunDirs = []
 SampleFinishedForEachSample = []
 PostJobFinishedForEachSample = []
+
+logger.LOG("INFO", "Looping over input samples..")
 
 for InputSample in InputSamples:
 
@@ -233,6 +231,8 @@ for InputSample in InputSamples:
   SubmitOutput.write('outputname = %s.root\n'%(outputname))
   FileRangesForEachSample.append(FileRanges)
 
+  logger.LOG("INFO", "Writing cafe scripts for each nodes")
+
   ## Write cafe script for each job
   for it_job in range(0,len(FileRanges)):
 
@@ -292,9 +292,28 @@ void run_%d(){
   m.FillMetaData = true;
   m.IsData = isDataInput;
 
-  m.initialize();
+  if(isDataInput){
+    intt.UseGHepRecord = false;
+  }
+  //TODO
+  intt.UseGHepRecord = false;
 '''%(ssDefLines, esDefLines,InputSample))
+
+
+    if args.ExtraLines!="":
+      if it_job==0:
+        logger.LOG("INFO", "Adding extra lines to cafe script from %s:"%(args.ExtraLines))
+
+      lines_extralines = open(args.ExtraLines).readlines()
+      for line_extralines in lines_extralines:
+        if it_job==0:
+          logger.LOG("INFO", "%s"%(line_extralines.strip('\n')))
+        cafeScriptFile.write(line_extralines)
+
+    cafeScriptFile.write('  m.initialize();\n')
     if args.syst:
+      if it_job==0:
+        logger.LOG("INFO", "Adding systematics")
       cafeScriptFile.write('  m.setSystematicWeights();\n')
 
     cafeScriptFile.write('''  for(unsigned int is=0; is<baseSampleNames.size(); is++){
@@ -330,6 +349,8 @@ void run_%d(){
 
     cafeScriptFile.close()  
 
+  logger.LOG("INFO", "Writing grid executable")
+
   ## Now Write executable
   executable_filename = args.Analyzer+'_%s_Run%s'%(DataStream,DataRunNum) if IsDATA else args.Analyzer+'_'+InputSample
   executable_file = open(base_rundir+'/'+executable_filename+'.sh','w')
@@ -360,7 +381,7 @@ echo "@@ Creating lib dir and go there"
 mkdir lib; cd lib
 echo "@@ Copying local.tar from %s"
 ifdh cp %s/local.tar ./
-tar -xvf local.tar
+tar -xf local.tar
 export MRB_BUILDDIR=$(pwd)
 export MRB_PROJECT="larsoft"
 export MRB_PROJECT_VERSION=${%s}
@@ -411,10 +432,11 @@ echo "@@ Done!"
   submitcmd += '''--tar_file_name "dropbox://$(pwd)/ToGrid.tar" \\\n'''
   submitcmd += '''--email-to jae.sung.kim.3426@gmail.com \\\n'''
   #submitcmd += '''--expected-lifetime %s \\\n'''%(args.Lifetime)
-  #submitcmd += '''--memory %s \\\n'''%(args.Memory)
+  submitcmd += '''--memory %s \\\n'''%(args.Memory)
   submitcmd += '''-N %d \\\n'''%(NJobs)
   if args.Server!="":
     submitcmd += '''--jobsub-server %s \\\n'''%(args.Server)
+  #submitcmd += '''--skip-check=rcds \\\n'''
   submitcmd += '''"file://$(pwd)/%s.sh"'''%(executable_filename)
 
   SubmitOutput.write("## Submit command :\n")
@@ -427,6 +449,9 @@ echo "@@ Done!"
   if not args.no_exec:
     cwd = os.getcwd()
     os.chdir(base_rundir)
+
+    logger.LOG("INFO", "Submitting...")
+
     os.system(submitcmd+' &> submitlog.log')
     os.chdir(cwd)
 

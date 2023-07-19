@@ -27,7 +27,7 @@ bool VolumeTool::isContained(double x, double y, double z) const {
 int VolumeTool::containedCryo(double x, double y, double z) const {
 
   int out=-1;
-  //==== Cryo0
+  // Cryo0
   if( x <= 0 ){
     if ( !isnan(x) &&
          ( x < fvCryo0.xmax - XMargin && x > fvCryo0.xmin + XMargin ) &&
@@ -37,7 +37,7 @@ int VolumeTool::containedCryo(double x, double y, double z) const {
          ( z > fvCryo0.zmin + ZMarginUp && z < fvCryo0.zmax - ZMarginDown )
        ) out = 0;
   }
-  //==== Cryo1
+  // Cryo1
   else{
     if ( !isnan(x) &&
          ( x > fvCryo1.xmin + XMargin && x < fvCryo1.xmax - XMargin ) &&
@@ -63,9 +63,41 @@ int VolumeTool::TPCIndex(double x, double y, double z) const {
 
 }
 
-//==== For a given truth particle, find the reco object
-//====   Track : return the longest matched track
-int ICARUSNumuXsec::GetMatchedRecoTrackIndex(const caf::SRSliceProxy* slc, int truth_idx){
+double VolumeTool::GetTotalVolume() const {
+
+  double vol0 = (fvCryo0.xmax-fvCryo0.xmin) * (fvCryo0.ymax-fvCryo0.ymin) * (fvCryo0.zmax-fvCryo0.zmin);
+  double vol1 = (fvCryo1.xmax-fvCryo1.xmin) * (fvCryo1.ymax-fvCryo1.ymin) * (fvCryo1.zmax-fvCryo1.zmin);
+
+  return vol0+vol1;
+
+}
+
+// Printing
+void ICARUSNumuXsec::PrintPrimaries(const caf::SRSliceProxy* slc){
+
+  std::cout << "[PrintPrimaries] called" << std::endl;
+
+  for(unsigned int i_prim=0; i_prim<slc->truth.prim.size(); ++i_prim){
+
+    const auto& prim = slc->truth.prim[i_prim];
+    printf("  - %d-th prim\n",i_prim);
+    printf("    - G4ID = %d\n", prim.G4ID.GetValue());
+    printf("    - pdg = %d\n", prim.pdg.GetValue());
+    printf("    - Parent ID = %d\n", prim.parent.GetValue());
+    printf("    - start = (%1.2f, %1.2f, %1.2f)\n", prim.start.x.GetValue(), prim.start.y.GetValue(), prim.start.z.GetValue());
+    printf("    - end = (%1.2f, %1.2f, %1.2f)\n", prim.end.x.GetValue(), prim.end.y.GetValue(), prim.end.z.GetValue());
+    const float dist = std::hypot(prim.end.x - prim.start.x, prim.end.y - prim.start.y, prim.end.z - prim.start.z);
+    printf("    - |end-start| = %1.2f\n", dist);
+    printf("    - start_process = %d\n", prim.start_process.GetValue());
+    printf("    - end_process = %d\n", prim.end_process.GetValue());
+
+  }
+
+}
+
+// For a given truth particle, find the reco object
+//   Track : return the longest matched track
+int ICARUSNumuXsec::GetMatchedRecoTrackIndex(const caf::SRSliceProxy* slc, int truth_idx, double scorecut){
 
   if(truth_idx>=0){
 
@@ -73,7 +105,7 @@ int ICARUSNumuXsec::GetMatchedRecoTrackIndex(const caf::SRSliceProxy* slc, int t
     double LMax(-999.);
     for(std::size_t i(0); i < slc->reco.pfp.size(); ++i){
       const auto& pfp = slc->reco.pfp.at(i);
-      if(pfp.trackScore<0.5) continue;
+      if(pfp.trackScore<scorecut) continue;
       const auto& trk = pfp.trk;
       if( trk.truth.p.pdg==slc->truth.prim.at(truth_idx).pdg && trk.truth.p.G4ID==slc->truth.prim.at(truth_idx).G4ID ){
         if(trk.len > LMax){
@@ -90,15 +122,15 @@ int ICARUSNumuXsec::GetMatchedRecoTrackIndex(const caf::SRSliceProxy* slc, int t
 
 }
 
-//====   Shower : return (TODO energetic?) shower
-int ICARUSNumuXsec::GetMatchedRecoShowerIndex(const caf::SRSliceProxy* slc, int truth_idx){
+//   Shower : return (TODO energetic?) shower
+int ICARUSNumuXsec::GetMatchedRecoShowerIndex(const caf::SRSliceProxy* slc, int truth_idx, double scorecut){
 
   if(truth_idx>=0){
 
     int PTrackInd(-999);
     for(std::size_t i(0); i < slc->reco.pfp.size(); ++i){
       const auto& pfp = slc->reco.pfp.at(i);
-      if(pfp.trackScore>=0.5) continue;
+      if(pfp.trackScore>=scorecut) continue;
       const auto& shw = pfp.shw;
       if( shw.truth.p.pdg==slc->truth.prim.at(truth_idx).pdg && shw.truth.p.G4ID==slc->truth.prim.at(truth_idx).G4ID ){
         PTrackInd = i;
@@ -168,9 +200,75 @@ NuMICoordinateTool& NuMICoordinateTool::Instance(){
   return nct;
 }
 
+NuMIPPFXWeightTool::NuMIPPFXWeightTool(){
+
+  // test
+
+  const std::string fname = "root://fndcadoor.fnal.gov:1094/pnfs/fnal.gov/usr/icarus/persistent/users/jskim/NuMINumuXSec/Flux/2023-05-16_out_450.37_7991.98_79512.66_QEL11.root";
+  //const std::string fname = "root://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/icarus/resilient/users/jskim/NuMINumuXSec/v09_69_01/Flux/2023-05-16_out_450.37_7991.98_79512.66_QEL11.root";
+  //const std::string fname = "/pnfs/icarus/persistent/users/jskim/NuMINumuXSec/Flux/2023-05-16_out_450.37_7991.98_79512.66_QEL11.root";
+  std::cout << "[NuMIPPFXWeightTool::NuMIPPFXWeightTool] Reading root file: " << fname << std::endl;
+  TFile *f_ppfx = TFile::Open(fname.c_str());
+
+  if(f_ppfx->IsZombie()){
+    std::cout << "NuMIPPFXWeightTool: Failed to open " << fname << std::endl;
+    std::abort();
+  }
+
+  std::cout << "[NuMIPPFXWeightTool::NuMIPPFXWeightTool] Filling in fWeight" << std::endl;
+
+  for(int hcIdx: {0, 1}){
+    for(int flavIdx: {0, 1}){
+      for(int signIdx: {0, 1}){
+        std::string      hName = "ppfx_flux_weights/hweights_";
+        if(hcIdx == 0)   hName += "fhc_"; else hName += "rhc_";
+        if(flavIdx == 0) hName += "nue";  else hName += "numu";
+        if(signIdx == 1) hName += "bar";
+
+        TH1* h_ppfx = (TH1*)f_ppfx->Get( hName.c_str() );
+        if(!h_ppfx){
+          std::cout << "NuMIPPFXWeightTool: failed to find " << hName << " in " << f_ppfx->GetName() << std::endl;
+          std::abort();
+        }
+        this->fWeight[hcIdx][flavIdx][signIdx] = h_ppfx;
+      }
+    }
+  }
+
+  std::cout << "[NuMIPPFXWeightTool::NuMIPPFXWeightTool] Done!" << std::endl;
+
+}
+
+NuMIPPFXWeightTool& NuMIPPFXWeightTool::Instance(){
+  static NuMIPPFXWeightTool nppfxwt;
+  return nppfxwt;
+}
+
+double NuMIPPFXWeightTool::GetWeight(const caf::SRSliceProxy* slc) const {
+
+  if ( slc->truth.index < 0 || abs(slc->truth.initpdg) == 16 ) return 1.0;
+
+  if ( !fWeight[0][0][0] ) {
+    std::cout << "Trying to access un-available weight array..." << std::endl;
+    std::abort();
+  }
+
+  unsigned int hcIdx = 0; // assume always FHC for now...
+  unsigned int flavIdx = ( abs(slc->truth.initpdg) == 12 ) ? 0 : 1;
+  unsigned int signIdx = ( slc->truth.initpdg > 0 ) ? 0 : 1;
+
+  TH1* h = fWeight[hcIdx][flavIdx][signIdx];
+  assert(h);
+
+  const int bin = h->FindBin( slc->truth.E );
+  if(bin == 0 || bin == h->GetNbinsX()+1) return 1.0;
+  return h->GetBinContent(bin);
+
+}
+
 dEdXTemplateTool::dEdXTemplateTool(){
 
-  std::cout << "[dEdXTemplateTool::dEdXTemplateTool] Setting up.." << std::endl;
+  std::cout << "[dEdXTemplateTool::dEdXTemplateTool] called" << std::endl;
 
   cet::search_path sp("FW_SEARCH_PATH");
 
@@ -178,11 +276,15 @@ dEdXTemplateTool::dEdXTemplateTool(){
 
   sp.find_file(fTemplateFile, fROOTfile);
 
+  std::cout << "[dEdXTemplateTool::dEdXTemplateTool] Template found from " << fROOTfile << std::endl;
+
   TFile *file = TFile::Open(fROOTfile.c_str());
   dedx_range_pro = (TProfile*)file->Get("dedx_range_pro");
   dedx_range_ka  = (TProfile*)file->Get("dedx_range_ka");
   dedx_range_pi  = (TProfile*)file->Get("dedx_range_pi");
   dedx_range_mu  = (TProfile*)file->Get("dedx_range_mu");
+
+  std::cout << "[dEdXTemplateTool::dEdXTemplateTool] Done!" << std::endl;
 
 }
 
@@ -300,6 +402,39 @@ double dEdXTemplateTool::CalculateChi2(const caf::Proxy<caf::SRTrackCalo>& calo,
 
 }
 
+double dEdXTemplateTool::CalculateInelasticPionChi2(const caf::Proxy<caf::SRTrackCalo>& calo, int ptlType) const {
+
+  int npt = 0;
+  double chi2 = 0;
+  for(unsigned i = 0; i < calo.points.size(); ++i) { //hits
+    const auto& pt = calo.points[i];
+    if (i == 0 || i == calo.points.size() - 1) continue;
+
+    if( pt.rr>=26. ) continue;
+    //if( pt.rr<=3. ) continue;
+
+    static double dedx = 1.8814277274698800;
+    double dedx_err = 0.3903743442373010;
+
+    bool UseThisPoint = (dedx>0.5) && (dedx_err>0);
+    //bool UseThisPoint = (dedx>0.) && (dedx_err>0);
+
+    if(UseThisPoint){
+      double errdedx = 0.04231 + 0.0001783 * pt.dedx * pt.dedx; //resolution on dE/dx
+      errdedx *= pt.dedx;
+      chi2 += pow( (pt.dedx-dedx)/std::sqrt( pow(dedx_err, 2) + pow(errdedx, 2) ), 2);
+      npt++;
+    }
+
+  }
+  if(npt){
+    chi2 /= npt;
+  }
+
+  return chi2;
+
+}
+
 dEdXTemplateTool& dEdXTemplateTool::Instance(){
   static dEdXTemplateTool dedxtt;
   return dedxtt;
@@ -314,7 +449,7 @@ SterileNuTool::SterileNuTool(){
 
 double SterileNuTool::GetOscProb(double LoE, int i, int f) const{
 
-  //==== flav : 0/1/2 = e/m/t
+  // flav : 0/1/2 = e/m/t
 
   return 1. - (sin2th*sin2th) * pow( TMath::Sin(1.27 * m2 * LoE), 2 );
   
@@ -325,257 +460,240 @@ SterileNuTool& SterileNuTool::Instance(){
   return snt;
 }
 
-CRTPMTMatchingTool::CRTPMTMatchingTool(){
-  std::cout << "[CRTPMTMatchingTool::CRTPMTMatchingTool] called" << std::endl;
-  UseTS0 = false;
-  Debug = false;
+ParticleTool::ParticleTool(){
 }
 
-CRTPMTMatchingTool& CRTPMTMatchingTool::Instance(){
-  static CRTPMTMatchingTool cpmt;
-  return cpmt;
+ParticleTool& ParticleTool::Instance(){
+  static ParticleTool ptlt;
+  return ptlt;
 }
 
-void CRTPMTMatchingTool::SetGateType(GateType gt) const {
-  GT = gt;
-  if(abs(GT)==1){
-    timecut_min = 0.;
-    timecut_max = 2.2;
-  }
-  else if(abs(GT)==2){
-    timecut_min = 0.;
-    timecut_max = 10.1;
-  }
-  else{
-    std::cout << "[CRTPMTMatchingTool] Wrong gate type = " << gt << std::endl;
-    abort();
-  }
+double ParticleTool::GetMass(int pdg) const {
 
-  std::cout << "[CRTPMTMatchingTool::SetGateType] GT = " << GT << ", timecut_min = " << timecut_min << ", timecut_max = " << timecut_max << std::endl;
+  const int apdg = std::abs(pdg);
+  if(apdg==13) return M_MUON;
+  else if(apdg==211) return M_CHARGEDPION;
+  else if(apdg==111) return M_PIZERO;
+  else if(apdg==2212) return M_PROTON;
+  else if(apdg==2112) return M_NEUTRON;
+  else return 0.;
 
 }
 
-void CRTPMTMatchingTool::SetInTimeRange(double t_min, double t_max) const {
-  timecut_min = t_min;
-  timecut_max = t_max;
-  std::cout << "[CRTPMTMatchingTool::SetInTimeRange] timecut_min = " << timecut_min << ", timecut_max = " << timecut_max << std::endl;
-}
+InteractionTool::InteractionTool(){
 
-bool CRTPMTMatchingTool::IsInTime(double t_gate) const{
-  //std::cout << "timecut_min = " << timecut_min << ", t_gate = " << t_gate << ", timecut_max = " << timecut_max << std::endl;
-  return ( timecut_min<=t_gate && t_gate<=timecut_max );
-}
-
-// mode = 0 : Top only
-// mode = 1 : Side only
-// mode = 2 : Top+Side
-std::vector<int> CRTPMTMatchingTool::GetMatchedCRTHitIndex(
-  double opt,
-  const caf::Proxy<std::vector<caf::SRCRTHit> >& crt_hits,
-  int mode) const{
-
-  static double interval = 0.1;
-
-  //double mindiff = std::numeric_limits<double>::max();
-  std::vector<int> rets = {};
-  for(size_t i=0; i<crt_hits.size(); i++){
-    const auto& hit = crt_hits.at(i);
-    bool IsTopCRT = hit.plane>=30 && hit.plane<=39;
-    bool IsSideCRT = hit.plane>=40 && hit.plane<=49;
-    bool crtSelection = false;
-    if(mode==0) crtSelection = IsTopCRT;
-    if(mode==1) crtSelection = IsSideCRT;
-    if(mode==2) crtSelection = IsTopCRT||IsSideCRT;
-    if( crtSelection ){
-      double crtt = UseTS0 ? hit.t0 : hit.t1;
-      double this_diff = crtt-opt;
-      if(abs(this_diff)<interval) rets.push_back(i);
-/*
-      if(fabs(this_diff)<fabs(mindiff)){
-        mindiff = this_diff;
-        ret = i;
-      }
-*/
-    }
-  }
-
-  return rets;
+  ClearIndices();
+  UseGHepRecord = true;
 
 }
+InteractionTool& InteractionTool::Instance(){
+  static InteractionTool intt;
+  return intt;
+}
 
-int CRTPMTMatchingTool::GetMatchID(
-  double opt,
-  const caf::Proxy<std::vector<caf::SRCRTHit> >& crt_hits,
-  int mode) const{
+void InteractionTool::ClearIndices() const {
+  MuonIndices.clear();
+  ProtonIndices.clear();
+  NeutronIndices.clear();
+  PipIndices.clear();
+  PimIndices.clear();
+  Pi0Indices.clear();
+}
 
-  int hasCRTHit = -1;
-  static double interval = 0.1;
-  int TopEn = 0, TopEx = 0, SideEn = 0, SideEx = 0;
-  int SideSouthEn = 0;
-  int SideEastEn = 0;
-  for(size_t i=0; i<crt_hits.size(); i++){
-    const auto& hit = crt_hits.at(i);
-    double crtt = UseTS0 ? hit.t0 : hit.t1;
-    double tof = crtt - opt;
+InteractionTool::NParticles InteractionTool::GetNParticles(const caf::SRSliceProxy* slc) const {
 
-    if(tof<0 && abs(tof)<interval){
-      if(hit.plane >= 40 && hit.plane<=49){
-        SideEn++;
-        if(hit.plane==46){
-          SideSouthEn++;
-        }
-        if(hit.plane>=43&&hit.plane<=45){
-          SideEastEn++;
-        }
+  ClearIndices();
+
+  InteractionTool::NParticles nptls;
+
+  if(UseGHepRecord){
+
+    // using ghep
+    int counter = -1;
+    for(const auto& ghepptl: slc->truth.ghepptl){
+      counter += 1;
+      if(ghepptl.gstatus!=1) continue;
+
+      const int pdg = ghepptl.pdg;
+      const int apdg = abs(pdg);
+      if(apdg==13){
+        nptls.NMuon++;
+        MuonIndices.push_back(counter);
       }
-      else if(hit.plane >= 30 && hit.plane <= 39){
-        TopEn++;
+
+      if( pdg==2212 ){
+        nptls.NProton++;
+        ProtonIndices.push_back(counter);
       }
-      else{
+      else if( pdg==2112 ){
+        nptls.NNeutron++;
+        NeutronIndices.push_back(counter);
       }
-    }
-    else if(tof>=0 && abs(tof)<interval){
-      if(hit.plane >= 40 && hit.plane<=49){
-        SideEx++;
+      else if( pdg==211 ){
+        nptls.NPip++;
+        PipIndices.push_back(counter);
       }
-      else if(hit.plane >= 30 && hit.plane <= 39){
-        TopEx++;
+      else if( pdg==-211 ){
+        nptls.NPim++;
+        PimIndices.push_back(counter);
       }
-      else{
+      else if( pdg==111 ){
+        Pi0Indices.push_back(counter);
+        nptls.NPi0++;
       }
-    }
 
-  }
-
-  int OtherSideEn = SideEn - SideSouthEn - SideEastEn;
-
-  // Top+Side
-  if(mode==0){
-
-    // -- No matching
-    // hasCRTHit = -1, no matched CRT
-    // -- 0 entering, but somthing exiting cases (e.g., exiting muon from nu)
-    // hasCRTHit = 0, 0 entering, something exiting
-    // -- Top-entering cases (Cosmic)
-    // hasCRTHit = 1, 1 entering from Top CRT, nothing else
-    // hasCRTHit = 2, 1 entering from Top CRT, >=1 exiting to side
-    // -- South-entering cases (BNB or NuMI DIRT)
-    // hasCRTHit = 3, 1 entering from South-Side CRT (no East-Side entering), nothing else
-    // hasCRTHit = 4, 1 entering from South-Side CRT (no East-Side entering), exiting to somewhere
-    // -- East-entering cases (NuMI DIRT)
-    // hasCRTHit = 5, 1 entering from East-Side CRT (no South-Side entering), nothing else
-    // hasCRTHit = 6, 1 entering from Esat-Side CRT (no South-Side entering), exiting to somewhere
-    // -- Other side wall entering cases (Cosmic)
-    // hasCRTHit = 7, 1 entering from Other-Side CRT, nothing else
-    // hasCRTHit = 8, 1 entering from Other-Side CRT, exiting to somewhere
-    // -- Multiple top-entering
-    // hasCRTHit = 9, >=1 entering from Top CRT, nothing else
-    // hasCRTHit = 10, >=1 entering from Top CRT, >=1 exiting to side
-    // --- Top-Side entering
-    // hasCRTHit = 11, >=1 entering from Top CRT, >=1 entering from side
-    // --- TEST
-    // hasCRTHit = 12, >=1 entering top and >=1 exiting top
-
-    if(TopEn==0 && SideEn==0 && TopEx==0 && SideEx==0)
-      hasCRTHit = -1;
-
-    else if(TopEn==0 && SideEn==0 && TopEx+SideEx>=1)
-      hasCRTHit = 0;
-
-    else if(TopEn==1 && SideEn==0 && TopEx==0 && SideEx==0)
-      hasCRTHit = 1;
-    else if(TopEn==1 && SideEn==0 && TopEx==0 && SideEx>=1)
-      hasCRTHit = 2;
-
-    else if(TopEn==0 && SideSouthEn==1 && SideEastEn==0 && TopEx==0 && SideEx==0)
-      hasCRTHit = 3;
-    else if(TopEn==0 && SideSouthEn==1 && SideEastEn==0 && TopEx+SideEx>=1)
-      hasCRTHit = 4;
-
-    else if(TopEn==0 && SideEastEn==1 && SideSouthEn==0 && TopEx==0 && SideEx==0)
-      hasCRTHit = 5;
-    else if(TopEn==0 && SideEastEn==1 && SideSouthEn==0 && TopEx+SideEx>=1)
-      hasCRTHit = 6;
-
-    else if(TopEn==0 && OtherSideEn==1 && TopEx==0 && SideEx==0)
-      hasCRTHit = 7;
-    else if(TopEn==0 && OtherSideEn==1 && TopEx+SideEx>=1)
-      hasCRTHit = 8;
-
-    else if(TopEn>=1 && SideEn==0 && TopEx==0 && SideEx==0)
-      hasCRTHit = 9;
-    else if(TopEn>=1 && SideEn==0 && TopEx==0 && SideEx>=1)
-      hasCRTHit = 10;
-
-    else if(TopEn>=1 && SideEn>=1)
-      hasCRTHit = 11;
-
-    else if(TopEn>=1 && TopEx>=1)
-      hasCRTHit = 12;
-
-    else{
-      if(Debug) printf("(TopEn, TopEx, SideEn, SideEx) = (%d, %d, %d, %d)\n",TopEn, TopEx, SideEn, SideEx);
-      hasCRTHit = 13;
-    }
-
-  }
-  // Top only
-  else if(mode==1){
-
-    // hasCRTHit = 0, no matched CRT
-    // hasCRTHit = 1, One top entering (no Top-exiting)
-    // hasCRTHit = 2, One top exiting (no Top-entering)
-    // hasCRTHit = 3, Multiple top entering (no top-exiting)
-    // hasCRTHit = 4, Multiple top exiting (no top-entering)
-    // hasCRTHit = 5, All other cases; entering>=1 && exiting>=1
-
-    if(TopEn==0 && TopEx==0)
-      hasCRTHit = 0;
-    else if(TopEn==1 && TopEx==0)
-      hasCRTHit = 1;
-    else if(TopEn==0 && TopEx==1)
-      hasCRTHit = 2;
-    else if(TopEn>=1 && TopEx==0)
-      hasCRTHit = 3;
-    else if(TopEn==0 && TopEx>=1)
-      hasCRTHit = 4;
-    else
-      hasCRTHit = 5;
-
-  }
-  // side only
-  else if(mode==2){
-
-    // hasCRTHit = 0, no matched CRT
-    // hasCRTHit = 1, One side entering (no side-exiting)
-    // hasCRTHit = 2, One side exiting (no side-entering)
-    // hasCRTHit = 3, Multiple side entering (no side-exiting)
-    // hasCRTHit = 4, Multiple side exiting (no side-entering)
-    // hasCRTHit = 5, All other cases; entering>=1 && exiting>=1
-
-    if(SideEn==0 && SideEx==0)
-      hasCRTHit = 0;
-    else if(SideEn==1 && SideEx==0)
-      hasCRTHit = 1;
-    else if(SideEn==0 && SideEx==1)
-      hasCRTHit = 2;
-    else if(SideEn>=1 && SideEx==0)
-      hasCRTHit = 3;
-    else if(SideEn==0 && SideEx>=1)
-      hasCRTHit = 4;
-    else
-      hasCRTHit = 5;
+    } // END prim loop
 
   }
   else{
+    // using prim
+    int counter = -1;
+    for(const auto& prm: slc->truth.prim){
+      counter += 1;
 
+      if(prm.start_process!=0){
+        continue;
+      }
+
+      const int pdg = prm.pdg;
+      const int apdg = abs(pdg);
+      if(apdg==13){
+        nptls.NMuon++;
+        MuonIndices.push_back(counter);
+      }
+
+      if( pdg==2212 ){
+        nptls.NProton++;
+        ProtonIndices.push_back(counter);
+      }
+      else if( pdg==2112 ){
+        nptls.NNeutron++;
+        NeutronIndices.push_back(counter);
+      }
+      else if( pdg==211 ){
+        nptls.NPip++;
+        PipIndices.push_back(counter);
+      }
+      else if( pdg==-211 ){
+        nptls.NPim++;
+        PimIndices.push_back(counter);
+      }
+      else if( pdg==111 ){
+        Pi0Indices.push_back(counter);
+        nptls.NPi0++;
+      }
+
+    } // END prim loop
   }
 
-  return hasCRTHit;
+  return nptls;
 
 }
 
-bool CRTPMTMatchingTool::IsNegativeTOF(double timediff) const{
-  return (timediff>-0.1 && timediff<0.);
+std::vector<std::string> ICARUSNumuXsec::GetGENIEMultisigmaKnobNames(){
+
+  return {
+"ZNormCCQE",
+"ZExpA1CCQE",
+"ZExpA2CCQE",
+"ZExpA3CCQE",
+"ZExpA4CCQE",
+"NormCCMEC",
+"NormNCMEC",
+"NormEMMEC",
+"DecayAngMEC",
+"FracPN_CCMEC",
+"FracDelta_CCMEC",
+"XSecShape_CCMEC",
+"MaNCEL",
+"EtaNCEL",
+"MaCCRES",
+"MvCCRES",
+"MaNCRES",
+"MvNCRES",
+"NonRESBGvpCC1pi",
+"NonRESBGvpCC2pi",
+"NonRESBGvpNC1pi",
+"NonRESBGvpNC2pi",
+"NonRESBGvnCC1pi",
+"NonRESBGvnCC2pi",
+"NonRESBGvnNC1pi",
+"NonRESBGvnNC2pi",
+"NonRESBGvbarpCC1pi",
+"NonRESBGvbarpCC2pi",
+"NonRESBGvbarpNC1pi",
+"NonRESBGvbarpNC2pi",
+"NonRESBGvbarnCC1pi",
+"NonRESBGvbarnCC2pi",
+"NonRESBGvbarnNC1pi",
+"NonRESBGvbarnNC2pi",
+"RDecBR1gamma",
+"RDecBR1eta",
+"Theta_Delta2Npi",
+"AhtBY",
+"BhtBY",
+"CV1uBY",
+"CV2uBY",
+"FormZone",
+"MFP_pi",
+"FrCEx_pi",
+"FrInel_pi",
+"FrAbs_pi",
+"FrPiProd_pi",
+"MFP_N",
+"FrCEx_N",
+"FrInel_N",
+"FrAbs_N",
+"FrPiProd_N",
+"CCQEPauliSupViaKF",
+"CCQEMomDistroFGtoSF",
+  };
+
+}
+
+std::vector<std::string> ICARUSNumuXsec::GetGENIEDependentKnobNames(){
+  return {
+"ZExpAVariationResponse",
+"NCELVariationResponse",
+"CCRESVariationResponse",
+"NCRESVariationResponse",
+"DISBYVariationResponse",
+"FSI_pi_VariationResponse",
+"FSI_N_VariationResponse",
+  };
+}
+
+std::vector<std::string> ICARUSNumuXsec::GetGENIEMultisimKnobNames(){
+
+  return {
+"ZNormCCQE",
+"ZExpAVariationResponse",
+"NCELVariationResponse",
+"CCRESVariationResponse",
+"NCRESVariationResponse",
+"NonRESBGvpCC1pi",
+"NonRESBGvpCC2pi",
+"NonRESBGvpNC1pi",
+"NonRESBGvpNC2pi",
+"NonRESBGvnCC1pi",
+"NonRESBGvnCC2pi",
+"NonRESBGvnNC1pi",
+"NonRESBGvnNC2pi",
+"NonRESBGvbarpCC1pi",
+"NonRESBGvbarpCC2pi",
+"NonRESBGvbarpNC1pi",
+"NonRESBGvbarpNC2pi",
+"NonRESBGvbarnCC1pi",
+"NonRESBGvbarnCC2pi",
+"NonRESBGvbarnNC1pi",
+"NonRESBGvbarnNC2pi",
+"RDecBR1gamma",
+"RDecBR1eta",
+"DISBYVariationResponse",
+//"FormZone",
+"FSI_pi_VariationResponse",
+"FSI_N_VariationResponse",
+  };
+
 }
 

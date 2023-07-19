@@ -3,11 +3,7 @@
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Utilities.h"
 #include "sbnana/SBNAna/CRTPMTMatching/ICARUSCRTPMTMatching_Tool.h"
 
-#define M_MUON 0.1057
-#define M_CHARGEDPION 0.13957039
-#define M_PROTON 0.938272
-#define M_NEUTRON 0.939565
-#define E_EffNuclB 0.040
+using namespace std;
 
 namespace ICARUSNumuXsec{
 
@@ -23,8 +19,11 @@ namespace ICARUSNumuXsec{
 
   static const SterileNuTool& snt = SterileNuTool::Instance();
 
-  //static const CRTPMTMatchingTool& cpmt = CRTPMTMatchingTool::Instance();
+  static const ParticleTool& ptlt = ParticleTool::Instance();
 
+  static const InteractionTool& intt = InteractionTool::Instance();
+
+  //static const NuMIPPFXWeightTool nppfxwt = NuMIPPFXWeightTool::Instance();
 
 }
 

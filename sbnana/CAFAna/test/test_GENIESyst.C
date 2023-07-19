@@ -67,7 +67,9 @@ void setAxis(TH1D* hist_up, TH1D* hist_down);
 void test_GENIESyst(){
 
   //==== Input
-  SpectrumLoader loader("/pnfs/icarus/persistent/users/jskim/mc/NUMI_Nu_Cosmics/flatcaf/v09_37_01_03p02/MultiSigmaAdded_RenamedPSet/*.root");
+  //SpectrumLoader loader("/pnfs/icarus/scratch/users/jskim/mc/NUMI_Nu_Cosmics/flatcaf/v09_68_00_01/230329_MergeMiniProd/flatcaf_0.root");
+  //SpectrumLoader loader("/pnfs/icarus/scratch/users/jskim/mc/NuMI_MC_Nu_Phase1/flatcaf/v09_72_00_03/230607_Systv2_SaveAllG4/flatcaf_0.root");
+  SpectrumLoader loader("/pnfs/icarus/scratch/users/jskim/mc/NuMI_MC_Nu_Phase1/flatcaf/v09_72_00_03/230627_Systv3_SaveAllG4_FixResBug_MECAdded_TEST/flatcaf_0.root");
 
   //==== output; where plots are saved
   TString outputPath = "./test_GENIESyst/";

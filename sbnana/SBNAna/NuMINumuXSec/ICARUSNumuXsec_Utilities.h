@@ -3,28 +3,30 @@
 #include "cetlib/search_path.h"
 
 #include "sbnana/SBNAna/Cuts/VolumeDefinitions.h"
-
 #include "sbnanaobj/StandardRecord/Proxy/SRProxy.h"
 
+#include "TH1.h"
 #include "TVector3.h"
 #include "TMatrixD.h"
 #include "TProfile.h"
 #include "TFile.h"
+
+#include <cassert>
+#include <cstdlib>
+
 #include <iostream>
+
+#define M_MUON 0.1057
+#define M_CHARGEDPION 0.13957039
+#define M_PIZERO 0.1349768
+#define M_PROTON 0.938272
+#define M_NEUTRON 0.939565
+#define M_ELECTRON 0.00051
+#define E_EffNuclB 0.040
 
 using namespace std;
 
 namespace ICARUSNumuXsec{
-
-  //==== TODO Use spill info in the future..
-  enum GateType
-  {
-    UNKNOWN = 0,
-    BNB = +1,
-    OffBeamBNB = -1,
-    NUMI = +2,
-    OffBeamNUMI = -2,
-  };
 
   class VolumeTool{
 
@@ -47,6 +49,8 @@ namespace ICARUSNumuXsec{
     int containedCryo(double x, double y, double z) const;
 
     int TPCIndex(double x, double y, double z) const;
+
+    double GetTotalVolume() const;
 
 
   }; // END Class VolumeTool
@@ -96,12 +100,15 @@ namespace ICARUSNumuXsec{
 
   }; // END TrackContained class def
 
-  //==== For a given truth particle, find the reco object
-  int GetMatchedRecoTrackIndex(const caf::SRSliceProxy* slc, int truth_idx);
-  int GetMatchedRecoShowerIndex(const caf::SRSliceProxy* slc, int truth_idx);
+  // Printing
+  void PrintPrimaries(const caf::SRSliceProxy* slc);
+
+  // For a given truth particle, find the reco object
+  int GetMatchedRecoTrackIndex(const caf::SRSliceProxy* slc, int truth_idx, double scorecut=0.5);
+  int GetMatchedRecoShowerIndex(const caf::SRSliceProxy* slc, int truth_idx, double scorecut=0.5);
   int GetMatchedRecoStubIndex(const caf::SRSliceProxy* slc, int truth_idx);
 
-  //==== Stub calib
+  // Stub calib
   double GetEnergyFromStubCharge(double q);
 
   class NuMICoordinateTool{
@@ -122,6 +129,18 @@ namespace ICARUSNumuXsec{
 
   }; // END Class NuMICoordinateTool
 
+  class NuMIPPFXWeightTool{
+
+  public:
+
+    NuMIPPFXWeightTool();
+    static NuMIPPFXWeightTool& Instance();
+    double GetWeight(const caf::SRSliceProxy* slc) const;
+
+    mutable TH1* fWeight[2][2][2]; // [fhc/rhc][nue/numu][nu/nubar]
+
+  };
+
   class dEdXTemplateTool{
 
   public:
@@ -132,6 +151,7 @@ namespace ICARUSNumuXsec{
     double GetdEdXErr(double rr, int ptlType) const;
 
     double CalculateChi2(const caf::Proxy<caf::SRTrackCalo>& calo, int ptlType) const;
+    double CalculateInelasticPionChi2(const caf::Proxy<caf::SRTrackCalo>& calo, int ptlType) const;
 
     static dEdXTemplateTool& Instance();
 
@@ -160,36 +180,53 @@ namespace ICARUSNumuXsec{
 
   };
 
-  class CRTPMTMatchingTool{
+  class ParticleTool{
+
+  public:
+
+    ParticleTool();
+
+    static ParticleTool& Instance();
+    double GetMass(int pdg) const;
+
+  };
+
+  class InteractionTool{
 
     public:
 
-    CRTPMTMatchingTool();
+      struct NParticles{
+        int NMuon = 0;
+        int NProton = 0;
+        int NNeutron = 0;
+        int NPip = 0;
+        int NPim = 0;
+        int NPi0 = 0;
+      };
 
-    static CRTPMTMatchingTool& Instance();
+      InteractionTool();
 
-    void SetGateType(GateType gt) const;
-    void SetInTimeRange(double t_min, double t_max) const;
-    bool IsInTime(double t_gate) const;
-    std::vector<int> GetMatchedCRTHitIndex(
-      double opt,
-      const caf::Proxy<std::vector<caf::SRCRTHit> >& crt_hits,
-      int mode
-    ) const;
-    int GetMatchID(
-      double opt,
-      const caf::Proxy<std::vector<caf::SRCRTHit> >& crt_hits,
-      int mode=0
-    ) const;
+      static InteractionTool& Instance();
 
-    bool IsNegativeTOF(double timediff) const;
+      mutable bool UseGHepRecord;
 
-    mutable bool Debug;
+      mutable vector<int> MuonIndices;
+      mutable vector<int> ProtonIndices;
+      mutable vector<int> NeutronIndices;
+      mutable vector<int> PipIndices;
+      mutable vector<int> PimIndices;
+      mutable vector<int> Pi0Indices;
+      void ClearIndices() const;
 
-    mutable bool UseTS0;
-    mutable GateType GT;
-    mutable double timecut_min, timecut_max;
+      bool MuonContained() const;
+
+
+      NParticles GetNParticles(const caf::SRSliceProxy* slc) const;
 
   };
+
+  std::vector<std::string> GetGENIEMultisigmaKnobNames();
+  std::vector<std::string> GetGENIEDependentKnobNames();
+  std::vector<std::string> GetGENIEMultisimKnobNames();
 
 }

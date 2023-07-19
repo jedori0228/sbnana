@@ -25,14 +25,15 @@
 // NuMINumuXSec
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Contants.h"
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Cuts.h"
-//#include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Weight.h"
-//#include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Systematics.h"
+#include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Weights.h"
 
 // ThreeTrack
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_TwoTrack_Cuts.h"
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_ThreeTrack_Cuts.h"
 
-#include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_TruthMatch_Variables.h"
+#include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_TruthMatch_Cuts.h"
+
+#include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_MichelStudy.h"
 
 using namespace ana;
 using namespace std;
@@ -66,19 +67,29 @@ namespace ICARUSNumuXsec{
     void TwoTrackAnalysis(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     void TwoTrackTruthMatching(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     void ThreeTrackAnalysis(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
-    // - 230223_WWTPCFieldTest
-    void WWTPCFieldTest(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    // - 230418_StubStudy
+    void StubStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    // - 230517_TriggerEffStudy
+    void TriggerEffStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    // - 230524_MichelStudy
+    void MichelStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
     void Test(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
     void saveHistograms();
 
     // Systematic weights
+    std::string SystProviderPrefix;
     void setSystematicWeights();
     std::vector<const ISyst*> IAllSysts; // TODO update later
     std::vector<const ISyst*> IGENIESysts;
-    std::vector< vector<Var> > vec_UniverseWeightsForEachGENIESource; // For EnsembleSpectrum
+
+    std::map<std::string, std::vector<Var>> map_DepDialName_to_UniverseWeights;
+    std::vector<Var> vec_UniverseWeightsForEachGENIESource; // For EnsembleSpectrum
+
+    int NNuMIFluxPCA;
     std::vector<const ISyst*> IFluxSysts;
+
     std::vector<const ISyst*> IDetectorSysts;
 
     ~HistoProducer();
@@ -105,12 +116,31 @@ namespace ICARUSNumuXsec{
     void AddUpDownSystematic(SpectrumLoader& loader, const HistAxis& ax, SpillCut spillCut, Cut cut, TString currentCutName, const ISyst* s);
     void AddUpDownSystematic(SpectrumLoader& loader, const HistAxis& axX, const HistAxis& axY, SpillCut spillCut, Cut cut, TString currentCutName, const ISyst* s);
 
+    // slice
+    template<class T>
+    void FillCVSpectrum(SpectrumLoader& loader, const std::string& label, const T& var, const Binning& binning, SpillCut spillCut, Cut cut, bool ForceFill=false);
+    template<class T>
+    void FillCVSpectrum(SpectrumLoader& loader, const std::string& label, const T& var1, const Binning& binning1, const T& var2, const Binning& binning2, SpillCut spillCut, Cut cut, bool ForceFill=false);
+    // spill
+    template<class T>
+    void FillCVSpectrum(SpectrumLoader& loader, const std::string& label, const T& spillvar, const Binning& binning, SpillCut spillCut, bool ForceFill=false);
+    template<class T>
+    void FillCVSpectrum(SpectrumLoader& loader, const std::string& label, const T& spillvar1, const Binning& binning1, const T& spillvar2, const Binning& binning2, SpillCut spillCut, bool ForceFill=false);
 
-    void FillSpectrum(SpectrumLoader& loader, const std::string& label, const Var& var, const Binning& binning, SpillCut spillCut, Cut cut);
+    void FillSystSpectrum(SpectrumLoader& loader, const std::string& label, const Var& var, const Binning& binning, SpillCut spillCut, Cut cut);
+    void FillCVandSystSpectrum(SpectrumLoader& loader, const std::string& label, const Var& var, const Binning& binning, SpillCut spillCut, Cut cut);
+
+    // weights
+    bool ApplyNuMIPPFXCVWeight;
+    const Var GetGlobalWeight();
 
     // booleans
     bool IsData;
     bool FillMetaData;
+    bool FillSystematics;
+    bool FillGENIESyst;
+    bool FillFlux;
+
 
   private:
 
