@@ -1308,10 +1308,21 @@ void HistoProducer::FillSystSpectrum(SpectrumLoader& loader, const std::string& 
 
 }
 
+void HistoProducer::FillSystSpectrum(SpectrumLoader& loader, const std::string& label, const SpillVar& var, const Binning& binning, SpillCut spillCut){
+
+}
+
 void HistoProducer::FillCVandSystSpectrum(SpectrumLoader& loader, const std::string& label, const Var& var, const Binning& binning, SpillCut spillCut, Cut cut){
 
   FillCVSpectrum(loader, label, var, binning, spillCut, cut, true);
   if(FillSystematics) FillSystSpectrum(loader, label, var, binning, spillCut, cut);
+
+}
+
+void HistoProducer::FillCVandSystSpectrum(SpectrumLoader& loader, const std::string& label, const SpillVar& var, const Binning& binning, SpillCut spillCut){
+
+  FillCVSpectrum(loader, label, var, binning, spillCut, true);
+  if(FillSystematics) FillSystSpectrum(loader, label, var, binning, spillCut);
 
 }
 

@@ -186,6 +186,15 @@ namespace ICARUSNumuXsec{
     }
     return rets;
   });
+  // Nu from spillvar
+  const SpillVar TruthFirstNuEnergy([](const caf::SRSpillProxy *sr) -> double {
+    if(sr->mc.nu.size()==0){
+      return -999.;
+    }
+    else{
+      return sr->mc.nu[0].E;
+    }
+  });
 
   // Var
   // - GENIE interaction code

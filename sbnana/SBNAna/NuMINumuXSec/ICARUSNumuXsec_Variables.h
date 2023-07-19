@@ -38,6 +38,8 @@ namespace ICARUSNumuXsec{
   // - PMT-CRT matching extra
   extern const SpillMultiVar spillvarTopCRTPMTTime;
   extern const SpillMultiVar spillvarSideCRTPMTTime;
+  // Nu from spillvar
+  extern const SpillVar TruthFirstNuEnergy;
 
   // Var
   // - GENIE interaction code
