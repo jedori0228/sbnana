@@ -17,6 +17,7 @@ namespace ana
     UniverseWeight(const std::string& psetName, int univIdx);
 
     double operator()(const caf::SRSliceProxy* sr) const;
+    double operator()(const caf::SRSpillProxy* sr) const;
 
   protected:
     std::string fPSetName;
