@@ -28,6 +28,10 @@ namespace ana
   {
     return Var(UniverseWeight(psetName, univIdx));
   }
+  SpillVar GetUniverseFirstNeutrinoWeight(const std::string& psetName, double x)
+  {
+    return SpillVar(UniverseWeight(psetName, x));
+  }
 
 
   class SBNWeightSyst: public ISyst
