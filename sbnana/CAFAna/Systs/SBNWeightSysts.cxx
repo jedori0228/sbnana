@@ -55,11 +55,17 @@ namespace ana
     const caf::Proxy<std::vector<caf::SRMultiverse>>& wgts = sr->mc.nu[0].wgt;
     if(wgts.empty()) return 1;
 
-    const UniverseOracle& uo = UniverseOracle::Instance();
-    double x0;
-    unsigned int windex = uo.ClosestShiftIndex(fPSetName, fSigma, ESide::kBelow, &x0);
+    const int Nwgts = wgts[fPSetIdx].univ.size();
 
-    return wgts[fPSetIdx].univ[windex];
+    static bool once = true;
+    if(!once && fUnivIdx >= Nwgts){
+      once = false;
+      std::cout << "UniverseWeight: WARNING requesting universe " << fUnivIdx << " in parameter set " << fPSetName << " which only has size " << Nwgts << ". Will wrap-around and suppress future warnings." << std::endl;
+    }
+
+    const unsigned int unividx = fUnivIdx % Nwgts;
+
+    return wgts[fPSetIdx].univ[unividx];
   }
 
   // --------------------------------------------------------------------------
