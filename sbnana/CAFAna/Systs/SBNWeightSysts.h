@@ -29,9 +29,9 @@ namespace ana
   {
     return Var(UniverseWeight(psetName, univIdx));
   }
-  SpillVar GetUniverseFirstNeutrinoWeight(const std::string& psetName, double x)
+  SpillVar GetUniverseFirstNeutrinoWeight(const std::string& psetName, int univIdx)
   {
-    return SpillVar(UniverseWeight(psetName, x));
+    return SpillVar(UniverseWeight(psetName, univIdx));
   }
 
 
