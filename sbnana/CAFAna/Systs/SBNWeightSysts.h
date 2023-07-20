@@ -17,6 +17,7 @@ namespace ana
     UniverseWeight(const std::string& psetName, int univIdx);
 
     double operator()(const caf::SRSliceProxy* sr) const;
+    double operator()(const caf::SRSpillProxy* sr) const;
 
   protected:
     std::string fPSetName;
@@ -27,6 +28,10 @@ namespace ana
   Var GetUniverseWeight(const std::string& psetName, int univIdx)
   {
     return Var(UniverseWeight(psetName, univIdx));
+  }
+  SpillVar GetUniverseFirstNeutrinoWeight(const std::string& psetName, int univIdx)
+  {
+    return SpillVar(UniverseWeight(psetName, univIdx));
   }
 
 

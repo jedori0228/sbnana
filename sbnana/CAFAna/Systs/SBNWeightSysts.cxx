@@ -42,6 +42,31 @@ namespace ana
 
     return wgts[fPSetIdx].univ[unividx];
   }
+  double UniverseWeight::operator()(const caf::SRSpillProxy* sr) const
+  {
+    if(sr->mc.nu.size() == 0) return 1;
+
+    if(fPSetIdx == -1){
+      const UniverseOracle& uo = UniverseOracle::Instance();
+      fPSetIdx = uo.ParameterSetIndex(fPSetName);
+    }
+
+    //==== TODO now returning the weight of the "First" neutrino.. this is dumb
+    const caf::Proxy<std::vector<caf::SRMultiverse>>& wgts = sr->mc.nu[0].wgt;
+    if(wgts.empty()) return 1;
+
+    const int Nwgts = wgts[fPSetIdx].univ.size();
+
+    static bool once = true;
+    if(!once && fUnivIdx >= Nwgts){
+      once = false;
+      std::cout << "UniverseWeight: WARNING requesting universe " << fUnivIdx << " in parameter set " << fPSetName << " which only has size " << Nwgts << ". Will wrap-around and suppress future warnings." << std::endl;
+    }
+
+    const unsigned int unividx = fUnivIdx % Nwgts;
+
+    return wgts[fPSetIdx].univ[unividx];
+  }
 
   // --------------------------------------------------------------------------
   SBNWeightSyst::SBNWeightSyst(const std::string& systName)

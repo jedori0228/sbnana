@@ -44,6 +44,16 @@ namespace ana
              const SystShifts& shift = kNoShift,
              const Var& wei = kUnweighted);
 
+    Spectrum(const std::string& label, SpectrumLoaderBase& loader,
+             const Binning& bins, const Var& var,
+             const SpillCut& spillcut,
+             const Cut& cut,
+             const SystShifts& shift = kNoShift,
+             const Var& wei = kUnweighted)
+      :Spectrum(label, bins, loader, var, spillcut, cut, shift, wei)
+    {
+    }
+
     Spectrum(const std::string& label, const Binning& bins,
              SpectrumLoaderBase& loader,
              const Var& var,
@@ -323,6 +333,8 @@ namespace ana
     unsigned int NDimensions() const{return fLabels.size();}
     std::vector<std::string> GetLabels() const {return fLabels;}
     std::vector<Binning> GetBinnings() const {return fBins;}
+
+    void SetLabel(int idx, std::string newlabel);
 
   protected:
     Spectrum(const std::vector<std::string>& labels,

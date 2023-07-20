@@ -38,6 +38,8 @@ namespace ana
                                       const std::string& prefix,
                                       const std::string& name);
 
+  const ISyst* GetISystNuMIPPFXCV();
+
   /// These are envelopes not real systs. TODO make clearer in naming
   std::vector<const ISyst*> GetNuMIHadronProductionFluxSysts();
 
