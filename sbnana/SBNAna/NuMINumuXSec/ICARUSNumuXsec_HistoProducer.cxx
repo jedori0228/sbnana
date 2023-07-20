@@ -172,6 +172,8 @@ void HistoProducer::TruthStudy(SpectrumLoader& loader, SpillCut spillCut, Cut cu
   // Scattering
 
   FillCVandSystSpectrum(loader, "TruthE", varNeutrinoTruthE, Binning::Simple(50, 0., 10.), spillCut, cut);
+  FillCVandSystSpectrum(loader, "TruthFirstNuEnergy", TruthFirstNuEnergy, Binning::Simple(50, 0., 10.), spillCut);
+
   FillCVSpectrum(loader, "TruthQ2", varTruthQ2, Binning::Simple(60, 0., 6.), spillCut, cut);
   FillCVSpectrum(loader, "Truthq0_lab", varTruthq0_lab, Binning::Simple(60, 0., 6.), spillCut, cut);
   FillCVSpectrum(loader, "Truthmodq_lab", varTruthmodq_lab, Binning::Simple(60, 0., 6.), spillCut, cut);
@@ -1127,10 +1129,12 @@ void HistoProducer::setSystematicWeights(){
     const std::vector<std::string> genieDependentKnobNames = ICARUSNumuXsec::GetGENIEDependentKnobNames();
     for(const std::string& name: genieDependentKnobNames){
       map_DepDialName_to_UniverseWeights[name] = {};
+      map_DepDialName_to_UniverseSpillWeights[name] = {};
       std::string psetname = SystProviderPrefix+"_multisim_"+name;
       std::cout << "[HistoProducer::setSystematicWeights] Dependent dial, " << name << " (psetname = " << psetname << ")" << std::endl;
       for(int u=0; u<100; u++){
         map_DepDialName_to_UniverseWeights[name].push_back( GetUniverseWeight(psetname, u) );
+        map_DepDialName_to_UniverseSpillWeights[name].push_back( GetUniverseFirstNeutrinoWeight(psetname, u) );
       }
     }
 
@@ -1309,6 +1313,14 @@ void HistoProducer::FillSystSpectrum(SpectrumLoader& loader, const std::string& 
 }
 
 void HistoProducer::FillSystSpectrum(SpectrumLoader& loader, const std::string& label, const SpillVar& var, const Binning& binning, SpillCut spillCut){
+
+  if(map_DepDialName_to_UniverseSpillWeights.size()>0){
+    for(const auto& it: map_DepDialName_to_UniverseSpillWeights){
+      map_cutName_to_vec_SystEnsembleSpectrumPairs[currentCutName].push_back(
+        std::make_pair( it.first, new EnsembleSpectrum(label, binning, loader, var, spillCut, it.second, kSpillUnweighted ) )
+      );
+    }
+  }
 
 }
 

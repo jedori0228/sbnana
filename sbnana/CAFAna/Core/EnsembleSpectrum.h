@@ -30,6 +30,13 @@ namespace ana
                      const std::vector<Var>& univ_weis,
                      const Var& cv_wei = kUnweighted);
 
+    EnsembleSpectrum(const std::string& label, const Binning& bins,
+                     SpectrumLoaderBase& loader,
+                     const SpillVar& var,
+                     const SpillCut& spillcut,
+                     const std::vector<SpillVar>& univ_weis,
+                     const SpillVar& cv_wei = kSpillUnweighted);
+
     EnsembleSpectrum(SpectrumLoaderBase& loader,
                      const HistAxis& xAxis,
                      const HistAxis& yAxis,

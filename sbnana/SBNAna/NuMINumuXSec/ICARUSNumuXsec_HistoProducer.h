@@ -85,7 +85,7 @@ namespace ICARUSNumuXsec{
     std::vector<const ISyst*> IGENIESysts;
 
     std::map<std::string, std::vector<Var>> map_DepDialName_to_UniverseWeights;
-    std::vector<Var> vec_UniverseWeightsForEachGENIESource; // For EnsembleSpectrum
+    std::map<std::string, std::vector<SpillVar>> map_DepDialName_to_UniverseSpillWeights;
 
     int NNuMIFluxPCA;
     std::vector<const ISyst*> IFluxSysts;
