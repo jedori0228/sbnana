@@ -66,12 +66,14 @@ namespace TwoTrack{
   extern const Var StoppedChargedPionTrackIndex;
   extern const Var StoppedChargedPionTrackLength;
   extern const Var StoppedChargedPionTrackNuMICosineTheta;
+  extern const Var StoppedChargedPionTrackNuMIToVtxCosineTheta;
   extern const Var StoppedChargedPionTrackChi2MuonCollection;
   extern const Var StoppedChargedPionTrackChi2ProtonCollection;
   // Charged pion, inelastic
   extern const Var InelasticChargedPionTrackIndex;
   extern const Var InelasticChargedPionTrackLength;
   extern const Var InelasticChargedPionTrackNuMICosineTheta;
+  extern const Var InelasticChargedPionTrackNuMIToVtxCosineTheta;
   extern const Var InelasticChargedPionTrackChi2MIPCollection;
 
   namespace Aux{
