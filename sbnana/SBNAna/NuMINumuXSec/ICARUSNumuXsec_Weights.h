@@ -6,5 +6,6 @@
 namespace ICARUSNumuXsec{
 
   extern Var NuMIPPFXCVWeight;
+  extern SpillVar NuMIPPFXCVFirstNuSpillWeight;
 
 }

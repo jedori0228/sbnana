@@ -136,6 +136,7 @@ namespace ICARUSNumuXsec{
     NuMIPPFXWeightTool();
     static NuMIPPFXWeightTool& Instance();
     double GetWeight(const caf::SRSliceProxy* slc) const;
+    double GetFirstNuWeight(const caf::SRSpillProxy* sr) const;
 
     mutable TH1* fWeight[2][2][2]; // [fhc/rhc][nue/numu][nu/nubar]
 
@@ -226,6 +227,7 @@ namespace ICARUSNumuXsec{
   };
 
   std::vector<std::string> GetGENIEMultisigmaKnobNames();
+  std::vector<std::string> GetGENIEMorphKnobNames();
   std::vector<std::string> GetGENIEDependentKnobNames();
   std::vector<std::string> GetGENIEMultisimKnobNames();
 
