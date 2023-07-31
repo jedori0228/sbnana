@@ -63,6 +63,7 @@ namespace ICARUSNumuXsec{
     // - 230216_ThreeTrack
     void TruthStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     void TrackPIDStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    void TrackPIDStudyQuick(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     void HighChi2MuonProton(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     void TwoTrackAnalysis(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     void TwoTrackTruthMatching(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
@@ -83,6 +84,7 @@ namespace ICARUSNumuXsec{
     void setSystematicWeights();
     std::vector<const ISyst*> IAllSysts; // TODO update later
     std::vector<const ISyst*> IGENIESysts;
+    std::vector<const ISyst*> IGENIEMorphSysts;
 
     std::map<std::string, std::vector<Var>> map_DepDialName_to_UniverseWeights;
     std::map<std::string, std::vector<SpillVar>> map_DepDialName_to_UniverseSpillWeights;
@@ -108,13 +110,9 @@ namespace ICARUSNumuXsec{
 
     // EnsembleSpectrum-based systematics
     std::map< TString, vector< pair<TString, EnsembleSpectrum *> > > map_cutName_to_vec_SystEnsembleSpectrumPairs;
-    void AddEnsembleSpectrum(SpectrumLoader& loader, const HistAxis& ax, SpillCut spillCut, Cut cut, TString currentCutName, vector<Var> varWeights, TString systName);
-    void AddEnsembleSpectrum(SpectrumLoader& loader, const HistAxis& axX, const HistAxis& axY, SpillCut spillCut, Cut cut, TString currentCutName, vector<Var> varWeights, TString systName);
 
     // Systematics by ISyst
     std::map< TString, vector< pair<TString, Spectrum *> > > map_cutName_to_vec_SystSpectrumPairs;
-    void AddUpDownSystematic(SpectrumLoader& loader, const HistAxis& ax, SpillCut spillCut, Cut cut, TString currentCutName, const ISyst* s);
-    void AddUpDownSystematic(SpectrumLoader& loader, const HistAxis& axX, const HistAxis& axY, SpillCut spillCut, Cut cut, TString currentCutName, const ISyst* s);
 
     // slice
     template<class T>
