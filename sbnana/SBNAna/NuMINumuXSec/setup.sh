@@ -21,7 +21,6 @@ export gridOutputDir=/pnfs/icarus/persistent/users/${USER}/NuMINumuXSec/
 
 export PATH=${gridBinDir}:${PYTHONDIR}:${PATH}
 
-echo "@@ Result:"
 echo "ANANAME: "${ANANAME}
 echo "gridLibDirPNFS: "${gridLibDirPNFS}
 

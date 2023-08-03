@@ -266,6 +266,30 @@ double NuMIPPFXWeightTool::GetWeight(const caf::SRSliceProxy* slc) const {
 
 }
 
+double NuMIPPFXWeightTool::GetFirstNuWeight(const caf::SRSpillProxy* sr) const {
+
+  if(sr->mc.nu.size()==0) return 1.0;
+  
+  if ( abs(sr->mc.nu[0].initpdg) == 16 ) return 1.0;
+
+  if ( !fWeight[0][0][0] ) {
+    std::cout << "Trying to access un-available weight array..." << std::endl;
+    std::abort();
+  }
+
+  unsigned int hcIdx = 0; // assume always FHC for now...
+  unsigned int flavIdx = ( abs(sr->mc.nu[0].initpdg) == 12 ) ? 0 : 1;
+  unsigned int signIdx = ( sr->mc.nu[0].initpdg > 0 ) ? 0 : 1;
+
+  TH1* h = fWeight[hcIdx][flavIdx][signIdx];
+  assert(h);
+
+  const int bin = h->FindBin( sr->mc.nu[0].E );
+  if(bin == 0 || bin == h->GetNbinsX()+1) return 1.0;
+  return h->GetBinContent(bin);
+
+}
+
 dEdXTemplateTool::dEdXTemplateTool(){
 
   std::cout << "[dEdXTemplateTool::dEdXTemplateTool] called" << std::endl;
@@ -593,18 +617,14 @@ InteractionTool::NParticles InteractionTool::GetNParticles(const caf::SRSlicePro
 std::vector<std::string> ICARUSNumuXsec::GetGENIEMultisigmaKnobNames(){
 
   return {
-"ZNormCCQE",
 "ZExpA1CCQE",
 "ZExpA2CCQE",
 "ZExpA3CCQE",
 "ZExpA4CCQE",
+"RPA_CCQE",
+"CoulombCCQE",
 "NormCCMEC",
 "NormNCMEC",
-"NormEMMEC",
-"DecayAngMEC",
-"FracPN_CCMEC",
-"FracDelta_CCMEC",
-"XSecShape_CCMEC",
 "MaNCEL",
 "EtaNCEL",
 "MaCCRES",
@@ -629,12 +649,12 @@ std::vector<std::string> ICARUSNumuXsec::GetGENIEMultisigmaKnobNames(){
 "NonRESBGvbarnNC2pi",
 "RDecBR1gamma",
 "RDecBR1eta",
-"Theta_Delta2Npi",
+"NormCCCOH",
+"NormNCCOH",
 "AhtBY",
 "BhtBY",
 "CV1uBY",
 "CV2uBY",
-"FormZone",
 "MFP_pi",
 "FrCEx_pi",
 "FrInel_pi",
@@ -645,10 +665,17 @@ std::vector<std::string> ICARUSNumuXsec::GetGENIEMultisigmaKnobNames(){
 "FrInel_N",
 "FrAbs_N",
 "FrPiProd_N",
-"CCQEPauliSupViaKF",
-"CCQEMomDistroFGtoSF",
   };
 
+}
+
+std::vector<std::string> ICARUSNumuXsec::GetGENIEMorphKnobNames(){
+  return {
+"VecFFCCQEshape",
+"DecayAngMEC",
+"Theta_Delta2Npi",
+"ThetaDelta2NRad",
+  };
 }
 
 std::vector<std::string> ICARUSNumuXsec::GetGENIEDependentKnobNames(){

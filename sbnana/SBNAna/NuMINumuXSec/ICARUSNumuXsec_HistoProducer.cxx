@@ -717,6 +717,56 @@ void HistoProducer::TrackPIDStudy(SpectrumLoader& loader, SpillCut spillCut, Cut
     )
   );
 
+  // tagged muon
+  FillCVSpectrum(loader, "MuonTrackLength", MuonTrackLength, Binning::Simple(500, 0., 500), spillCut, cut);
+
+}
+
+void HistoProducer::TrackPIDStudyQuick(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  FillSpill(loader, spillCut, cut);
+  FillSlice(loader, spillCut, cut);
+
+  using namespace ICARUSNumuXsec::TwoTrack;
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum(
+      "RelaxedMuonTrackLength",
+      Binning::Simple(500, 0., 500), loader,
+      ICARUSNumuXsec::TwoTrack::Aux::RelaxedMuonTrackLength,
+      spillCut, cut
+    )
+  );
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum(
+      "RelaxedProtonTrackLength",
+      Binning::Simple(100, 0., 100), loader,
+      ICARUSNumuXsec::TwoTrack::Aux::RelaxedProtonTrackLength,
+      spillCut, cut
+    )
+  );
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum(
+      "RelaxedProtonTrackP",
+      Binning::Simple(50, 0., 5), loader,
+      ICARUSNumuXsec::TwoTrack::Aux::RelaxedProtonTrackP,
+      spillCut, cut
+    )
+  );
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum(
+      "RelaxedChargedPionTrackLength",
+      Binning::Simple(500, 0., 500), loader,
+      ICARUSNumuXsec::TwoTrack::Aux::RelaxedChargedPionTrackLength,
+      spillCut, cut
+    )
+  );
+
+  FillCVSpectrum(loader, "MuonTrackLength", MuonTrackLength, Binning::Simple(500, 0., 500), spillCut, cut);
+
 }
 
 void HistoProducer::HighChi2MuonProton(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
@@ -791,11 +841,13 @@ void HistoProducer::TwoTrackAnalysis(SpectrumLoader& loader, SpillCut spillCut, 
   // pions for side band
   FillCVSpectrum(loader, "StoppedChargedPionTrackLength", StoppedChargedPionTrackLength, Binning::Simple(300, 0., 300.), spillCut, cut);
   FillCVandSystSpectrum(loader, "StoppedChargedPionTrackNuMICosineTheta", StoppedChargedPionTrackNuMICosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
+  FillCVandSystSpectrum(loader, "StoppedChargedPionTrackNuMIToVtxCosineTheta", StoppedChargedPionTrackNuMIToVtxCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
   FillCVSpectrum(loader, "StoppedChargedPionTrackChi2MuonCollection", StoppedChargedPionTrackChi2MuonCollection, Binning::Simple(100, 0., 100.), spillCut, cut);
   FillCVSpectrum(loader, "StoppedChargedPionTrackChi2ProtonCollection", StoppedChargedPionTrackChi2ProtonCollection, Binning::Simple(400, 0., 400.), spillCut, cut);
 
   FillCVSpectrum(loader, "InelasticChargedPionTrackLength", InelasticChargedPionTrackLength, Binning::Simple(200, 0., 200.), spillCut, cut);
   FillCVandSystSpectrum(loader, "InelasticChargedPionTrackNuMICosineTheta", InelasticChargedPionTrackNuMICosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
+  FillCVandSystSpectrum(loader, "InelasticChargedPionTrackNuMIToVtxCosineTheta", InelasticChargedPionTrackNuMIToVtxCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
   FillCVSpectrum(loader, "InelasticChargedPionTrackChi2MIPCollection", InelasticChargedPionTrackChi2MIPCollection, Binning::Simple(100, 0., 10.), spillCut, cut);
 
 
@@ -1124,6 +1176,19 @@ void HistoProducer::setSystematicWeights(){
       IGENIESysts.push_back( new SBNWeightSyst(psetname) );
     }
 
+    // Shape morphs
+    cout << "[HistoProducer::setSystematicWeights] - Adding morphing dials" << std::endl;
+    const std::vector<std::string> genieMorphKnobNames = ICARUSNumuXsec::GetGENIEMorphKnobNames();
+    for(const std::string& name: genieMorphKnobNames){
+      if(name=="FormZone"){
+       std::cout << "[HistoProducer::setSystematicWeights] Skipping FormZone" << std::endl;
+       continue;
+      }
+      std::string psetname = SystProviderPrefix+"_multisigma_"+name;
+      std::cout << "[HistoProducer::setSystematicWeights] Multisigma, " << name << " (psetname = " << psetname << ")" << std::endl;
+      IGENIEMorphSysts.push_back( new SBNWeightSyst(psetname) );
+    }
+
     // Multisim for dependent dials
     cout << "[HistoProducer::setSystematicWeights] - Adding dependent dials by multisim" << std::endl;
     const std::vector<std::string> genieDependentKnobNames = ICARUSNumuXsec::GetGENIEDependentKnobNames();
@@ -1142,7 +1207,8 @@ void HistoProducer::setSystematicWeights(){
 
   if(FillFlux){
     cout << "[HistoProducer::setSystematicWeights] Setting flux systematics" << endl;
-    IFluxSysts = GetNuMIPCAFluxSysts(NNuMIFluxPCA);
+    //IFluxSysts = GetNuMIPCAFluxSysts(NNuMIFluxPCA);
+    IFluxSysts = GetAllNuMIFluxSysts(NNuMIFluxPCA);
     for(unsigned int i=0; i<IFluxSysts.size(); i++){
       cout << "[HistoProducer::setSystematicWeights] Syst = " << IFluxSysts.at(i)->ShortName() << endl;
     }
@@ -1150,44 +1216,6 @@ void HistoProducer::setSystematicWeights(){
 
   //cout << "[HistoProducer::setSystematicWeights] Setting detector systematics" << endl;
   //IDetectorSysts.push_back( new MuonMomentumScaleSyst(0.02) );
-
-}
-
-void HistoProducer::AddEnsembleSpectrum(SpectrumLoader& loader, const HistAxis& ax, SpillCut spillCut, Cut cut, TString currentCutName, vector<Var> varWeights, TString systName){
-
-  map_cutName_to_vec_SystEnsembleSpectrumPairs[currentCutName].push_back( 
-    std::make_pair( systName, new EnsembleSpectrum(loader, ax, spillCut, cut, varWeights) )
-  );
-
-}
-
-void HistoProducer::AddEnsembleSpectrum(SpectrumLoader& loader, const HistAxis& axX, const HistAxis& axY, SpillCut spillCut, Cut cut, TString currentCutName, vector<Var> varWeights, TString systName){
-
-  map_cutName_to_vec_SystEnsembleSpectrumPairs[currentCutName].push_back(
-    std::make_pair( systName, new EnsembleSpectrum(loader, axX, axY, spillCut, cut, varWeights) )
-  );
-
-}
-
-void HistoProducer::AddUpDownSystematic(SpectrumLoader& loader, const HistAxis& ax, SpillCut spillCut, Cut cut, TString currentCutName, const ISyst* s){
-
-  map_cutName_to_vec_SystSpectrumPairs[currentCutName].push_back(
-    std::make_pair( s->ShortName()+"_Up", new Spectrum(loader, ax, spillCut, cut, SystShifts(s, +1)) )
-  );
-  map_cutName_to_vec_SystSpectrumPairs[currentCutName].push_back(
-    std::make_pair( s->ShortName()+"_Down", new Spectrum(loader, ax, spillCut, cut, SystShifts(s, -1)) )
-  );
-
-}
-
-void HistoProducer::AddUpDownSystematic(SpectrumLoader& loader, const HistAxis& axX, const HistAxis& axY, SpillCut spillCut, Cut cut, TString currentCutName, const ISyst* s){
-
-  map_cutName_to_vec_SystSpectrumPairs[currentCutName].push_back(
-    std::make_pair( s->ShortName()+"_Up", new Spectrum(loader, axX, axY, spillCut, cut, SystShifts(s, +1)) )
-  );
-  map_cutName_to_vec_SystSpectrumPairs[currentCutName].push_back(
-    std::make_pair( s->ShortName()+"_Down", new Spectrum(loader, axX, axY, spillCut, cut, SystShifts(s, -1)) )
-  );
 
 }
 
@@ -1241,8 +1269,8 @@ void HistoProducer::FillCVSpectrum(SpectrumLoader& loader, const std::string& la
 }
 
 void HistoProducer::FillSystSpectrum(SpectrumLoader& loader, const std::string& label, const Var& var, const Binning& binning, SpillCut spillCut, Cut cut){
-  // ensemble spectrum
 
+  // ensemble spectrum
   if(map_DepDialName_to_UniverseWeights.size()>0){
     const HistAxis ax(label, binning, var);
     for(const auto& it: map_DepDialName_to_UniverseWeights){
@@ -1262,15 +1290,27 @@ void HistoProducer::FillSystSpectrum(SpectrumLoader& loader, const std::string& 
     );
   }
 
+  // morph
+  for(const auto& s: IGENIEMorphSysts){
+    // +1: Morphed to another model
+    map_cutName_to_vec_SystSpectrumPairs[currentCutName].push_back(
+      std::make_pair( s->ShortName()+"_Up", new Spectrum(label, loader, binning, var, spillCut, cut, SystShifts(s, +1), GetGlobalWeight() ) )
+    );
+    // 0: CV, so we don't have _Down. Just saving nominal
+    map_cutName_to_vec_SystSpectrumPairs[currentCutName].push_back(
+      std::make_pair( s->ShortName()+"_Down", new Spectrum(label, loader, binning, var, spillCut, cut, kNoShift, GetGlobalWeight() ) )
+    );
+  }
+
   //TEST
   // zexp
   Var wZExpMultiplied_Up = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_ZExpA1CCQE", 1) 
                            * GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_ZExpA2CCQE", 1)
                            * GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_ZExpA3CCQE", 1)
                            * GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_ZExpA4CCQE", 1);
-	map_cutName_to_vec_SystSpectrumPairs[currentCutName].push_back(
-		std::make_pair( "GENIEReWeight_ICARUS_v2_multisigma_ZExpMultiplied_Up", new Spectrum(label, loader, binning, var, spillCut, cut, kNoShift, GetGlobalWeight()*wZExpMultiplied_Up ) )
-	);  
+  map_cutName_to_vec_SystSpectrumPairs[currentCutName].push_back(
+    std::make_pair( "GENIEReWeight_ICARUS_v2_multisigma_ZExpMultiplied_Up", new Spectrum(label, loader, binning, var, spillCut, cut, kNoShift, GetGlobalWeight()*wZExpMultiplied_Up ) )
+  );  
 
   Var wZExpMultiplied_Down = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_ZExpA1CCQE", 0)
                              * GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_ZExpA2CCQE", 0)
@@ -1299,7 +1339,24 @@ void HistoProducer::FillSystSpectrum(SpectrumLoader& loader, const std::string& 
     std::make_pair( "GENIEReWeight_ICARUS_v2_multisigma_FSIPiMultiplied_Down", new Spectrum(label, loader, binning, var, spillCut, cut, kNoShift, GetGlobalWeight()*wFSIPiMultiplied_Down ) )
   );
 
+  // fsi_N
+  Var wFSINMultiplied_Up = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_MFP_N", 1)
+                            * GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_FrCEx_N", 1)
+                            * GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_FrInel_N", 1)
+                            * GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_FrAbs_N", 1)
+                            * GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_FrPiProd_N", 1);
+  map_cutName_to_vec_SystSpectrumPairs[currentCutName].push_back(
+    std::make_pair( "GENIEReWeight_ICARUS_v2_multisigma_FSINMultiplied_Up", new Spectrum(label, loader, binning, var, spillCut, cut, kNoShift, GetGlobalWeight()*wFSINMultiplied_Up ) )
+  );
 
+  Var wFSINMultiplied_Down = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_MFP_N", 0)
+                              * GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_FrCEx_N", 0)
+                              * GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_FrInel_N", 0)
+                              * GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_FrAbs_N", 0)
+                              * GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_FrPiProd_N", 0);
+  map_cutName_to_vec_SystSpectrumPairs[currentCutName].push_back(
+    std::make_pair( "GENIEReWeight_ICARUS_v2_multisigma_FSINMultiplied_Down", new Spectrum(label, loader, binning, var, spillCut, cut, kNoShift, GetGlobalWeight()*wFSINMultiplied_Down ) )
+  );
 
   for(const auto& s: IFluxSysts){
     map_cutName_to_vec_SystSpectrumPairs[currentCutName].push_back(
@@ -1314,12 +1371,32 @@ void HistoProducer::FillSystSpectrum(SpectrumLoader& loader, const std::string& 
 
 void HistoProducer::FillSystSpectrum(SpectrumLoader& loader, const std::string& label, const SpillVar& var, const Binning& binning, SpillCut spillCut){
 
+  // ensemble spectrum
   if(map_DepDialName_to_UniverseSpillWeights.size()>0){
     for(const auto& it: map_DepDialName_to_UniverseSpillWeights){
       map_cutName_to_vec_SystEnsembleSpectrumPairs[currentCutName].push_back(
         std::make_pair( it.first, new EnsembleSpectrum(label, binning, loader, var, spillCut, it.second, kSpillUnweighted ) )
       );
     }
+  }
+
+  static const std::vector<std::string> genieMultisigmaKnobNames = ICARUSNumuXsec::GetGENIEMultisigmaKnobNames();
+  for(const std::string& name: genieMultisigmaKnobNames){
+    if(name=="FormZone"){
+     continue;
+    }
+    std::string psetname = SystProviderPrefix+"_multisigma_"+name;
+
+    SpillVar wUp = GetUniverseFirstNeutrinoWeight(psetname, 1);
+    SpillVar wDown = GetUniverseFirstNeutrinoWeight(psetname, 0);
+
+    map_cutName_to_vec_SystSpectrumPairs[currentCutName].push_back(
+      std::make_pair( psetname+"_Up", new Spectrum(label, binning, loader, var, spillCut, wUp ) )
+    );
+    map_cutName_to_vec_SystSpectrumPairs[currentCutName].push_back(
+      std::make_pair( psetname+"_Down", new Spectrum(label, binning, loader, var, spillCut, wUp ) )
+    );
+
   }
 
 }
@@ -1339,12 +1416,7 @@ void HistoProducer::FillCVandSystSpectrum(SpectrumLoader& loader, const std::str
 }
 
 const Var HistoProducer::GetGlobalWeight(){
-/*
-  static const NuMIPPFXWeightTool nppfxwt = NuMIPPFXWeightTool::Instance();
-  Var NuMIPPFXCVWeight( [](const caf::SRSliceProxy* slc) -> double {
-    return nppfxwt.GetWeight(slc);
-  });
-*/
+
   Var GlobalWeight = kUnweighted;
   if(ApplyNuMIPPFXCVWeight) GlobalWeight = GlobalWeight * NuMIPPFXCVWeight;
 

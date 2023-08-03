@@ -701,6 +701,25 @@ namespace TwoTrack{
       return -999.;
     }
   });
+  const Var StoppedChargedPionTrackNuMIToVtxCosineTheta([](const caf::SRSliceProxy* slc) -> double {
+    int stoppedCPionIndex = StoppedChargedPionTrackIndex(slc);
+    if(stoppedCPionIndex>=0){
+      const auto& trk = slc->reco.pfp.at(stoppedCPionIndex).trk;
+      const auto& vtx = slc->vertex;
+
+      TVector3 v3_trk(trk.dir.x, trk.dir.y, trk.dir.z);
+      TVector3 v3_vtx(vtx.x, vtx.y, vtx.z);
+      static const TVector3 dFromNuMI(315.120380, 33.644912, 733.632532);
+
+      TVector3 v3_numi_to_vtx = dFromNuMI+v3_vtx;
+
+      double angleNuMI = v3_trk.Angle(v3_numi_to_vtx);
+      return TMath::Cos(angleNuMI);
+    }
+    else{
+      return -999.;
+    }
+  });
   const Var StoppedChargedPionTrackChi2MuonCollection([](const caf::SRSliceProxy* slc) -> double {
     int stoppedCPionIndex = StoppedChargedPionTrackIndex(slc);
     if(stoppedCPionIndex>=0){
@@ -794,6 +813,25 @@ namespace TwoTrack{
       const auto& trk = slc->reco.pfp.at(inelCPionIndex).trk;
       TVector3 v3_trk(trk.dir.x, trk.dir.y, trk.dir.z);
       double angleNuMI = v3_trk.Angle(NuDirection_NuMI);
+      return TMath::Cos(angleNuMI);
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var InelasticChargedPionTrackNuMIToVtxCosineTheta([](const caf::SRSliceProxy* slc) -> double {
+    int inelCPionIndex = InelasticChargedPionTrackIndex(slc);
+    if(inelCPionIndex>=0){
+      const auto& trk = slc->reco.pfp.at(inelCPionIndex).trk;
+      const auto& vtx = slc->vertex;
+
+      TVector3 v3_trk(trk.dir.x, trk.dir.y, trk.dir.z);
+      TVector3 v3_vtx(vtx.x, vtx.y, vtx.z);
+      static const TVector3 dFromNuMI(315.120380, 33.644912, 733.632532);
+
+      TVector3 v3_numi_to_vtx = dFromNuMI+v3_vtx;
+
+      double angleNuMI = v3_trk.Angle(v3_numi_to_vtx);
       return TMath::Cos(angleNuMI);
     }
     else{
