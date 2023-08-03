@@ -1,4 +1,5 @@
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Utilities.h"
+#include "sbnana/CAFAna/Core/Utilities.h"
 
 using namespace ICARUSNumuXsec;
 
@@ -204,9 +205,7 @@ NuMIPPFXWeightTool::NuMIPPFXWeightTool(){
 
   // test
 
-  const std::string fname = "root://fndcadoor.fnal.gov:1094/pnfs/fnal.gov/usr/icarus/persistent/users/jskim/NuMINumuXSec/Flux/2023-05-16_out_450.37_7991.98_79512.66_QEL11.root";
-  //const std::string fname = "root://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/icarus/resilient/users/jskim/NuMINumuXSec/v09_69_01/Flux/2023-05-16_out_450.37_7991.98_79512.66_QEL11.root";
-  //const std::string fname = "/pnfs/icarus/persistent/users/jskim/NuMINumuXSec/Flux/2023-05-16_out_450.37_7991.98_79512.66_QEL11.root";
+  const std::string fname = "root://fndcadoor.fnal.gov:1094/pnfs/fnal.gov/usr/icarus/persistent/users/jskim/NuMINumuXSec/Flux/2023-07-31_out_450.37_7991.98_79512.66_QEL11.root";
   std::cout << "[NuMIPPFXWeightTool::NuMIPPFXWeightTool] Reading root file: " << fname << std::endl;
   TFile *f_ppfx = TFile::Open(fname.c_str());
 
@@ -217,20 +216,30 @@ NuMIPPFXWeightTool::NuMIPPFXWeightTool(){
 
   std::cout << "[NuMIPPFXWeightTool::NuMIPPFXWeightTool] Filling in fWeight" << std::endl;
 
-  for(int hcIdx: {0, 1}){
-    for(int flavIdx: {0, 1}){
-      for(int signIdx: {0, 1}){
-        std::string      hName = "ppfx_flux_weights/hweights_";
-        if(hcIdx == 0)   hName += "fhc_"; else hName += "rhc_";
-        if(flavIdx == 0) hName += "nue";  else hName += "numu";
-        if(signIdx == 1) hName += "bar";
+  for (int hcIdx : {0, 1}) {
+    for (int flavIdx : {0, 1}) {
+      for (int signIdx : {0, 1}) {
+        std::string hNamePPFX = "ppfx_flux_weights/hweights_";
+        if (hcIdx == 0)
+          hNamePPFX += "fhc_";
+        else
+          hNamePPFX += "rhc_";
+        if (flavIdx == 0)
+          hNamePPFX += "nue";
+        else
+          hNamePPFX += "numu";
+        if (signIdx == 1) hNamePPFX += "bar";
 
-        TH1* h_ppfx = (TH1*)f_ppfx->Get( hName.c_str() );
-        if(!h_ppfx){
-          std::cout << "NuMIPPFXWeightTool: failed to find " << hName << " in " << f_ppfx->GetName() << std::endl;
+        TH1* h_ppfx = (TH1*)f_ppfx->Get(hNamePPFX.c_str());
+        if (!h_ppfx) {
+          std::cout << "NuMIPpfxFluxWeight: failed to find " << hNamePPFX << " in " << f_ppfx->GetName()
+                    << std::endl;
           std::abort();
         }
-        this->fWeight[hcIdx][flavIdx][signIdx] = h_ppfx;
+        h_ppfx = (TH1*)h_ppfx->Clone(ana::UniqueName().c_str());
+        h_ppfx->SetDirectory(0);
+
+        fWeight[hcIdx][flavIdx][signIdx] = h_ppfx;
       }
     }
   }

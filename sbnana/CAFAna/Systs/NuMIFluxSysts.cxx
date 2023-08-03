@@ -23,6 +23,7 @@ namespace ana {
   {
     if (!fluxFile.empty()) { fFluxFilePath = fluxFile; }
     else {
+/*
       const char* sbndata = std::getenv("SBNDATA_DIR");
       if (!sbndata) {
         std::cout << "NuMIPpfxFluxWeight: $SBNDATA_DIR environment variable not set. Please setup "
@@ -33,6 +34,11 @@ namespace ana {
 
       fFluxFilePath = std::string(sbndata) +
                      "beamData/NuMIdata/2023-07-31_out_450.37_7991.98_79512.66_QEL11.root";
+*/
+
+      fFluxFilePath = "root://fndcadoor.fnal.gov:1094/pnfs/fnal.gov/usr/icarus/persistent/users/jskim/NuMINumuXSec/Flux/2023-07-31_out_450.37_7991.98_79512.66_QEL11.root";
+      std::cout << "[NuMIFluxSyst::NuMIFluxSyst] Flux file read from: " << fFluxFilePath << std::endl;
+
     }
   }
 
@@ -58,8 +64,9 @@ namespace ana {
     }
 
     if (!fScale[0][0][0]) {
-      TFile f(fFluxFilePath.c_str());
-      if (f.IsZombie()) {
+      TFile *f = TFile::Open(fFluxFilePath.c_str());
+      //TFile f(fFluxFilePath.c_str());
+      if (f->IsZombie()) {
         std::cout << "NuMIFluxSysts: Failed to open " << fFluxFilePath << std::endl;
         abort();
       }
@@ -78,9 +85,9 @@ namespace ana {
               hName += "_numu";
             if (signIdx == 1) hName += "bar";
 
-            TH1* h = (TH1*)f.Get(hName.c_str());
+            TH1* h = (TH1*)f->Get(hName.c_str());
             if (!h) {
-              std::cout << "NuMIFluxSysts: failed to find " << hName << " in " << f.GetName()
+              std::cout << "NuMIFluxSysts: failed to find " << hName << " in " << f->GetName()
                         << std::endl;
               abort();
             }
