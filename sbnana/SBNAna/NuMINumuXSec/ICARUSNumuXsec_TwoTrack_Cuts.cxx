@@ -240,7 +240,7 @@ namespace TwoTrack{
       return false;
     }
     else{
-      return (protonP>0.6);
+      return (protonP>0.4);
     }
   });
 
@@ -305,6 +305,7 @@ namespace TwoTrack{
   });
 
   // pion tagging
+  // - charged
   const Cut HasChargedPionTrack([](const caf::SRSliceProxy* slc) {
     return ChargedPionTrackIndex(slc)>=0;
   });
@@ -336,6 +337,12 @@ namespace TwoTrack{
     else{
       return false;
     }
+  });
+  // - neutral
+  const Cut HasNeutralPionPhotonShower([](const caf::SRSliceProxy* slc) {
+    int Nshw = NeutralPionPhotonShowerIndices(slc).size();
+    if(Nshw>=1) return true;
+    else return false;
   });
 
   // Signal def
@@ -376,6 +383,8 @@ namespace TwoTrack{
 
     }
     if(LargestProtonP<0.400) return false;
+    //if(LargestProtonP<0) return false; // TODO test
+
     if(HasExitingProton) return false;
 
 
@@ -392,14 +401,18 @@ namespace TwoTrack{
     if(nptls.NMuon!=1) return false;
 
     const auto& mu_ghep = slc->truth.prim[ intt.MuonIndices[0] ];
-/*
+
+    // using FV
     bool MuonStartContained = fv_track.isContained(mu_ghep.start.x, mu_ghep.start.y, mu_ghep.start.z);
     bool MuonEndContained = fv_track.isContained(mu_ghep.end.x, mu_ghep.end.y, mu_ghep.end.z);
-
     return MuonStartContained&&MuonEndContained;
-*/
+
+/*
+    // using turth contained
     if(mu_ghep.contained) return true;
     else return false;
+*/
+
   });
 
   const Cut SignalMuonExiting([](const caf::SRSliceProxy* slc) {
@@ -416,16 +429,16 @@ namespace TwoTrack{
     //double MuonP = sqrt(mu_ghep.genp.x*mu_ghep.genp.x + mu_ghep.genp.y*mu_ghep.genp.y + mu_ghep.genp.z*mu_ghep.genp.z);
     //if(MuonP<0.340) return false;
 
-/*
+    // using FV
     bool MuonStartContained = fv_track.isContained(mu_ghep.start.x, mu_ghep.start.y, mu_ghep.start.z);
     bool MuonEndContained = fv_track.isContained(mu_ghep.end.x, mu_ghep.end.y, mu_ghep.end.z);
-    
     return !(MuonStartContained&&MuonEndContained);
-*/
 
+/*
+    // using turth contained
     if(mu_ghep.contained) return false;
     else return true;
-
+*/
   });
 
   namespace Aux{

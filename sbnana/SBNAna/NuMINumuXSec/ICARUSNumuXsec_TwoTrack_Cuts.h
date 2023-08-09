@@ -37,11 +37,14 @@ namespace TwoTrack{
   extern const Cut HadronContained;
 
   // pion tagging
+  // - charged
   extern const Cut HasChargedPionTrack;
   extern const Cut HasStoppedChargedPionTrack;
   extern const Cut StoppedChargedPionTrackLongEnough;
   extern const Cut HasInelasticChargedPionTrack;
   extern const Cut InelasticChargedPionTrackLongEnough;
+  // - neutral
+  extern const Cut HasNeutralPionPhotonShower;
 
   // Signal def
   extern const Cut SignalDef;

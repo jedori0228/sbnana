@@ -18,6 +18,7 @@
 
 #define M_MUON 0.1057
 #define M_CHARGEDPION 0.13957039
+#define M_NEUTRALPION 0.1349768
 #define M_PIZERO 0.1349768
 #define M_PROTON 0.938272
 #define M_NEUTRON 0.939565
@@ -28,6 +29,7 @@ using namespace std;
 
 namespace ICARUSNumuXsec{
 
+  //---------------------------------------------------
   class VolumeTool{
 
   public:
@@ -55,6 +57,7 @@ namespace ICARUSNumuXsec{
 
   }; // END Class VolumeTool
 
+  //---------------------------------------------------
   class ActiveVolumeTool : public VolumeTool{
 
   public:
@@ -70,6 +73,7 @@ namespace ICARUSNumuXsec{
 
   }; // END ActiveVolumeTool class def
 
+  //---------------------------------------------------
   class VertexContained : public VolumeTool{
 
   public:
@@ -85,6 +89,7 @@ namespace ICARUSNumuXsec{
 
   }; // END VertexContained class def
 
+  //---------------------------------------------------
   class TrackContained : public VolumeTool{
 
   public:
@@ -100,17 +105,7 @@ namespace ICARUSNumuXsec{
 
   }; // END TrackContained class def
 
-  // Printing
-  void PrintPrimaries(const caf::SRSliceProxy* slc);
-
-  // For a given truth particle, find the reco object
-  int GetMatchedRecoTrackIndex(const caf::SRSliceProxy* slc, int truth_idx, double scorecut=0.5);
-  int GetMatchedRecoShowerIndex(const caf::SRSliceProxy* slc, int truth_idx, double scorecut=0.5);
-  int GetMatchedRecoStubIndex(const caf::SRSliceProxy* slc, int truth_idx);
-
-  // Stub calib
-  double GetEnergyFromStubCharge(double q);
-
+  //---------------------------------------------------
   class NuMICoordinateTool{
 
   public:
@@ -129,6 +124,7 @@ namespace ICARUSNumuXsec{
 
   }; // END Class NuMICoordinateTool
 
+  //---------------------------------------------------
   class NuMIPPFXWeightTool{
 
   public:
@@ -142,6 +138,7 @@ namespace ICARUSNumuXsec{
 
   };
 
+  //---------------------------------------------------
   class dEdXTemplateTool{
 
   public:
@@ -166,6 +163,7 @@ namespace ICARUSNumuXsec{
 
   };
 
+  //---------------------------------------------------
   class SterileNuTool{
 
   public:
@@ -181,6 +179,7 @@ namespace ICARUSNumuXsec{
 
   };
 
+  //---------------------------------------------------
   class ParticleTool{
 
   public:
@@ -192,6 +191,7 @@ namespace ICARUSNumuXsec{
 
   };
 
+  //---------------------------------------------------
   class InteractionTool{
 
     public:
@@ -226,9 +226,23 @@ namespace ICARUSNumuXsec{
 
   };
 
+  //---------------------------------------------------
+  // Printing
+  void PrintPrimaries(const caf::SRSliceProxy* slc);
+  // For a given truth particle, find the reco object
+  int GetMatchedRecoTrackIndex(const caf::SRSliceProxy* slc, int truth_idx, double scorecut=0.5);
+  int GetMatchedRecoShowerIndex(const caf::SRSliceProxy* slc, int truth_idx, double scorecut=0.5);
+  std::vector<double> GetMatchedRecoShowerIndices(const caf::SRSliceProxy* slc, int truth_idx, double scorecut=0.5);
+  int GetMatchedRecoStubIndex(const caf::SRSliceProxy* slc, int truth_idx);
+
+  //---------------------------------------------------
   std::vector<std::string> GetGENIEMultisigmaKnobNames();
   std::vector<std::string> GetGENIEMorphKnobNames();
   std::vector<std::string> GetGENIEDependentKnobNames();
   std::vector<std::string> GetGENIEMultisimKnobNames();
+
+  //---------------------------------------------------
+  bool IsPFPTrack(const caf::SRPFPProxy& pfp);
+  bool IsPFPShower(const caf::SRPFPProxy& pfp);
 
 }

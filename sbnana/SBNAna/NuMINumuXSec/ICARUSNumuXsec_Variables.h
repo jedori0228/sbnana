@@ -20,6 +20,8 @@ namespace ICARUSNumuXsec{
   extern const SpillVar spillvarCountSpill;
   // Trigger
   extern const SpillVar TriggerWithinGate;
+  extern const SpillVar TriggerInfoTriggerType;
+  extern const SpillVar TriggerInfoSourceType;
   // - Test
   extern const SpillMultiVar spillvarTest;
   extern const SpillVar spillvarNTrack;

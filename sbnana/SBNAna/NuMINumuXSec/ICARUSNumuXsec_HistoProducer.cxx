@@ -48,6 +48,13 @@ bool HistoProducer::setCut(TString cutName){
 
 }
 
+void HistoProducer::FillMetadata(SpectrumLoader& loader){
+
+  map_cutName_to_vec_Spectrums["Metadata"].push_back( new Spectrum("TriggerInfoTriggerType", Binning::Simple(11, -1., 10.), loader, TriggerInfoTriggerType, kNoSpillCut) );
+  map_cutName_to_vec_Spectrums["Metadata"].push_back( new Spectrum("TriggerInfoSourceType", Binning::Simple(11, -1., 10.), loader, TriggerInfoSourceType, kNoSpillCut) );
+
+}
+
 void HistoProducer::FillFlashMatching(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
   map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("FMScore", Binning::Simple(102, -2., 100.), loader, varFMScore, spillCut, cut) );
@@ -207,7 +214,7 @@ void HistoProducer::TruthStudy(SpectrumLoader& loader, SpillCut spillCut, Cut cu
   FillCVSpectrum(loader, "TruthdeltaPTx", ICARUSNumuXsec::TruthMatch::TKI::deltaPTx, Binning::Simple(60, -1.5, 1.5), spillCut, cut);
   FillCVSpectrum(loader, "TruthdeltaPTy", ICARUSNumuXsec::TruthMatch::TKI::deltaPTy, Binning::Simple(60, -1.5, 1.5), spillCut, cut);
 
-  // Pion
+  // Charged Pion
 
   FillCVSpectrum(loader, "TruthChargedPionKE", TruthChargedPionKE, Binning::Simple(100, 0., 1.0), spillCut, cut);
   FillCVSpectrum(loader, "TruthChargedPionLength", TruthChargedPionLength, Binning::Simple(500, 0., 500.), spillCut, cut);
@@ -217,8 +224,7 @@ void HistoProducer::TruthStudy(SpectrumLoader& loader, SpillCut spillCut, Cut cu
   FillCVSpectrum(loader, "TruthChargedPionMatchedTrackCustomChi2MuonCollection", TruthChargedPionMatchedTrackCustomChi2MuonCollection, Binning::Simple(100, 0., 100.), spillCut, cut);
   FillCVSpectrum(loader, "TruthChargedPionMatchedTrackCustomChi2ProtonCollection", TruthChargedPionMatchedTrackCustomChi2ProtonCollection, Binning::Simple(200, 0., 200.), spillCut, cut);
   FillCVSpectrum(loader, "TruthChargedPionMatchedTrackCustomChi2InelasticPionCollection", TruthChargedPionMatchedTrackCustomChi2InelasticPionCollection, Binning::Simple(80, 0., 80), spillCut, cut);
-
-  // Pion michel
+  // ChargedPion michel
   FillCVSpectrum(loader, "TruthChargedPionMichelExistence", TruthChargedPionMichelExistence, Binning::Simple(3, -1., 2.), spillCut, cut);
   FillCVSpectrum(loader, "TruthChargedPionMichelStartProcess", TruthChargedPionMichelStartProcess, Binning::Simple(65, 0., 65.), spillCut, cut);
   FillCVSpectrum(loader, "TruthChargedPionMichelKE", TruthChargedPionMichelKE, Binning::Simple(100, 0., 0.1), spillCut, cut);
@@ -226,6 +232,10 @@ void HistoProducer::TruthStudy(SpectrumLoader& loader, SpillCut spillCut, Cut cu
   FillCVSpectrum(loader, "TruthChargedPionMichelMatchedShowerDistanceFromMuonEnd", TruthChargedPionMichelMatchedShowerDistanceFromMuonEnd, Binning::Simple(300, 0., 30.), spillCut, cut);
   FillCVSpectrum(loader, "TruthChargedPionMichelHasReco", TruthChargedPionMichelHasReco, Binning::Simple(6, -1., 5.), spillCut, cut);
   FillCVSpectrum(loader, "TruthChargedPionMichelMatchedSlice", ICARUSNumuXsec::TruthMatch::TruthChargedPionMichelMatchedSlice, Binning::Simple(8, -3., 5.), spillCut);
+
+  // Neutral Pion
+  FillCVSpectrum(loader, "TruthNeutralPionKE", TruthNeutralPionKE, Binning::Simple(100, 0., 1.0), spillCut, cut);
+  FillCVSpectrum(loader, "TruthNeutralPionNMatchedShower", TruthNeutralPionNMatchedShower, Binning::Simple(10, 0., 10.), spillCut, cut);
 
   // Number of particles
   FillCVSpectrum(loader, "TruthNProton", varTruthNProton, Binning::Simple(10, 0., 10.), spillCut, cut);
@@ -839,17 +849,25 @@ void HistoProducer::TwoTrackAnalysis(SpectrumLoader& loader, SpillCut spillCut, 
   FillCVSpectrum(loader, "TruthdeltaPTy_vs_deltaPTy", ICARUSNumuXsec::TruthMatch::TKI::deltaPTy, Binning::Simple(30, -1.5, 1.5), ICARUSNumuXsec::TwoTrack::TKI::deltaPTy, Binning::Simple(30, -1.5, 1.5), spillCut, cut);
 
   // pions for side band
+  // - stopping charged pion
   FillCVSpectrum(loader, "StoppedChargedPionTrackLength", StoppedChargedPionTrackLength, Binning::Simple(300, 0., 300.), spillCut, cut);
   FillCVandSystSpectrum(loader, "StoppedChargedPionTrackNuMICosineTheta", StoppedChargedPionTrackNuMICosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
   FillCVandSystSpectrum(loader, "StoppedChargedPionTrackNuMIToVtxCosineTheta", StoppedChargedPionTrackNuMIToVtxCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
   FillCVSpectrum(loader, "StoppedChargedPionTrackChi2MuonCollection", StoppedChargedPionTrackChi2MuonCollection, Binning::Simple(100, 0., 100.), spillCut, cut);
   FillCVSpectrum(loader, "StoppedChargedPionTrackChi2ProtonCollection", StoppedChargedPionTrackChi2ProtonCollection, Binning::Simple(400, 0., 400.), spillCut, cut);
-
+  // - inelastic pion
   FillCVSpectrum(loader, "InelasticChargedPionTrackLength", InelasticChargedPionTrackLength, Binning::Simple(200, 0., 200.), spillCut, cut);
   FillCVandSystSpectrum(loader, "InelasticChargedPionTrackNuMICosineTheta", InelasticChargedPionTrackNuMICosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
   FillCVandSystSpectrum(loader, "InelasticChargedPionTrackNuMIToVtxCosineTheta", InelasticChargedPionTrackNuMIToVtxCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
   FillCVSpectrum(loader, "InelasticChargedPionTrackChi2MIPCollection", InelasticChargedPionTrackChi2MIPCollection, Binning::Simple(100, 0., 10.), spillCut, cut);
-
+  // - neutral pion
+  FillCVSpectrum(loader, "NNeutralPionPhotonShower", NNeutralPionPhotonShower, Binning::Simple(10, 0., 10.), spillCut, cut);
+  FillCVSpectrum(loader, "NeutralPionPhotonShowerSumEnergy", NeutralPionPhotonShowerSumEnergy, Binning::Simple(20, 0., 2.), spillCut, cut);
+  FillCVSpectrum(loader, "NeutralPionPhotonShowerSumInvariantMass", NeutralPionPhotonShowerSumInvariantMass, Binning::Simple(60, 0., 0.3), spillCut, cut);
+  FillCVSpectrum(loader, "NeutralPionPhotonShowerConvGaps", NeutralPionPhotonShowerConvGaps, Binning::Simple(120, 0., 30.), spillCut, cut);
+  FillCVSpectrum(loader, "NeutralPionPhotonShowerLengths", NeutralPionPhotonShowerLengths, Binning::Simple(50, 0., 50.), spillCut, cut);
+  FillCVSpectrum(loader, "NeutralPionPhotonShowerEnergies", NeutralPionPhotonShowerEnergies, Binning::Simple(20, 0., 1.), spillCut, cut);
+  FillCVSpectrum(loader, "NeutralPionPhotonShowerdEdxs", NeutralPionPhotonShowerdEdxs, Binning::Simple(50, 0., 10.), spillCut, cut);
 
 }
 
@@ -972,13 +990,36 @@ void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
   //map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("spillvarTest", Binning::Simple(1, 0., 1.), loader, spillvarTest, spillCut) );
 
+  //map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("spillvarTest", Binning::Simple(1, 0., 1.), loader, ICARUSNumuXsec::TwoTrack::Aux::TestSpillVar, spillCut) );
+
+  using namespace ICARUSNumuXsec::TwoTrack;
+
+  FillCVSpectrum(loader, "NNeutralPionPhotonShower", NNeutralPionPhotonShower, Binning::Simple(10, 0., 10.), spillCut, cut);
+  FillCVSpectrum(loader, "NeutralPionPhotonShowerSumEnergy", NeutralPionPhotonShowerSumEnergy, Binning::Simple(20, 0., 2.), spillCut, cut);
+  FillCVSpectrum(loader, "NeutralPionPhotonShowerConvGaps", NeutralPionPhotonShowerConvGaps, Binning::Simple(120, 0., 30.), spillCut, cut);
+  FillCVSpectrum(loader, "NeutralPionPhotonShowerLengths", NeutralPionPhotonShowerLengths, Binning::Simple(50, 0., 50.), spillCut, cut);
+
+  using namespace ICARUSNumuXsec::TruthMatch;
+
+  FillCVSpectrum(loader, "TruthNeutralPionMatchedShowerTrackScores", TruthNeutralPionMatchedShowerTrackScores, Binning::Simple(20, 0., 1.), spillCut, cut);
+  FillCVSpectrum(loader, "TruthNeutralPionMatchedShowerEnergies", TruthNeutralPionMatchedShowerEnergies, Binning::Simple(20, 0., 1.), spillCut, cut);
+  FillCVSpectrum(loader, "TruthNeutralPionMatchedShowerdEdxs", TruthNeutralPionMatchedShowerdEdxs, Binning::Simple(50, 0., 10.), spillCut, cut);
+  FillCVSpectrum(loader, "TruthNeutralPionMatchedShowerConvGaps", TruthNeutralPionMatchedShowerConvGaps, Binning::Simple(120, 0., 30.), spillCut, cut);
+  FillCVSpectrum(loader, "TruthNeutralPionMatchedShowerLengths", TruthNeutralPionMatchedShowerLengths, Binning::Simple(50, 0., 50.), spillCut, cut);
+
+  FillCVSpectrum(loader, "TruthNeutralPionNMatchedShower", TruthNeutralPionNMatchedShower, Binning::Simple(10, 0., 10.), spillCut, cut);
+  FillCVSpectrum(loader, "TruthNeutralPionNMatchedShowerWithCut", TruthNeutralPionNMatchedShowerWithCut, Binning::Simple(10, 0., 10.), spillCut, cut);
+
+  FillCVSpectrum(loader, "TruthNeutralPionMatchedShowerSumEnergy", TruthNeutralPionMatchedShowerSumEnergy, Binning::Simple(20, 0., 2.), spillCut, cut);
+  FillCVSpectrum(loader, "TruthNeutralPionMatchedShowerSumInvariantMass", TruthNeutralPionMatchedShowerSumInvariantMass, Binning::Simple(50, 0., 0.5), spillCut, cut);
+
   //map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("Test", Binning::Simple(1, 0., 1.), loader, ICARUSNumuXsec::TruthMatch::TruthChargedPionMichelIndex, spillCut, cut) );
 
   //map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("Test", Binning::Simple(8, -3., 5.), loader, ICARUSNumuXsec::TruthMatch::TruthChargedPionMichelMatchedSlice, spillCut) );
 
   //FillCVandSystSpectrum(loader, "TruthE", varNeutrinoTruthE, Binning::Simple(50, 0., 10.), spillCut, cut);
 
-
+/*
   map_cutName_to_vec_Spectrums[currentCutName].push_back(
     new Spectrum(
       "TruthProtonP_vs_TruthProtonLength", loader,
@@ -987,6 +1028,7 @@ void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
       spillCut, cut
     )
   );
+*/
 
 }
 

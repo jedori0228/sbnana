@@ -79,6 +79,21 @@ namespace TruthMatch{
   extern const Var TruthChargedPionMichelMatchedShowerDistanceFromMuonEnd;
   extern const Var TruthChargedPionMichelHasReco;
 
+  // - Neutral pion
+  // For a given true neutral pion (truth_index), find a reco track whose best-matched is this particle
+  extern const Var TruthNeutralPionIndex;
+  extern const Var TruthNeutralPionKE;
+  extern const MultiVar TruthNeutralPionMatchedShowerIndicies;
+  extern const MultiVar TruthNeutralPionMatchedShowerTrackScores;
+  extern const MultiVar TruthNeutralPionMatchedShowerEnergies;
+  extern const MultiVar TruthNeutralPionMatchedShowerdEdxs;
+  extern const MultiVar TruthNeutralPionMatchedShowerConvGaps;
+  extern const MultiVar TruthNeutralPionMatchedShowerLengths;
+  extern const Var TruthNeutralPionNMatchedShower;
+  extern const Var TruthNeutralPionNMatchedShowerWithCut;
+  extern const Var TruthNeutralPionMatchedShowerSumEnergy;
+  extern const Var TruthNeutralPionMatchedShowerSumInvariantMass;
+
   // test
   extern const SpillMultiVar TruthChargedPionMichelMatchedSlice;
 

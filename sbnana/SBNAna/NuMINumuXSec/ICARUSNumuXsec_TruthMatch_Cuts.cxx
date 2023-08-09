@@ -79,7 +79,13 @@ namespace TruthMatch{
     return TruthMuonMichelIndex(slc)>=0;
   });
   const Cut TruthChargedPionHasMichel([](const caf::SRSliceProxy* slc) {
-    return TruthChargedPionMichelMatchedShowerIndex(slc)>=0;
+    return TruthChargedPionMichelIndex(slc)>=0;
+  });
+  const Cut HasTruthChargedPion([](const caf::SRSliceProxy* slc) {
+    return TruthChargedPionIndex(slc)>=0;
+  });
+  const Cut HasTruthNeutralPion([](const caf::SRSliceProxy* slc) {
+    return TruthNeutralPionIndex(slc)>=0;
   });
 
 } // end namespace TruthMatch

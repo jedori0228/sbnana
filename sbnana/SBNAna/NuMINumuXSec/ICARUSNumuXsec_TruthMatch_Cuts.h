@@ -26,6 +26,8 @@ namespace TruthMatch{
 
   extern const Cut TruthMuonHasMichel;
   extern const Cut TruthChargedPionHasMichel;
+  extern const Cut HasTruthChargedPion;
+  extern const Cut HasTruthNeutralPion;
 
 } // end namespace TruthMatch
 

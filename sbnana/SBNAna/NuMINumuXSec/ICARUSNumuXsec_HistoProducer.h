@@ -114,6 +114,9 @@ namespace ICARUSNumuXsec{
     // Systematics by ISyst
     std::map< TString, vector< pair<TString, Spectrum *> > > map_cutName_to_vec_SystSpectrumPairs;
 
+    // Metadata
+    void FillMetadata(SpectrumLoader& loader);
+
     // slice
     template<class T>
     void FillCVSpectrum(SpectrumLoader& loader, const std::string& label, const T& var, const Binning& binning, SpillCut spillCut, Cut cut, bool ForceFill=false);

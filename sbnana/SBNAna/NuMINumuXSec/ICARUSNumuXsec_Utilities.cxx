@@ -3,20 +3,32 @@
 
 using namespace ICARUSNumuXsec;
 
+//---------------------------------------------------
+// ActiveColumeTool
+
 ActiveVolumeTool& ActiveVolumeTool::Instance(){
   static ActiveVolumeTool avt;
   return avt;
 }
+
+//---------------------------------------------------
+// VertexContained
 
 VertexContained& VertexContained::Instance(){
   static VertexContained vc;
   return vc;
 }
 
+//---------------------------------------------------
+// TrackContained
+
 TrackContained& TrackContained::Instance(){
   static TrackContained tc;
   return tc;
 }
+
+//---------------------------------------------------
+// VolumeTool
 
 bool VolumeTool::isContained(double x, double y, double z) const {
 
@@ -73,103 +85,8 @@ double VolumeTool::GetTotalVolume() const {
 
 }
 
-// Printing
-void ICARUSNumuXsec::PrintPrimaries(const caf::SRSliceProxy* slc){
-
-  std::cout << "[PrintPrimaries] called" << std::endl;
-
-  for(unsigned int i_prim=0; i_prim<slc->truth.prim.size(); ++i_prim){
-
-    const auto& prim = slc->truth.prim[i_prim];
-    printf("  - %d-th prim\n",i_prim);
-    printf("    - G4ID = %d\n", prim.G4ID.GetValue());
-    printf("    - pdg = %d\n", prim.pdg.GetValue());
-    printf("    - Parent ID = %d\n", prim.parent.GetValue());
-    printf("    - start = (%1.2f, %1.2f, %1.2f)\n", prim.start.x.GetValue(), prim.start.y.GetValue(), prim.start.z.GetValue());
-    printf("    - end = (%1.2f, %1.2f, %1.2f)\n", prim.end.x.GetValue(), prim.end.y.GetValue(), prim.end.z.GetValue());
-    const float dist = std::hypot(prim.end.x - prim.start.x, prim.end.y - prim.start.y, prim.end.z - prim.start.z);
-    printf("    - |end-start| = %1.2f\n", dist);
-    printf("    - start_process = %d\n", prim.start_process.GetValue());
-    printf("    - end_process = %d\n", prim.end_process.GetValue());
-
-  }
-
-}
-
-// For a given truth particle, find the reco object
-//   Track : return the longest matched track
-int ICARUSNumuXsec::GetMatchedRecoTrackIndex(const caf::SRSliceProxy* slc, int truth_idx, double scorecut){
-
-  if(truth_idx>=0){
-
-    int PTrackInd(-999);
-    double LMax(-999.);
-    for(std::size_t i(0); i < slc->reco.pfp.size(); ++i){
-      const auto& pfp = slc->reco.pfp.at(i);
-      if(pfp.trackScore<scorecut) continue;
-      const auto& trk = pfp.trk;
-      if( trk.truth.p.pdg==slc->truth.prim.at(truth_idx).pdg && trk.truth.p.G4ID==slc->truth.prim.at(truth_idx).G4ID ){
-        if(trk.len > LMax){
-          PTrackInd = i;
-          LMax = trk.len;
-        }
-      }
-    }
-    return PTrackInd;
-  }
-  else{
-    return -1;
-  }
-
-}
-
-//   Shower : return (TODO energetic?) shower
-int ICARUSNumuXsec::GetMatchedRecoShowerIndex(const caf::SRSliceProxy* slc, int truth_idx, double scorecut){
-
-  if(truth_idx>=0){
-
-    int PTrackInd(-999);
-    for(std::size_t i(0); i < slc->reco.pfp.size(); ++i){
-      const auto& pfp = slc->reco.pfp.at(i);
-      if(pfp.trackScore>=scorecut) continue;
-      const auto& shw = pfp.shw;
-      if( shw.truth.p.pdg==slc->truth.prim.at(truth_idx).pdg && shw.truth.p.G4ID==slc->truth.prim.at(truth_idx).G4ID ){
-        PTrackInd = i;
-      }
-    }
-    return PTrackInd;
-  }
-  else{
-    return -1;
-  }
-
-}
-
-int ICARUSNumuXsec::GetMatchedRecoStubIndex(const caf::SRSliceProxy* slc, int truth_idx){
-
-  if(truth_idx>=0){
-
-    int PTrackInd(-999);
-    for(std::size_t i(0); i < slc->reco.stub.size(); ++i){
-      const auto& stub = slc->reco.stub.at(i);
-      if( stub.truth.p.pdg==slc->truth.prim.at(truth_idx).pdg && stub.truth.p.G4ID==slc->truth.prim.at(truth_idx).G4ID ){
-        PTrackInd = i;
-      }
-    }
-    return PTrackInd;
-  }
-  else{
-    return -1;
-  }
-
-}
-
-double ICARUSNumuXsec::GetEnergyFromStubCharge(double q){
-  static double p0 = -0.00236892;
-  static double p1 = 0.383538;
-  if(q<=0.) return -999.;
-  else return (q*23.6e-9-p0)/p1; // to GeV
-}
+//---------------------------------------------------
+// NuMICoordinateTool
 
 NuMICoordinateTool::NuMICoordinateTool(){
 
@@ -200,6 +117,10 @@ NuMICoordinateTool& NuMICoordinateTool::Instance(){
   static NuMICoordinateTool nct;
   return nct;
 }
+
+
+//---------------------------------------------------
+// NuMIPPFXWeightTool
 
 NuMIPPFXWeightTool::NuMIPPFXWeightTool(){
 
@@ -298,6 +219,9 @@ double NuMIPPFXWeightTool::GetFirstNuWeight(const caf::SRSpillProxy* sr) const {
   return h->GetBinContent(bin);
 
 }
+
+//---------------------------------------------------
+// dEdXTemplateTool
 
 dEdXTemplateTool::dEdXTemplateTool(){
 
@@ -473,6 +397,9 @@ dEdXTemplateTool& dEdXTemplateTool::Instance(){
   return dedxtt;
 }
 
+//---------------------------------------------------
+// SterileNuTool
+
 SterileNuTool::SterileNuTool(){
 
   sin2th = 0.10;
@@ -493,6 +420,9 @@ SterileNuTool& SterileNuTool::Instance(){
   return snt;
 }
 
+//---------------------------------------------------
+// ParticleTool
+
 ParticleTool::ParticleTool(){
 }
 
@@ -512,6 +442,9 @@ double ParticleTool::GetMass(int pdg) const {
   else return 0.;
 
 }
+
+//---------------------------------------------------
+// InteractionTool
 
 InteractionTool::InteractionTool(){
 
@@ -623,6 +556,118 @@ InteractionTool::NParticles InteractionTool::GetNParticles(const caf::SRSlicePro
 
 }
 
+//---------------------------------------------------
+// Printing
+void ICARUSNumuXsec::PrintPrimaries(const caf::SRSliceProxy* slc){
+
+  std::cout << "[PrintPrimaries] called" << std::endl;
+
+  for(unsigned int i_prim=0; i_prim<slc->truth.prim.size(); ++i_prim){
+
+    const auto& prim = slc->truth.prim[i_prim];
+    printf("  - %d-th prim\n",i_prim);
+    printf("    - G4ID = %d\n", prim.G4ID.GetValue());
+    printf("    - pdg = %d\n", prim.pdg.GetValue());
+    printf("    - Parent ID = %d\n", prim.parent.GetValue());
+    printf("    - start = (%1.2f, %1.2f, %1.2f)\n", prim.start.x.GetValue(), prim.start.y.GetValue(), prim.start.z.GetValue());
+    printf("    - end = (%1.2f, %1.2f, %1.2f)\n", prim.end.x.GetValue(), prim.end.y.GetValue(), prim.end.z.GetValue());
+    const float dist = std::hypot(prim.end.x - prim.start.x, prim.end.y - prim.start.y, prim.end.z - prim.start.z);
+    printf("    - |end-start| = %1.2f\n", dist);
+    printf("    - start_process = %d\n", prim.start_process.GetValue());
+    printf("    - end_process = %d\n", prim.end_process.GetValue());
+
+  }
+
+}
+
+// For a given truth particle, find the reco object
+//   Track : return the longest matched track
+int ICARUSNumuXsec::GetMatchedRecoTrackIndex(const caf::SRSliceProxy* slc, int truth_idx, double scorecut){
+
+  if(truth_idx>=0){
+
+    int PTrackInd(-999);
+    double LMax(-999.);
+    for(std::size_t i(0); i < slc->reco.pfp.size(); ++i){
+      const auto& pfp = slc->reco.pfp.at(i);
+      if(pfp.trackScore<scorecut) continue;
+      const auto& trk = pfp.trk;
+      if( trk.truth.p.pdg==slc->truth.prim.at(truth_idx).pdg && trk.truth.p.G4ID==slc->truth.prim.at(truth_idx).G4ID ){
+        if(trk.len > LMax){
+          PTrackInd = i;
+          LMax = trk.len;
+        }
+      }
+    }
+    return PTrackInd;
+  }
+  else{
+    return -1;
+  }
+
+}
+
+//   Shower : return (TODO energetic?) shower
+int ICARUSNumuXsec::GetMatchedRecoShowerIndex(const caf::SRSliceProxy* slc, int truth_idx, double scorecut){
+
+  if(truth_idx>=0){
+
+    int PTrackInd(-999);
+    for(std::size_t i(0); i < slc->reco.pfp.size(); ++i){
+      const auto& pfp = slc->reco.pfp.at(i);
+      if(pfp.trackScore>=scorecut) continue;
+      const auto& shw = pfp.shw;
+      if( shw.truth.p.pdg==slc->truth.prim.at(truth_idx).pdg && shw.truth.p.G4ID==slc->truth.prim.at(truth_idx).G4ID ){
+        PTrackInd = i;
+      }
+    }
+    return PTrackInd;
+  }
+  else{
+    return -1;
+  }
+
+}
+std::vector<double> ICARUSNumuXsec::GetMatchedRecoShowerIndices(const caf::SRSliceProxy* slc, int truth_idx, double scorecut){
+
+  std::vector<double> rets;
+
+  if(truth_idx>=0){
+
+    for(std::size_t i(0); i < slc->reco.pfp.size(); ++i){
+      const auto& pfp = slc->reco.pfp.at(i);
+      if(pfp.trackScore>=scorecut) continue;
+      const auto& shw = pfp.shw;
+      if( shw.truth.p.pdg==slc->truth.prim.at(truth_idx).pdg && shw.truth.p.G4ID==slc->truth.prim.at(truth_idx).G4ID ){
+        rets.push_back( i );
+      }
+    }
+  }
+
+  return rets;
+
+}
+
+int ICARUSNumuXsec::GetMatchedRecoStubIndex(const caf::SRSliceProxy* slc, int truth_idx){
+
+  if(truth_idx>=0){
+
+    int PTrackInd(-999);
+    for(std::size_t i(0); i < slc->reco.stub.size(); ++i){
+      const auto& stub = slc->reco.stub.at(i);
+      if( stub.truth.p.pdg==slc->truth.prim.at(truth_idx).pdg && stub.truth.p.G4ID==slc->truth.prim.at(truth_idx).G4ID ){
+        PTrackInd = i;
+      }
+    }
+    return PTrackInd;
+  }
+  else{
+    return -1;
+  }
+
+}
+
+
 std::vector<std::string> ICARUSNumuXsec::GetGENIEMultisigmaKnobNames(){
 
   return {
@@ -731,5 +776,13 @@ std::vector<std::string> ICARUSNumuXsec::GetGENIEMultisimKnobNames(){
 "FSI_N_VariationResponse",
   };
 
+}
+
+//---------------------------------------------------
+bool ICARUSNumuXsec::IsPFPTrack(const caf::SRPFPProxy& pfp){
+  return pfp.trackScore>0.4;
+}
+bool ICARUSNumuXsec::IsPFPShower(const caf::SRPFPProxy& pfp){
+  return !IsPFPTrack(pfp);
 }
 

@@ -23,7 +23,7 @@ parser.add_argument('--args', dest='ArgsToPass', default="")
 parser.add_argument('--memory', dest='Memory', default="2GB")
 parser.add_argument('--no_exec', action='store_true')
 parser.add_argument('--batchname',dest='BatchName', default="")
-parser.add_argument('--lifetime',dest='Lifetime',default="1h")
+parser.add_argument('--lifetime',dest='Lifetime',default="2h")
 parser.add_argument('--server',dest='Server',default="")
 parser.add_argument('--syst',action='store_true')
 parser.add_argument('--verbos',dest="Verbos",default="INFO")
@@ -372,9 +372,10 @@ filesFromSender=${CONDOR_DIR_INPUT}/ToGrid/ToGrid/
 echo "@@ setup_icarus.sh"
 source /cvmfs/icarus.opensciencegrid.org/products/icarus/setup_icarus.sh
 
-setup cetlib v3_13_04 -q e20:prof
+setup cetlib v3_16_00 -q e20:prof
 setup larsoft_data v1_02_02
-setup ifdhc v2_6_18 -q e20:p392:prof
+setup ifdhc v2_6_20 -q e20:p3913:prof
+setup sam_web_client v3_3
 export IFDH_CP_MAXRETRIES=2
 
 echo "@@ Creating lib dir and go there"
@@ -431,6 +432,7 @@ echo "@@ Done!"
   submitcmd += '''--append_condor_requirements='(TARGET.HAS_SINGULARITY=?=true)' \\\n'''
   submitcmd += '''--tar_file_name "dropbox://$(pwd)/ToGrid.tar" \\\n'''
   submitcmd += '''--email-to jae.sung.kim.3426@gmail.com \\\n'''
+  submitcmd += '''-e LC_ALL=C \\\n'''
   #submitcmd += '''--expected-lifetime %s \\\n'''%(args.Lifetime)
   submitcmd += '''--memory %s \\\n'''%(args.Memory)
   submitcmd += '''-N %d \\\n'''%(NJobs)
@@ -470,7 +472,7 @@ echo "@@ Done!"
 
     killcmd_file = open(base_rundir+'/killcmd.sh','w')
     for it_job in range(0,NJobs):
-      killcmd_file.write('jobsub_rm --user jskim --jobid %s.%d@%s\n'%(jobID_Cluster,it_job,jobID_Schedd))
+      killcmd_file.write('jobsub_rm user jskim -J%s.%d@%s\n'%(jobID_Cluster,it_job,jobID_Schedd))
     killcmd_file.close()
 
   gridJobInfos.append(this_GridJobInfo)
@@ -667,9 +669,14 @@ try:
                 os.system('echo "Too many hadd currently (nhadd='+str(nhadd)+'). Sleep 60s" >> JobStatus.log')
                 time.sleep(60)
               logger.LOG("DEBUG", "Running hadd..")
+
+              ## check number of output file
+
+              NOutputFile = len([f for f in os.listdir(base_rundir+"/output/") if f.endswith('.root') and os.path.isfile(os.path.join(base_rundir+"/output/", f))])
+              if NOutputFile!=nFiles:
+                raise ValueError("@@ Number of output files does not match: %d submitted, but only got %d.\nCheck %s/"%(nFiles, NOutputFile, base_rundir))
+
               os.system('hadd -f '+outputname+'.root output/*.root >> PostJob.log')
-              #print("@@@@ Jobstatus")
-              #print(lines_JobStatus)
               #os.system('rm output/*.root') ## TODO enable this
 
             ## Final Outputpath

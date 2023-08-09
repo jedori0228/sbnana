@@ -18,6 +18,22 @@ namespace ICARUSNumuXsec{
       return sr->hdr.triggerinfo.trigger_within_gate-4.;
     }
   });
+  const SpillVar TriggerInfoTriggerType([](const caf::SRSpillProxy *sr) -> double {
+    if(sr->hdr.ismc){
+      return -1.;
+    }
+    else{
+      return sr->hdr.triggerinfo.trigger_type;
+    }
+  });
+  const SpillVar TriggerInfoSourceType([](const caf::SRSpillProxy *sr) -> double {
+    if(sr->hdr.ismc){
+      return -1.;
+    }
+    else{
+      return sr->hdr.triggerinfo.source_type;
+    }
+  });
   // - Test
   const SpillMultiVar spillvarTest([](const caf::SRSpillProxy *sr) -> vector<double> {
 
@@ -71,10 +87,9 @@ namespace ICARUSNumuXsec{
     int nTrk=0;
     for(std::size_t i(0); i < sr->slc.size(); ++i){
       const auto& slc = sr->slc.at(i);
-      //std::cout << "[spillvarTest] Slice index = " << i << ", slc.reco.pfp.size() = " << slc.reco.pfp.size() << std::endl;
-      for(std::size_t ip(0); ip < slc.reco.pfp.size(); ++ip){
-        bool IsTrack = slc.reco.pfp.at(ip).trackScore > 0.5;
-        if(IsTrack) nTrk++;
+      for(const auto& pfp: slc.reco.pfp){
+        bool IsTrack = IsPFPTrack(pfp);
+        if( IsTrack ) nTrk++;
       }
     }
     return nTrk;
@@ -83,10 +98,9 @@ namespace ICARUSNumuXsec{
     int nShw=0;
     for(std::size_t i(0); i < sr->slc.size(); ++i){
       const auto& slc = sr->slc.at(i);
-      //std::cout << "[spillvarTest] Slice index = " << i << ", slc.reco.pfp.size() = " << slc.reco.pfp.size() << std::endl;
-      for(std::size_t ip(0); ip < slc.reco.pfp.size(); ++ip){
-        bool IsShower = slc.reco.pfp.at(ip).trackScore < 0.5;
-        if(IsShower) nShw++;
+      for(const auto& pfp: slc.reco.pfp){
+        bool IsShower = IsPFPShower(pfp);
+        if( IsShower ) nShw++;
       }
     }
     return nShw;
@@ -308,7 +322,7 @@ namespace ICARUSNumuXsec{
     std::vector<double> rets;
     for(std::size_t i(0); i < slc->reco.pfp.size(); ++i){
 
-      bool IsTrack = slc->reco.pfp.at(i).trackScore > 0.5;
+      bool IsTrack = IsPFPTrack( slc->reco.pfp.at(i) );
       if(!IsTrack) continue;
       const auto& trk = slc->reco.pfp.at(i).trk;
       if(isnan(trk.len)) continue;
@@ -322,7 +336,7 @@ namespace ICARUSNumuXsec{
     std::vector<double> rets;
     for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); i_pfp++){
       const auto& pfp = slc->reco.pfp.at(i_pfp);
-      if(pfp.trackScore<0.5) continue;
+      if( !IsPFPTrack(pfp) ) continue; // TODO
       const auto& trk = pfp.trk;
       if(isnan(trk.start.x)) continue;
       const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
@@ -346,7 +360,7 @@ namespace ICARUSNumuXsec{
 
     for(std::size_t i(0); i < slc->reco.pfp.size(); ++i){
 
-      bool IsTrack = slc->reco.pfp.at(i).trackScore > 0.5;
+      bool IsTrack = IsPFPTrack( slc->reco.pfp.at(i) );
       if(!IsTrack) continue;
 
       const auto& trk = slc->reco.pfp.at(i).trk;

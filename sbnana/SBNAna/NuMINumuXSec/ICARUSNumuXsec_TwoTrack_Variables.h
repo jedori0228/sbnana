@@ -76,6 +76,16 @@ namespace TwoTrack{
   extern const Var InelasticChargedPionTrackNuMIToVtxCosineTheta;
   extern const Var InelasticChargedPionTrackChi2MIPCollection;
 
+  // Neutral pion
+  extern const MultiVar NeutralPionPhotonShowerIndices;
+  extern const MultiVar NeutralPionPhotonShowerConvGaps;
+  extern const MultiVar NeutralPionPhotonShowerLengths;
+  extern const MultiVar NeutralPionPhotonShowerEnergies;
+  extern const MultiVar NeutralPionPhotonShowerdEdxs;
+  extern const Var NNeutralPionPhotonShower;
+  extern const Var NeutralPionPhotonShowerSumEnergy;
+  extern const Var NeutralPionPhotonShowerSumInvariantMass;
+
   namespace Aux{
 
     extern const SpillMultiVar TestSpillVar;

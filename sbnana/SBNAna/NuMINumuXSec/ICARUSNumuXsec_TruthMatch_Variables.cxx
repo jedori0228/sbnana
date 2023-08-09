@@ -636,7 +636,7 @@ namespace TruthMatch{
   });
   const Var TruthChargedPionMichelMatchedShowerIndex([](const caf::SRSliceProxy* slc) -> double {
     int truth_idx = TruthChargedPionMichelIndex(slc);
-    return GetMatchedRecoShowerIndex(slc, truth_idx, 0.);
+    return GetMatchedRecoShowerIndex(slc, truth_idx, 1.0);
   });
   const Var TruthChargedPionMichelMatchedShowerKE([](const caf::SRSliceProxy* slc) -> double {
     int pionMichelShowerIndex = TruthChargedPionMichelMatchedShowerIndex(slc);
@@ -684,6 +684,153 @@ namespace TruthMatch{
     return 4.;
 
   });
+
+  // - Neutral pion
+  // For a given true neutral pion (truth_index), find a reco track whose best-matched is this particle
+  const Var TruthNeutralPionIndex([](const caf::SRSliceProxy* slc) -> double {
+    double max_E(-999);
+    int truth_idx(-1);
+    for(std::size_t i(0); i < slc->truth.prim.size(); ++i){
+      if( abs(slc->truth.prim.at(i).pdg)==111 && slc->truth.prim.at(i).start_process==0 ){
+        if(isnan(slc->truth.prim.at(i).genE)) continue;
+        double this_E = slc->truth.prim.at(i).genE;
+        if(this_E>max_E){
+          max_E = this_E;
+          truth_idx = i;
+        }
+      }
+    }
+    return truth_idx;
+  });
+  const Var TruthNeutralPionKE([](const caf::SRSliceProxy* slc) -> double {
+    int truth_idx = TruthNeutralPionIndex(slc);
+    if(truth_idx>=0){
+      return slc->truth.prim.at(truth_idx).genE - M_NEUTRALPION;
+    }
+    else{
+      return -999.;
+    }
+
+  });
+  const MultiVar TruthNeutralPionMatchedShowerIndicies([](const caf::SRSliceProxy* slc) -> vector<double> {
+    int truth_idx = TruthNeutralPionIndex(slc);
+
+    vector<double> rets;
+
+    if(truth_idx>=0){
+
+      //return GetMatchedRecoShowerIndices(slc, truth_idx, 1.0);
+      const auto& prim = slc->truth.prim.at(truth_idx);
+
+      for(std::size_t i(0); i < slc->reco.pfp.size(); ++i){
+        const auto& pfp = slc->reco.pfp.at(i);
+        const auto& shw = pfp.shw;
+
+        const auto& shw_pdg = shw.truth.p.pdg;
+        // photon
+        if(shw_pdg!=22) continue;
+
+        const auto& shw_ParentG4ID = shw.truth.p.parent;
+
+        if((int)shw_ParentG4ID==prim.G4ID){
+          rets.push_back(i);
+        }
+      }
+
+    }
+
+    return rets;
+
+  });
+  const MultiVar TruthNeutralPionMatchedShowerTrackScores([](const caf::SRSliceProxy* slc) -> vector<double> {
+    vector<double> shw_indices = TruthNeutralPionMatchedShowerIndicies(slc);
+    vector<double> rets;
+    for(const auto& shw_index: shw_indices){
+      rets.push_back( slc->reco.pfp[shw_index].trackScore );
+    }
+    return rets;
+  });
+  const MultiVar TruthNeutralPionMatchedShowerEnergies([](const caf::SRSliceProxy* slc) -> vector<double> {
+    vector<double> shw_indices = TruthNeutralPionMatchedShowerIndicies(slc);
+    vector<double> rets;
+    for(const auto& shw_index: shw_indices){
+      rets.push_back( slc->reco.pfp[shw_index].shw.plane[2].energy );
+    }
+    return rets;
+  });
+  const MultiVar TruthNeutralPionMatchedShowerdEdxs([](const caf::SRSliceProxy* slc) -> vector<double> {
+    vector<double> shw_indices = TruthNeutralPionMatchedShowerIndicies(slc);
+    vector<double> rets;
+    for(const auto& shw_index: shw_indices){
+      rets.push_back( slc->reco.pfp[shw_index].shw.plane[2].dEdx );
+    }
+    return rets;
+  });
+  const MultiVar TruthNeutralPionMatchedShowerConvGaps([](const caf::SRSliceProxy* slc) -> vector<double> {
+    vector<double> shw_indices = TruthNeutralPionMatchedShowerIndicies(slc);
+    vector<double> rets;
+    for(const auto& shw_index: shw_indices){
+      rets.push_back( slc->reco.pfp[shw_index].shw.conversion_gap );
+    }
+    return rets;
+  });
+  const MultiVar TruthNeutralPionMatchedShowerLengths([](const caf::SRSliceProxy* slc) -> vector<double> {
+    vector<double> shw_indices = TruthNeutralPionMatchedShowerIndicies(slc);
+    vector<double> rets;
+    for(const auto& shw_index: shw_indices){
+      rets.push_back( slc->reco.pfp[shw_index].shw.len );
+    }
+    return rets;
+  });
+  const Var TruthNeutralPionNMatchedShower([](const caf::SRSliceProxy* slc) -> double {
+    return TruthNeutralPionMatchedShowerIndicies(slc).size();
+  });
+  const Var TruthNeutralPionNMatchedShowerWithCut([](const caf::SRSliceProxy* slc) -> double {
+    vector<double> shw_indices = TruthNeutralPionMatchedShowerIndicies(slc);
+    int Nshw = 0;
+    for(const auto& shw_index: shw_indices){
+      const auto& pfp = slc->reco.pfp.at(shw_index);
+      const auto& shw = pfp.shw;
+
+      if(pfp.trackScore>0.5) continue;
+      if(shw.plane[2].dEdx<3) continue;
+
+      Nshw++;
+    }
+    return Nshw;
+  });
+
+  const Var TruthNeutralPionMatchedShowerSumEnergy([](const caf::SRSliceProxy* slc) -> double {
+    vector<double> shw_indices = TruthNeutralPionMatchedShowerIndicies(slc);
+    double esum = 0.;
+    for(const auto& shw_index: shw_indices){
+      const auto& shw = slc->reco.pfp.at(shw_index).shw;
+      esum += shw.plane[2].energy;
+    }
+
+    return esum;
+
+  });
+  const Var TruthNeutralPionMatchedShowerSumInvariantMass([](const caf::SRSliceProxy* slc) -> double {
+    vector<double> shw_indices = TruthNeutralPionMatchedShowerIndicies(slc);
+    double esum = 0.;
+    TVector3 psum(0., 0., 0.);
+    for(const auto& shw_index: shw_indices){
+      const auto& shw = slc->reco.pfp.at(shw_index).shw;
+
+      TVector3 this_p(shw.dir.x.GetValue(), shw.dir.y.GetValue(), shw.dir.z.GetValue());
+      this_p *= shw.plane[2].energy;
+
+      esum += shw.plane[2].energy;
+      psum += this_p;
+    }
+
+    double m2 = esum*esum - psum.Mag2();
+
+    return m2>0 ? sqrt(m2) : 0.;
+
+  });
+
 
   // test
   const SpillMultiVar TruthChargedPionMichelMatchedSlice([](const caf::SRSpillProxy *sr) -> vector<double> {

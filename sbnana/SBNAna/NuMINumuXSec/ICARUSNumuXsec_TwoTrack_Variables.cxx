@@ -22,6 +22,7 @@ namespace TwoTrack{
 
         if(trk.bestplane == -1) continue;
         if(isnan(trk.start.x)) continue;
+
         // First we calculate the distance of each track to the slice vertex.
         const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
                                        slc->vertex.y - trk.start.y,
@@ -194,7 +195,6 @@ namespace TwoTrack{
 
         if(trkIdx==muonTrackIndex) continue;
         if(trk.bestplane == -1) continue;
-        //if(trk.calo[2].nhit<10) continue;
 
         // First we calculate the distance of each track to the slice vertex.
         if(isnan(trk.start.x)) continue;
@@ -219,7 +219,12 @@ namespace TwoTrack{
           angle = TMath::Cos(muDir.Angle(pDir));
         }
 
-        if ( AtSlice && Contained && trk.calo[2].nhit>=5 && Chi2Proton <= 90 && Chi2Muon >= 30 && angle >= -0.9 && trk.len > Longest ) {
+        bool PassPCut = false;
+        if( !isnan(trk.rangeP.p_proton) ){
+          PassPCut = trk.rangeP.p_proton>0.4;
+        }
+
+        if ( AtSlice && Contained && trk.calo[2].nhit>=5 && Chi2Proton <= 90 && Chi2Muon >= 30 && angle >= -0.9 && trk.len > Longest && PassPCut ) {
         //if ( AtSlice && Contained && trk.calo[2].nhit!=0 && Chi2Proton <= 100 && angle >= -0.9 && trk.len > Longest ) {
           Longest = trk.len;
           PTrackInd = trkIdx;
@@ -537,6 +542,7 @@ namespace TwoTrack{
           if(trkIdx==(unsigned int)muonTrackIndex) continue;
           if(trk.bestplane==-1) continue;
           if(isnan(trk.start.x)) continue;
+
           // First we calculate the distance of each track to the slice vertex.
           const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
                                          slc->vertex.y - trk.start.y,
@@ -593,6 +599,7 @@ namespace TwoTrack{
           if(trkIdx==(unsigned int)protonTrackIndex) continue;
           if(trk.bestplane==-1) continue;
           if(isnan(trk.start.x)) continue;
+
           // First we calculate the distance of each track to the slice vertex.
           const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
                                          slc->vertex.y - trk.start.y,
@@ -850,13 +857,112 @@ namespace TwoTrack{
     }
   });
 
+  // Neutral pion
+  const MultiVar NeutralPionPhotonShowerIndices([](const caf::SRSliceProxy* slc) -> vector<double> {
+    vector<double> rets;
+    for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); i_pfp++){
+      const auto& pfp = slc->reco.pfp.at(i_pfp);
+
+      if( !IsPFPShower(pfp) ) continue; // TODO
+
+      const auto& shw = pfp.shw;
+
+      // dEdx
+      if( isnan(shw.plane[2].dEdx) ) continue;
+      if(shw.plane[2].dEdx<1.0) continue;
+
+      // conversion gap
+      if( isnan(shw.conversion_gap) ) continue;
+      if(shw.conversion_gap<10.) continue;
+
+      rets.push_back(i_pfp);
+    }
+
+    return rets;
+
+  });
+  const MultiVar NeutralPionPhotonShowerConvGaps([](const caf::SRSliceProxy* slc) -> vector<double> {
+    vector<double> shw_indices = NeutralPionPhotonShowerIndices(slc);
+    vector<double> rets;
+    for(const auto& shw_index: shw_indices){
+      const auto& shw = slc->reco.pfp.at(shw_index).shw;
+      rets.push_back( shw.conversion_gap );
+    }
+    return rets;
+  });
+  const MultiVar NeutralPionPhotonShowerLengths([](const caf::SRSliceProxy* slc) -> vector<double> {
+    vector<double> shw_indices = NeutralPionPhotonShowerIndices(slc);
+    vector<double> rets;
+    for(const auto& shw_index: shw_indices){
+      const auto& shw = slc->reco.pfp.at(shw_index).shw;
+      rets.push_back( shw.len );
+    }
+    return rets;
+  });
+  const MultiVar NeutralPionPhotonShowerEnergies([](const caf::SRSliceProxy* slc) -> vector<double> {
+    vector<double> shw_indices = NeutralPionPhotonShowerIndices(slc);
+    vector<double> rets;
+    for(const auto& shw_index: shw_indices){
+      const auto& shw = slc->reco.pfp.at(shw_index).shw;
+      if( isnan(shw.plane[2].energy) ) rets.push_back(0.);
+      else rets.push_back( shw.plane[2].energy );
+    }
+    return rets;
+  });
+  const MultiVar NeutralPionPhotonShowerdEdxs([](const caf::SRSliceProxy* slc) -> vector<double> {
+    vector<double> shw_indices = NeutralPionPhotonShowerIndices(slc);
+    vector<double> rets;
+    for(const auto& shw_index: shw_indices){
+      const auto& shw = slc->reco.pfp.at(shw_index).shw;
+      if( isnan(shw.plane[2].dEdx) ) rets.push_back(0.);
+      else rets.push_back( shw.plane[2].dEdx );
+    }
+    return rets;
+  });
+  const Var NNeutralPionPhotonShower([](const caf::SRSliceProxy* slc) -> double {
+    return NeutralPionPhotonShowerIndices(slc).size();
+  });
+  const Var NeutralPionPhotonShowerSumEnergy([](const caf::SRSliceProxy* slc) -> double {
+    vector<double> shw_indices = NeutralPionPhotonShowerIndices(slc);
+    double esum = 0.;
+    for(const auto& shw_index: shw_indices){
+      const auto& shw = slc->reco.pfp.at(shw_index).shw;
+      if( !isnan(shw.plane[2].energy) ) esum += shw.plane[2].energy;
+    }
+    return esum;
+  });
+  const Var NeutralPionPhotonShowerSumInvariantMass([](const caf::SRSliceProxy* slc) -> double {
+    vector<double> shw_indices = NeutralPionPhotonShowerIndices(slc);
+    double esum = 0.;
+    TVector3 psum(0., 0., 0.);
+    for(const auto& shw_index: shw_indices){
+      const auto& shw = slc->reco.pfp.at(shw_index).shw;
+
+      TVector3 this_p(shw.dir.x.GetValue(), shw.dir.y.GetValue(), shw.dir.z.GetValue());
+      if( isnan(shw.plane[2].energy) ) continue;
+      this_p *= shw.plane[2].energy;
+
+      esum += shw.plane[2].energy;
+      psum += this_p;
+    }
+
+    double m2 = esum*esum - psum.Mag2();
+    return m2>0 ? sqrt(m2) : 0.;
+  });
+
   namespace Aux{
 
     const SpillMultiVar TestSpillVar([](const caf::SRSpillProxy *sr) -> vector<double> {
 
       vector<double> rets;
-      for(const auto& nu: sr->mc.nu){
-        rets.push_back( nu.time );
+
+      for(std::size_t i(0); i < sr->slc.size(); ++i){
+        const auto& slc = sr->slc.at(i);
+        int truth_index = ICARUSNumuXsec::TruthMatch::TruthNeutralPionIndex(&slc);
+        if(truth_index>=0){
+          std::cout << "[JSKIMDEBUG][Neutral pion event found]" << std::endl;
+          PrintPrimaries(&slc);
+        }
       }
 
       return rets;
