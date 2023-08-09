@@ -4,6 +4,7 @@ echo "@@ Setting NuMINumuXSec..."
 
 export NUMIXSECWD=`pwd`
 export PostJobWD=${NUMIXSECWD}/PostJob/
+export PlotDir=${PostJobWD}/plots/
 export gridWD=${NUMIXSECWD}/GridSub/
 
 export PYTHONPATH=${PYTHONPATH}:${PostJobWD}/Libs/:${PostJobWD}/Configs/:${gridWD}/python/:${gridWD}/Configs/
