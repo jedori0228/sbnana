@@ -165,6 +165,6 @@ const Cut kIsSlcOtherNuCC_1muNp0pi_NoContainment_ProtonKinematicTreshold([](cons
     if ( slc->truth.index < 0 ) return false; // not Nu
     if ( !slc->truth.iscc ) return false; // not CC
 
-    if ( kIsSlcSignal_1muNp0pi_NoContainment_ProtonKinematicTreshold(slc) ) return false; // covered by signal
+    if ( kIsSlcSignal_1muNp0pi_NoContainment_ProtonKinematicThreshold(slc) ) return false; // covered by signal
     return true;
   });
