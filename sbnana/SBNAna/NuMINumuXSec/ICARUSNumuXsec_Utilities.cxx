@@ -780,7 +780,7 @@ std::vector<std::string> ICARUSNumuXsec::GetGENIEMultisimKnobNames(){
 
 //---------------------------------------------------
 bool ICARUSNumuXsec::IsPFPTrack(const caf::SRPFPProxy& pfp){
-  return pfp.trackScore>0.4;
+  return pfp.trackScore>0.45;
 }
 bool ICARUSNumuXsec::IsPFPShower(const caf::SRPFPProxy& pfp){
   return !IsPFPTrack(pfp);
