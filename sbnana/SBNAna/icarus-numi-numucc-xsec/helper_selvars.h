@@ -286,7 +286,7 @@ const Cut kNuMISelection_1muNp0pi = kRFiducialNew && kNotClearCosmic && /*Presel
                                     kAllPrimaryHadronsContained && kNoSecondPrimaryMuonlikeTracks && /*Esp. chg pi rejection*/
                                     kCutPhotons;                                                     /*Esp. pi0 rejection*/
 
-// Version from plot approvals (USE WITH "Legacy_TrkAndShw.h" as the one determining IsTracklikeTrack !!)
+// Version from plot approvals (USE WITH "TrkAndShwLEGACY.h" as the one determining IsTracklikeTrack !!)
 const Cut kNuMISelection_1muNp0pi_Legacy = kRFiducialNew && kNotClearCosmic && /*Preselection*/
                                            kPTrackNew && kProtonTrack && /*Mu, P candidates*/
                                            kAllPrimaryHadronsContained && kNoSecondPrimaryMuonlikeTracks; /*Esp. chg pi rejection*/
