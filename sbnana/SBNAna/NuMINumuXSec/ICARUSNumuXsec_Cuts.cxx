@@ -9,12 +9,16 @@ namespace ICARUSNumuXsec{
 
   // - Trigger emul
   const SpillCut HasTrigger([](const caf::SRSpillProxy* sr){
+    // TODO
+/*
     if(sr->hdr.ismc){
       return ( fabs(sr->hdr.triggerinfo.trigger_within_gate) != std::numeric_limits<double>::max() );
     }
     else{
       return true;
     }
+*/
+    return true;
   });
 
   // - CRTPMT matching
