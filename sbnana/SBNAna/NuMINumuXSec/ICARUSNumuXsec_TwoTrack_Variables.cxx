@@ -867,13 +867,15 @@ namespace TwoTrack{
 
       const auto& shw = pfp.shw;
 
-      // dEdx
-      if( isnan(shw.plane[2].dEdx) ) continue;
-      if(shw.plane[2].dEdx<1.0) continue;
+      // Check if shower fit even seems kind-of valid:
+      if ( std::isnan(shw.start.x) || (shw.start.x > -5.5 && shw.start.x < -4.5) ||
+           std::isnan(shw.len) || shw.len <= 0. ) continue;
 
-      // conversion gap
-      if( isnan(shw.conversion_gap) ) continue;
-      if(shw.conversion_gap<10.) continue;
+      // if it meets this then we're not going to cut on it...
+      if ( std::isnan(shw.plane[2].energy) || std::isinf(shw.plane[2].energy) || shw.plane[2].energy <= 0.04 ) continue;
+
+      // and... if it meets then then we're not going to cut on it...
+      if ( std::isnan(shw.conversion_gap) || std::isinf(shw.conversion_gap) || shw.conversion_gap <= 5. ) continue;
 
       rets.push_back(i_pfp);
     }
