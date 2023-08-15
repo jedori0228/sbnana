@@ -65,6 +65,7 @@ namespace TwoTrack{
   // Charged pion, stopped
   extern const Var StoppedChargedPionTrackIndex;
   extern const Var StoppedChargedPionTrackLength;
+  extern const Var StoppedChargedPionTrackP;
   extern const Var StoppedChargedPionTrackNuMICosineTheta;
   extern const Var StoppedChargedPionTrackNuMIToVtxCosineTheta;
   extern const Var StoppedChargedPionTrackChi2MuonCollection;

@@ -833,12 +833,12 @@ void HistoProducer::TwoTrackAnalysis(SpectrumLoader& loader, SpillCut spillCut, 
   FillCVSpectrum(loader, "ProtonTrackNuMIToVtxCosineTheta", ProtonTrackNuMIToVtxCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
   FillCVSpectrum(loader, "ProtonTrackNHitsCollection", ProtonTrackNHitsCollection, Binning::Simple(200, 0., 200.), spillCut, cut);
   FillCVSpectrum(loader, "ProtonTrackChi2MuonCollection", ProtonTrackChi2MuonCollection, Binning::Simple(150, 0., 150.), spillCut, cut);
-  //FillCVSpectrum(loader, "ProtonTrackChi2ProtonCollection_vs_ProtonTrackNHitsCollection", ProtonTrackChi2ProtonCollection, Binning::Simple(20, 0., 20.), ProtonTrackNHitsCollection, Binning::Simple(100, 0., 100.), spillCut, cut);
   FillCVSpectrum(loader, "ProtonTrackChi2ProtonCollection", ProtonTrackChi2ProtonCollection, Binning::Simple(400, 0., 400.), spillCut, cut);
   FillCVSpectrum(loader, "ProtonTrackTruthP_vs_ProtonTrackP", ProtonTrackTruthP, Binning::Simple(20, 0., 2.), ProtonTrackP, Binning::Simple(20, 0., 2.), spillCut, cut);
   FillCVSpectrum(loader, "ProtonTrackTruthNuMICosineTheta_vs_ProtonTrackNuMICosineTheta", ProtonTrackTruthNuMICosineTheta, Binning::Simple(40, -1., 1.), ProtonTrackNuMICosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
 
   FillCVandSystSpectrum(loader, "MuonProtonCosineTheta", MuonProtonCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
+  FillCVSpectrum(loader, "TruthMuonProtonCosineTheta_vs_MuonProtonCosineTheta", ICARUSNumuXsec::TruthMatch::TruthMuonProtonCosineTheta, Binning::Simple(40, -1., 1.), MuonProtonCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
 
   FillCVandSystSpectrum(loader, "deltaPT", ICARUSNumuXsec::TwoTrack::TKI::deltaPT, Binning::Simple(40, 0., 2.0), spillCut, cut);
   FillCVSpectrum(loader, "deltaPTx", ICARUSNumuXsec::TwoTrack::TKI::deltaPTx, Binning::Simple(60, -3.0, 3.0), spillCut, cut);
@@ -851,18 +851,19 @@ void HistoProducer::TwoTrackAnalysis(SpectrumLoader& loader, SpillCut spillCut, 
   // pions for side band
   // - stopping charged pion
   FillCVSpectrum(loader, "StoppedChargedPionTrackLength", StoppedChargedPionTrackLength, Binning::Simple(300, 0., 300.), spillCut, cut);
-  FillCVandSystSpectrum(loader, "StoppedChargedPionTrackNuMICosineTheta", StoppedChargedPionTrackNuMICosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
-  FillCVandSystSpectrum(loader, "StoppedChargedPionTrackNuMIToVtxCosineTheta", StoppedChargedPionTrackNuMIToVtxCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
+  FillCVandSystSpectrum(loader, "StoppedChargedPionTrackP", StoppedChargedPionTrackP, Binning::Simple(200, 0., 2.), spillCut, cut);
+  FillCVSpectrum(loader, "StoppedChargedPionTrackNuMICosineTheta", StoppedChargedPionTrackNuMICosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
+  FillCVSpectrum(loader, "StoppedChargedPionTrackNuMIToVtxCosineTheta", StoppedChargedPionTrackNuMIToVtxCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
   FillCVSpectrum(loader, "StoppedChargedPionTrackChi2MuonCollection", StoppedChargedPionTrackChi2MuonCollection, Binning::Simple(100, 0., 100.), spillCut, cut);
   FillCVSpectrum(loader, "StoppedChargedPionTrackChi2ProtonCollection", StoppedChargedPionTrackChi2ProtonCollection, Binning::Simple(400, 0., 400.), spillCut, cut);
   // - inelastic pion
   FillCVSpectrum(loader, "InelasticChargedPionTrackLength", InelasticChargedPionTrackLength, Binning::Simple(200, 0., 200.), spillCut, cut);
-  FillCVandSystSpectrum(loader, "InelasticChargedPionTrackNuMICosineTheta", InelasticChargedPionTrackNuMICosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
-  FillCVandSystSpectrum(loader, "InelasticChargedPionTrackNuMIToVtxCosineTheta", InelasticChargedPionTrackNuMIToVtxCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
+  FillCVSpectrum(loader, "InelasticChargedPionTrackNuMICosineTheta", InelasticChargedPionTrackNuMICosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
+  FillCVSpectrum(loader, "InelasticChargedPionTrackNuMIToVtxCosineTheta", InelasticChargedPionTrackNuMIToVtxCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
   FillCVSpectrum(loader, "InelasticChargedPionTrackChi2MIPCollection", InelasticChargedPionTrackChi2MIPCollection, Binning::Simple(100, 0., 10.), spillCut, cut);
   // - neutral pion
   FillCVSpectrum(loader, "NNeutralPionPhotonShower", NNeutralPionPhotonShower, Binning::Simple(10, 0., 10.), spillCut, cut);
-  FillCVSpectrum(loader, "NeutralPionPhotonShowerSumEnergy", NeutralPionPhotonShowerSumEnergy, Binning::Simple(20, 0., 2.), spillCut, cut);
+  FillCVandSystSpectrum(loader, "NeutralPionPhotonShowerSumEnergy", NeutralPionPhotonShowerSumEnergy, Binning::Simple(20, 0., 2.), spillCut, cut);
   FillCVSpectrum(loader, "NeutralPionPhotonShowerSumInvariantMass", NeutralPionPhotonShowerSumInvariantMass, Binning::Simple(60, 0., 0.3), spillCut, cut);
   FillCVSpectrum(loader, "NeutralPionPhotonShowerConvGaps", NeutralPionPhotonShowerConvGaps, Binning::Simple(120, 0., 30.), spillCut, cut);
   FillCVSpectrum(loader, "NeutralPionPhotonShowerLengths", NeutralPionPhotonShowerLengths, Binning::Simple(50, 0., 50.), spillCut, cut);

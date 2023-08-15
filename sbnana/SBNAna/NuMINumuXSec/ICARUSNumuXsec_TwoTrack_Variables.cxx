@@ -157,8 +157,10 @@ namespace TwoTrack{
     int muonTrackIndex = MuonTrackIndex(slc);
     if(muonTrackIndex>=0){
       const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
-      if( isnan(trk.truth.p.genE) ) return -999.;
-      return trk.truth.p.genE - M_MUON;
+      const auto& truth_p = trk.truth.p;
+      if( isnan(truth_p.genp.x) ) return -999.;
+      TVector3 v3_gen_p(truth_p.genp.x, truth_p.genp.y, truth_p.genp.z);
+      return v3_gen_p.Mag();
     }
     else{
       return -999.;
@@ -372,8 +374,10 @@ namespace TwoTrack{
     int protonTrackIndex = ProtonTrackIndex(slc);
     if(protonTrackIndex>=0){
       const auto& trk = slc->reco.pfp.at(protonTrackIndex).trk;
-      if( isnan(trk.truth.p.genE) ) return -999.;
-      return trk.truth.p.genE - M_PROTON;
+      const auto& truth_p = trk.truth.p; 
+      if( isnan(truth_p.genp.x) ) return -999.;
+      TVector3 v3_gen_p(truth_p.genp.x, truth_p.genp.y, truth_p.genp.z);
+      return v3_gen_p.Mag();
     }
     else{
       return -999.;
@@ -691,6 +695,24 @@ namespace TwoTrack{
     if(stoppedCPionIndex>=0){
       const auto& trk = slc->reco.pfp.at(stoppedCPionIndex).trk;
       return trk.len;
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var StoppedChargedPionTrackP([](const caf::SRSliceProxy* slc) -> double {
+    int stoppedCPionIndex = StoppedChargedPionTrackIndex(slc);
+    if(stoppedCPionIndex>=0){
+      const auto& trk = slc->reco.pfp.at(stoppedCPionIndex).trk;
+      bool Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
+      if(Contained){
+        if(isnan(trk.rangeP.p_pion)) return -999.;
+        return trk.rangeP.p_pion;
+      }
+      else{
+        if(isnan(trk.mcsP.fwdP_pion)) return -999.;
+        return trk.mcsP.fwdP_pion;
+      }
     }
     else{
       return -999.;
