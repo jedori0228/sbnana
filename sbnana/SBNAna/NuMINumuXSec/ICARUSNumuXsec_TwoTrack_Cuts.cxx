@@ -7,20 +7,18 @@ namespace ICARUSNumuXsec{
 
 namespace TwoTrack{
 
+  // Primray tracks
   const Cut HasTwoPrimaryTracks([](const caf::SRSliceProxy* slc) {
     return ICARUSNumuXsec::PrimaryTrackIndices(slc).size()>=2;
   });
   const Cut HasOnlyTwoPrimaryTracks([](const caf::SRSliceProxy* slc) {
     return ICARUSNumuXsec::PrimaryTrackIndices(slc).size()==2;
   });
+
+  // Reco muon track
   const Cut HasMuonTrack([](const caf::SRSliceProxy* slc) {
     return MuonTrackIndex(slc)>=0.;
   });
-
-  const Cut HasProtonTrack([](const caf::SRSliceProxy* slc) {
-    return ProtonTrackIndex(slc)>=0;
-  });
-
   const Cut MuonTrackContained([](const caf::SRSliceProxy* slc) {
     int muonTrackIndex = MuonTrackIndex(slc);
     if(muonTrackIndex>=0){
@@ -57,7 +55,7 @@ namespace TwoTrack{
     double muonTrackRecoP = MuonTrackP(slc);
     return muonTrackRecoP<0.6;
   });
-
+  // - Truth matching
   const Cut MuonTrackTruthContainedNuMuon([](const caf::SRSliceProxy* slc) {
     int muonTrackIndex = MuonTrackIndex(slc);
     if(muonTrackIndex>=0){
@@ -218,8 +216,6 @@ namespace TwoTrack{
       return false;
     }
   });
-
-
   const Cut MuonTrackTruthOther([](const caf::SRSliceProxy* slc) {
     bool IsCategorized = MuonTrackTruthContainedNuMuon(slc);
     IsCategorized |= MuonTrackTruthExitingNuMuon(slc);
@@ -232,8 +228,31 @@ namespace TwoTrack{
     IsCategorized |= MuonTrackTruthOtherChargedPion(slc);
     return !IsCategorized;
   });
+  // - Comparing truth match to primary
+  const Cut MuonTrackTruthMatchedPrimary([](const caf::SRSliceProxy* slc) {
+    int muonTrackIndex = MuonTrackIndex(slc); // index of slc->reco.pfp
+    int muonPrimrayIndex = ICARUSNumuXsec::TruthMatch::TruthMuonIndex(slc); // index of slc->truth.prim
+    if(muonTrackIndex>=0 && muonPrimrayIndex>=0){
+      // reco track
+      const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
+      const auto& trk_truth = trk.truth.p;
+      const auto& trk_truth_G4ID = trk_truth.G4ID;
+      // primray
+      const auto& prim = slc->truth.prim.at(muonPrimrayIndex);
+      const auto& prim_G4ID = prim.G4ID;
 
+      if(trk_truth_G4ID==prim_G4ID) return true;
+      else return false;
+    }
+    else{
+      return false;
+    }
+  });
 
+  // Reco proton track
+  const Cut HasProtonTrack([](const caf::SRSliceProxy* slc) {
+    return ProtonTrackIndex(slc)>=0;
+  });
   const Cut ProtonPCut([](const caf::SRSliceProxy* slc) {
     double protonP = ProtonTrackP(slc);
     if(protonP<0){
@@ -241,6 +260,26 @@ namespace TwoTrack{
     }
     else{
       return (protonP>0.4);
+    }
+  });
+  // - Comparing truth match to primary
+  const Cut ProtonTrackTruthMatchedPrimaryProton([](const caf::SRSliceProxy* slc) {
+    int protonTrackIndex = ProtonTrackIndex(slc); // index of slc->reco.pfp
+    int protonPrimrayIndex = ICARUSNumuXsec::TruthMatch::TruthProtonIndex(slc); // index of slc->truth.prim
+    if(protonTrackIndex>=0 && protonPrimrayIndex>=0){
+      // reco track
+      const auto& trk = slc->reco.pfp.at(protonTrackIndex).trk;
+      const auto& trk_truth = trk.truth.p;
+      const auto& trk_truth_G4ID = trk_truth.G4ID;
+      // primray
+      const auto& prim = slc->truth.prim.at(protonPrimrayIndex);
+      const auto& prim_G4ID = prim.G4ID;
+
+      if(trk_truth_G4ID==prim_G4ID) return true;
+      else return false;
+    }
+    else{
+      return false;
     }
   });
 
@@ -439,6 +478,10 @@ namespace TwoTrack{
     if(mu_ghep.contained) return false;
     else return true;
 */
+  });
+
+  const Var IsSignal([](const caf::SRSliceProxy* slc) -> double {
+    return cutIsNuMuCC(slc) && ICARUSNumuXsec::TwoTrack::SignalDef(slc);
   });
 
   namespace Aux{

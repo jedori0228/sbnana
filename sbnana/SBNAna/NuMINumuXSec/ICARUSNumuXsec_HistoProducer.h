@@ -17,6 +17,7 @@
 // Make a plot with cuts
 #include "sbnana/CAFAna/Core/Binning.h"
 #include "sbnana/CAFAna/Core/Spectrum.h"
+#include "sbnana/CAFAna/Core/Tree.h"
 #include "sbnana/CAFAna/Core/SpectrumLoader.h"
 #include "sbnana/CAFAna/Core/EnsembleSpectrum.h"
 #include "sbnana/CAFAna/Systs/SBNWeightSysts.h"
@@ -74,6 +75,8 @@ namespace ICARUSNumuXsec{
     void TriggerEffStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     // - 230524_MichelStudy
     void MichelStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    // - 230814_MakeTree
+    void MakeTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
     void Test(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
@@ -107,6 +110,8 @@ namespace ICARUSNumuXsec{
     TString currentCutName;
     vector<TString> vec_cutNames;
     std::map< TString, vector<Spectrum *> > map_cutName_to_vec_Spectrums;
+    std::map< TString, std::vector<ana::Tree *> > map_cutName_to_vec_Trees;
+    std::map< TString, std::vector<ana::NSigmasTree *> > map_cutName_to_vec_NSigmasTrees;
 
     // EnsembleSpectrum-based systematics
     std::map< TString, vector< pair<TString, EnsembleSpectrum *> > > map_cutName_to_vec_SystEnsembleSpectrumPairs;

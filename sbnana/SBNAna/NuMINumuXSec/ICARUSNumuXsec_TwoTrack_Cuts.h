@@ -10,15 +10,17 @@ namespace ICARUSNumuXsec{
 
 namespace TwoTrack{
 
+  // Primray tracks
   extern const Cut HasTwoPrimaryTracks;
   extern const Cut HasOnlyTwoPrimaryTracks;
 
+  // Reco muon track
   extern const Cut HasMuonTrack;
   extern const Cut MuonTrackContained;
   extern const Cut MuonTrackExiting;
   extern const Cut MuonTrackOneMeter;
   extern const Cut MuonTrackBelowBlindP;
-
+  // - Truth matching
   extern const Cut MuonTrackTruthContainedNuMuon;
   extern const Cut MuonTrackTruthExitingNuMuon;
   extern const Cut MuonTrackTruthCosmicMuon;
@@ -29,9 +31,14 @@ namespace TwoTrack{
   extern const Cut MuonTrackTruthInelChargedPion;
   extern const Cut MuonTrackTruthOtherChargedPion;
   extern const Cut MuonTrackTruthOther;
+  // - Comparing truth match to primary
+  extern const Cut MuonTrackTruthMatchedPrimaryMuon;
 
+  // Reco proton track
   extern const Cut HasProtonTrack;
   extern const Cut ProtonPCut;
+  // - Comparing truth match to primary
+  extern const Cut ProtonTrackTruthMatchedPrimaryProton;
 
   // Hadron (non-muon) contrained
   extern const Cut HadronContained;
@@ -50,6 +57,8 @@ namespace TwoTrack{
   extern const Cut SignalDef;
   extern const Cut SignalMuonContained;
   extern const Cut SignalMuonExiting;
+
+  extern const Var IsSignal;
 
   namespace Aux{
     extern const Cut HasRelaxedMuonTrack;

@@ -811,6 +811,7 @@ void HistoProducer::TwoTrackAnalysis(SpectrumLoader& loader, SpillCut spillCut, 
   //FillLongestTrack(loader, spillCut, cut);
 
   using namespace ICARUSNumuXsec::TwoTrack;
+  using namespace ICARUSNumuXsec::TruthMatch;
 
   FillCVSpectrum(loader, "NPrimaryTracks", NPrimaryTracks, Binning::Simple(10, 0., 10.), spillCut, cut);
   FillCVSpectrum(loader, "MuonTrackLength", MuonTrackLength, Binning::Simple(500, 0., 500), spillCut, cut);
@@ -823,6 +824,11 @@ void HistoProducer::TwoTrackAnalysis(SpectrumLoader& loader, SpillCut spillCut, 
   // truth match
   FillCVSpectrum(loader, "MuonTrackTruthP_vs_MuonTrackP", MuonTrackTruthP, Binning::Simple(50, 0., 5.), MuonTrackP, Binning::Simple(50, 0., 5.), spillCut, cut);
   FillCVSpectrum(loader, "MuonTrackTruthNuMICosineTheta_vs_MuonTrackNuMICosineTheta", MuonTrackTruthNuMICosineTheta, Binning::Simple(40, -1., 1.), MuonTrackNuMICosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
+  FillCVSpectrum(loader, "MuonTrackTruthPDG", MuonTrackTruthPDG, Binning::Simple(6000, -3000, 3000.), spillCut, cut);
+  FillCVSpectrum(loader, "MuonTrackTruthMatchedPrimaryType", MuonTrackTruthMatchedPrimaryType, Binning::Simple(6, -1., 5.), spillCut, cut);
+  // true primary
+  FillCVSpectrum(loader, "TruthMuonP_vs_MuonTrackP", TruthMuonP, Binning::Simple(50, 0., 5.), MuonTrackP, Binning::Simple(50, 0., 5.), spillCut, cut);
+  FillCVSpectrum(loader, "TruthMuonNuCosineTheta_vs_MuonTrackNuMIToVtxCosineTheta", TruthMuonNuCosineTheta, Binning::Simple(40, -1., 1.), MuonTrackNuMIToVtxCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
 
   FillCVSpectrum(loader, "ProtonTrackP", ProtonTrackP, Binning::Simple(20, 0., 2.), spillCut, cut);
   FillCVSpectrum(loader, "ProtonTrackDirX", ProtonTrackDirX, Binning::Simple(40, -1., 1), spillCut, cut);
@@ -834,15 +840,22 @@ void HistoProducer::TwoTrackAnalysis(SpectrumLoader& loader, SpillCut spillCut, 
   FillCVSpectrum(loader, "ProtonTrackNHitsCollection", ProtonTrackNHitsCollection, Binning::Simple(200, 0., 200.), spillCut, cut);
   FillCVSpectrum(loader, "ProtonTrackChi2MuonCollection", ProtonTrackChi2MuonCollection, Binning::Simple(150, 0., 150.), spillCut, cut);
   FillCVSpectrum(loader, "ProtonTrackChi2ProtonCollection", ProtonTrackChi2ProtonCollection, Binning::Simple(400, 0., 400.), spillCut, cut);
+  // truth match
   FillCVSpectrum(loader, "ProtonTrackTruthP_vs_ProtonTrackP", ProtonTrackTruthP, Binning::Simple(20, 0., 2.), ProtonTrackP, Binning::Simple(20, 0., 2.), spillCut, cut);
   FillCVSpectrum(loader, "ProtonTrackTruthNuMICosineTheta_vs_ProtonTrackNuMICosineTheta", ProtonTrackTruthNuMICosineTheta, Binning::Simple(40, -1., 1.), ProtonTrackNuMICosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
+  FillCVSpectrum(loader, "ProtonTrackTruthPDG", ProtonTrackTruthPDG, Binning::Simple(6000, -3000, 3000.), spillCut, cut);
+  FillCVSpectrum(loader, "ProtonTrackTruthMatchedPrimaryType", ProtonTrackTruthMatchedPrimaryType, Binning::Simple(6, -1., 5.), spillCut, cut);
+  // true primary
+  FillCVSpectrum(loader, "TruthProtonP_vs_ProtonTrackP", TruthProtonP, Binning::Simple(20, 0., 2.), ProtonTrackP, Binning::Simple(20, 0., 2.), spillCut, cut);
+  FillCVSpectrum(loader, "TruthProtonNuCosineTheta_vs_ProtonTrackNuMIToVtxCosineTheta", TruthProtonNuCosineTheta, Binning::Simple(40, -1., 1.), ProtonTrackNuMIToVtxCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
+
 
   FillCVandSystSpectrum(loader, "MuonProtonCosineTheta", MuonProtonCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
   FillCVSpectrum(loader, "TruthMuonProtonCosineTheta_vs_MuonProtonCosineTheta", ICARUSNumuXsec::TruthMatch::TruthMuonProtonCosineTheta, Binning::Simple(40, -1., 1.), MuonProtonCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
 
   FillCVandSystSpectrum(loader, "deltaPT", ICARUSNumuXsec::TwoTrack::TKI::deltaPT, Binning::Simple(40, 0., 2.0), spillCut, cut);
-  FillCVSpectrum(loader, "deltaPTx", ICARUSNumuXsec::TwoTrack::TKI::deltaPTx, Binning::Simple(60, -3.0, 3.0), spillCut, cut);
-  FillCVSpectrum(loader, "deltaPTy", ICARUSNumuXsec::TwoTrack::TKI::deltaPTy, Binning::Simple(60, -3.0, 3.0), spillCut, cut);
+  FillCVandSystSpectrum(loader, "deltaPTx", ICARUSNumuXsec::TwoTrack::TKI::deltaPTx, Binning::Simple(60, -3.0, 3.0), spillCut, cut);
+  FillCVandSystSpectrum(loader, "deltaPTy", ICARUSNumuXsec::TwoTrack::TKI::deltaPTy, Binning::Simple(60, -3.0, 3.0), spillCut, cut);
 
   FillCVSpectrum(loader, "TruthdeltaPT_vs_deltaPT", ICARUSNumuXsec::TruthMatch::TKI::deltaPT, Binning::Simple(40, 0., 2.0), ICARUSNumuXsec::TwoTrack::TKI::deltaPT, Binning::Simple(40, 0., 2.0), spillCut, cut);
   FillCVSpectrum(loader, "TruthdeltaPTx_vs_deltaPTx", ICARUSNumuXsec::TruthMatch::TKI::deltaPTx, Binning::Simple(30, -1.5, 1.5), ICARUSNumuXsec::TwoTrack::TKI::deltaPTx, Binning::Simple(30, -1.5, 1.5), spillCut, cut);
@@ -987,6 +1000,82 @@ void HistoProducer::MichelStudy(SpectrumLoader& loader, SpillCut spillCut, Cut c
 */
 }
 
+// - 230814_MakeTree
+void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  using namespace ICARUSNumuXsec::TwoTrack;
+  using namespace ICARUSNumuXsec::TruthMatch;
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+
+    new ana::Tree(
+      "selectedEvents",
+      {
+      "TruePDG/i", "TrueMode/i", "TrueTarget/i", "IsSignal",
+      "FluxWeight",
+      "TrueE",
+      "RecoMuonP", "TrueMuonP",
+      "RecoMuonCos", "TrueMuonCos",
+      "RecoProtonP", "TrueProtonP",
+      "RecoProtonCos", "TrueProtonCos",
+      "RecoMuonProtonCos", "TrueMuonProtonCos",
+      "RecodeltaPT", "TruedeltaPT",
+      "RecodeltaPTx", "TruedeltaPTx",
+      "RecodeltaPTy", "TruedeltaPTy",
+      },
+      loader,
+      {
+      varTruePDG, varGENIEIntCode, varTrueTarget, IsSignal,
+      NuMIPPFXCVWeight,
+      varNeutrinoTruthE,
+      MuonTrackP, TruthMuonP,
+      MuonTrackNuMIToVtxCosineTheta, TruthMuonNuCosineTheta,
+      ProtonTrackP, TruthProtonP,
+      ProtonTrackNuMIToVtxCosineTheta, TruthProtonNuCosineTheta,
+      MuonProtonCosineTheta, TruthMuonProtonCosineTheta,
+      ICARUSNumuXsec::TwoTrack::TKI::deltaPT, ICARUSNumuXsec::TruthMatch::TKI::deltaPT,
+      ICARUSNumuXsec::TwoTrack::TKI::deltaPTx, ICARUSNumuXsec::TruthMatch::TKI::deltaPTx,
+      ICARUSNumuXsec::TwoTrack::TKI::deltaPTy, ICARUSNumuXsec::TruthMatch::TKI::deltaPTy,
+      },
+      spillCut, cut,
+      kNoShift, true, true
+    )
+
+  );
+
+  std::vector<std::string> this_PsetNames;
+  std::vector<const ISyst*> this_SigmaSysts;
+
+  for(const std::string& name: ICARUSNumuXsec::GetGENIEMultisigmaKnobNames()){
+    if(name=="FormZone"){
+     continue;
+    }
+    std::string psetname = SystProviderPrefix+"_multisigma_"+name;
+    this_PsetNames.push_back( name );
+    this_SigmaSysts.push_back( new SBNWeightSyst(psetname) );
+  }
+  std::vector<const ISyst*> this_IFluxSysts = GetAllNuMIFluxSysts(NNuMIFluxPCA);
+  for(unsigned int i=0; i<this_IFluxSysts.size(); i++){
+    this_PsetNames.push_back( this_IFluxSysts.at(i)->ShortName() );
+    this_SigmaSysts.push_back( this_IFluxSysts.at(i) );
+  }
+
+
+  map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
+
+    new ana::NSigmasTree(
+      (currentCutName+"_Sigma").Data(),
+      this_PsetNames,
+      loader,
+      this_SigmaSysts,
+      spillCut, cut,
+      kNoShift, 3, false, false
+    )
+
+  );
+
+}
+
 void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
   //map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("spillvarTest", Binning::Simple(1, 0., 1.), loader, spillvarTest, spillCut) );
@@ -1057,6 +1146,8 @@ void HistoProducer::saveHistograms(){
       vector<Spectrum *> vec_Spectrums = map_cutName_to_vec_Spectrums[cutName];
       vector< pair<TString, EnsembleSpectrum *> > vec_SystEnsembleSpectrumPairs = map_cutName_to_vec_SystEnsembleSpectrumPairs[cutName];
       vector< pair<TString, Spectrum *> > vec_SystSpectrumPairs = map_cutName_to_vec_SystSpectrumPairs[cutName];
+      vector<ana::Tree *> vec_Trees = map_cutName_to_vec_Trees[cutName];
+      vector<ana::NSigmasTree *> vec_NSigmasTrees = map_cutName_to_vec_NSigmasTrees[cutName];
 
       cout << "[HistoProducer::saveHistograms] cutName = " << cutName << endl;
       cout << "[HistoProducer::saveHistograms]   Directory name = " << dirName << endl;
@@ -1161,6 +1252,24 @@ void HistoProducer::saveHistograms(){
           h->Write();
           cout << "[HistoProducer::saveHistograms]     --> Done" << endl;
         }
+
+      }
+
+      // Tree
+      cout << "[HistoProducer::saveHistograms]   Number of Trees = " << vec_Trees.size() << endl;
+      for(unsigned int i=0; i<vec_Trees.size(); i++){
+
+        cout << "[HistoProducer::saveHistograms]   " << i << "-th Tree.." << endl;
+
+        vec_Trees.at(i)->SaveTo(dir);
+
+      }
+      cout << "[HistoProducer::saveHistograms]   Number of NSigmasTrees = " << vec_NSigmasTrees.size() << endl;
+      for(unsigned int i=0; i<vec_NSigmasTrees.size(); i++){
+
+        cout << "[HistoProducer::saveHistograms]   " << i << "-th NSigmasTree.." << endl;
+
+        vec_NSigmasTrees.at(i)->SaveTo(dir);
 
       }
 

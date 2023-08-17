@@ -44,6 +44,9 @@ namespace ICARUSNumuXsec{
   extern const SpillVar TruthFirstNuEnergy;
 
   // Var
+  // - Some truth
+  extern const Var varTruePDG;
+  extern const Var varTrueTarget;
   // - GENIE interaction code
   // - https://internal.dunescience.org/doxygen/namespacesimb.html#a2cce734d1b71408bbc7d98d148ac4360
   extern const Var varGENIEIntCode;

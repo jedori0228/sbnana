@@ -30,6 +30,8 @@ namespace TwoTrack{
   extern const Var MuonTrackTruthLength;
   extern const Var MuonTrackTruthP;
   extern const Var MuonTrackTruthNuMICosineTheta;
+  extern const Var MuonTrackTruthPDG;
+  extern const Var MuonTrackTruthMatchedPrimaryType;
 
   // Proton
   extern const Var ProtonTrackIndex;
@@ -47,6 +49,8 @@ namespace TwoTrack{
   extern const Var ProtonTrackTruthLength;
   extern const Var ProtonTrackTruthP;
   extern const Var ProtonTrackTruthNuMICosineTheta;
+  extern const Var ProtonTrackTruthPDG;
+  extern const Var ProtonTrackTruthMatchedPrimaryType;
 
   // Muon+Proton
   extern const Var MuonProtonCosineTheta;
@@ -60,7 +64,7 @@ namespace TwoTrack{
   // All non-muon track indices, i.e. hadron candiates
   extern const MultiVar NonMuonTrackIndecies;
 
-  // Charged pion
+  // Charged pion (LEGACY)
   extern const Var ChargedPionTrackIndex;
   // Charged pion, stopped
   extern const Var StoppedChargedPionTrackIndex;

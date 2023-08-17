@@ -211,16 +211,24 @@ namespace ICARUSNumuXsec{
   });
 
   // Var
+  // - Some truth
+  const Var varTruePDG([](const caf::SRSliceProxy* slc) -> int {
+    if ( slc->truth.index < 0 ) return 0;
+    return slc->truth.pdg;
+  });
+
+  const Var varTrueTarget([](const caf::SRSliceProxy* slc) -> int {
+    if ( slc->truth.index < 0 ) return 0;
+    return slc->truth.targetPDG;
+  });
   // - GENIE interaction code
   // - https://internal.dunescience.org/doxygen/namespacesimb.html#a2cce734d1b71408bbc7d98d148ac4360
   const Var varGENIEIntCode([](const caf::SRSliceProxy* slc) -> int {
     if(slc->truth.index >= 0.f){
-      if(slc->truth.genie_mode<0) return -1;
-      else if(slc->truth.genie_mode>13) return 14;
-      else return slc->truth.genie_mode;
+      return slc->truth.genie_mode;
     }
     else{
-      return -2;
+      return -1;
     }
   });
   // - Truth interaction

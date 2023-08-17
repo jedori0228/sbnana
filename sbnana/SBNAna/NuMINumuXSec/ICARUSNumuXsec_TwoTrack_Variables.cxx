@@ -180,6 +180,47 @@ namespace TwoTrack{
       return -999.;
     }
   });
+  const Var MuonTrackTruthPDG([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = MuonTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
+      const auto& truth_p = trk.truth.p;
+      return truth_p.pdg;
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var MuonTrackTruthMatchedPrimaryType([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = MuonTrackIndex(slc); // index of slc->reco.pfp
+    if(muonTrackIndex>=0){
+
+      int muonPrimaryIndex = ICARUSNumuXsec::TruthMatch::TruthMuonIndex(slc); // index of slc->truth.prim
+      int protonPrimaryIndex = ICARUSNumuXsec::TruthMatch::TruthProtonIndex(slc); // index of slc->truth.prim
+      int cpionPrimaryIndex = ICARUSNumuXsec::TruthMatch::TruthChargedPionIndex(slc);
+      int npionPrimaryIndex = ICARUSNumuXsec::TruthMatch::TruthNeutralPionIndex(slc);
+
+      // reco track
+      const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
+      const auto& trk_truth = trk.truth.p;
+      const auto& trk_truth_G4ID = trk_truth.G4ID;
+      // primary
+      const auto& prim_muon_G4ID = muonPrimaryIndex>=0 ? slc->truth.prim.at(muonPrimaryIndex).G4ID.GetValue() : -999;
+      const auto& prim_proton_G4ID = protonPrimaryIndex>=0 ? slc->truth.prim.at(protonPrimaryIndex).G4ID.GetValue() : -999;
+      const auto& prim_cpion_G4ID = cpionPrimaryIndex>=0 ? slc->truth.prim.at(cpionPrimaryIndex).G4ID.GetValue() : -999;
+      const auto& prim_npion_G4ID = npionPrimaryIndex>=0 ? slc->truth.prim.at(npionPrimaryIndex).G4ID.GetValue() : -999;
+
+      if(trk_truth_G4ID==prim_muon_G4ID) return 1.;
+      else if(trk_truth_G4ID==prim_proton_G4ID) return 2.;
+      else if(trk_truth_G4ID==prim_cpion_G4ID) return 3.;
+      else if(trk_truth_G4ID==prim_npion_G4ID) return 4.;
+      return 0.;
+    }
+    else{
+      return -1.;
+    }
+  });
+
 
   // Proton
   const Var ProtonTrackIndex([](const caf::SRSliceProxy* slc) -> double {
@@ -395,6 +436,47 @@ namespace TwoTrack{
     }
     else{
       return -999.;
+    }
+  });
+  const Var ProtonTrackTruthPDG([](const caf::SRSliceProxy* slc) -> double {
+    int protonTrackIndex = ProtonTrackIndex(slc);
+    if(protonTrackIndex>=0){
+      const auto& trk = slc->reco.pfp.at(protonTrackIndex).trk;
+      const auto& truth_p = trk.truth.p;
+      return truth_p.pdg;
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var ProtonTrackTruthMatchedPrimaryType([](const caf::SRSliceProxy* slc) -> double {
+    int protonTrackIndex = ProtonTrackIndex(slc); // index of slc->reco.pfp
+    if(protonTrackIndex>=0){
+
+      int muonPrimaryIndex = ICARUSNumuXsec::TruthMatch::TruthMuonIndex(slc); // index of slc->truth.prim
+      int protonPrimaryIndex = ICARUSNumuXsec::TruthMatch::TruthProtonIndex(slc); // index of slc->truth.prim
+      int cpionPrimaryIndex = ICARUSNumuXsec::TruthMatch::TruthChargedPionIndex(slc);
+      int npionPrimaryIndex = ICARUSNumuXsec::TruthMatch::TruthNeutralPionIndex(slc);
+
+      // reco track
+      const auto& trk = slc->reco.pfp.at(protonTrackIndex).trk;
+      const auto& trk_truth = trk.truth.p;
+      const auto& trk_truth_G4ID = trk_truth.G4ID;
+      // primary
+      const auto& prim_muon_G4ID = muonPrimaryIndex>=0 ? slc->truth.prim.at(muonPrimaryIndex).G4ID.GetValue() : -999;
+      const auto& prim_proton_G4ID = protonPrimaryIndex>=0 ? slc->truth.prim.at(protonPrimaryIndex).G4ID.GetValue() : -999;
+      const auto& prim_cpion_G4ID = cpionPrimaryIndex>=0 ? slc->truth.prim.at(cpionPrimaryIndex).G4ID.GetValue() : -999;
+      const auto& prim_npion_G4ID = npionPrimaryIndex>=0 ? slc->truth.prim.at(npionPrimaryIndex).G4ID.GetValue() : -999;
+
+      if(trk_truth_G4ID==prim_muon_G4ID) return 1.;
+      else if(trk_truth_G4ID==prim_proton_G4ID) return 2.;
+      else if(trk_truth_G4ID==prim_cpion_G4ID) return 3.;
+      else if(trk_truth_G4ID==prim_npion_G4ID) return 4.;
+      return 0.;
+
+    }
+    else{
+      return -1.;
     }
   });
 
@@ -810,7 +892,7 @@ namespace TwoTrack{
           bool isPionInelastic = false;
           if(trk.calo[2].nhit!=0){
             double new_chi2 = dedxtempt.CalculateInelasticPionChi2(trk.calo[2], 3);
-            isPionInelastic = (Contained && trk.calo[2].nhit>=5 && new_chi2<10.);
+            isPionInelastic = (Contained && trk.calo[2].nhit>=5 && new_chi2<20.);
           }
 
           if ( AtSlice && ( isPionInelastic ) && trk.len > Longest )
