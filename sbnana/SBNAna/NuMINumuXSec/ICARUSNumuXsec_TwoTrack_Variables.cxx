@@ -30,6 +30,13 @@ namespace TwoTrack{
         printf("[JSKIMDEBUG] MISSMATCH from proton track index: (JS, BH) = (%d, %d)\n", JS_ProtonTrackIdx, BH_ProtonTrackIdx);
       }
 
+      vector<double> JS_PhotonIndices = NeutralPionPhotonShowerIndices(&slc);
+      vector<double> BH_PhotonIndices = kNuMIPhotonCandidateIdxs(&slc);
+
+      if(JS_PhotonIndices.size()!=BH_PhotonIndices.size()){
+        printf("[JSKIMDEBUG] MISSMATCH from photons: (JS, BH) = (%ld, %ld)\n", JS_PhotonIndices.size(), BH_PhotonIndices.size());
+      }
+
 
     }
 
