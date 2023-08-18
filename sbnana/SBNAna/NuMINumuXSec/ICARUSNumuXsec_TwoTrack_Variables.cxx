@@ -7,50 +7,82 @@ namespace ICARUSNumuXsec{
 
 namespace TwoTrack{
 
-  // Muon
-  const Var MuonTrackIndex([](const caf::SRSliceProxy* slc) -> double {
-    vector<double> primTrackIndices = ICARUSNumuXsec::PrimaryTrackIndices(slc);
-    if(primTrackIndices.size()==0){
-      return -999.;
-    }
-    else{
-      float Longest(0);
-      int PTrackInd(-1);
-      for(const auto& trkIdx: primTrackIndices){
-        const auto& pfp = slc->reco.pfp.at(trkIdx);
-        const auto& trk = pfp.trk;
+  // Test
 
-        if(trk.bestplane == -1) continue;
-        if(isnan(trk.start.x)) continue;
+  const SpillMultiVar TestVar([](const caf::SRSpillProxy *sr) -> vector<double> {
 
-        // First we calculate the distance of each track to the slice vertex.
-        const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
-                                       slc->vertex.y - trk.start.y,
-                                       slc->vertex.z - trk.start.z);
+    std::vector<double> rets;
 
-        // We require that the distance of the track from the slice is less than
-        // 10 cm and that the parent of the track has been marked as the primary.
-        const bool AtSlice = ( Atslc < 10.0 && pfp.parent_is_primary);
+    for(std::size_t i(0); i < sr->slc.size(); ++i){
+      const auto& slc = sr->slc.at(i);
 
-        // pid from collection
-        const float Chi2Proton = trk.chi2pid[2].chi2_proton;
-        const float Chi2Muon = trk.chi2pid[2].chi2_muon;
+      int JS_MuonTrackIdx = MuonTrackIndex(&slc);
+      int BH_MuonTrackIdx = kNuMIMuonCandidateIdx(&slc);
 
-        const bool Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
-
-        const bool MaybeMuonExiting = ( !Contained && trk.len > 100);
-        const bool MaybeMuonContained = ( Contained && trk.calo[2].nhit>=5 && Chi2Proton > 60 && Chi2Muon < 30 && trk.len > 50 );
-        if ( AtSlice && ( MaybeMuonExiting || MaybeMuonContained ) && trk.len > Longest )
-        {
-          Longest = trk.len;
-          PTrackInd = trkIdx;
-        }
-
+      if(JS_MuonTrackIdx!=BH_MuonTrackIdx){
+        printf("[JSKIMDEBUG] MISSMATCH from muon track index: (JS, BH) = (%d, %d)\n", JS_MuonTrackIdx, BH_MuonTrackIdx);
       }
 
-      return PTrackInd;
+      int JS_ProtonTrackIdx = ProtonTrackIndex(&slc);
+      int BH_ProtonTrackIdx = kNuMIProtonCandidateIdx(&slc);
+
+      if(JS_ProtonTrackIdx!=BH_ProtonTrackIdx){
+        printf("[JSKIMDEBUG] MISSMATCH from proton track index: (JS, BH) = (%d, %d)\n", JS_ProtonTrackIdx, BH_ProtonTrackIdx);
+      }
+
 
     }
+
+    return rets;
+
+
+  });
+
+  // Muon
+  const Var MuonTrackIndex([](const caf::SRSliceProxy* slc) -> double {
+    return kNuMIMuonCandidateIdx(slc);
+/*
+    float Longest(0);
+    int PTrackInd(-1);
+    for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); i_pfp++){
+      const auto& pfp = slc->reco.pfp.at(i_pfp);
+      if( !IsPFPTrack(pfp) ) continue;
+      const auto& trk = pfp.trk;
+
+      //if(isnan(trk.start.x)) continue;
+      if ( std::isnan(trk.start.x) || std::isnan(trk.len) || trk.len <= 0. ) continue;
+      if ( std::isnan(slc->vertex.x) || std::isnan(slc->vertex.y) || std::isnan(slc->vertex.z) ) continue;
+
+      // First we calculate the distance of each track to the slice vertex.
+      const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
+                                     slc->vertex.y - trk.start.y,
+                                     slc->vertex.z - trk.start.z);
+
+      // We require that the distance of the track from the slice is less than
+      // 10 cm and that the parent of the track has been marked as the primary.
+      const bool AtSlice = ( Atslc < 10.0 && pfp.parent_is_primary);
+      if(!AtSlice) continue;
+
+      if(trk.calo[2].nhit < 5) continue;
+
+      // pid from collection
+      const float Chi2Proton = trk.chi2pid[2].chi2_proton;
+      const float Chi2Muon = trk.chi2pid[2].chi2_muon;
+
+      const bool Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
+
+      const bool MaybeMuonExiting = ( !Contained && trk.len > 100);
+      const bool MaybeMuonContained = ( Contained && Chi2Proton > 60 && Chi2Muon < 30 && trk.len > 50 );
+      if ( ( MaybeMuonExiting || MaybeMuonContained ) && trk.len > Longest )
+      {
+        Longest = trk.len;
+        PTrackInd = i_pfp;
+      }
+
+    }
+
+    return PTrackInd;
+*/
   });
   const Var MuonTrackLength([](const caf::SRSliceProxy* slc) -> double {
     int muonTrackIndex = MuonTrackIndex(slc);
@@ -224,60 +256,65 @@ namespace TwoTrack{
 
   // Proton
   const Var ProtonTrackIndex([](const caf::SRSliceProxy* slc) -> double {
-    vector<double> primTrackIndices = ICARUSNumuXsec::PrimaryTrackIndices(slc);
-    if(primTrackIndices.size()==0){
-      return -999.;
-    }
-    else{
-      float Longest(0);
-      int PTrackInd(-1);
-      int muonTrackIndex = MuonTrackIndex(slc);
-      for(const auto& trkIdx: primTrackIndices){
-        const auto& pfp = slc->reco.pfp.at(trkIdx);
-        const auto& trk = pfp.trk;
 
-        if(trkIdx==muonTrackIndex) continue;
-        if(trk.bestplane == -1) continue;
+    return kNuMIProtonCandidateIdx(slc);
 
-        // First we calculate the distance of each track to the slice vertex.
-        if(isnan(trk.start.x)) continue;
-        const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
-                                       slc->vertex.y - trk.start.y,
-                                       slc->vertex.z - trk.start.z);
+/*
+    float Longest(0);
+    int PTrackInd(-1);
+    unsigned int muonTrackIndex = MuonTrackIndex(slc);
+    for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); i_pfp++){
+      const auto& pfp = slc->reco.pfp.at(i_pfp);
+      if( !IsPFPTrack(pfp) ) continue; 
 
-        // We require that the distance of the track from the slice is less than
-        // 10 cm and that the parent of the track has been marked as the primary.
-        const bool AtSlice = ( Atslc < 10.0 && pfp.parent_is_primary);
-        // pid from collection only
-        const float Chi2Proton = trk.chi2pid[2].chi2_proton;
-        const float Chi2Muon = trk.chi2pid[2].chi2_muon;
+      if(i_pfp==muonTrackIndex) continue;
 
-        const bool Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
+      const auto& trk = pfp.trk;
 
-        float angle = -5.0;
-        if ( muonTrackIndex >= 0 ) {
-          const unsigned int idxPrim = (unsigned int)muonTrackIndex;
-          TVector3 muDir( slc->reco.pfp[idxPrim].trk.dir.x, slc->reco.pfp[idxPrim].trk.dir.y, slc->reco.pfp[idxPrim].trk.dir.z );
-          TVector3 pDir( slc->reco.pfp[trkIdx].trk.dir.x, slc->reco.pfp[trkIdx].trk.dir.y, slc->reco.pfp[trkIdx].trk.dir.z );
-          angle = TMath::Cos(muDir.Angle(pDir));
-        }
+      // First we calculate the distance of each track to the slice vertex.
+      if ( std::isnan(trk.start.x) || std::isnan(trk.len) || trk.len <= 0. ) continue;
+      if ( std::isnan(slc->vertex.x) || std::isnan(slc->vertex.y) || std::isnan(slc->vertex.z) ) continue;
+      const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
+                                     slc->vertex.y - trk.start.y,
+                                     slc->vertex.z - trk.start.z);
 
-        bool PassPCut = false;
-        if( !isnan(trk.rangeP.p_proton) ){
-          PassPCut = trk.rangeP.p_proton>0.4;
-        }
+      // We require that the distance of the track from the slice is less than
+      // 10 cm and that the parent of the track has been marked as the primary.
+      const bool AtSlice = ( Atslc < 10.0 && pfp.parent_is_primary);
+      if(!AtSlice) continue;
 
-        if ( AtSlice && Contained && trk.calo[2].nhit>=5 && Chi2Proton <= 90 && Chi2Muon >= 30 && angle >= -0.9 && trk.len > Longest && PassPCut ) {
-        //if ( AtSlice && Contained && trk.calo[2].nhit!=0 && Chi2Proton <= 100 && angle >= -0.9 && trk.len > Longest ) {
-          Longest = trk.len;
-          PTrackInd = trkIdx;
-        }
+      if(trk.calo[2].nhit < 5) continue;
 
+      const bool Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
+      if(!Contained) continue;
+
+      // pid from collection only
+      const float Chi2Proton = trk.chi2pid[2].chi2_proton;
+      const float Chi2Muon = trk.chi2pid[2].chi2_muon;
+
+      float angle = -5.0;
+      if ( muonTrackIndex >= 0 ) {
+        const unsigned int idxPrim = (unsigned int)muonTrackIndex;
+        TVector3 muDir( slc->reco.pfp[idxPrim].trk.dir.x, slc->reco.pfp[idxPrim].trk.dir.y, slc->reco.pfp[idxPrim].trk.dir.z );
+        TVector3 pDir( slc->reco.pfp[i_pfp].trk.dir.x, slc->reco.pfp[i_pfp].trk.dir.y, slc->reco.pfp[i_pfp].trk.dir.z );
+        angle = TMath::Cos(muDir.Angle(pDir));
       }
 
-      return PTrackInd;
+      bool PassPCut = false;
+      if( !isnan(trk.rangeP.p_proton) ){
+        PassPCut = trk.rangeP.p_proton>0.4;
+      }
+
+      //if ( Chi2Proton <= 90 && Chi2Muon >= 30 && angle >= -0.9 && trk.len > Longest && PassPCut ) {
+      if( Chi2Proton <= 90 && Chi2Muon >= 30 && trk.len > Longest ){
+        Longest = trk.len;
+        PTrackInd = i_pfp;
+      }
 
     }
+
+    return PTrackInd;
+*/
   });
 
   const Var ProtonTrackLength([](const caf::SRSliceProxy* slc) -> double {
@@ -626,7 +663,6 @@ namespace TwoTrack{
           const auto& trk = pfp.trk;
 
           if(trkIdx==(unsigned int)muonTrackIndex) continue;
-          if(trk.bestplane==-1) continue;
           if(isnan(trk.start.x)) continue;
 
           // First we calculate the distance of each track to the slice vertex.
@@ -683,7 +719,6 @@ namespace TwoTrack{
 
           if(trkIdx==(unsigned int)muonTrackIndex) continue;
           if(trkIdx==(unsigned int)protonTrackIndex) continue;
-          if(trk.bestplane==-1) continue;
           if(isnan(trk.start.x)) continue;
 
           // First we calculate the distance of each track to the slice vertex.
@@ -738,7 +773,6 @@ namespace TwoTrack{
 
           if(i_pfp==(unsigned int)muonTrackIndex) continue;
           if(i_pfp==(unsigned int)protonTrackIndex) continue;
-          if(trk.bestplane==-1) continue;
           if(isnan(trk.start.x)) continue;
           // First we calculate the distance of each track to the slice vertex.
           const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
@@ -874,7 +908,6 @@ namespace TwoTrack{
 
           if(i_pfp==(unsigned int)muonTrackIndex) continue;
           if(i_pfp==(unsigned int)protonTrackIndex) continue;
-          if(trk.bestplane==-1) continue;
           if(isnan(trk.start.x)) continue;
           // First we calculate the distance of each track to the slice vertex.
           const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
@@ -1175,8 +1208,6 @@ namespace TwoTrack{
           const auto& pfp = slc->reco.pfp.at(i_pfp);
           const auto& trk = pfp.trk;
 
-          if(trk.bestplane == -1) continue;
-
           // First we calculate the distance of each track to the slice vertex.
           if(isnan(trk.start.x)) continue;
           const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
@@ -1311,7 +1342,6 @@ namespace TwoTrack{
       int muonTrackIndex = RelaxedMuonTrackIndex(slc);
       if(muonTrackIndex>=0){
         const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
-        if(trk.bestplane == -1) return -999.;
         if(trk.calo[2].nhit==0) return -999.;
         
         return trk.chi2pid[2].chi2_muon;
@@ -1324,7 +1354,6 @@ namespace TwoTrack{
       int muonTrackIndex = RelaxedMuonTrackIndex(slc);
       if(muonTrackIndex>=0){
         const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
-        if(trk.bestplane == -1) return -999.;
         if(trk.calo[2].nhit==0) return -999.;
         
         return trk.chi2pid[2].chi2_proton;
@@ -1503,7 +1532,6 @@ namespace TwoTrack{
             const auto& trk = pfp.trk;
 
             if(i_pfp==(unsigned int )muonTrackIndex) continue;
-            if(trk.bestplane == -1) continue;
             if(isnan(trk.start.x)) continue;
             // First we calculate the distance of each track to the slice vertex.
             const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
@@ -1638,7 +1666,6 @@ namespace TwoTrack{
       int protonTrackIndex = RelaxedProtonTrackIndex(slc);
       if(protonTrackIndex>=0){
         const auto& trk = slc->reco.pfp.at(protonTrackIndex).trk;
-        if(trk.bestplane == -1) return -999.;
         if(trk.calo[2].nhit==0) return -999.;
         return trk.chi2pid[2].chi2_muon;
       }
@@ -1650,7 +1677,6 @@ namespace TwoTrack{
       int protonTrackIndex = RelaxedProtonTrackIndex(slc);
       if(protonTrackIndex>=0){
         const auto& trk = slc->reco.pfp.at(protonTrackIndex).trk;
-        if(trk.bestplane == -1) return -999.;
         if(trk.calo[2].nhit==0) return -999.;
 
         return trk.chi2pid[2].chi2_proton;
@@ -1813,7 +1839,6 @@ namespace TwoTrack{
             const auto& trk = pfp.trk;
 
             if(i_pfp==(unsigned int)muonTrackIndex) continue;
-            if(trk.bestplane==-1) continue;
             if(isnan(trk.start.x)) continue;
             // First we calculate the distance of each track to the slice vertex.
             const float Atslc = std::hypot(slc->vertex.x - trk.start.x,

@@ -16,6 +16,9 @@ using namespace ana;
 
 namespace ICARUSNumuXsec{
 
+  // - Test
+  extern const SpillMultiVar spillvarTest;
+
   // SpillVar
   extern const SpillVar spillvarCountSpill;
   // Trigger
@@ -23,7 +26,6 @@ namespace ICARUSNumuXsec{
   extern const SpillVar TriggerInfoTriggerType;
   extern const SpillVar TriggerInfoSourceType;
   // - Test
-  extern const SpillMultiVar spillvarTest;
   extern const SpillVar spillvarNTrack;
   extern const SpillVar spillvarNShower;
   // - CRT Hit

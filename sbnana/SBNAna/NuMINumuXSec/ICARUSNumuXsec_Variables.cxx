@@ -5,6 +5,16 @@ using namespace ana;
 
 namespace ICARUSNumuXsec{
 
+  // - Test
+  const SpillMultiVar spillvarTest([](const caf::SRSpillProxy *sr) -> vector<double> {
+
+    std::vector<double> rets;
+
+    return rets;
+
+
+  });
+
   // SpillVar
   const SpillVar spillvarCountSpill([](const caf::SRSpillProxy *sr) -> double {
     return 0.;
@@ -33,55 +43,6 @@ namespace ICARUSNumuXsec{
     else{
       return sr->hdr.triggerinfo.source_type;
     }
-  });
-  // - Test
-  const SpillMultiVar spillvarTest([](const caf::SRSpillProxy *sr) -> vector<double> {
-
-    std::vector<double> rets;
-
-    for(std::size_t i(0); i < sr->slc.size(); ++i){
-      const auto& slc = sr->slc.at(i);
-      int michel_index = ICARUSNumuXsec::TruthMatch::TruthMuonMichelIndex(&slc);
-      if(michel_index>=0){
-
-        double vertexDiff = 0.;
-        vertexDiff += pow(slc.truth.position.x - slc.vertex.x, 2);
-        vertexDiff += pow(slc.truth.position.y - slc.vertex.y, 2);
-        vertexDiff += pow(slc.truth.position.z - slc.vertex.z, 2);
-        vertexDiff = sqrt(vertexDiff);
-        if(vertexDiff>3.) continue;
-
-        int nmuontrack = 0;
-        for(const auto& pfp: slc.reco.pfp){
-          if(abs(pfp.trk.truth.p.pdg)==13) nmuontrack++;
-        }
-        if(nmuontrack!=1) continue;
-
-        std::cout << "[spillvarTest] Muon michel event" << std::endl;
-        printf("[spillvarTest] Muon michel event: (run, subrun, event) = (%d, %d, %d), nSlice = %ld\n", sr->hdr.run.GetValue(), sr->hdr.subrun.GetValue(), sr->hdr.evt.GetValue(),sr->slc.size());
-
-        printf("[spillvarTest] True vertex: (%1.3f, %1.3f, %1.3f)\n", slc.truth.position.x.GetValue(), slc.truth.position.y.GetValue(), slc.truth.position.z.GetValue());
-        printf("[spillvarTest] Reco vertex: (%1.3f, %1.3f, %1.3f)\n", slc.vertex.x.GetValue(), slc.vertex.y.GetValue(), slc.vertex.z.GetValue());
-        printf("[spillvarTest] -> Vertex diff = %1.3f\n", vertexDiff);
-
-        const auto& michel_prim = slc.truth.prim[michel_index];
-        printf("[spillvarTest] Michel electron start: (%1.3f, %1.3f, %1.3f)\n", michel_prim.start.x.GetValue(), michel_prim.start.y.GetValue(), michel_prim.start.z.GetValue());
-        printf("[spillvarTest] Michel electron end: (%1.3f, %1.3f, %1.3f)\n", michel_prim.end.x.GetValue(), michel_prim.end.y.GetValue(), michel_prim.end.z.GetValue());
-
-        std::cout << "[spillvarTest] Printing all reco pfps.." << std::endl;
-        for(const auto& pfp: slc.reco.pfp){
-          printf("[spillvarTest] - pfp id = %d\n",pfp.id.GetValue());
-          printf("[spillvarTest] - pfp.track start = (%1.3f, %1.3f, %1.3f)\n", pfp.trk.start.x.GetValue(), pfp.trk.start.y.GetValue(), pfp.trk.start.z.GetValue());
-          printf("[spillvarTest] - pfp.track end = (%1.3f, %1.3f, %1.3f)\n", pfp.trk.end.x.GetValue(), pfp.trk.end.y.GetValue(), pfp.trk.end.z.GetValue());
-          printf("[spillvarTest] - pfp.track match pdg = %d\n", pfp.trk.truth.p.pdg.GetValue());
-        }
-
-      }
-    }
-
-    return rets;
-
-
   });
   const SpillVar spillvarNTrack([](const caf::SRSpillProxy *sr) -> double {
     int nTrk=0;

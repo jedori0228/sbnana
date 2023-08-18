@@ -779,10 +779,11 @@ std::vector<std::string> ICARUSNumuXsec::GetGENIEMultisimKnobNames(){
 }
 
 //---------------------------------------------------
+static double TrackScoreCutValue = 0.45;
 bool ICARUSNumuXsec::IsPFPTrack(const caf::SRPFPProxy& pfp){
-  return pfp.trackScore>0.45;
+  return !isnan(pfp.trackScore) && pfp.trackScore>TrackScoreCutValue;
 }
 bool ICARUSNumuXsec::IsPFPShower(const caf::SRPFPProxy& pfp){
-  return !IsPFPTrack(pfp);
+  return !isnan(pfp.trackScore) && pfp.trackScore<=TrackScoreCutValue;
 }
 

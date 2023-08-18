@@ -1083,25 +1083,9 @@ void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
   //map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("spillvarTest", Binning::Simple(1, 0., 1.), loader, ICARUSNumuXsec::TwoTrack::Aux::TestSpillVar, spillCut) );
 
   using namespace ICARUSNumuXsec::TwoTrack;
-
-  FillCVSpectrum(loader, "NNeutralPionPhotonShower", NNeutralPionPhotonShower, Binning::Simple(10, 0., 10.), spillCut, cut);
-  FillCVSpectrum(loader, "NeutralPionPhotonShowerSumEnergy", NeutralPionPhotonShowerSumEnergy, Binning::Simple(20, 0., 2.), spillCut, cut);
-  FillCVSpectrum(loader, "NeutralPionPhotonShowerConvGaps", NeutralPionPhotonShowerConvGaps, Binning::Simple(120, 0., 30.), spillCut, cut);
-  FillCVSpectrum(loader, "NeutralPionPhotonShowerLengths", NeutralPionPhotonShowerLengths, Binning::Simple(50, 0., 50.), spillCut, cut);
-
   using namespace ICARUSNumuXsec::TruthMatch;
 
-  FillCVSpectrum(loader, "TruthNeutralPionMatchedShowerTrackScores", TruthNeutralPionMatchedShowerTrackScores, Binning::Simple(20, 0., 1.), spillCut, cut);
-  FillCVSpectrum(loader, "TruthNeutralPionMatchedShowerEnergies", TruthNeutralPionMatchedShowerEnergies, Binning::Simple(20, 0., 1.), spillCut, cut);
-  FillCVSpectrum(loader, "TruthNeutralPionMatchedShowerdEdxs", TruthNeutralPionMatchedShowerdEdxs, Binning::Simple(50, 0., 10.), spillCut, cut);
-  FillCVSpectrum(loader, "TruthNeutralPionMatchedShowerConvGaps", TruthNeutralPionMatchedShowerConvGaps, Binning::Simple(120, 0., 30.), spillCut, cut);
-  FillCVSpectrum(loader, "TruthNeutralPionMatchedShowerLengths", TruthNeutralPionMatchedShowerLengths, Binning::Simple(50, 0., 50.), spillCut, cut);
-
-  FillCVSpectrum(loader, "TruthNeutralPionNMatchedShower", TruthNeutralPionNMatchedShower, Binning::Simple(10, 0., 10.), spillCut, cut);
-  FillCVSpectrum(loader, "TruthNeutralPionNMatchedShowerWithCut", TruthNeutralPionNMatchedShowerWithCut, Binning::Simple(10, 0., 10.), spillCut, cut);
-
-  FillCVSpectrum(loader, "TruthNeutralPionMatchedShowerSumEnergy", TruthNeutralPionMatchedShowerSumEnergy, Binning::Simple(20, 0., 2.), spillCut, cut);
-  FillCVSpectrum(loader, "TruthNeutralPionMatchedShowerSumInvariantMass", TruthNeutralPionMatchedShowerSumInvariantMass, Binning::Simple(50, 0., 0.5), spillCut, cut);
+  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("spillvarTest", Binning::Simple(1, 0., 1.), loader, TestVar, spillCut) );
 
   //map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("Test", Binning::Simple(1, 0., 1.), loader, ICARUSNumuXsec::TruthMatch::TruthChargedPionMichelIndex, spillCut, cut) );
 

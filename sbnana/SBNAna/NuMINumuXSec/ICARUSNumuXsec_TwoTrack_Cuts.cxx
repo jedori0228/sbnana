@@ -253,7 +253,7 @@ namespace TwoTrack{
   const Cut HasProtonTrack([](const caf::SRSliceProxy* slc) {
     return ProtonTrackIndex(slc)>=0;
   });
-  const Cut ProtonPCut([](const caf::SRSliceProxy* slc) {
+  const Cut ProtonTrackPCut([](const caf::SRSliceProxy* slc) {
     double protonP = ProtonTrackP(slc);
     if(protonP<0){
       return false;
@@ -285,43 +285,19 @@ namespace TwoTrack{
 
   // Hadron (non-muon) contrained
   const Cut HadronContained([](const caf::SRSliceProxy* slc) {
-/*
-    vector<double> nonMuonTrackIndcies = NonMuonTrackIndecies(slc);
-    if(nonMuonTrackIndcies.size()==0){
-      return true;
-    }
-    else{
-      for(const auto& trkIdx: nonMuonTrackIndcies){
-        const auto& pfp = slc->reco.pfp.at(trkIdx);
-        const auto& trk = pfp.trk;
-
-        if(isnan(trk.start.x)) continue;
-
-        const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
-                                       slc->vertex.y - trk.start.y,
-                                       slc->vertex.z - trk.start.z);
-        const bool AtSlice = ( Atslc < 10.0 && pfp.parent_is_primary);
-        const bool Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
-
-        if(AtSlice){
-          if(!Contained) return false;
-        }
-
-      }
-      return true;
-    }
-*/
 
     int muonTrackIndex = MuonTrackIndex(slc);
     if(muonTrackIndex>=0){
 
       for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); i_pfp++){
 
+        if(i_pfp==(unsigned int )muonTrackIndex) continue;
+
         const auto& pfp = slc->reco.pfp.at(i_pfp);
         const auto& trk = pfp.trk;
 
-        if(i_pfp==(unsigned int )muonTrackIndex) continue;
-        if(isnan(trk.start.x)) continue;
+        if ( std::isnan(trk.start.x) || std::isnan(trk.len) || trk.len <= 0. ) continue;
+        if ( std::isnan(slc->vertex.x) || std::isnan(slc->vertex.y) || std::isnan(slc->vertex.z) ) return false;
 
         const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
                                        slc->vertex.y - trk.start.y,

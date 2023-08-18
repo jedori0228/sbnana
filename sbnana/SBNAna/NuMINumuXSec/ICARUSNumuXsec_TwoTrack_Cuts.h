@@ -36,7 +36,7 @@ namespace TwoTrack{
 
   // Reco proton track
   extern const Cut HasProtonTrack;
-  extern const Cut ProtonPCut;
+  extern const Cut ProtonTrackPCut;
   // - Comparing truth match to primary
   extern const Cut ProtonTrackTruthMatchedPrimaryProton;
 
