@@ -10,6 +10,9 @@ namespace ICARUSNumuXsec{
 
 namespace TwoTrack{
 
+  // Test
+  extern const SpillMultiVar TestVar;
+
   // Primray tracks
   extern const Cut HasTwoPrimaryTracks;
   extern const Cut HasOnlyTwoPrimaryTracks;
@@ -57,8 +60,11 @@ namespace TwoTrack{
   extern const Cut SignalDef;
   extern const Cut SignalMuonContained;
   extern const Cut SignalMuonExiting;
-
   extern const Var IsSignal;
+
+  // Sideband def
+  extern const Cut ChargedPionSideBand;
+  extern const Cut NeutralPionSideBand;
 
   namespace Aux{
     extern const Cut HasRelaxedMuonTrack;

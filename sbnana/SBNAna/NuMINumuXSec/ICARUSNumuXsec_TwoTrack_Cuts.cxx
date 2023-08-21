@@ -7,6 +7,58 @@ namespace ICARUSNumuXsec{
 
 namespace TwoTrack{
 
+  // Test
+
+  const SpillMultiVar TestVar([](const caf::SRSpillProxy *sr) -> vector<double> {
+
+    std::vector<double> rets;
+
+    for(std::size_t i(0); i < sr->slc.size(); ++i){
+      const auto& slc = sr->slc.at(i);
+
+/*
+      int JS_MuonTrackIdx = MuonTrackIndex(&slc);
+      int BH_MuonTrackIdx = kNuMIMuonCandidateIdx(&slc);
+
+      if(JS_MuonTrackIdx!=BH_MuonTrackIdx){
+        printf("[JSKIMDEBUG] MISSMATCH from muon track index: (JS, BH) = (%d, %d)\n", JS_MuonTrackIdx, BH_MuonTrackIdx);
+      }
+
+      int JS_ProtonTrackIdx = ProtonTrackIndex(&slc);
+      int BH_ProtonTrackIdx = kNuMIProtonCandidateIdx(&slc);
+
+      if(JS_ProtonTrackIdx!=BH_ProtonTrackIdx){
+        printf("[JSKIMDEBUG] MISSMATCH from proton track index: (JS, BH) = (%d, %d)\n", JS_ProtonTrackIdx, BH_ProtonTrackIdx);
+      }
+
+      vector<double> JS_PhotonIndices = NeutralPionPhotonShowerIndices(&slc);
+      vector<double> BH_PhotonIndices = kNuMIPhotonCandidateIdxs(&slc);
+
+      if(JS_PhotonIndices.size()!=BH_PhotonIndices.size()){
+        printf("[JSKIMDEBUG] MISSMATCH from photons: (JS, BH) = (%ld, %ld)\n", JS_PhotonIndices.size(), BH_PhotonIndices.size());
+      }
+
+      bool JS_IsSignal = SignalDef(&slc) && cutIsNuMuCC(&slc);
+      bool BH_IsSignal = kNuMI_1muNp0piStudy_Signal_NoContainment_ProtonThreshold(&slc);
+
+      if(JS_IsSignal != BH_IsSignal){
+        printf("[JSKIMDEBUG] MISSMATCH from signal def: (JS, BH) = (%d, %d)\n", int(JS_IsSignal), int(BH_IsSignal));
+      }
+*/
+
+      bool JS_CPSB = ChargedPionSideBand(&slc);
+      bool BH_CPSB = kNuMIChargedPionSideBand(&slc);
+      if(JS_CPSB != BH_CPSB){
+        printf("[JSKIMDEBUG] MISSMATCH from signal def: (JS, BH) = (%d, %d)\n", int(JS_CPSB), int(BH_CPSB));
+      }
+
+    }
+
+    return rets;
+
+
+  });
+
   // Primray tracks
   const Cut HasTwoPrimaryTracks([](const caf::SRSliceProxy* slc) {
     return ICARUSNumuXsec::PrimaryTrackIndices(slc).size()>=2;
@@ -254,13 +306,16 @@ namespace TwoTrack{
     return ProtonTrackIndex(slc)>=0;
   });
   const Cut ProtonTrackPCut([](const caf::SRSliceProxy* slc) {
+    return kNuMIProtonCandidateRecoPTreshold(slc);
+/*
     double protonP = ProtonTrackP(slc);
     if(protonP<0){
       return false;
     }
     else{
-      return (protonP>0.4);
+      return (protonP>0.4 && protonP<1.0);
     }
+*/
   });
   // - Comparing truth match to primary
   const Cut ProtonTrackTruthMatchedPrimaryProton([](const caf::SRSliceProxy* slc) {
@@ -286,6 +341,8 @@ namespace TwoTrack{
   // Hadron (non-muon) contrained
   const Cut HadronContained([](const caf::SRSliceProxy* slc) {
 
+    return kNuMIAllPrimaryHadronsContained(slc);
+/*
     int muonTrackIndex = MuonTrackIndex(slc);
     if(muonTrackIndex>=0){
 
@@ -316,7 +373,7 @@ namespace TwoTrack{
     else{
       return false;
     }
-
+*/
   });
 
   // pion tagging
@@ -364,6 +421,9 @@ namespace TwoTrack{
 
   const Cut SignalDef([](const caf::SRSliceProxy* slc) {
 
+    return kNuMI_1muNp0piStudy_Signal_NoContainment_ProtonThreshold(slc);
+
+/*
     bool bk_UseGHepRecord = intt.UseGHepRecord;
     intt.UseGHepRecord = false;
     ICARUSNumuXsec::InteractionTool::NParticles nptls = intt.GetNParticles(slc);
@@ -373,7 +433,7 @@ namespace TwoTrack{
     if(!isCCQELike) return false;
 
     bool VertexContained = false;
-    if( !isnan(slc->truth.position.x) ){
+    if( !isnan(slc->truth.position.x) && !isnan(slc->truth.position.y) && !isnan(slc->truth.position.z) ){
       VertexContained = fv.isContained(slc->truth.position.x, slc->truth.position.y, slc->truth.position.z);
     }
     if(!VertexContained) return false;
@@ -382,28 +442,26 @@ namespace TwoTrack{
 
     double MuonP = sqrt(mu_ghep.genp.x*mu_ghep.genp.x + mu_ghep.genp.y*mu_ghep.genp.y + mu_ghep.genp.z*mu_ghep.genp.z);
 
-    double minMuonP = mu_ghep.contained ? 0.226 : 0.340;
+    //double minMuonP = mu_ghep.contained ? 0.226 : 0.340; // TODO
+    double minMuonP = 0.226;
 
     if(MuonP<minMuonP) return false;
 
-    double LargestProtonP = -999.;
-    bool HasExitingProton = false;
+    int nSignalProton = 0;
     for(const auto& protonInx: intt.ProtonIndices){
       const auto& p_ghep = slc->truth.prim[ protonInx ];
       double ProtonP = sqrt(p_ghep.genp.x*p_ghep.genp.x + p_ghep.genp.y*p_ghep.genp.y + p_ghep.genp.z*p_ghep.genp.z);
-      LargestProtonP = max(LargestProtonP, ProtonP);
 
       bool IsProtonContained = fv_track.isContained(p_ghep.end.x, p_ghep.end.y, p_ghep.end.z);
-      if(!IsProtonContained) HasExitingProton = true;
+      bool IsProtonInPRange = ProtonP>0.4 && ProtonP<1.0;
+
+      if(IsProtonContained&&IsProtonInPRange) nSignalProton++;
 
     }
-    if(LargestProtonP<0.400) return false;
-    //if(LargestProtonP<0) return false; // TODO test
-
-    if(HasExitingProton) return false;
-
+    if(nSignalProton==0) return false;
 
     return true;
+*/
 
   });
   const Cut SignalMuonContained([](const caf::SRSliceProxy* slc) {
@@ -459,6 +517,21 @@ namespace TwoTrack{
   const Var IsSignal([](const caf::SRSliceProxy* slc) -> double {
     return cutIsNuMuCC(slc) && ICARUSNumuXsec::TwoTrack::SignalDef(slc);
   });
+
+  // Sideband def
+  const Cut ChargedPionSideBand = cutRFiducial && cutNotClearCosmic &&
+                                  ICARUSNumuXsec::TwoTrack::HasMuonTrack &&
+                                  ICARUSNumuXsec::TwoTrack::HasProtonTrack && ICARUSNumuXsec::TwoTrack::ProtonTrackPCut &&
+                                  ICARUSNumuXsec::TwoTrack::HadronContained &&
+                                  ICARUSNumuXsec::TwoTrack::HasStoppedChargedPionTrack &&
+                                  !ICARUSNumuXsec::TwoTrack::HasNeutralPionPhotonShower;
+
+  const Cut NeutralPionSideBand = cutRFiducial && cutNotClearCosmic &&
+                                  ICARUSNumuXsec::TwoTrack::HasMuonTrack &&
+                                  ICARUSNumuXsec::TwoTrack::HasProtonTrack && ICARUSNumuXsec::TwoTrack::ProtonTrackPCut &&
+                                  ICARUSNumuXsec::TwoTrack::HadronContained &&
+                                  !ICARUSNumuXsec::TwoTrack::HasStoppedChargedPionTrack &&
+                                  ICARUSNumuXsec::TwoTrack::HasNeutralPionPhotonShower;
 
   namespace Aux{
 
