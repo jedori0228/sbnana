@@ -7,44 +7,6 @@ namespace ICARUSNumuXsec{
 
 namespace TwoTrack{
 
-  // Test
-
-  const SpillMultiVar TestVar([](const caf::SRSpillProxy *sr) -> vector<double> {
-
-    std::vector<double> rets;
-
-    for(std::size_t i(0); i < sr->slc.size(); ++i){
-      const auto& slc = sr->slc.at(i);
-
-      int JS_MuonTrackIdx = MuonTrackIndex(&slc);
-      int BH_MuonTrackIdx = kNuMIMuonCandidateIdx(&slc);
-
-      if(JS_MuonTrackIdx!=BH_MuonTrackIdx){
-        printf("[JSKIMDEBUG] MISSMATCH from muon track index: (JS, BH) = (%d, %d)\n", JS_MuonTrackIdx, BH_MuonTrackIdx);
-      }
-
-      int JS_ProtonTrackIdx = ProtonTrackIndex(&slc);
-      int BH_ProtonTrackIdx = kNuMIProtonCandidateIdx(&slc);
-
-      if(JS_ProtonTrackIdx!=BH_ProtonTrackIdx){
-        printf("[JSKIMDEBUG] MISSMATCH from proton track index: (JS, BH) = (%d, %d)\n", JS_ProtonTrackIdx, BH_ProtonTrackIdx);
-      }
-
-      vector<double> JS_PhotonIndices = NeutralPionPhotonShowerIndices(&slc);
-      vector<double> BH_PhotonIndices = kNuMIPhotonCandidateIdxs(&slc);
-
-      if(JS_PhotonIndices.size()!=BH_PhotonIndices.size()){
-        printf("[JSKIMDEBUG] MISSMATCH from photons: (JS, BH) = (%ld, %ld)\n", JS_PhotonIndices.size(), BH_PhotonIndices.size());
-      }
-
-
-    }
-
-    return rets;
-
-
-  });
-
   // Muon
   const Var MuonTrackIndex([](const caf::SRSliceProxy* slc) -> double {
     return kNuMIMuonCandidateIdx(slc);
