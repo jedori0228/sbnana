@@ -784,6 +784,6 @@ bool ICARUSNumuXsec::IsPFPTrack(const caf::SRPFPProxy& pfp){
   return !isnan(pfp.trackScore) && pfp.trackScore>TrackScoreCutValue;
 }
 bool ICARUSNumuXsec::IsPFPShower(const caf::SRPFPProxy& pfp){
-  return !isnan(pfp.trackScore) && pfp.trackScore<=TrackScoreCutValue;
+  return !isnan(pfp.trackScore) && pfp.trackScore<=TrackScoreCutValue && pfp.trackScore>0.;
 }
 
