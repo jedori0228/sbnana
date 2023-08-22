@@ -189,7 +189,8 @@ void HistoProducer::TruthStudy(SpectrumLoader& loader, SpillCut spillCut, Cut cu
   // Muon
 
   FillCVSpectrum(loader, "TruthMuonKE", TruthMuonKE, Binning::Simple(300, 0., 3.), spillCut, cut);
-  FillCVSpectrum(loader, "TruthMuonP", TruthMuonP, Binning::Simple(20, 0., 2.), spillCut, cut);
+  FillCVSpectrum(loader, "TruthMuonP", TruthMuonP, Binning::Simple(50, 0., 5.), spillCut, cut);
+  FillCVSpectrum(loader, "TruthMuonPt", TruthMuonPt, Binning::Simple(20, 0., 2.), spillCut, cut);
   FillCVSpectrum(loader, "TruthMuonLength", TruthMuonLength, Binning::Simple(500, 0., 500), spillCut, cut);
   FillCVSpectrum(loader, "TruthMuonNuCosineTheta", TruthMuonNuCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
   FillCVSpectrum(loader, "TruthMuonMatchedTrackCustomChi2InelasticPionCollection", TruthMuonMatchedTrackCustomChi2InelasticPionCollection, Binning::Simple(80, 0., 80), spillCut, cut);
@@ -816,6 +817,7 @@ void HistoProducer::TwoTrackAnalysis(SpectrumLoader& loader, SpillCut spillCut, 
   FillCVSpectrum(loader, "NPrimaryTracks", NPrimaryTracks, Binning::Simple(10, 0., 10.), spillCut, cut);
   FillCVSpectrum(loader, "MuonTrackLength", MuonTrackLength, Binning::Simple(500, 0., 500), spillCut, cut);
   FillCVandSystSpectrum(loader, "MuonTrackP", MuonTrackP, Binning::Simple(50, 0., 5.), spillCut, cut);
+  FillCVandSystSpectrum(loader, "MuonTrackPt", MuonTrackPt, Binning::Simple(20, 0., 2.), spillCut, cut);
   FillCVSpectrum(loader, "MuonTrackDirX", MuonTrackDirX, Binning::Simple(40, -1., 1), spillCut, cut);
   FillCVSpectrum(loader, "MuonTrackDirY", MuonTrackDirY, Binning::Simple(40, -1., 1), spillCut, cut);
   FillCVSpectrum(loader, "MuonTrackDirZ", MuonTrackDirZ, Binning::Simple(40, -1., 1), spillCut, cut);
@@ -828,6 +830,7 @@ void HistoProducer::TwoTrackAnalysis(SpectrumLoader& loader, SpillCut spillCut, 
   FillCVSpectrum(loader, "MuonTrackTruthMatchedPrimaryType", MuonTrackTruthMatchedPrimaryType, Binning::Simple(6, -1., 5.), spillCut, cut);
   // true primary
   FillCVSpectrum(loader, "TruthMuonP_vs_MuonTrackP", TruthMuonP, Binning::Simple(50, 0., 5.), MuonTrackP, Binning::Simple(50, 0., 5.), spillCut, cut);
+  FillCVSpectrum(loader, "TruthMuonPt_vs_MuonTrackPt", TruthMuonPt, Binning::Simple(20, 0., 2.), MuonTrackPt, Binning::Simple(20, 0., 2.), spillCut, cut);
   FillCVSpectrum(loader, "TruthMuonNuCosineTheta_vs_MuonTrackNuMIToVtxCosineTheta", TruthMuonNuCosineTheta, Binning::Simple(40, -1., 1.), MuonTrackNuMIToVtxCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
 
   FillCVSpectrum(loader, "ProtonTrackP", ProtonTrackP, Binning::Simple(20, 0., 2.), spillCut, cut);
@@ -1085,7 +1088,8 @@ void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
   using namespace ICARUSNumuXsec::TwoTrack;
   using namespace ICARUSNumuXsec::TruthMatch;
 
-  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("spillvarTest", Binning::Simple(1, 0., 1.), loader, TestVar, spillCut) );
+  //map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("spillvarTest", Binning::Simple(1, 0., 1.), loader, TestVar, spillCut) );
+  FillCVSpectrum(loader, "TruthMuonNuCosineTheta_vs_MuonTrackNuMIToVtxCosineTheta", TruthMuonNuCosineTheta, Binning::Simple(40, -1., 1.), MuonTrackNuMIToVtxCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
 
   //map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("Test", Binning::Simple(1, 0., 1.), loader, ICARUSNumuXsec::TruthMatch::TruthChargedPionMichelIndex, spillCut, cut) );
 

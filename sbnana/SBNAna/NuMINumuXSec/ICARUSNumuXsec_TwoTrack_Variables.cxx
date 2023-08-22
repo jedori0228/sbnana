@@ -83,6 +83,36 @@ namespace TwoTrack{
     }
 
   });
+  const Var MuonTrackPt([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = MuonTrackIndex(slc);
+    if(muonTrackIndex>=0){
+
+      double P = MuonTrackP(slc);
+      if(P<0.) return -999.;
+
+      const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
+      TVector3 vec_P(trk.dir.x, trk.dir.y, trk.dir.z);
+      vec_P *= P;
+
+      const auto& vtx = slc->vertex;
+      TVector3 v3_vtx(vtx.x, vtx.y, vtx.z);
+      TVector3 dFromNuMI(315.120380, 33.644912, 733.632532);
+      dFromNuMI *= 100.; // m to cm
+
+      TVector3 v3_numi_to_vtx = dFromNuMI+v3_vtx;
+      v3_numi_to_vtx = v3_numi_to_vtx.Unit(); // Make unit
+
+      double P_l = vec_P.Dot(v3_numi_to_vtx);
+      TVector3 vec_P_t = vec_P - P_l*v3_numi_to_vtx;
+
+      return vec_P_t.Mag();
+
+    }
+    else{
+      return -999.;
+    }
+
+  });
   const Var MuonTrackDirX([](const caf::SRSliceProxy* slc) -> double {
     int muonTrackIndex = MuonTrackIndex(slc);
     if(muonTrackIndex>=0){
@@ -131,7 +161,8 @@ namespace TwoTrack{
 
       TVector3 v3_trk(trk.dir.x, trk.dir.y, trk.dir.z);
       TVector3 v3_vtx(vtx.x, vtx.y, vtx.z);
-      static const TVector3 dFromNuMI(315.120380, 33.644912, 733.632532);
+      TVector3 dFromNuMI(315.120380, 33.644912, 733.632532);
+      dFromNuMI *= 100.; // m to cm
 
       TVector3 v3_numi_to_vtx = dFromNuMI+v3_vtx;
 
@@ -360,7 +391,8 @@ namespace TwoTrack{
       
       TVector3 v3_trk(trk.dir.x, trk.dir.y, trk.dir.z);
       TVector3 v3_vtx(vtx.x, vtx.y, vtx.z);
-      static const TVector3 dFromNuMI(315.120380, 33.644912, 733.632532);
+      TVector3 dFromNuMI(315.120380, 33.644912, 733.632532);
+      dFromNuMI *= 100.; // m to cm
       
       TVector3 v3_numi_to_vtx = dFromNuMI+v3_vtx;
       
@@ -823,7 +855,8 @@ namespace TwoTrack{
 
       TVector3 v3_trk(trk.dir.x, trk.dir.y, trk.dir.z);
       TVector3 v3_vtx(vtx.x, vtx.y, vtx.z);
-      static const TVector3 dFromNuMI(315.120380, 33.644912, 733.632532);
+      TVector3 dFromNuMI(315.120380, 33.644912, 733.632532);
+      dFromNuMI *= 100.; // m to cm
 
       TVector3 v3_numi_to_vtx = dFromNuMI+v3_vtx;
 
@@ -940,7 +973,8 @@ namespace TwoTrack{
 
       TVector3 v3_trk(trk.dir.x, trk.dir.y, trk.dir.z);
       TVector3 v3_vtx(vtx.x, vtx.y, vtx.z);
-      static const TVector3 dFromNuMI(315.120380, 33.644912, 733.632532);
+      TVector3 dFromNuMI(315.120380, 33.644912, 733.632532);
+      dFromNuMI *= 100.; // m to cm
 
       TVector3 v3_numi_to_vtx = dFromNuMI+v3_vtx;
 

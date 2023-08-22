@@ -21,6 +21,7 @@ namespace TwoTrack{
   extern const Var MuonTrackIndex;
   extern const Var MuonTrackLength;
   extern const Var MuonTrackP;
+  extern const Var MuonTrackPt;
   extern const Var MuonTrackDirX;
   extern const Var MuonTrackDirY;
   extern const Var MuonTrackDirZ;

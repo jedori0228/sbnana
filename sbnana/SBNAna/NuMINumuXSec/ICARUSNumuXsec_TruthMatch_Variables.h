@@ -19,6 +19,7 @@ namespace TruthMatch{
   extern const Var TruthMuonNuCosineTheta;
   extern const Var TruthMuonKE;
   extern const Var TruthMuonP;
+  extern const Var TruthMuonPt;
   extern const Var TruthMuonMatchedTrackIndex;
   extern const Var TruthMuonMatchedTrackContainedness;
   extern const Var TruthMuonMatchedTrackChi2Proton;

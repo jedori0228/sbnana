@@ -69,6 +69,26 @@ namespace TruthMatch{
       return -999.;
     }
   });
+  const Var TruthMuonPt([](const caf::SRSliceProxy* slc) -> double {
+    int truth_idx = TruthMuonIndex(slc);
+    if(truth_idx>=0){
+      const auto& p_mu = slc->truth.prim.at(truth_idx).genp;
+      const auto& p_nu = slc->truth.momentum;
+
+      TVector3 vec_p_mu(p_mu.x, p_mu.y, p_mu.z);
+      TVector3 vec_dir_nu(p_nu.x, p_nu.y, p_nu.z);
+      vec_dir_nu = vec_dir_nu.Unit();
+
+      double p_l = vec_p_mu.Dot(vec_dir_nu);
+      TVector3 vec_p_l_mu = vec_p_mu - p_l*vec_dir_nu;
+
+      return vec_p_l_mu.Mag();
+
+    }
+    else{
+      return -999.;
+    }
+  });
   const Var TruthMuonMatchedTrackIndex([](const caf::SRSliceProxy* slc) -> double {
     int truth_idx = TruthMuonIndex(slc);
     return GetMatchedRecoTrackIndex(slc, truth_idx);
