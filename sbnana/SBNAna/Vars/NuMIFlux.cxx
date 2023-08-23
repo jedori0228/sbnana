@@ -16,7 +16,6 @@ namespace ana {
   //// ----------------------------------------------
   NuMIPpfxFluxWeight::NuMIPpfxFluxWeight()
   {
-/*
     const char* sbndata = std::getenv("SBNDATA_DIR");
     if (!sbndata) {
       std::cout << "NuMIPpfxFluxWeight: $SBNDATA_DIR environment variable not set. Please setup "
@@ -27,12 +26,9 @@ namespace ana {
 
     fFluxFilePath = std::string(sbndata) +
                    "beamData/NuMIdata/2023-07-31_out_450.37_7991.98_79512.66_QEL11.root";
-*/
 
-    fFluxFilePath = "root://fndcadoor.fnal.gov:1094/pnfs/fnal.gov/usr/icarus/persistent/users/jskim/NuMINumuXSec/Flux/2023-07-31_out_450.37_7991.98_79512.66_QEL11.root";
-    TFile *f = TFile::Open(fFluxFilePath.c_str());
-    //TFile f(fFluxFilePath.c_str());
-    if (f->IsZombie()) {
+    TFile f(fFluxFilePath.c_str());
+    if (f.IsZombie()) {
       std::cout << "NuMIPpfxFluxWeight: Failed to open " << fFluxFilePath << std::endl;
       std::abort();
     }
@@ -51,9 +47,9 @@ namespace ana {
             hNamePPFX += "numu";
           if (signIdx == 1) hNamePPFX += "bar";
 
-          TH1* h_ppfx = (TH1*)f->Get(hNamePPFX.c_str());
+          TH1* h_ppfx = (TH1*)f.Get(hNamePPFX.c_str());
           if (!h_ppfx) {
-            std::cout << "NuMIPpfxFluxWeight: failed to find " << hNamePPFX << " in " << f->GetName()
+            std::cout << "NuMIPpfxFluxWeight: failed to find " << hNamePPFX << " in " << f.GetName()
                       << std::endl;
             std::abort();
           }
@@ -95,7 +91,7 @@ namespace ana {
         for (int k = 0; k < 2; ++k)
           delete fWeight[i][j][k];
   }
-/*
+
   //// ----------------------------------------------
 
   const Var kGetNuMIFluxWeight([](const caf::SRSliceProxy* slc) -> double {
@@ -121,5 +117,5 @@ namespace ana {
   });
 
   //// ----------------------------------------------
-*/
+
 }
