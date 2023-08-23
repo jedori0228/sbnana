@@ -1036,6 +1036,8 @@ void HistoProducer::MakeTrueTree(SpectrumLoader& loader){
       "TruedeltaPT",
       "TruedeltaPTx",
       "TruedeltaPTy",
+      "TruedeltaalphaT",
+      "TruedeltaphiT",
       },
       loader,
       {
@@ -1058,6 +1060,8 @@ void HistoProducer::MakeTrueTree(SpectrumLoader& loader){
       kTruedeltaPTVectorPerSignalNu,
       kTruedeltaPTxVectorPerSignalNu,
       kTruedeltaPTyVectorPerSignalNu,
+      kTruedeltaalphaTVectorPerSignalNu,
+      kTruedeltaphiTVectorPerSignalNu,
       },
       kNoSpillCut,
       false
@@ -1091,6 +1095,8 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       "RecodeltaPT", "TruedeltaPT",
       "RecodeltaPTx", "TruedeltaPTx",
       "RecodeltaPTy", "TruedeltaPTy",
+      "RecodeltaalphaT", "TruedeltaalphaT",
+      "RecodeltaphiT", "TruedeltaphiT",
       },
       loader,
       {
@@ -1106,6 +1112,8 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       kNuMIRecodeltaPT, kNuMITruedeltaPT,
       kNuMIRecodeltaPTx, kNuMITruedeltaPTx,
       kNuMIRecodeltaPTy, kNuMITruedeltaPTy,
+      kNuMIRecodeltaalphaT, kNuMITruedeltaalphaT,
+      kNuMIRecodeltaphiT, kNuMITruedeltaphiT,
       },
       spillCut, cut,
       kNoShift, true, true
