@@ -5,6 +5,7 @@
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_TruthMatch_Variables.h"
 #include "sbnana/SBNAna/Vars/Vars.h"
 #include "sbnana/SBNAna/Vars/NuMIXSecVars.h"
+#include "sbnana/SBNAna/Cuts/NuMIXSecTrueEventVars.h"
 #include "sbnana/SBNAna/Cuts/NuMIXSecCuts.h"
 #include "sbnana/CAFAna/Core/Cut.h"
 #include "sbnana/CAFAna/Core/MultiVar.h"

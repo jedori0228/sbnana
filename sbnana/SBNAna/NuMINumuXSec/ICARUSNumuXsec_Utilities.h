@@ -125,20 +125,6 @@ namespace ICARUSNumuXsec{
   }; // END Class NuMICoordinateTool
 
   //---------------------------------------------------
-  class NuMIPPFXWeightTool{
-
-  public:
-
-    NuMIPPFXWeightTool();
-    static NuMIPPFXWeightTool& Instance();
-    double GetWeight(const caf::SRSliceProxy* slc) const;
-    double GetFirstNuWeight(const caf::SRSpillProxy* sr) const;
-
-    mutable TH1* fWeight[2][2][2]; // [fhc/rhc][nue/numu][nu/nubar]
-
-  };
-
-  //---------------------------------------------------
   class dEdXTemplateTool{
 
   public:

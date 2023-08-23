@@ -4,6 +4,7 @@ HistoProducer::HistoProducer(){
 
   cout << "[HistoProducer::HistoProducer] called" << endl;
   SystProviderPrefix = "GENIEReWeight_ICARUS_v2";
+  TrueTreeFilled = false;
   NNuMIFluxPCA = 12;
   TargetPOT = 6.0e20;
   str_TargetPOT = "6.0e20 POT";
@@ -1004,7 +1005,51 @@ void HistoProducer::MichelStudy(SpectrumLoader& loader, SpillCut spillCut, Cut c
 }
 
 // - 230814_MakeTree
+void HistoProducer::MakeTrueTree(SpectrumLoader& loader){
+  if(TrueTreeFilled) return;
+
+  using namespace ICARUSNumuXsec::TwoTrack;
+  using namespace ICARUSNumuXsec::TruthMatch;
+  using namespace ana::TrueEvent;
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+
+    new ana::Tree(
+      "trueEvents",
+      {
+      "CutType/i",
+      "TruePDG/i", "TrueMode/i", "TrueTarget/i",
+      "FluxWeight",
+      "TrueE",
+
+      "TrueMuonP",
+      "TrueMuonCos",
+      "TrueProtonP",
+      "TrueMuonProtonCos",
+      },
+      loader,
+      {
+      kCutTypeVectorPerSignalNu,
+      kTruePDGVectorPerSignalNu, kTrueModeVectorPerSignalNu, kTrueTargetVectorPerSignalNu,
+      kNuMIPPFXWeightVectorPerSignalNu,
+      kTrueEVectorPerSignalNu,
+
+      kTrueMuonPVectorPerSignalNu,
+      kTrueMuonNuCosineThetaVectorPerSignalNu,
+      kTrueProtonPVectorPerSignalNu,
+      kTrueProtonNuCosineThetaVectorPerSignalNu
+      },
+      kNoSpillCut,
+      false
+    )
+
+  );
+
+  TrueTreeFilled = true;
+}
 void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  MakeTrueTree(loader);
 
   using namespace ICARUSNumuXsec::TwoTrack;
   using namespace ICARUSNumuXsec::TruthMatch;
@@ -1014,7 +1059,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
     new ana::Tree(
       "selectedEvents",
       {
-      "CutType/i"
+      "CutType/i",
       "TruePDG/i", "TrueMode/i", "TrueTarget/i", "IsSignal",
       "FluxWeight",
       "TrueE",
@@ -1031,7 +1076,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       {
       ICARUSNumuXsec::TwoTrack::CutType,
       varTruePDG, varGENIEIntCode, varTrueTarget, IsSignal,
-      NuMIPPFXCVWeight,
+      ana::kGetNuMIFluxWeight,
       varNeutrinoTruthE,
       ICARUSNumuXsec::TwoTrack::MuonTrackType,
       kNuMIMuonCandidateRecoP, kNuMIMuonTrueP,
@@ -1560,7 +1605,7 @@ void HistoProducer::FillCVandSystSpectrum(SpectrumLoader& loader, const std::str
 const Var HistoProducer::GetGlobalWeight(){
 
   Var GlobalWeight = kUnweighted;
-  if(ApplyNuMIPPFXCVWeight) GlobalWeight = GlobalWeight * NuMIPPFXCVWeight;
+  if(ApplyNuMIPPFXCVWeight) GlobalWeight = GlobalWeight * ana::kGetNuMIFluxWeight;
 
   return GlobalWeight;
 

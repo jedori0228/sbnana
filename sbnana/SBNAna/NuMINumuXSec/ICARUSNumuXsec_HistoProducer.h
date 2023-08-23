@@ -23,6 +23,9 @@
 #include "sbnana/CAFAna/Systs/SBNWeightSysts.h"
 #include "sbnana/CAFAna/Systs/NuMIFluxSysts.h"
 
+// SBNANA
+#include "sbnana/SBNAna/Vars/NuMIFlux.h"
+
 // NuMINumuXSec
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Contants.h"
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Cuts.h"
@@ -76,7 +79,7 @@ namespace ICARUSNumuXsec{
     // - 230524_MichelStudy
     void MichelStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     // - 230814_MakeTree
-    bool FillTrueTree;
+    bool TrueTreeFilled;
     void MakeTrueTree(SpectrumLoader& loader);
     void MakeTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 

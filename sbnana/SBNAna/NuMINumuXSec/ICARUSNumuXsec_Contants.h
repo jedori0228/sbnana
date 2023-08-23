@@ -23,7 +23,5 @@ namespace ICARUSNumuXsec{
 
   static const InteractionTool& intt = InteractionTool::Instance();
 
-  //static const NuMIPPFXWeightTool nppfxwt = NuMIPPFXWeightTool::Instance();
-
 }
 
