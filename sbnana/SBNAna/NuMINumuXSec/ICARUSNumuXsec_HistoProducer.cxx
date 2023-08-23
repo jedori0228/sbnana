@@ -1017,27 +1017,47 @@ void HistoProducer::MakeTrueTree(SpectrumLoader& loader){
     new ana::Tree(
       "trueEvents",
       {
+      // CutType
       "CutType/i",
+      // Interaction
       "TruePDG/i", "TrueMode/i", "TrueTarget/i",
+      // Weight
       "FluxWeight",
+      // Nu E
       "TrueE",
-
+      // Muon
       "TrueMuonP",
       "TrueMuonCos",
+      // Proton
       "TrueProtonP",
+      // Muon+Proton
       "TrueMuonProtonCos",
+      // TKI
+      "TruedeltaPT",
+      "TruedeltaPTx",
+      "TruedeltaPTy",
       },
       loader,
       {
+      // CutType
       kCutTypeVectorPerSignalNu,
+      // Interaction
       kTruePDGVectorPerSignalNu, kTrueModeVectorPerSignalNu, kTrueTargetVectorPerSignalNu,
+      // Weight
       kNuMIPPFXWeightVectorPerSignalNu,
+      // Nu E
       kTrueEVectorPerSignalNu,
-
+      // Muon
       kTrueMuonPVectorPerSignalNu,
       kTrueMuonNuCosineThetaVectorPerSignalNu,
+      // Proton
       kTrueProtonPVectorPerSignalNu,
-      kTrueProtonNuCosineThetaVectorPerSignalNu
+      // Muon+Proton
+      kTrueProtonNuCosineThetaVectorPerSignalNu,
+      // TKI
+      kTruedeltaPTVectorPerSignalNu,
+      kTruedeltaPTxVectorPerSignalNu,
+      kTruedeltaPTyVectorPerSignalNu,
       },
       kNoSpillCut,
       false
@@ -1083,9 +1103,9 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       kNuMIRecoCosThBeam, kNuMITrueCosThBeam,
       kNuMIProtonCandidateRecoP, kNuMIProtonTrueP,
       kNuMIRecoCosThMuP, kNuMITrueCosThMuP,
-      ICARUSNumuXsec::TwoTrack::TKI::deltaPT, ICARUSNumuXsec::TruthMatch::TKI::deltaPT,
-      ICARUSNumuXsec::TwoTrack::TKI::deltaPTx, ICARUSNumuXsec::TruthMatch::TKI::deltaPTx,
-      ICARUSNumuXsec::TwoTrack::TKI::deltaPTy, ICARUSNumuXsec::TruthMatch::TKI::deltaPTy,
+      kNuMIRecodeltaPT, kNuMITruedeltaPT,
+      kNuMIRecodeltaPTx, kNuMITruedeltaPTx,
+      kNuMIRecodeltaPTy, kNuMITruedeltaPTy,
       },
       spillCut, cut,
       kNoShift, true, true
