@@ -557,7 +557,8 @@ namespace TwoTrack{
         vec_pro *= p_pro;
 
         TVector3 vec_vtx_icarus(vtx.x, vtx.y, vtx.z);
-        static const TVector3 vec_NuMI_to_ICARUS(315.120380, 33.644912, 733.632532);
+        TVector3 vec_NuMI_to_ICARUS(315.120380, 33.644912, 733.632532);
+        vec_NuMI_to_ICARUS *= 100.;
 
         TVector3 unit_numi_to_vtx = (vec_NuMI_to_ICARUS+vec_vtx_icarus).Unit();
 
@@ -590,7 +591,8 @@ namespace TwoTrack{
         vec_pro *= p_pro;
 
         TVector3 vec_vtx_icarus(vtx.x, vtx.y, vtx.z);
-        static const TVector3 vec_NuMI_to_ICARUS(315.120380, 33.644912, 733.632532);
+        TVector3 vec_NuMI_to_ICARUS(315.120380, 33.644912, 733.632532);
+        vec_NuMI_to_ICARUS *= 100.;
 
         TVector3 unit_numi_to_vtx = (vec_NuMI_to_ICARUS+vec_vtx_icarus).Unit();
 
@@ -625,7 +627,8 @@ namespace TwoTrack{
         vec_pro *= p_pro;
 
         TVector3 vec_vtx_icarus(vtx.x, vtx.y, vtx.z);
-        static const TVector3 vec_NuMI_to_ICARUS(315.120380, 33.644912, 733.632532);
+        TVector3 vec_NuMI_to_ICARUS(315.120380, 33.644912, 733.632532);
+        vec_NuMI_to_ICARUS *= 100.;
 
         TVector3 unit_numi_to_vtx = (vec_NuMI_to_ICARUS+vec_vtx_icarus).Unit();
 
