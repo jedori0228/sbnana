@@ -21,6 +21,7 @@ namespace TwoTrack{
   extern const Cut HasMuonTrack;
   extern const Cut MuonTrackContained;
   extern const Cut MuonTrackExiting;
+  extern const Var MuonTrackType;
   extern const Cut MuonTrackOneMeter;
   extern const Cut MuonTrackBelowBlindP;
   // - Truth matching
@@ -65,6 +66,10 @@ namespace TwoTrack{
   // Sideband def
   extern const Cut ChargedPionSideBand;
   extern const Cut NeutralPionSideBand;
+
+  // cut type
+  extern const Var CutType;
+  extern const Cut IsForTree;
 
   namespace Aux{
     extern const Cut HasRelaxedMuonTrack;

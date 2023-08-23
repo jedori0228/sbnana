@@ -221,8 +221,8 @@ namespace ICARUSNumuXsec{
 
       bool MuonContained() const;
 
-
       NParticles GetNParticles(const caf::SRSliceProxy* slc) const;
+      NParticles GetNParticles(const caf::Proxy<std::vector<caf::SRTrueParticle>>& prim) const;
 
   };
 

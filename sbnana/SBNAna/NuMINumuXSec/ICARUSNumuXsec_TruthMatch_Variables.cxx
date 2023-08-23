@@ -2,6 +2,7 @@
 
 using namespace std;
 using namespace ana;
+using namespace ana::PrimaryUtil;
 
 namespace ICARUSNumuXsec{
 
@@ -9,6 +10,8 @@ namespace TruthMatch{
 
   // For a given true muon (truth_index), find a reco track whose best-matched is this particle
   const Var TruthMuonIndex([](const caf::SRSliceProxy* slc) -> double {
+    return ana::PrimaryUtil::MuonIndex(slc->truth);
+/*
     double max_E(-999);
     int truth_idx(-1);
     for(std::size_t i(0); i < slc->truth.prim.size(); ++i){
@@ -22,6 +25,7 @@ namespace TruthMatch{
       }
     }
     return truth_idx;
+*/
   });
   const Var TruthMuonLength([](const caf::SRSliceProxy* slc) -> double {
     int truth_idx = TruthMuonIndex(slc);
@@ -34,6 +38,8 @@ namespace TruthMatch{
     }
   });
   const Var TruthMuonNuCosineTheta([](const caf::SRSliceProxy* slc) -> double {
+    return ana::PrimaryUtil::MuonNuCosineTheta(slc->truth);
+/*
     int truth_idx = TruthMuonIndex(slc);
     if(truth_idx>=0){
 
@@ -49,6 +55,7 @@ namespace TruthMatch{
     else{
       return -999.;
     }
+*/
   });
   const Var TruthMuonKE([](const caf::SRSliceProxy* slc) -> double {
     int truth_idx = TruthMuonIndex(slc);

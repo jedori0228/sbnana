@@ -512,45 +512,58 @@ InteractionTool::NParticles InteractionTool::GetNParticles(const caf::SRSlicePro
 
   }
   else{
-    // using prim
-    int counter = -1;
-    for(const auto& prm: slc->truth.prim){
-      counter += 1;
 
-      if(prm.start_process!=0){
-        continue;
-      }
+    GetNParticles(slc->truth.prim);
 
-      const int pdg = prm.pdg;
-      const int apdg = abs(pdg);
-      if(apdg==13){
-        nptls.NMuon++;
-        MuonIndices.push_back(counter);
-      }
-
-      if( pdg==2212 ){
-        nptls.NProton++;
-        ProtonIndices.push_back(counter);
-      }
-      else if( pdg==2112 ){
-        nptls.NNeutron++;
-        NeutronIndices.push_back(counter);
-      }
-      else if( pdg==211 ){
-        nptls.NPip++;
-        PipIndices.push_back(counter);
-      }
-      else if( pdg==-211 ){
-        nptls.NPim++;
-        PimIndices.push_back(counter);
-      }
-      else if( pdg==111 ){
-        Pi0Indices.push_back(counter);
-        nptls.NPi0++;
-      }
-
-    } // END prim loop
   }
+
+  return nptls;
+
+}
+
+InteractionTool::NParticles InteractionTool::GetNParticles(const caf::Proxy<std::vector<caf::SRTrueParticle>>& prim) const {
+
+  ClearIndices();
+
+  InteractionTool::NParticles nptls;
+
+  int counter = -1;
+  for(const auto& prm: prim){
+    counter += 1;
+
+    if(prm.start_process!=0){
+      continue;
+    }
+
+    const int pdg = prm.pdg;
+    const int apdg = abs(pdg);
+    if(apdg==13){
+      nptls.NMuon++;
+      MuonIndices.push_back(counter);
+    }
+
+    if( pdg==2212 ){
+      nptls.NProton++;
+      ProtonIndices.push_back(counter);
+    }
+    else if( pdg==2112 ){
+      nptls.NNeutron++;
+      NeutronIndices.push_back(counter);
+    }
+    else if( pdg==211 ){
+      nptls.NPip++;
+      PipIndices.push_back(counter);
+    }
+    else if( pdg==-211 ){
+      nptls.NPim++;
+      PimIndices.push_back(counter);
+    }
+    else if( pdg==111 ){
+      Pi0Indices.push_back(counter);
+      nptls.NPi0++;
+    }
+
+  } // END prim loop
 
   return nptls;
 

@@ -76,6 +76,8 @@ namespace ICARUSNumuXsec{
     // - 230524_MichelStudy
     void MichelStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     // - 230814_MakeTree
+    bool FillTrueTree;
+    void MakeTrueTree(SpectrumLoader& loader);
     void MakeTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
     void Test(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);

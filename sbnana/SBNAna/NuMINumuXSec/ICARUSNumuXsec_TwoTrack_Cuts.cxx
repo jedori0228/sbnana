@@ -93,6 +93,18 @@ namespace TwoTrack{
       return false;
     }
   });
+  const Var MuonTrackType([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = MuonTrackIndex(slc);
+    if(muonTrackIndex>=0){
+      const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
+      bool isContained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
+      if(isContained) return 1;
+      else return 2;
+    }
+    else{
+      return 0;
+    }
+  });
   const Cut MuonTrackOneMeter([](const caf::SRSliceProxy* slc) {
     int muonTrackIndex = MuonTrackIndex(slc);
     if(muonTrackIndex>=0){
@@ -532,6 +544,21 @@ namespace TwoTrack{
                                   ICARUSNumuXsec::TwoTrack::HadronContained &&
                                   !ICARUSNumuXsec::TwoTrack::HasStoppedChargedPionTrack &&
                                   ICARUSNumuXsec::TwoTrack::HasNeutralPionPhotonShower;
+
+  const Var CutType([](const caf::SRSliceProxy* slc) -> double {
+
+    if( kNuMISelection_1muNp0pi(slc) ) return 1;
+    else if( ChargedPionSideBand(slc) ) return 2;
+    else if( NeutralPionSideBand(slc) ) return 3;
+    else return 0;
+
+  });
+
+  const Cut IsForTree([](const caf::SRSliceProxy* slc) {
+    int cuttpye = CutType(slc);
+    if(cuttpye==0) return false;
+    else return true;
+  });
 
   namespace Aux{
 

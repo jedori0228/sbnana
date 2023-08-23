@@ -2,6 +2,7 @@
 
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Contants.h"
 #include "sbnana/SBNAna/Vars/Vars.h"
+#include "sbnana/SBNAna/Vars/PrimaryUtils.h"
 #include "sbnana/CAFAna/Core/Cut.h"
 #include "sbnana/CAFAna/Core/MultiVar.h"
 #include <iostream>
