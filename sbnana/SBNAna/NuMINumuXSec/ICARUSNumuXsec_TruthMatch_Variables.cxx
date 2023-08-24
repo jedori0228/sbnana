@@ -10,22 +10,7 @@ namespace TruthMatch{
 
   // For a given true muon (truth_index), find a reco track whose best-matched is this particle
   const Var TruthMuonIndex([](const caf::SRSliceProxy* slc) -> double {
-    return ana::PrimaryUtil::MuonIndex(slc->truth);
-/*
-    double max_E(-999);
-    int truth_idx(-1);
-    for(std::size_t i(0); i < slc->truth.prim.size(); ++i){
-      if( abs(slc->truth.prim.at(i).pdg)==13 && slc->truth.prim.at(i).start_process==0 ){
-        if(isnan(slc->truth.prim.at(i).genE)) continue;
-        double this_E = slc->truth.prim.at(i).genE;
-        if(this_E>max_E){
-          max_E = this_E;
-          truth_idx = i;
-        }
-      }
-    }
-    return truth_idx;
-*/
+    return ana::PrimaryUtil::MuonIndex_True(slc->truth);
   });
   const Var TruthMuonLength([](const caf::SRSliceProxy* slc) -> double {
     int truth_idx = TruthMuonIndex(slc);
@@ -38,24 +23,7 @@ namespace TruthMatch{
     }
   });
   const Var TruthMuonNuCosineTheta([](const caf::SRSliceProxy* slc) -> double {
-    return ana::PrimaryUtil::MuonNuCosineTheta(slc->truth);
-/*
-    int truth_idx = TruthMuonIndex(slc);
-    if(truth_idx>=0){
-
-      const auto& p_mu = slc->truth.prim.at(truth_idx).genp;
-      const auto& p_nu = slc->truth.momentum;
-
-      TVector3 vec_p_mu(p_mu.x, p_mu.y, p_mu.z);
-      TVector3 vec_p_nu(p_nu.x, p_nu.y, p_nu.z);
-
-      return vec_p_mu.Unit().Dot( vec_p_nu.Unit() );
-
-    }
-    else{
-      return -999.;
-    }
-*/
+    return ana::PrimaryUtil::MuonNuCosineTheta_True(slc->truth);
   });
   const Var TruthMuonKE([](const caf::SRSliceProxy* slc) -> double {
     int truth_idx = TruthMuonIndex(slc);
