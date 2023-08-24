@@ -1010,59 +1010,13 @@ void HistoProducer::MakeTrueTree(SpectrumLoader& loader){
 
   using namespace ICARUSNumuXsec::TwoTrack;
   using namespace ICARUSNumuXsec::TruthMatch;
-  using namespace ana::TrueEvent;
 
   map_cutName_to_vec_Trees[currentCutName].push_back(
 
     new ana::Tree(
-      "trueEvents",
-      {
-      // CutType
-      "CutType/i",
-      // Interaction
-      "TruePDG/i", "TrueMode/i", "TrueTarget/i",
-      // Weight
-      "FluxWeight",
-      // Nu E
-      "TrueE",
-      // Muon
-      "TrueMuonP",
-      "TrueMuonCos",
-      // Proton
-      "TrueProtonP",
-      // Muon+Proton
-      "TrueMuonProtonCos",
-      // TKI
-      "TruedeltaPT",
-      "TruedeltaPTx",
-      "TruedeltaPTy",
-      "TruedeltaalphaT",
-      "TruedeltaphiT",
-      },
+      "trueEvents", GetNuMITrueTreeLabels(),
       loader,
-      {
-      // CutType
-      kCutTypeVectorPerSignalNu,
-      // Interaction
-      kTruePDGVectorPerSignalNu, kTrueModeVectorPerSignalNu, kTrueTargetVectorPerSignalNu,
-      // Weight
-      kNuMIPPFXWeightVectorPerSignalNu,
-      // Nu E
-      kTrueEVectorPerSignalNu,
-      // Muon
-      kTrueMuonPVectorPerSignalNu,
-      kTrueMuonNuCosineThetaVectorPerSignalNu,
-      // Proton
-      kTrueProtonPVectorPerSignalNu,
-      // Muon+Proton
-      kTrueProtonNuCosineThetaVectorPerSignalNu,
-      // TKI
-      kTruedeltaPTVectorPerSignalNu,
-      kTruedeltaPTxVectorPerSignalNu,
-      kTruedeltaPTyVectorPerSignalNu,
-      kTruedeltaalphaTVectorPerSignalNu,
-      kTruedeltaphiTVectorPerSignalNu,
-      },
+      GetNuMITrueTreeVars(),
       kNoSpillCut,
       false
     )
@@ -1081,40 +1035,9 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
   map_cutName_to_vec_Trees[currentCutName].push_back(
 
     new ana::Tree(
-      "selectedEvents",
-      {
-      "CutType/i",
-      "TruePDG/i", "TrueMode/i", "TrueTarget/i", "IsSignal",
-      "FluxWeight",
-      "TrueE",
-      "MuonTrackType/i",
-      "RecoMuonP", "TrueMuonP",
-      "RecoMuonCos", "TrueMuonCos",
-      "RecoProtonP", "TrueProtonP",
-      "RecoMuonProtonCos", "TrueMuonProtonCos",
-      "RecodeltaPT", "TruedeltaPT",
-      "RecodeltaPTx", "TruedeltaPTx",
-      "RecodeltaPTy", "TruedeltaPTy",
-      "RecodeltaalphaT", "TruedeltaalphaT",
-      "RecodeltaphiT", "TruedeltaphiT",
-      },
+      "selectedEvents", GetNuMIRecoTreeLabels(),
       loader,
-      {
-      ICARUSNumuXsec::TwoTrack::CutType,
-      varTruePDG, varGENIEIntCode, varTrueTarget, IsSignal,
-      ana::kGetNuMIFluxWeight,
-      varNeutrinoTruthE,
-      ICARUSNumuXsec::TwoTrack::MuonTrackType,
-      kNuMIMuonCandidateRecoP, kNuMIMuonTrueP,
-      kNuMIRecoCosThBeam, kNuMITrueCosThBeam,
-      kNuMIProtonCandidateRecoP, kNuMIProtonTrueP,
-      kNuMIRecoCosThMuP, kNuMITrueCosThMuP,
-      kNuMIRecodeltaPT, kNuMITruedeltaPT,
-      kNuMIRecodeltaPTx, kNuMITruedeltaPTx,
-      kNuMIRecodeltaPTy, kNuMITruedeltaPTy,
-      kNuMIRecodeltaalphaT, kNuMITruedeltaalphaT,
-      kNuMIRecodeltaphiT, kNuMITruedeltaphiT,
-      },
+      GetNuMIRecoTreeVars(),
       spillCut, cut,
       kNoShift, true, true
     )

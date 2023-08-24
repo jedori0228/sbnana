@@ -545,17 +545,8 @@ namespace TwoTrack{
                                   !ICARUSNumuXsec::TwoTrack::HasStoppedChargedPionTrack &&
                                   ICARUSNumuXsec::TwoTrack::HasNeutralPionPhotonShower;
 
-  const Var CutType([](const caf::SRSliceProxy* slc) -> double {
-
-    if( kNuMISelection_1muNp0pi(slc) ) return 1;
-    else if( ChargedPionSideBand(slc) ) return 2;
-    else if( NeutralPionSideBand(slc) ) return 3;
-    else return 0;
-
-  });
-
   const Cut IsForTree([](const caf::SRSliceProxy* slc) {
-    int cuttpye = CutType(slc);
+    int cuttpye = kNuMICutType(slc);
     if(cuttpye==0) return false;
     else return true;
   });

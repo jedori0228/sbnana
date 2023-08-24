@@ -10,48 +10,6 @@ namespace TwoTrack{
   // Muon
   const Var MuonTrackIndex([](const caf::SRSliceProxy* slc) -> double {
     return kNuMIMuonCandidateIdx(slc);
-/*
-    float Longest(0);
-    int PTrackInd(-1);
-    for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); i_pfp++){
-      const auto& pfp = slc->reco.pfp.at(i_pfp);
-      if( !IsPFPTrack(pfp) ) continue;
-      const auto& trk = pfp.trk;
-
-      //if(isnan(trk.start.x)) continue;
-      if ( std::isnan(trk.start.x) || std::isnan(trk.len) || trk.len <= 0. ) continue;
-      if ( std::isnan(slc->vertex.x) || std::isnan(slc->vertex.y) || std::isnan(slc->vertex.z) ) continue;
-
-      // First we calculate the distance of each track to the slice vertex.
-      const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
-                                     slc->vertex.y - trk.start.y,
-                                     slc->vertex.z - trk.start.z);
-
-      // We require that the distance of the track from the slice is less than
-      // 10 cm and that the parent of the track has been marked as the primary.
-      const bool AtSlice = ( Atslc < 10.0 && pfp.parent_is_primary);
-      if(!AtSlice) continue;
-
-      if(trk.calo[2].nhit < 5) continue;
-
-      // pid from collection
-      const float Chi2Proton = trk.chi2pid[2].chi2_proton;
-      const float Chi2Muon = trk.chi2pid[2].chi2_muon;
-
-      const bool Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
-
-      const bool MaybeMuonExiting = ( !Contained && trk.len > 100);
-      const bool MaybeMuonContained = ( Contained && Chi2Proton > 60 && Chi2Muon < 30 && trk.len > 50 );
-      if ( ( MaybeMuonExiting || MaybeMuonContained ) && trk.len > Longest )
-      {
-        Longest = trk.len;
-        PTrackInd = i_pfp;
-      }
-
-    }
-
-    return PTrackInd;
-*/
   });
   const Var MuonTrackLength([](const caf::SRSliceProxy* slc) -> double {
     int muonTrackIndex = MuonTrackIndex(slc);
@@ -65,23 +23,7 @@ namespace TwoTrack{
 
   });
   const Var MuonTrackP([](const caf::SRSliceProxy* slc) -> double {
-    int muonTrackIndex = MuonTrackIndex(slc);
-    if(muonTrackIndex>=0){
-      const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
-      bool Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
-      if(Contained){
-        if(isnan(trk.rangeP.p_muon)) return -999.;
-        return trk.rangeP.p_muon;
-      }
-      else{
-        if(isnan(trk.mcsP.fwdP_muon)) return -999.;
-        return trk.mcsP.fwdP_muon;
-      }
-    }
-    else{
-      return -999.;
-    }
-
+    return kNuMIMuonCandidateRecoP(slc);
   });
   const Var MuonTrackPt([](const caf::SRSliceProxy* slc) -> double {
     int muonTrackIndex = MuonTrackIndex(slc);
@@ -152,7 +94,6 @@ namespace TwoTrack{
       return -999.;
     }
   });
-  // truth match
   const Var MuonTrackNuMIToVtxCosineTheta([](const caf::SRSliceProxy* slc) -> double {
     int muonTrackIndex = MuonTrackIndex(slc);
     if(muonTrackIndex>=0){

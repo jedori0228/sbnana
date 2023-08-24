@@ -25,6 +25,7 @@
 
 // SBNANA
 #include "sbnana/SBNAna/Vars/NuMIFlux.h"
+#include "sbnana/SBNAna/Cuts/NuMIXSecTreeHelper.h"
 
 // NuMINumuXSec
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Contants.h"
