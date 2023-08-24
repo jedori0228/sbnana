@@ -25,6 +25,7 @@ parser.add_argument('--no_exec', action='store_true')
 parser.add_argument('--batchname',dest='BatchName', default="")
 parser.add_argument('--lifetime',dest='Lifetime',default="2h")
 parser.add_argument('--server',dest='Server',default="")
+parser.add_argument('--jobsubopt',dest='JobsubOpt',default="")
 parser.add_argument('--syst',action='store_true')
 parser.add_argument('--verbos',dest="Verbos",default="INFO")
 parser.add_argument('--extra_lines',dest="ExtraLines",default="")
@@ -394,6 +395,16 @@ export MRB_INSTALL=$(pwd)
 export PRODUCTS="${MRB_INSTALL}:${PRODUCTS}"
 mrbslp
 
+## TEMPORARY FOR THIS RELEASE (v09_75_03)
+cd ${nodeBaseDir}
+mkdir -p sbndata_local
+cd sbndata_local/
+ifdh cp /pnfs/icarus/persistent/users/jskim/NuMINumuXSec/Flux/2023-07-31_out_450.37_7991.98_79512.66_QEL11.root ./
+echo "@@ Using temporal SBNDATA_DIR"
+export SBNDATA_DIR=${nodeBaseDir}/sbndata_local/
+echo "@@ SBNDATA_DIR:"
+echo ${SBNDATA_DIR}
+
 echo "@@ Now go to "${thisOutputCreationDir}
 cd ${thisOutputCreationDir}
 
@@ -433,12 +444,14 @@ echo "@@ Done!"
   submitcmd += '''--tar_file_name "dropbox://$(pwd)/ToGrid.tar" \\\n'''
   submitcmd += '''--email-to jae.sung.kim.3426@gmail.com \\\n'''
   submitcmd += '''-e LC_ALL=C \\\n'''
-  #submitcmd += '''--expected-lifetime %s \\\n'''%(args.Lifetime)
+  submitcmd += '''--expected-lifetime %s \\\n'''%(args.Lifetime)
   submitcmd += '''--memory %s \\\n'''%(args.Memory)
   submitcmd += '''-N %d \\\n'''%(NJobs)
   if args.Server!="":
     submitcmd += '''--jobsub-server %s \\\n'''%(args.Server)
-  #submitcmd += '''--skip-check=rcds \\\n'''
+  if args.JobsubOpt!="":
+    jobsubopt = '''%s \\\n'''%(args.JobsubOpt)
+    logger.LOG("INFO", "Adding jobsub_submit option: %s"%(jobsubopt))
   submitcmd += '''"file://$(pwd)/%s.sh"'''%(executable_filename)
 
   SubmitOutput.write("## Submit command :\n")
