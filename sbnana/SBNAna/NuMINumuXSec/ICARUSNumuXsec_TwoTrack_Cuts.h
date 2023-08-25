@@ -30,8 +30,16 @@ namespace TwoTrack{
   // - Comparing truth match to primary
   extern const Cut MuonTrackTruthMatchedPrimaryMuon;
 
+  // Sample categorization
+  const Cut IsSignal = kNuMI_1muNp0piStudy_Signal_NoContainment_ProtonThreshold;
+  const Cut IsNuCCNotSignal = kNuMI_1muNp0piStudy_OtherNuCC_NoContainment_ProtonThreshold;
+  const Cut HasPrimaryChargedPion = (kNuMITrueNpip+kNuMITrueNpim>0);
+  const Cut HasPrimaryNeutralPion = (kNuMITrueNpi0>0);
+
   // - Comparing truth match to primary
   extern const Cut ProtonTrackTruthMatchedPrimaryProton;
+
+  extern const Cut IsForTree;
 
   namespace Aux{
     extern const Cut HasRelaxedMuonTrack;
