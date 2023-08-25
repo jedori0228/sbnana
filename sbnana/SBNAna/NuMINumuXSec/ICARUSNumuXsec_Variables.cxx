@@ -172,23 +172,6 @@ namespace ICARUSNumuXsec{
   });
 
   // Var
-  // - Some truth
-  const Var varTruePDG([](const caf::SRSliceProxy* slc) -> int {
-    return kNuMITruePDG(slc);
-  });
-
-  const Var varTrueTarget([](const caf::SRSliceProxy* slc) -> int {
-    return kNuMITrueTarget(slc);
-  });
-  // - GENIE interaction code
-  // - https://internal.dunescience.org/doxygen/namespacesimb.html#a2cce734d1b71408bbc7d98d148ac4360
-  const Var varGENIEIntCode([](const caf::SRSliceProxy* slc) -> int {
-    return kNuMITrueMode(slc);
-  });
-  // - Truth interaction
-  const Var varNeutrinoTruthE([](const caf::SRSliceProxy* slc) -> double {
-    return kNuMITrueNuE(slc);
-  });
   const Var varNuDirectionX([](const caf::SRSliceProxy* slc) ->int {
       double this_x = slc->truth.prod_vtx.x/100.;
       double this_y = slc->truth.prod_vtx.y/100.;

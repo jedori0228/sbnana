@@ -250,55 +250,55 @@ namespace ICARUSNumuXsec{
   });
   //   - GENIE Interaction code
   const Cut cutIsQE([](const caf::SRSliceProxy* slc) {
-    return varGENIEIntCode(slc)==0;
+    return kNuMITrueMode(slc)==0;
   });
   const Cut cutIsRes([](const caf::SRSliceProxy* slc) {
-    return varGENIEIntCode(slc)==1;
+    return kNuMITrueMode(slc)==1;
   });
   const Cut cutIsDIS([](const caf::SRSliceProxy* slc) {
-    return varGENIEIntCode(slc)==2;
+    return kNuMITrueMode(slc)==2;
   });
   const Cut cutIsCoh([](const caf::SRSliceProxy* slc) {
-    return varGENIEIntCode(slc)==3;
+    return kNuMITrueMode(slc)==3;
   });
   const Cut cutIsCohElastic([](const caf::SRSliceProxy* slc) {
-    return varGENIEIntCode(slc)==4;
+    return kNuMITrueMode(slc)==4;
   });
   const Cut cutIsElectronScattering([](const caf::SRSliceProxy* slc) {
-    return varGENIEIntCode(slc)==5;
+    return kNuMITrueMode(slc)==5;
   });
   const Cut cutIsIMDAnnihilation([](const caf::SRSliceProxy* slc) {
-    return varGENIEIntCode(slc)==6;
+    return kNuMITrueMode(slc)==6;
   });
   const Cut cutIsInverseBetaDecay([](const caf::SRSliceProxy* slc) {
-    return varGENIEIntCode(slc)==7;
+    return kNuMITrueMode(slc)==7;
   });
   const Cut cutIsGlashowResonance([](const caf::SRSliceProxy* slc) {
-    return varGENIEIntCode(slc)==8;
+    return kNuMITrueMode(slc)==8;
   });
   const Cut cutIsAMNuGamma([](const caf::SRSliceProxy* slc) {
-    return varGENIEIntCode(slc)==9;
+    return kNuMITrueMode(slc)==9;
   });
   const Cut cutIsMEC([](const caf::SRSliceProxy* slc) {
-    return varGENIEIntCode(slc)==10;
+    return kNuMITrueMode(slc)==10;
   });
   const Cut cutIsDiffractive([](const caf::SRSliceProxy* slc) {
-    return varGENIEIntCode(slc)==11;
+    return kNuMITrueMode(slc)==11;
   });
   const Cut cutIsEM([](const caf::SRSliceProxy* slc) {
-    return varGENIEIntCode(slc)==12;
+    return kNuMITrueMode(slc)==12;
   });
   const Cut cutIsWeakMix([](const caf::SRSliceProxy* slc) {
-    return varGENIEIntCode(slc)==13;
+    return kNuMITrueMode(slc)==13;
   });
   const Cut cutIsUnknownInteractionType1([](const caf::SRSliceProxy* slc) {
-    return varGENIEIntCode(slc)==-1;
+    return kNuMITrueMode(slc)==-1;
   });
   const Cut cutIsUnknownInteractionType2([](const caf::SRSliceProxy* slc) {
-    return varGENIEIntCode(slc)>13;
+    return kNuMITrueMode(slc)>13;
   });
   const Cut cutIsUnknownInteractionType3([](const caf::SRSliceProxy* slc) {
-    return varGENIEIntCode(slc)<-1;
+    return kNuMITrueMode(slc)<-1;
   });
 
   //   - NuMu-CC categories

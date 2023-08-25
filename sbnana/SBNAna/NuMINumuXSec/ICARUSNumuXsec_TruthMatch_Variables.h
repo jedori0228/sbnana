@@ -17,10 +17,6 @@ namespace TruthMatch{
   // For a given true muon (truth_index), find a reco track whose best-matched is this particle
   extern const Var TruthMuonIndex;
   extern const Var TruthMuonLength;
-  extern const Var TruthMuonNuCosineTheta;
-  extern const Var TruthMuonKE;
-  extern const Var TruthMuonP;
-  extern const Var TruthMuonPt;
   extern const Var TruthMuonMatchedTrackIndex;
   extern const Var TruthMuonMatchedTrackContainedness;
   extern const Var TruthMuonMatchedTrackChi2Proton;
@@ -40,9 +36,6 @@ namespace TruthMatch{
   // For a given true proton (truth_index), find a reco track whose best-matched is this particle
   extern const Var TruthProtonIndex;
   extern const Var TruthProtonLength;
-  extern const Var TruthProtonNuCosineTheta;
-  extern const Var TruthProtonKE;
-  extern const Var TruthProtonP;
   extern const Var TruthProtonMatchedTrackIndex;
   extern const Var TruthProtonMatchedTrackContainedness;
   extern const Var TruthProtonMatchedTrackChi2Proton;
@@ -98,12 +91,6 @@ namespace TruthMatch{
 
   // test
   extern const SpillMultiVar TruthChargedPionMichelMatchedSlice;
-
-  namespace TKI{
-    extern const Var deltaPT;
-    extern const Var deltaPTx;
-    extern const Var deltaPTy;
-  }
 
 } // end namespace TruthMatch
 
