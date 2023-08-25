@@ -12,67 +12,18 @@ namespace TwoTrack{
   const SpillMultiVar TestVar([](const caf::SRSpillProxy *sr) -> vector<double> {
 
     std::vector<double> rets;
-
+/*
     for(std::size_t i(0); i < sr->slc.size(); ++i){
       const auto& slc = sr->slc.at(i);
-
-/*
-      int JS_MuonTrackIdx = MuonTrackIndex(&slc);
-      int BH_MuonTrackIdx = kNuMIMuonCandidateIdx(&slc);
-
-      if(JS_MuonTrackIdx!=BH_MuonTrackIdx){
-        printf("[JSKIMDEBUG] MISSMATCH from muon track index: (JS, BH) = (%d, %d)\n", JS_MuonTrackIdx, BH_MuonTrackIdx);
-      }
-
-      int JS_ProtonTrackIdx = ProtonTrackIndex(&slc);
-      int BH_ProtonTrackIdx = kNuMIProtonCandidateIdx(&slc);
-
-      if(JS_ProtonTrackIdx!=BH_ProtonTrackIdx){
-        printf("[JSKIMDEBUG] MISSMATCH from proton track index: (JS, BH) = (%d, %d)\n", JS_ProtonTrackIdx, BH_ProtonTrackIdx);
-      }
-
-      vector<double> JS_PhotonIndices = NeutralPionPhotonShowerIndices(&slc);
-      vector<double> BH_PhotonIndices = kNuMIPhotonCandidateIdxs(&slc);
-
-      if(JS_PhotonIndices.size()!=BH_PhotonIndices.size()){
-        printf("[JSKIMDEBUG] MISSMATCH from photons: (JS, BH) = (%ld, %ld)\n", JS_PhotonIndices.size(), BH_PhotonIndices.size());
-      }
-
-      bool JS_IsSignal = SignalDef(&slc) && cutIsNuMuCC(&slc);
-      bool BH_IsSignal = kNuMI_1muNp0piStudy_Signal_NoContainment_ProtonThreshold(&slc);
-
-      if(JS_IsSignal != BH_IsSignal){
-        printf("[JSKIMDEBUG] MISSMATCH from signal def: (JS, BH) = (%d, %d)\n", int(JS_IsSignal), int(BH_IsSignal));
-      }
-*/
-
-      bool JS_CPSB = ChargedPionSideBand(&slc);
-      bool BH_CPSB = kNuMIChargedPionSideBand(&slc);
-      if(JS_CPSB != BH_CPSB){
-        printf("[JSKIMDEBUG] MISSMATCH from signal def: (JS, BH) = (%d, %d)\n", int(JS_CPSB), int(BH_CPSB));
-      }
-
     }
-
+*/
     return rets;
 
 
   });
 
-  // Primray tracks
-  const Cut HasTwoPrimaryTracks([](const caf::SRSliceProxy* slc) {
-    return ICARUSNumuXsec::PrimaryTrackIndices(slc).size()>=2;
-  });
-  const Cut HasOnlyTwoPrimaryTracks([](const caf::SRSliceProxy* slc) {
-    return ICARUSNumuXsec::PrimaryTrackIndices(slc).size()==2;
-  });
-
-  // Reco muon track
-  const Cut HasMuonTrack([](const caf::SRSliceProxy* slc) {
-    return MuonTrackIndex(slc)>=0.;
-  });
   const Cut MuonTrackContained([](const caf::SRSliceProxy* slc) {
-    int muonTrackIndex = MuonTrackIndex(slc);
+    int muonTrackIndex = kNuMIMuonCandidateIdx(slc);
     if(muonTrackIndex>=0){
       const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
       bool isContained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
@@ -83,7 +34,7 @@ namespace TwoTrack{
     }
   });
   const Cut MuonTrackExiting([](const caf::SRSliceProxy* slc) {
-    int muonTrackIndex = MuonTrackIndex(slc);
+    int muonTrackIndex = kNuMIMuonCandidateIdx(slc);
     if(muonTrackIndex>=0){
       const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
       bool isContained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
@@ -93,35 +44,9 @@ namespace TwoTrack{
       return false;
     }
   });
-  const Var MuonTrackType([](const caf::SRSliceProxy* slc) -> double {
-    int muonTrackIndex = MuonTrackIndex(slc);
-    if(muonTrackIndex>=0){
-      const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
-      bool isContained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
-      if(isContained) return 1;
-      else return 2;
-    }
-    else{
-      return 0;
-    }
-  });
-  const Cut MuonTrackOneMeter([](const caf::SRSliceProxy* slc) {
-    int muonTrackIndex = MuonTrackIndex(slc);
-    if(muonTrackIndex>=0){
-      const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
-      return trk.len>100.;
-    }
-    else{
-      return false;
-    }
-  });
-  const Cut MuonTrackBelowBlindP([](const caf::SRSliceProxy* slc) {
-    double muonTrackRecoP = MuonTrackP(slc);
-    return muonTrackRecoP<0.6;
-  });
   // - Truth matching
   const Cut MuonTrackTruthContainedNuMuon([](const caf::SRSliceProxy* slc) {
-    int muonTrackIndex = MuonTrackIndex(slc);
+    int muonTrackIndex = kNuMIMuonCandidateIdx(slc);
     if(muonTrackIndex>=0){
       const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
       const auto& trk_truth = trk.truth.p;
@@ -138,7 +63,7 @@ namespace TwoTrack{
     }
   });
   const Cut MuonTrackTruthExitingNuMuon([](const caf::SRSliceProxy* slc) {
-    int muonTrackIndex = MuonTrackIndex(slc);
+    int muonTrackIndex = kNuMIMuonCandidateIdx(slc);
     if(muonTrackIndex>=0){
       const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
       const auto& trk_truth = trk.truth.p;
@@ -155,7 +80,7 @@ namespace TwoTrack{
     }
   });
   const Cut MuonTrackTruthCosmicMuon([](const caf::SRSliceProxy* slc) {
-    int muonTrackIndex = MuonTrackIndex(slc);
+    int muonTrackIndex = kNuMIMuonCandidateIdx(slc);
     if(muonTrackIndex>=0){
       const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
       const auto& trk_truth = trk.truth.p;
@@ -167,7 +92,7 @@ namespace TwoTrack{
     }
   });
   const Cut MuonTrackTruthStoppingProton([](const caf::SRSliceProxy* slc) {
-    int muonTrackIndex = MuonTrackIndex(slc);
+    int muonTrackIndex = kNuMIMuonCandidateIdx(slc);
     if(muonTrackIndex>=0){
       const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
       const auto& trk_truth = trk.truth.p;
@@ -184,7 +109,7 @@ namespace TwoTrack{
     }
   });
   const Cut MuonTrackTruthInelProton([](const caf::SRSliceProxy* slc) {
-    int muonTrackIndex = MuonTrackIndex(slc);
+    int muonTrackIndex = kNuMIMuonCandidateIdx(slc);
     if(muonTrackIndex>=0){
       const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
       const auto& trk_truth = trk.truth.p;
@@ -201,7 +126,7 @@ namespace TwoTrack{
     }
   });
   const Cut MuonTrackTruthOtherProton([](const caf::SRSliceProxy* slc) {
-    int muonTrackIndex = MuonTrackIndex(slc);
+    int muonTrackIndex = kNuMIMuonCandidateIdx(slc);
     if(muonTrackIndex>=0){
       const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
       const auto& trk_truth = trk.truth.p;
@@ -224,7 +149,7 @@ namespace TwoTrack{
     }
   });
   const Cut MuonTrackTruthStoppingChargedPion([](const caf::SRSliceProxy* slc) {
-    int muonTrackIndex = MuonTrackIndex(slc);
+    int muonTrackIndex = kNuMIMuonCandidateIdx(slc);
     if(muonTrackIndex>=0){
       const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
       const auto& trk_truth = trk.truth.p;
@@ -241,7 +166,7 @@ namespace TwoTrack{
     }
   });
   const Cut MuonTrackTruthInelChargedPion([](const caf::SRSliceProxy* slc) {
-    int muonTrackIndex = MuonTrackIndex(slc);
+    int muonTrackIndex = kNuMIMuonCandidateIdx(slc);
     if(muonTrackIndex>=0){
       const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
       const auto& trk_truth = trk.truth.p;
@@ -258,7 +183,7 @@ namespace TwoTrack{
     }
   });
   const Cut MuonTrackTruthOtherChargedPion([](const caf::SRSliceProxy* slc) {
-    int muonTrackIndex = MuonTrackIndex(slc);
+    int muonTrackIndex = kNuMIMuonCandidateIdx(slc);
     if(muonTrackIndex>=0){
       const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
       const auto& trk_truth = trk.truth.p;
@@ -294,8 +219,8 @@ namespace TwoTrack{
   });
   // - Comparing truth match to primary
   const Cut MuonTrackTruthMatchedPrimary([](const caf::SRSliceProxy* slc) {
-    int muonTrackIndex = MuonTrackIndex(slc); // index of slc->reco.pfp
-    int muonPrimrayIndex = ICARUSNumuXsec::TruthMatch::TruthMuonIndex(slc); // index of slc->truth.prim
+    int muonTrackIndex = kNuMIMuonCandidateIdx(slc); // index of slc->reco.pfp
+    int muonPrimrayIndex = ana::PrimaryUtil::MuonIndex_True(slc->truth); // index of slc->truth.prim
     if(muonTrackIndex>=0 && muonPrimrayIndex>=0){
       // reco track
       const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
@@ -313,26 +238,11 @@ namespace TwoTrack{
     }
   });
 
-  // Reco proton track
-  const Cut HasProtonTrack([](const caf::SRSliceProxy* slc) {
-    return ProtonTrackIndex(slc)>=0;
-  });
-  const Cut ProtonTrackPCut([](const caf::SRSliceProxy* slc) {
-    return kNuMIProtonCandidateRecoPTreshold(slc);
-/*
-    double protonP = ProtonTrackP(slc);
-    if(protonP<0){
-      return false;
-    }
-    else{
-      return (protonP>0.4 && protonP<1.0);
-    }
-*/
-  });
   // - Comparing truth match to primary
   const Cut ProtonTrackTruthMatchedPrimaryProton([](const caf::SRSliceProxy* slc) {
-    int protonTrackIndex = ProtonTrackIndex(slc); // index of slc->reco.pfp
-    int protonPrimrayIndex = ICARUSNumuXsec::TruthMatch::TruthProtonIndex(slc); // index of slc->truth.prim
+
+    int protonTrackIndex = kNuMIProtonCandidateIdx(slc); // index of slc->reco.pfp
+    int protonPrimrayIndex = ana::PrimaryUtil::ProtonIndex_True(slc->truth); // index of slc->truth.prim
     if(protonTrackIndex>=0 && protonPrimrayIndex>=0){
       // reco track
       const auto& trk = slc->reco.pfp.at(protonTrackIndex).trk;
@@ -349,201 +259,6 @@ namespace TwoTrack{
       return false;
     }
   });
-
-  // Hadron (non-muon) contrained
-  const Cut HadronContained([](const caf::SRSliceProxy* slc) {
-
-    return kNuMIAllPrimaryHadronsContained(slc);
-/*
-    int muonTrackIndex = MuonTrackIndex(slc);
-    if(muonTrackIndex>=0){
-
-      for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); i_pfp++){
-
-        if(i_pfp==(unsigned int )muonTrackIndex) continue;
-
-        const auto& pfp = slc->reco.pfp.at(i_pfp);
-        const auto& trk = pfp.trk;
-
-        if ( std::isnan(trk.start.x) || std::isnan(trk.len) || trk.len <= 0. ) continue;
-        if ( std::isnan(slc->vertex.x) || std::isnan(slc->vertex.y) || std::isnan(slc->vertex.z) ) return false;
-
-        const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
-                                       slc->vertex.y - trk.start.y,
-                                       slc->vertex.z - trk.start.z);
-        const bool AtSlice = ( Atslc < 10.0 && pfp.parent_is_primary);
-        const bool Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
-
-        if(AtSlice){
-          if(!Contained) return false;
-        }
-
-      }
-      return true;
-
-    }
-    else{
-      return false;
-    }
-*/
-  });
-
-  // pion tagging
-  // - charged
-  const Cut HasChargedPionTrack([](const caf::SRSliceProxy* slc) {
-    return ChargedPionTrackIndex(slc)>=0;
-  });
-  const Cut HasStoppedChargedPionTrack([](const caf::SRSliceProxy* slc) {
-    return StoppedChargedPionTrackIndex(slc)>=0;
-  });
-  const Cut StoppedChargedPionTrackLongEnough([](const caf::SRSliceProxy* slc) {
-    int stoppedCPionIndex = StoppedChargedPionTrackIndex(slc);
-    if(stoppedCPionIndex>=0){
-      const auto& trk = slc->reco.pfp.at(stoppedCPionIndex).trk;
-      if(trk.len>20.) return true;
-      else return false;
-    }
-    else{
-      return false;
-    }
-  });
-
-  const Cut HasInelasticChargedPionTrack([](const caf::SRSliceProxy* slc) {
-    return InelasticChargedPionTrackIndex(slc)>=0;
-  });
-  const Cut InelasticChargedPionTrackLongEnough([](const caf::SRSliceProxy* slc) {
-    int inelCPionIndex = InelasticChargedPionTrackIndex(slc);
-    if(inelCPionIndex>=0){
-      const auto& trk = slc->reco.pfp.at(inelCPionIndex).trk;
-      if(trk.len>20.) return true;
-      else return false;
-    }
-    else{
-      return false;
-    }
-  });
-  // - neutral
-  const Cut HasNeutralPionPhotonShower([](const caf::SRSliceProxy* slc) {
-    int Nshw = NeutralPionPhotonShowerIndices(slc).size();
-    if(Nshw>=1) return true;
-    else return false;
-  });
-
-  // Signal def
-
-  const Cut SignalDef([](const caf::SRSliceProxy* slc) {
-
-    return kNuMI_1muNp0piStudy_Signal_NoContainment_ProtonThreshold(slc);
-
-/*
-    bool bk_UseGHepRecord = intt.UseGHepRecord;
-    intt.UseGHepRecord = false;
-    ICARUSNumuXsec::InteractionTool::NParticles nptls = intt.GetNParticles(slc);
-    intt.UseGHepRecord = bk_UseGHepRecord;
-
-    bool isCCQELike = (nptls.NMuon==1 && nptls.NProton>=1 && nptls.NPip+nptls.NPim+nptls.NPi0==0);
-    if(!isCCQELike) return false;
-
-    bool VertexContained = false;
-    if( !isnan(slc->truth.position.x) && !isnan(slc->truth.position.y) && !isnan(slc->truth.position.z) ){
-      VertexContained = fv.isContained(slc->truth.position.x, slc->truth.position.y, slc->truth.position.z);
-    }
-    if(!VertexContained) return false;
-
-    const auto& mu_ghep = slc->truth.prim[ intt.MuonIndices[0] ];
-
-    double MuonP = sqrt(mu_ghep.genp.x*mu_ghep.genp.x + mu_ghep.genp.y*mu_ghep.genp.y + mu_ghep.genp.z*mu_ghep.genp.z);
-
-    //double minMuonP = mu_ghep.contained ? 0.226 : 0.340; // TODO
-    double minMuonP = 0.226;
-
-    if(MuonP<minMuonP) return false;
-
-    int nSignalProton = 0;
-    for(const auto& protonInx: intt.ProtonIndices){
-      const auto& p_ghep = slc->truth.prim[ protonInx ];
-      double ProtonP = sqrt(p_ghep.genp.x*p_ghep.genp.x + p_ghep.genp.y*p_ghep.genp.y + p_ghep.genp.z*p_ghep.genp.z);
-
-      bool IsProtonContained = fv_track.isContained(p_ghep.end.x, p_ghep.end.y, p_ghep.end.z);
-      bool IsProtonInPRange = ProtonP>0.4 && ProtonP<1.0;
-
-      if(IsProtonContained&&IsProtonInPRange) nSignalProton++;
-
-    }
-    if(nSignalProton==0) return false;
-
-    return true;
-*/
-
-  });
-  const Cut SignalMuonContained([](const caf::SRSliceProxy* slc) {
-
-    bool bk_UseGHepRecord = intt.UseGHepRecord;
-    intt.UseGHepRecord = false;
-    ICARUSNumuXsec::InteractionTool::NParticles nptls = intt.GetNParticles(slc);
-    intt.UseGHepRecord = bk_UseGHepRecord;
-
-    if(nptls.NMuon!=1) return false;
-
-    const auto& mu_ghep = slc->truth.prim[ intt.MuonIndices[0] ];
-
-    // using FV
-    bool MuonStartContained = fv_track.isContained(mu_ghep.start.x, mu_ghep.start.y, mu_ghep.start.z);
-    bool MuonEndContained = fv_track.isContained(mu_ghep.end.x, mu_ghep.end.y, mu_ghep.end.z);
-    return MuonStartContained&&MuonEndContained;
-
-/*
-    // using turth contained
-    if(mu_ghep.contained) return true;
-    else return false;
-*/
-
-  });
-
-  const Cut SignalMuonExiting([](const caf::SRSliceProxy* slc) {
-
-    bool bk_UseGHepRecord = intt.UseGHepRecord;
-    intt.UseGHepRecord = false;
-    ICARUSNumuXsec::InteractionTool::NParticles nptls = intt.GetNParticles(slc);
-    intt.UseGHepRecord = bk_UseGHepRecord;
-    
-    if(nptls.NMuon!=1) return false;
-    
-    const auto& mu_ghep = slc->truth.prim[ intt.MuonIndices[0] ];
-
-    //double MuonP = sqrt(mu_ghep.genp.x*mu_ghep.genp.x + mu_ghep.genp.y*mu_ghep.genp.y + mu_ghep.genp.z*mu_ghep.genp.z);
-    //if(MuonP<0.340) return false;
-
-    // using FV
-    bool MuonStartContained = fv_track.isContained(mu_ghep.start.x, mu_ghep.start.y, mu_ghep.start.z);
-    bool MuonEndContained = fv_track.isContained(mu_ghep.end.x, mu_ghep.end.y, mu_ghep.end.z);
-    return !(MuonStartContained&&MuonEndContained);
-
-/*
-    // using turth contained
-    if(mu_ghep.contained) return false;
-    else return true;
-*/
-  });
-
-  const Var IsSignal([](const caf::SRSliceProxy* slc) -> double {
-    return cutIsNuMuCC(slc) && ICARUSNumuXsec::TwoTrack::SignalDef(slc);
-  });
-
-  // Sideband def
-  const Cut ChargedPionSideBand = cutRFiducial && cutNotClearCosmic &&
-                                  ICARUSNumuXsec::TwoTrack::HasMuonTrack &&
-                                  ICARUSNumuXsec::TwoTrack::HasProtonTrack && ICARUSNumuXsec::TwoTrack::ProtonTrackPCut &&
-                                  ICARUSNumuXsec::TwoTrack::HadronContained &&
-                                  ICARUSNumuXsec::TwoTrack::HasStoppedChargedPionTrack &&
-                                  !ICARUSNumuXsec::TwoTrack::HasNeutralPionPhotonShower;
-
-  const Cut NeutralPionSideBand = cutRFiducial && cutNotClearCosmic &&
-                                  ICARUSNumuXsec::TwoTrack::HasMuonTrack &&
-                                  ICARUSNumuXsec::TwoTrack::HasProtonTrack && ICARUSNumuXsec::TwoTrack::ProtonTrackPCut &&
-                                  ICARUSNumuXsec::TwoTrack::HadronContained &&
-                                  !ICARUSNumuXsec::TwoTrack::HasStoppedChargedPionTrack &&
-                                  ICARUSNumuXsec::TwoTrack::HasNeutralPionPhotonShower;
 
   const Cut IsForTree([](const caf::SRSliceProxy* slc) {
     int cuttpye = kNuMICutType(slc);

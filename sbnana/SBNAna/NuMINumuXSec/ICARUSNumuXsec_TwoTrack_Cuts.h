@@ -13,17 +13,9 @@ namespace TwoTrack{
   // Test
   extern const SpillMultiVar TestVar;
 
-  // Primray tracks
-  extern const Cut HasTwoPrimaryTracks;
-  extern const Cut HasOnlyTwoPrimaryTracks;
-
   // Reco muon track
-  extern const Cut HasMuonTrack;
   extern const Cut MuonTrackContained;
   extern const Cut MuonTrackExiting;
-  extern const Var MuonTrackType;
-  extern const Cut MuonTrackOneMeter;
-  extern const Cut MuonTrackBelowBlindP;
   // - Truth matching
   extern const Cut MuonTrackTruthContainedNuMuon;
   extern const Cut MuonTrackTruthExitingNuMuon;
@@ -38,38 +30,8 @@ namespace TwoTrack{
   // - Comparing truth match to primary
   extern const Cut MuonTrackTruthMatchedPrimaryMuon;
 
-  // Reco proton track
-  extern const Cut HasProtonTrack;
-  extern const Cut ProtonTrackPCut;
   // - Comparing truth match to primary
   extern const Cut ProtonTrackTruthMatchedPrimaryProton;
-
-  // Hadron (non-muon) contrained
-  extern const Cut HadronContained;
-
-  // pion tagging
-  // - charged
-  extern const Cut HasChargedPionTrack;
-  extern const Cut HasStoppedChargedPionTrack;
-  extern const Cut StoppedChargedPionTrackLongEnough;
-  extern const Cut HasInelasticChargedPionTrack;
-  extern const Cut InelasticChargedPionTrackLongEnough;
-  // - neutral
-  extern const Cut HasNeutralPionPhotonShower;
-
-  // Signal def
-  extern const Cut SignalDef;
-  extern const Cut SignalMuonContained;
-  extern const Cut SignalMuonExiting;
-  extern const Var IsSignal;
-
-  // Sideband def
-  extern const Cut ChargedPionSideBand;
-  extern const Cut NeutralPionSideBand;
-
-  // cut type
-  extern const Var CutType;
-  extern const Cut IsForTree;
 
   namespace Aux{
     extern const Cut HasRelaxedMuonTrack;

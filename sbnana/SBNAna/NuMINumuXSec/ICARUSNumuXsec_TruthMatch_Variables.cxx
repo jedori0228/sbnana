@@ -22,48 +22,6 @@ namespace TruthMatch{
       return -999.;
     }
   });
-  const Var TruthMuonNuCosineTheta([](const caf::SRSliceProxy* slc) -> double {
-    return ana::PrimaryUtil::MuonNuCosineTheta_True(slc->truth);
-  });
-  const Var TruthMuonKE([](const caf::SRSliceProxy* slc) -> double {
-    int truth_idx = TruthMuonIndex(slc);
-    if(truth_idx>=0){
-      return slc->truth.prim.at(truth_idx).genE - M_MUON;
-    }
-    else{
-      return -999.;
-    }
-  });
-  const Var TruthMuonP([](const caf::SRSliceProxy* slc) -> double {
-    int truth_idx = TruthMuonIndex(slc);
-    if(truth_idx>=0){
-      const auto& mu_p = slc->truth.prim.at(truth_idx).genp;
-      return sqrt(mu_p.x*mu_p.x + mu_p.y*mu_p.y + mu_p.z*mu_p.z);
-    }
-    else{
-      return -999.;
-    }
-  });
-  const Var TruthMuonPt([](const caf::SRSliceProxy* slc) -> double {
-    int truth_idx = TruthMuonIndex(slc);
-    if(truth_idx>=0){
-      const auto& p_mu = slc->truth.prim.at(truth_idx).genp;
-      const auto& p_nu = slc->truth.momentum;
-
-      TVector3 vec_p_mu(p_mu.x, p_mu.y, p_mu.z);
-      TVector3 vec_dir_nu(p_nu.x, p_nu.y, p_nu.z);
-      vec_dir_nu = vec_dir_nu.Unit();
-
-      double p_l = vec_p_mu.Dot(vec_dir_nu);
-      TVector3 vec_p_l_mu = vec_p_mu - p_l*vec_dir_nu;
-
-      return vec_p_l_mu.Mag();
-
-    }
-    else{
-      return -999.;
-    }
-  });
   const Var TruthMuonMatchedTrackIndex([](const caf::SRSliceProxy* slc) -> double {
     int truth_idx = TruthMuonIndex(slc);
     return GetMatchedRecoTrackIndex(slc, truth_idx);
@@ -231,61 +189,13 @@ namespace TruthMatch{
 
   // For a given true proton (truth_index), find a reco track whose best-matched is this particle
   const Var TruthProtonIndex([](const caf::SRSliceProxy* slc) -> double {
-    double max_E(-999);
-    int truth_idx(-1);
-    for(std::size_t i(0); i < slc->truth.prim.size(); ++i){
-      if( slc->truth.prim.at(i).pdg==2212 && slc->truth.prim.at(i).start_process==0 ){
-        if(isnan(slc->truth.prim.at(i).genE)) continue;
-        double this_E = slc->truth.prim.at(i).genE;
-        if(this_E>max_E){
-          max_E = this_E;
-          truth_idx = i;
-        }
-      }
-    }
-    return truth_idx;
+    return ana::PrimaryUtil::ProtonIndex_True(slc->truth);
   });
   const Var TruthProtonLength([](const caf::SRSliceProxy* slc) -> double {
     int truth_idx = TruthProtonIndex(slc);
     if(truth_idx>=0){
       if(isnan(slc->truth.prim.at(truth_idx).length)) return -999.;
       else return slc->truth.prim.at(truth_idx).length;
-    }
-    else{
-      return -999.;
-    }
-  });
-  const Var TruthProtonNuCosineTheta([](const caf::SRSliceProxy* slc) -> double {
-    int truth_idx = TruthProtonIndex(slc);
-    if(truth_idx>=0){
-
-      const auto& p_pro = slc->truth.prim.at(truth_idx).genp;
-      const auto& p_nu = slc->truth.momentum;
-
-      TVector3 vec_p_pro(p_pro.x, p_pro.y, p_pro.z);
-      TVector3 vec_p_nu(p_nu.x, p_nu.y, p_nu.z);
-
-      return vec_p_pro.Unit().Dot( vec_p_nu.Unit() );
-
-    }
-    else{
-      return -999.;
-    }
-  });
-  const Var TruthProtonKE([](const caf::SRSliceProxy* slc) -> double {
-    int truth_idx = TruthProtonIndex(slc);
-    if(truth_idx>=0){
-      return slc->truth.prim.at(truth_idx).genE - M_PROTON;
-    }
-    else{
-      return -999.;
-    }
-  });
-  const Var TruthProtonP([](const caf::SRSliceProxy* slc) -> double {
-    int truth_idx = TruthProtonIndex(slc);
-    if(truth_idx>=0){
-      const auto& p_p = slc->truth.prim.at(truth_idx).genp;
-      return sqrt(p_p.x*p_p.x + p_p.y*p_p.y + p_p.z*p_p.z);
     }
     else{
       return -999.;
@@ -359,26 +269,6 @@ namespace TruthMatch{
       return new_chi2;
     }
     else{ 
-      return -999.;
-    }
-  });
-
-  // muon+proton
-  const Var TruthMuonProtonCosineTheta([](const caf::SRSliceProxy* slc) -> double {
-    int truth_mu_idx = TruthMuonIndex(slc);
-    int truth_pro_idx = TruthProtonIndex(slc);
-    if(truth_mu_idx>=0 && truth_pro_idx>=0){
-
-      const auto& p_mu = slc->truth.prim.at(truth_mu_idx).genp;
-      const auto& p_pro = slc->truth.prim.at(truth_pro_idx).genp;
-
-      TVector3 vec_p_mu(p_mu.x, p_mu.y, p_mu.z);
-      TVector3 vec_p_pro(p_pro.x, p_pro.y, p_pro.z);
-
-      return vec_p_mu.Unit().Dot( vec_p_pro.Unit() );
-
-    }
-    else{
       return -999.;
     }
   });
@@ -883,93 +773,6 @@ namespace TruthMatch{
     return rets;
 
   });
-
-  namespace TKI{
-
-    const Var deltaPT([](const caf::SRSliceProxy* slc) -> double {
-      int muonTrackIndex = TruthMuonIndex(slc);
-      int protonTrackIndex = TruthProtonIndex(slc);
-      if(muonTrackIndex>=0 && protonTrackIndex>=0){
-        const auto& prim_mu = slc->truth.prim.at(muonTrackIndex);
-        const auto& prim_pro = slc->truth.prim.at(protonTrackIndex);
-
-        TVector3 vec_mu(prim_mu.genp.x, prim_mu.genp.y, prim_mu.genp.z);
-        TVector3 vec_pro(prim_pro.genp.x, prim_pro.genp.y, prim_pro.genp.z);
-
-        TVector3 unit_numi_to_vtx(slc->truth.momentum.x, slc->truth.momentum.y, slc->truth.momentum.z);
-        unit_numi_to_vtx = unit_numi_to_vtx.Unit();
-
-        TVector3 pt_mu = vec_mu - (vec_mu.Dot(unit_numi_to_vtx))*unit_numi_to_vtx ;
-        TVector3 pt_pro = vec_pro - (vec_pro.Dot(unit_numi_to_vtx))*unit_numi_to_vtx;
-
-        TVector3 vec_deltaPT = pt_mu+pt_pro;
-
-        return vec_deltaPT.Mag();
-
-      }
-      else{
-        return -9999999.;
-      }
-    });
-
-    const Var deltaPTx([](const caf::SRSliceProxy* slc) -> double {
-      int muonTrackIndex = TruthMuonIndex(slc);
-      int protonTrackIndex = TruthProtonIndex(slc);
-      if(muonTrackIndex>=0 && protonTrackIndex>=0){
-        const auto& prim_mu = slc->truth.prim.at(muonTrackIndex);
-        const auto& prim_pro = slc->truth.prim.at(protonTrackIndex);
-
-        TVector3 vec_mu(prim_mu.genp.x, prim_mu.genp.y, prim_mu.genp.z);
-        TVector3 vec_pro(prim_pro.genp.x, prim_pro.genp.y, prim_pro.genp.z);
-
-        TVector3 unit_numi_to_vtx(slc->truth.momentum.x, slc->truth.momentum.y, slc->truth.momentum.z);
-        unit_numi_to_vtx = unit_numi_to_vtx.Unit();
-
-        TVector3 pt_mu = vec_mu - (vec_mu.Dot(unit_numi_to_vtx))*unit_numi_to_vtx ;
-        TVector3 pt_pro = vec_pro - (vec_pro.Dot(unit_numi_to_vtx))*unit_numi_to_vtx;
-
-        TVector3 vec_deltaPT = pt_mu+pt_pro;
-
-        double deltaPT_x = ( unit_numi_to_vtx.Cross(pt_mu.Unit()) ).Dot(vec_deltaPT);
-
-        return deltaPT_x;
-
-      }
-      else{
-        return -9999999.;
-      }
-    });
-
-    const Var deltaPTy([](const caf::SRSliceProxy* slc) -> double {
-      int muonTrackIndex = TruthMuonIndex(slc);
-      int protonTrackIndex = TruthProtonIndex(slc);
-      if(muonTrackIndex>=0 && protonTrackIndex>=0){
-        const auto& prim_mu = slc->truth.prim.at(muonTrackIndex);
-        const auto& prim_pro = slc->truth.prim.at(protonTrackIndex);
-
-        TVector3 vec_mu(prim_mu.genp.x, prim_mu.genp.y, prim_mu.genp.z);
-        TVector3 vec_pro(prim_pro.genp.x, prim_pro.genp.y, prim_pro.genp.z);
-
-        TVector3 unit_numi_to_vtx(slc->truth.momentum.x, slc->truth.momentum.y, slc->truth.momentum.z);
-        unit_numi_to_vtx = unit_numi_to_vtx.Unit();
-
-        TVector3 pt_mu = vec_mu - (vec_mu.Dot(unit_numi_to_vtx))*unit_numi_to_vtx ;
-        TVector3 pt_pro = vec_pro - (vec_pro.Dot(unit_numi_to_vtx))*unit_numi_to_vtx;
-
-        TVector3 vec_deltaPT = pt_mu+pt_pro;
-
-        double deltaPT_y = -1.*(pt_mu.Unit().Dot(vec_deltaPT));
-
-        return deltaPT_y;
-
-      }
-      else{
-        return -9999999.;
-      }
-    });
-    
-
-  } // END namespace TKI
 
 
 } // end namespace TruthMatch

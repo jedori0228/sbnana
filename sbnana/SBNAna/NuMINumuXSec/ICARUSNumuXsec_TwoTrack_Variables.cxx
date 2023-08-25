@@ -642,114 +642,22 @@ namespace TwoTrack{
 
   });
 
-  // Charged pion
-  const Var ChargedPionTrackIndex([](const caf::SRSliceProxy* slc) -> double {
-    vector<double> primTrackIndices = ICARUSNumuXsec::PrimaryTrackIndices(slc);
-    if(primTrackIndices.size()==0){
-      return -999.;
-    }
-    else{
-
-      // Requiring good muon
-      int muonTrackIndex = MuonTrackIndex(slc);
-      int PTrackInd(-1);
-      if(muonTrackIndex>=0){
-
-        int protonTrackIndex = ProtonTrackIndex(slc);
-
-        float Longest(0);
-        for(const auto& trkIdx: primTrackIndices){
-          const auto& pfp = slc->reco.pfp.at(trkIdx);
-          const auto& trk = pfp.trk;
-
-          if(trkIdx==(unsigned int)muonTrackIndex) continue;
-          if(trkIdx==(unsigned int)protonTrackIndex) continue;
-          if(isnan(trk.start.x)) continue;
-
-          // First we calculate the distance of each track to the slice vertex.
-          const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
-                                         slc->vertex.y - trk.start.y,
-                                         slc->vertex.z - trk.start.z);
-
-          // We require that the distance of the track from the slice is less than
-          // 10 cm and that the parent of the track has been marked as the primary.
-          const bool AtSlice = ( Atslc < 10.0 && pfp.parent_is_primary);
-
-          // pid from collection
-          const float Chi2Proton = trk.chi2pid[2].chi2_proton;
-          const float Chi2Muon = trk.chi2pid[2].chi2_muon;
-
-          const bool Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
-
-          const bool MaybeExiting = ( !Contained && trk.len > 50);
-          const bool MaybeContained = ( Contained && trk.calo[2].nhit>=5 && Chi2Proton > 60 && Chi2Muon < 30 && trk.len > 20 );
-
-          if ( AtSlice && ( MaybeExiting || MaybeContained ) && trk.len > Longest )
-          {
-            Longest = trk.len;
-            PTrackInd = trkIdx;
-          }
-        } // END pfp loop
-
-      } // END if muon track exist
-
-      return PTrackInd;
-
-    } // END if slice has primary tracks
-  });
   // Charged pion, stopped
   const Var StoppedChargedPionTrackIndex([](const caf::SRSliceProxy* slc) -> double {
-    if(slc->reco.pfp.size()==0){
-      return -999.;
-    }
+    vector<double> candIdxs = kNuMIChargedPionCandidateIdxs(slc);
+    if(candIdxs.size()==0) return -999;
     else{
-
-      // Requiring good muon
-      int muonTrackIndex = MuonTrackIndex(slc);
-      int PTrackInd(-1);
-      if(muonTrackIndex>=0){
-
-        int protonTrackIndex = ProtonTrackIndex(slc);
-
-        float Longest(0);
-        for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); i_pfp++){
-          const auto& pfp = slc->reco.pfp.at(i_pfp);
-          const auto& trk = pfp.trk;
-
-          if(i_pfp==(unsigned int)muonTrackIndex) continue;
-          if(i_pfp==(unsigned int)protonTrackIndex) continue;
-          if(isnan(trk.start.x)) continue;
-          // First we calculate the distance of each track to the slice vertex.
-          const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
-                                         slc->vertex.y - trk.start.y,
-                                         slc->vertex.z - trk.start.z);
-
-          // We require that the distance of the track from the slice is less than
-          // 10 cm and that the parent of the track has been marked as the primary.
-          const bool AtSlice = ( Atslc < 10.0 && pfp.parent_is_primary);
-
-          // pid from collection
-          const float Chi2Proton = trk.chi2pid[2].chi2_proton;
-          const float Chi2Muon = trk.chi2pid[2].chi2_muon;
-
-          const bool Contained = fv_track.isContained(trk.end.x, trk.end.y, trk.end.z);
-
-          const bool MaybeExiting = ( !Contained && trk.len > 50);
-          //TODO
-          const bool MaybeContained = ( Contained && trk.calo[2].nhit>=5 && Chi2Proton > 60 && Chi2Muon < 30 && trk.len > 0. );
-
-          if ( AtSlice && ( MaybeExiting || MaybeContained ) && trk.len > Longest )
-          {
-            Longest = trk.len;
-            PTrackInd = i_pfp;
-          }
-        } // END pfp loop
-
-      } // END if muon track exist
-
-      return PTrackInd;
-
-    } // END if slice has primary tracks
+      double maxlength = -999.;
+      int ret = -1;
+      for(const auto& idx: candIdxs){
+        const auto& trk = slc->reco.pfp.at(idx).trk;
+        if(trk.len > maxlength){
+          maxlength = trk.len;
+          ret = idx;
+        }
+      }
+      return ret;
+    }
   });
   const Var StoppedChargedPionTrackLength([](const caf::SRSliceProxy* slc) -> double {
     int stoppedCPionIndex = StoppedChargedPionTrackIndex(slc);
@@ -943,9 +851,7 @@ namespace TwoTrack{
 
   // Neutral pion
   const MultiVar NeutralPionPhotonShowerIndices([](const caf::SRSliceProxy* slc) -> vector<double> {
-
     return kNuMIPhotonCandidateIdxs(slc);
-
   });
   const MultiVar NeutralPionPhotonShowerConvGaps([](const caf::SRSliceProxy* slc) -> vector<double> {
     vector<double> shw_indices = NeutralPionPhotonShowerIndices(slc);
