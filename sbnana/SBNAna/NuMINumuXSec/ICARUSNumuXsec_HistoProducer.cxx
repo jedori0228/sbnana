@@ -856,12 +856,81 @@ void HistoProducer::MakeTrueTree(SpectrumLoader& loader){
   using namespace ICARUSNumuXsec::TwoTrack;
   using namespace ICARUSNumuXsec::TruthMatch;
 
+  std::vector<std::string> labels_cv = GetNuMITrueTreeLabels();
+  std::vector<SpillMultiVar> vars_cv = GetNuMITrueTreeVars();
+
+  // Multisigma: Save Up (+1sigma) and Down (-1sigma)
+  std::vector<std::string> labels_GENIEMultiSigmaKnob;
+  std::vector<SpillMultiVar> vars_GENIEMultiSigmaKnob;
+  const std::vector<std::string> genieMultisigmaKnobNames = ICARUSNumuXsec::GetGENIEMultisigmaKnobNames();
+  for(const std::string& name: genieMultisigmaKnobNames){
+    if(name=="FormZone"){
+     std::cout << "[HistoProducer::MakeTrueTree] Skipping FormZone" << std::endl;
+     continue;
+    }
+    std::string psetname = SystProviderPrefix+"_multisigma_"+name;
+
+    labels_GENIEMultiSigmaKnob.push_back( name+"_1up" );
+    vars_GENIEMultiSigmaKnob.push_back( GetSigmaWeightSpillMultiVarPerSignalNu(psetname, +1) );
+
+    labels_GENIEMultiSigmaKnob.push_back( name+"_1dn" );
+    vars_GENIEMultiSigmaKnob.push_back( GetSigmaWeightSpillMultiVarPerSignalNu(psetname, -1) );
+
+  }
+
+  // Morphing: Save +1
+  std::vector<std::string> labels_GENIEMorphKnob;
+  std::vector<SpillMultiVar> vars_GENIEMorphKnob;
+  const std::vector<std::string> genieMorphKnobNames = ICARUSNumuXsec::GetGENIEMorphKnobNames();
+  for(const std::string& name: genieMorphKnobNames){
+    if(name=="FormZone"){
+     std::cout << "[HistoProducer::MakeTrueTree] Skipping FormZone" << std::endl;
+     continue;
+    }
+    std::string psetname = SystProviderPrefix+"_multisigma_"+name;
+
+    labels_GENIEMorphKnob.push_back( name );
+    vars_GENIEMorphKnob.push_back( GetSigmaWeightSpillMultiVarPerSignalNu(psetname, +1) );
+
+  }
+
+  // Dependent dials (multisim)
+  // Multisim: Save 100 universes
+  std::vector<std::string> labels_GENIEMultiSimKnob;
+  std::vector<SpillMultiVar> vars_GENIEMultiSimKnob;
+  const std::vector<std::string> genieMultisimKnobNames = ICARUSNumuXsec::GetGENIEDependentKnobNames();
+  for(const std::string& name: genieMultisimKnobNames){
+    if(name=="FormZone"){
+     std::cout << "[HistoProducer::MakeTrueTree] Skipping FormZone" << std::endl;
+     continue;
+    }
+    std::string psetname = SystProviderPrefix+"_multisim_"+name;
+
+    for(int u=0; u<100; u++){
+      labels_GENIEMultiSimKnob.push_back( name+"_Univ"+std::to_string(u) );
+      vars_GENIEMultiSimKnob.push_back( GetUniverseWeightSpillMultiVarPerSignalNu(psetname, u) );
+    }
+
+  }
+
+  std::vector<std::string> labels_all;
+  labels_all.insert( labels_all.end(), labels_cv.begin(), labels_cv.end() );
+  labels_all.insert( labels_all.end(), labels_GENIEMultiSigmaKnob.begin(), labels_GENIEMultiSigmaKnob.end() );
+  labels_all.insert( labels_all.end(), labels_GENIEMorphKnob.begin(), labels_GENIEMorphKnob.end() );
+  labels_all.insert( labels_all.end(), labels_GENIEMultiSimKnob.begin(), labels_GENIEMultiSimKnob.end() );
+
+  std::vector<SpillMultiVar> vars_all;
+  vars_all.insert( vars_all.end(), vars_cv.begin(), vars_cv.end() );
+  vars_all.insert( vars_all.end(), vars_GENIEMultiSigmaKnob.begin(), vars_GENIEMultiSigmaKnob.end() );
+  vars_all.insert( vars_all.end(), vars_GENIEMorphKnob.begin(), vars_GENIEMorphKnob.end() );
+  vars_all.insert( vars_all.end(), vars_GENIEMultiSimKnob.begin(), vars_GENIEMultiSimKnob.end() );
+
   map_cutName_to_vec_Trees[currentCutName].push_back(
 
     new ana::Tree(
-      "trueEvents", GetNuMITrueTreeLabels(),
+      "trueEvents", labels_all,
       loader,
-      GetNuMITrueTreeVars(),
+      vars_all,
       kNoSpillCut,
       false
     )
