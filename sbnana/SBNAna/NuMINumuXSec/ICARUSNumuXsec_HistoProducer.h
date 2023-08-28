@@ -110,8 +110,10 @@ namespace ICARUSNumuXsec{
     TString currentCutName;
     vector<TString> vec_cutNames;
     std::map< TString, vector<Spectrum *> > map_cutName_to_vec_Spectrums;
-    std::map< TString, std::vector<ana::Tree *> > map_cutName_to_vec_Trees;
+    std::map< TString, std::vector<ana::Tree *> > map_cutName_to_vec_TrueTrees; // true
+    std::map< TString, std::vector<ana::Tree *> > map_cutName_to_vec_Trees; // reco
     std::map< TString, std::vector<ana::NSigmasTree *> > map_cutName_to_vec_NSigmasTrees;
+    std::map< TString, std::vector<ana::NUniversesTree *> > map_cutName_to_vec_NUniversesTrees;
 
     // EnsembleSpectrum-based systematics
     std::map< TString, vector< pair<TString, EnsembleSpectrum *> > > map_cutName_to_vec_SystEnsembleSpectrumPairs;

@@ -925,7 +925,7 @@ void HistoProducer::MakeTrueTree(SpectrumLoader& loader){
   vars_all.insert( vars_all.end(), vars_GENIEMorphKnob.begin(), vars_GENIEMorphKnob.end() );
   vars_all.insert( vars_all.end(), vars_GENIEMultiSimKnob.begin(), vars_GENIEMultiSimKnob.end() );
 
-  map_cutName_to_vec_Trees[currentCutName].push_back(
+  map_cutName_to_vec_TrueTrees[currentCutName].push_back(
 
     new ana::Tree(
       "trueEvents", labels_all,
@@ -958,36 +958,65 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
 
   );
 
-  std::vector<std::string> this_PsetNames;
-  std::vector<const ISyst*> this_SigmaSysts;
+  std::vector<std::string> this_NSigmasPsetNames;
+  std::vector<const ISyst*> this_NSigmasISysts;
 
   for(const std::string& name: ICARUSNumuXsec::GetGENIEMultisigmaKnobNames()){
     if(name=="FormZone"){
      continue;
     }
     std::string psetname = SystProviderPrefix+"_multisigma_"+name;
-    this_PsetNames.push_back( name );
-    this_SigmaSysts.push_back( new SBNWeightSyst(psetname) );
+    this_NSigmasPsetNames.push_back( name );
+    this_NSigmasISysts.push_back( new SBNWeightSyst(psetname) );
   }
   std::vector<const ISyst*> this_IFluxSysts = GetAllNuMIFluxSysts(NNuMIFluxPCA);
   for(unsigned int i=0; i<this_IFluxSysts.size(); i++){
-    this_PsetNames.push_back( this_IFluxSysts.at(i)->ShortName() );
-    this_SigmaSysts.push_back( this_IFluxSysts.at(i) );
+    this_NSigmasPsetNames.push_back( this_IFluxSysts.at(i)->ShortName() );
+    this_NSigmasISysts.push_back( this_IFluxSysts.at(i) );
   }
-
 
   map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
 
     new ana::NSigmasTree(
-      (currentCutName+"_Sigma").Data(),
-      this_PsetNames,
+      (currentCutName+"_NSigmas").Data(),
+      this_NSigmasPsetNames,
       loader,
-      this_SigmaSysts,
+      this_NSigmasISysts,
       spillCut, cut,
-      kNoShift, 3, false, false
+      kNoShift, 3, true, true
     )
 
   );
+
+  std::vector<std::string> this_NUniversesPsetNames;
+  std::vector<std::vector<Var>> this_NUniversesVarVectors;
+
+  for(const std::string& name: ICARUSNumuXsec::GetGENIEDependentKnobNames()){
+    if(name=="FormZone"){
+     continue;
+    }
+    std::string psetname = SystProviderPrefix+"_multisim_"+name;
+    this_NUniversesPsetNames.push_back( name );
+    std::vector<Var> this_NUniversesVarVector;
+    for(int u=0; u<100; u++){
+      this_NUniversesVarVector.push_back( GetUniverseWeight(psetname, u) );
+    }
+    this_NUniversesVarVectors.push_back( this_NUniversesVarVector );
+  }
+
+  map_cutName_to_vec_NUniversesTrees[currentCutName].push_back(
+
+    new ana::NUniversesTree(
+      (currentCutName+"_NUniverses").Data(),
+      this_NUniversesPsetNames,
+      loader,
+      this_NUniversesVarVectors, 100,
+      spillCut, cut,
+      kNoShift, true, true
+    )
+
+  );
+
 
 }
 
@@ -1045,8 +1074,10 @@ void HistoProducer::saveHistograms(){
       vector<Spectrum *> vec_Spectrums = map_cutName_to_vec_Spectrums[cutName];
       vector< pair<TString, EnsembleSpectrum *> > vec_SystEnsembleSpectrumPairs = map_cutName_to_vec_SystEnsembleSpectrumPairs[cutName];
       vector< pair<TString, Spectrum *> > vec_SystSpectrumPairs = map_cutName_to_vec_SystSpectrumPairs[cutName];
+      vector<ana::Tree *> vec_TrueTrees = map_cutName_to_vec_TrueTrees[cutName];
       vector<ana::Tree *> vec_Trees = map_cutName_to_vec_Trees[cutName];
       vector<ana::NSigmasTree *> vec_NSigmasTrees = map_cutName_to_vec_NSigmasTrees[cutName];
+      vector<ana::NUniversesTree *> vec_NUniversesTrees = map_cutName_to_vec_NUniversesTrees[cutName];
 
       cout << "[HistoProducer::saveHistograms] cutName = " << cutName << endl;
       cout << "[HistoProducer::saveHistograms]   Directory name = " << dirName << endl;
@@ -1155,22 +1186,85 @@ void HistoProducer::saveHistograms(){
       }
 
       // Tree
-      cout << "[HistoProducer::saveHistograms]   Number of Trees = " << vec_Trees.size() << endl;
+
+      // TODO For now, I am saving weights to TrueTree
+      // No need to merge.. Write TrueTree first without merging
+      for(unsigned int i=0; i<vec_TrueTrees.size(); i++){
+
+        cout << "[HistoProducer::saveHistograms]   " << i << "-th TrueTree.." << endl;
+
+        vec_TrueTrees.at(i)->SaveTo(dir);
+
+      }
+
+      // If no Tree, continue;
+      if(vec_Trees.size()==0){
+        continue;
+      }
+
       for(unsigned int i=0; i<vec_Trees.size(); i++){
-
-        cout << "[HistoProducer::saveHistograms]   " << i << "-th Tree.." << endl;
-
         vec_Trees.at(i)->SaveTo(dir);
-
       }
-      cout << "[HistoProducer::saveHistograms]   Number of NSigmasTrees = " << vec_NSigmasTrees.size() << endl;
       for(unsigned int i=0; i<vec_NSigmasTrees.size(); i++){
-
-        cout << "[HistoProducer::saveHistograms]   " << i << "-th NSigmasTree.." << endl;
-
         vec_NSigmasTrees.at(i)->SaveTo(dir);
+      }
+      for(unsigned int i=0; i<vec_NUniversesTrees.size(); i++){
+        vec_NUniversesTrees.at(i)->SaveTo(dir);
+      }
+
+
+/*
+      // Now we can assume we have at least one Tree
+      // If we have WeightTrees, merge everything there
+      WeightsTree *MergedTree = 0;
+      if(vec_NSigmasTrees.size()>0){
+        printf("[HistoProducer::saveHistograms]   Using NSigmasTrees, %s, for mering\n", vec_NSigmasTrees.at(0)->Name());
+        MergedTree = (WeightsTree *)vec_NSigmasTrees.at(0);
+      }
+      else if(vec_NUniversesTrees.size()>0){
+        printf("[HistoProducer::saveHistograms]   Using NUniversesTrees, %s, for mering\n", vec_NUniversesTrees.at(0)->Name());
+        MergedTree = (WeightsTree *)vec_NUniversesTrees.at(0);
+      }
+
+      // If no WeightTree, simply save individual Tree
+      if(MergedTree==0){
+
+        cout << "[HistoProducer::saveHistograms]   No Weight, tree, so saving individual Trees" << std::endl;
+        cout << "[HistoProducer::saveHistograms]   Number of Trees = " << vec_Trees.size() << endl;
+        for(unsigned int i=0; i<vec_Trees.size(); i++){
+          printf("[HistoProducer::saveHistograms]   Saving Tree; name = %s\n", vec_Trees.at(i)->Name());
+          vec_Trees.at(i)->SaveTo(dir);
+        }
+      }
+      // If we have WeightTree, merge
+      else{
+
+        for(unsigned int i=0; i<vec_Trees.size(); i++){
+          printf("[HistoProducer::saveHistograms]   Merging Tree; name = %s\n", vec_Trees.at(i)->Name());
+          MergedTree->MergeTree( *vec_Trees.at(i) );
+        }
+        for(unsigned int i=0; i<vec_NSigmasTrees.size(); i++){
+          if(MergedTree==(WeightsTree *)vec_NSigmasTrees.at(i)){
+            printf("[HistoProducer::saveHistograms]   Skipping this NSigmasTree; name = %s\n", vec_NSigmasTrees.at(i)->Name());
+            continue;
+          }
+          printf("[HistoProducer::saveHistograms]   Merging NSigmasTree; name = %s\n", vec_NSigmasTrees.at(i)->Name());
+          MergedTree->MergeTree( * (Tree *)vec_NSigmasTrees.at(i) );
+        }
+        for(unsigned int i=0; i<vec_NUniversesTrees.size(); i++){
+          if(MergedTree==(WeightsTree *)vec_NUniversesTrees.at(i)){
+            printf("[HistoProducer::saveHistograms]   Skipping this NUniversesTree; name = %s\n", vec_NUniversesTrees.at(i)->Name());
+            continue;
+          }
+          printf("[HistoProducer::saveHistograms]   Merging NUniversesTree; name = %s\n", vec_NUniversesTrees.at(i)->Name());
+          vec_NUniversesTrees.at(i)->SaveTo(dir);
+          MergedTree->MergeTree( * (Tree *)vec_NUniversesTrees.at(i) );
+        }
+
+        MergedTree->SaveTo(dir);
 
       }
+*/
 
       outputfile->cd();
 
