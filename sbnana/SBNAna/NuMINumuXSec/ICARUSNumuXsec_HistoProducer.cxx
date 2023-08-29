@@ -960,6 +960,8 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
 
   std::vector<std::string> this_NSigmasPsetNames;
   std::vector<const ISyst*> this_NSigmasISysts;
+  std::vector<std::pair<int,int>> this_NSigmasPairs;
+
 
   for(const std::string& name: ICARUSNumuXsec::GetGENIEMultisigmaKnobNames()){
     if(name=="FormZone"){
@@ -968,11 +970,13 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
     std::string psetname = SystProviderPrefix+"_multisigma_"+name;
     this_NSigmasPsetNames.push_back( name );
     this_NSigmasISysts.push_back( new SBNWeightSyst(psetname) );
+    this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
   }
   std::vector<const ISyst*> this_IFluxSysts = GetAllNuMIFluxSysts(NNuMIFluxPCA);
   for(unsigned int i=0; i<this_IFluxSysts.size(); i++){
     this_NSigmasPsetNames.push_back( this_IFluxSysts.at(i)->ShortName() );
     this_NSigmasISysts.push_back( this_IFluxSysts.at(i) );
+    this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
   }
 
   map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
@@ -982,14 +986,16 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       this_NSigmasPsetNames,
       loader,
       this_NSigmasISysts,
+      this_NSigmasPairs,
       spillCut, cut,
-      kNoShift, 3, true, true
+      kNoShift, true, true
     )
 
   );
 
   std::vector<std::string> this_NUniversesPsetNames;
   std::vector<std::vector<Var>> this_NUniversesVarVectors;
+  std::vector<unsigned int> this_NUniversesNUnivs;
 
   for(const std::string& name: ICARUSNumuXsec::GetGENIEDependentKnobNames()){
     if(name=="FormZone"){
@@ -1002,6 +1008,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       this_NUniversesVarVector.push_back( GetUniverseWeight(psetname, u) );
     }
     this_NUniversesVarVectors.push_back( this_NUniversesVarVector );
+    this_NUniversesNUnivs.push_back( 100 );
   }
 
   map_cutName_to_vec_NUniversesTrees[currentCutName].push_back(
@@ -1010,7 +1017,8 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       (currentCutName+"_NUniverses").Data(),
       this_NUniversesPsetNames,
       loader,
-      this_NUniversesVarVectors, 100,
+      this_NUniversesVarVectors,
+      this_NUniversesNUnivs,
       spillCut, cut,
       kNoShift, true, true
     )
