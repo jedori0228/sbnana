@@ -327,6 +327,71 @@ namespace ana
       } // end for slc
     } // end for spillcutdef
 
+    // TruthVar without (Slice)Cut
+
+    for(auto& spillcutdef: fTruthHistDefs){
+      const SpillCut& spillcut = spillcutdef.first;
+
+      const bool spillpass = spillcut(sr); // nomSpillCutCache.Get(spillcut, sr);
+      // Cut failed, skip all the histograms that depended on it
+      if(!spillpass) continue;
+
+      // now start the nu loop
+      for(caf::SRTrueInteractionProxy& nu: sr->mc.nu){
+
+        for(auto& truthcutdef: spillcutdef.second){
+
+          const TruthCut& truthcut = truthcutdef.first;
+
+          const bool truthpass = truthcut(&nu);
+          // TruthCut failed, skip all the histograms that depended on it
+          if(!truthpass) continue;
+
+          for(auto& truthweidef: truthcutdef.second){
+
+            const TruthVar& truthweivar = truthweidef.first;
+            double truthwei = truthweivar(&nu);
+
+            for(auto& truthvardef: truthweidef.second){
+
+              // if TruthMultiVar
+              if(truthvardef.first.IsMulti()){
+                for(double truthval: truthvardef.first.GetMultiVar()(&slc)){
+                  for(Spectrum* s: truthvardef.second.spects)
+                    s->Fill(truthval, truthwei);
+                }
+              }
+              // if TruthVar
+              else{
+
+                const TruthVar& truthvar = truthvardef.first.GetVar();
+                const double truthval = truthvar(&nu);
+
+                if(std::isnan(truthval) || std::isinf(truthval)){
+                  std::cerr << "Warning: Bad value: " << truthval
+                            << " returned from a TruthVar. The input variable(s) could "
+                            << "be NaN in the CAF, or perhaps your "
+                            << "Var code computed 0/0?";
+                  std::cout << " Not filling into this histogram for this slice." << std::endl;
+                  continue;
+                }
+
+                for(Spectrum* s: truthvardef.second.spects) s->Fill(truthval, truthwei);
+
+              }
+
+            } // end for truthvardef
+
+
+
+          } // end for truthweidef
+
+        } // end for truthcutdef
+
+      } // end for nu loop
+
+    } // end for spillcutdef
+
     // Trees
     //unsigned int idxSpillCut = 0; // testing
     for ( auto& [spillcut, shiftmap] : fTreeDefs ) {
