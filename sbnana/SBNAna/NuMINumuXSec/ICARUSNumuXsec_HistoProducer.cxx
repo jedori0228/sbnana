@@ -849,65 +849,7 @@ void HistoProducer::MichelStudy(SpectrumLoader& loader, SpillCut spillCut, Cut c
 */
 }
 
-// - 230814_MakeTree
-void HistoProducer::MakeTrueTree(SpectrumLoader& loader){
-  if(TrueTreeFilled) return;
-
-  map_cutName_to_vec_TrueTrees[currentCutName].push_back(
-
-    new ana::Tree(
-      "trueEvents", GetNuMITrueTreeLabels(),
-      loader,
-      GetNuMITrueTreeVars(), kNuMIValidTrigger,
-      kTruthCut_IsSignal,
-      kNuMISelection_1muNp0pi,
-      kNoShift,
-      false
-    )
-
-  );
-
-  // NSigma
-
-  std::vector<std::string> this_NSigmasPsetNames;
-  std::vector<const ISyst*> this_NSigmasISysts;
-  std::vector<std::pair<int,int>> this_NSigmasPairs;
-
-  for(unsigned int i=0; i<genieMultisigmaKnobNames.size(); i++){
-    this_NSigmasPsetNames.push_back( genieMultisigmaKnobNames.at(i) );
-    this_NSigmasISysts.push_back( IGENIESysts.at(i) );
-    this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
-  }
-  for(unsigned int i=0; i<IFluxSysts.size(); i++){
-    this_NSigmasPsetNames.push_back( IFluxSysts.at(i)->ShortName() );
-    this_NSigmasISysts.push_back( IFluxSysts.at(i) );
-    this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
-  }
-
-
-  map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
-
-    new ana::NSigmasTree(
-      "trueEvents_NSigmas",
-      this_NSigmasPsetNames,
-      loader,
-      this_NSigmasISysts,
-      this_NSigmasPairs,
-      kTruthCut_IsSignal,
-      kNoShift, true
-    )
-
-  );
-
-
-  TrueTreeFilled = true;
-}
 void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
-
-  MakeTrueTree(loader);
-
-  using namespace ICARUSNumuXsec::TwoTrack;
-  using namespace ICARUSNumuXsec::TruthMatch;
 
   map_cutName_to_vec_Trees[currentCutName].push_back(
 
@@ -952,19 +894,13 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
 
   std::vector<std::string> this_NUniversesPsetNames;
   std::vector<std::vector<Var>> this_NUniversesVarVectors;
+  std::vector<std::vector<TruthVar>> this_NUniversesTruthVarVectors;
   std::vector<unsigned int> this_NUniversesNUnivs;
 
-  for(const std::string& name: ICARUSNumuXsec::GetGENIEDependentKnobNames()){
-    if(name=="FormZone"){
-     continue;
-    }
-    std::string psetname = SystProviderPrefix+"_multisim_"+name;
+  for(const std::string& name: genieDependentKnobNames){
     this_NUniversesPsetNames.push_back( name );
-    std::vector<Var> this_NUniversesVarVector;
-    for(int u=0; u<100; u++){
-      this_NUniversesVarVector.push_back( GetUniverseWeight(psetname, u) );
-    }
-    this_NUniversesVarVectors.push_back( this_NUniversesVarVector );
+    this_NUniversesVarVectors.push_back( map_DepDialName_to_UniverseWeights[name] );
+    this_NUniversesTruthVarVectors.push_back( map_DepDialName_to_TruthUniverseWeights[name] );
     this_NUniversesNUnivs.push_back( 100 );
   }
 
@@ -981,6 +917,55 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
     )
 
   );
+
+  // TrueTree
+  if(TrueTreeFilled) return;
+
+  map_cutName_to_vec_TrueTrees[currentCutName].push_back(
+
+    new ana::Tree(
+      "trueEvents", GetNuMITrueTreeLabels(),
+      loader,
+      GetNuMITrueTreeVars(), kNuMIValidTrigger,
+      kTruthCut_IsSignal,
+      kNuMISelection_1muNp0pi,
+      kNoShift,
+      false
+    )
+
+  );
+
+  map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
+
+    new ana::NSigmasTree(
+      "trueEvents_NSigmas",
+      this_NSigmasPsetNames,
+      loader,
+      this_NSigmasISysts,
+      this_NSigmasPairs,
+      kTruthCut_IsSignal,
+      kNoShift, true
+    )
+
+  );
+
+  map_cutName_to_vec_NUniversesTrees[currentCutName].push_back(
+
+    new ana::NUniversesTree(
+      "trueEvents_NUniverses",
+      this_NUniversesPsetNames,
+      loader,
+      this_NUniversesVarVectors,
+      this_NUniversesNUnivs,
+      spillCut, cut,
+      kNoShift, true, true
+    )
+
+  );
+
+  TrueTreeFilled = true;
+
+
 
 
 }
@@ -1301,15 +1286,15 @@ void HistoProducer::setSystematicWeights(){
 
     // Multisim for dependent dials
     cout << "[HistoProducer::setSystematicWeights] - Adding dependent dials by multisim" << std::endl;
-    const std::vector<std::string> genieDependentKnobNames = ICARUSNumuXsec::GetGENIEDependentKnobNames();
+    genieDependentKnobNames = ICARUSNumuXsec::GetGENIEDependentKnobNames();
     for(const std::string& name: genieDependentKnobNames){
       map_DepDialName_to_UniverseWeights[name] = {};
-      map_DepDialName_to_UniverseSpillWeights[name] = {};
+      map_DepDialName_to_TruthUniverseWeights[name] = {};
       std::string psetname = SystProviderPrefix+"_multisim_"+name;
       std::cout << "[HistoProducer::setSystematicWeights] Dependent dial, " << name << " (psetname = " << psetname << ")" << std::endl;
       for(int u=0; u<100; u++){
         map_DepDialName_to_UniverseWeights[name].push_back( GetUniverseWeight(psetname, u) );
-        map_DepDialName_to_UniverseSpillWeights[name].push_back( GetUniverseFirstNeutrinoWeight(psetname, u) );
+        map_DepDialName_to_TruthUniverseWeights[name].push_back( GetTruthUniverseWeight(psetname, u) );
       }
     }
 
@@ -1480,15 +1465,6 @@ void HistoProducer::FillSystSpectrum(SpectrumLoader& loader, const std::string& 
 }
 
 void HistoProducer::FillSystSpectrum(SpectrumLoader& loader, const std::string& label, const SpillVar& var, const Binning& binning, SpillCut spillCut){
-
-  // ensemble spectrum
-  if(map_DepDialName_to_UniverseSpillWeights.size()>0){
-    for(const auto& it: map_DepDialName_to_UniverseSpillWeights){
-      map_cutName_to_vec_SystEnsembleSpectrumPairs[currentCutName].push_back(
-        std::make_pair( it.first, new EnsembleSpectrum(label, binning, loader, var, spillCut, it.second, kSpillUnweighted ) )
-      );
-    }
-  }
 
   static const std::vector<std::string> genieMultisigmaKnobNames = ICARUSNumuXsec::GetGENIEMultisigmaKnobNames();
   for(const std::string& name: genieMultisigmaKnobNames){

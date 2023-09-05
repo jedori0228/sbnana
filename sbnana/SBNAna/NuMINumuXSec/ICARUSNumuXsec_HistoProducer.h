@@ -75,7 +75,6 @@ namespace ICARUSNumuXsec{
     void MichelStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     // - 230814_MakeTree
     bool TrueTreeFilled;
-    void MakeTrueTree(SpectrumLoader& loader);
     void MakeTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
     void Test(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
@@ -90,9 +89,9 @@ namespace ICARUSNumuXsec{
     std::vector<std::string> genieMultisigmaKnobNames;
     std::vector<const ISyst*> IGENIESysts;
     std::vector<const ISyst*> IGENIEMorphSysts;
-
+    std::vector<std::string> genieDependentKnobNames;
     std::map<std::string, std::vector<Var>> map_DepDialName_to_UniverseWeights;
-    std::map<std::string, std::vector<SpillVar>> map_DepDialName_to_UniverseSpillWeights;
+    std::map<std::string, std::vector<TruthVar>> map_DepDialName_to_TruthUniverseWeights;
 
     int NNuMIFluxPCA;
     std::vector<const ISyst*> IFluxSysts;
