@@ -220,7 +220,7 @@ namespace TwoTrack{
   // - Comparing truth match to primary
   const Cut MuonTrackTruthMatchedPrimary([](const caf::SRSliceProxy* slc) {
     int muonTrackIndex = kNuMIMuonCandidateIdx(slc); // index of slc->reco.pfp
-    int muonPrimrayIndex = ana::PrimaryUtil::MuonIndex_True(slc->truth); // index of slc->truth.prim
+    int muonPrimrayIndex = ana::kTruth_MuonIndex(&slc->truth); // index of slc->truth.prim
     if(muonTrackIndex>=0 && muonPrimrayIndex>=0){
       // reco track
       const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
@@ -242,7 +242,7 @@ namespace TwoTrack{
   const Cut ProtonTrackTruthMatchedPrimaryProton([](const caf::SRSliceProxy* slc) {
 
     int protonTrackIndex = kNuMIProtonCandidateIdx(slc); // index of slc->reco.pfp
-    int protonPrimrayIndex = ana::PrimaryUtil::ProtonIndex_True(slc->truth); // index of slc->truth.prim
+    int protonPrimrayIndex = ana::kTruth_ProtonIndex(&slc->truth); // index of slc->truth.prim
     if(protonTrackIndex>=0 && protonPrimrayIndex>=0){
       // reco track
       const auto& trk = slc->reco.pfp.at(protonTrackIndex).trk;

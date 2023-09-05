@@ -857,8 +857,9 @@ void HistoProducer::MakeTrueTree(SpectrumLoader& loader){
   using namespace ICARUSNumuXsec::TruthMatch;
 
   std::vector<std::string> labels_cv = GetNuMITrueTreeLabels();
-  std::vector<SpillMultiVar> vars_cv = GetNuMITrueTreeVars();
+  std::vector<TruthVar> vars_cv = GetNuMITrueTreeVars();
 
+/*
   // Multisigma: Save Up (+1sigma) and Down (-1sigma)
   std::vector<std::string> labels_GENIEMultiSigmaKnob;
   std::vector<SpillMultiVar> vars_GENIEMultiSigmaKnob;
@@ -912,26 +913,29 @@ void HistoProducer::MakeTrueTree(SpectrumLoader& loader){
     }
 
   }
+*/
 
   std::vector<std::string> labels_all;
   labels_all.insert( labels_all.end(), labels_cv.begin(), labels_cv.end() );
-  labels_all.insert( labels_all.end(), labels_GENIEMultiSigmaKnob.begin(), labels_GENIEMultiSigmaKnob.end() );
-  labels_all.insert( labels_all.end(), labels_GENIEMorphKnob.begin(), labels_GENIEMorphKnob.end() );
-  labels_all.insert( labels_all.end(), labels_GENIEMultiSimKnob.begin(), labels_GENIEMultiSimKnob.end() );
+  //labels_all.insert( labels_all.end(), labels_GENIEMultiSigmaKnob.begin(), labels_GENIEMultiSigmaKnob.end() );
+  //labels_all.insert( labels_all.end(), labels_GENIEMorphKnob.begin(), labels_GENIEMorphKnob.end() );
+  //labels_all.insert( labels_all.end(), labels_GENIEMultiSimKnob.begin(), labels_GENIEMultiSimKnob.end() );
 
-  std::vector<SpillMultiVar> vars_all;
+  std::vector<TruthVar> vars_all;
   vars_all.insert( vars_all.end(), vars_cv.begin(), vars_cv.end() );
-  vars_all.insert( vars_all.end(), vars_GENIEMultiSigmaKnob.begin(), vars_GENIEMultiSigmaKnob.end() );
-  vars_all.insert( vars_all.end(), vars_GENIEMorphKnob.begin(), vars_GENIEMorphKnob.end() );
-  vars_all.insert( vars_all.end(), vars_GENIEMultiSimKnob.begin(), vars_GENIEMultiSimKnob.end() );
+  //vars_all.insert( vars_all.end(), vars_GENIEMultiSigmaKnob.begin(), vars_GENIEMultiSigmaKnob.end() );
+  //vars_all.insert( vars_all.end(), vars_GENIEMorphKnob.begin(), vars_GENIEMorphKnob.end() );
+  //vars_all.insert( vars_all.end(), vars_GENIEMultiSimKnob.begin(), vars_GENIEMultiSimKnob.end() );
 
   map_cutName_to_vec_TrueTrees[currentCutName].push_back(
 
     new ana::Tree(
       "trueEvents", labels_all,
       loader,
-      vars_all,
-      kNoSpillCut,
+      vars_all, kNuMIValidTrigger,
+      kTruthCut_IsSignal,
+      kNuMISelection_1muNp0pi,
+      kNoShift,
       false
     )
 
