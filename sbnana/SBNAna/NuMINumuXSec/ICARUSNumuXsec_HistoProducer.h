@@ -86,6 +86,8 @@ namespace ICARUSNumuXsec{
     std::string SystProviderPrefix;
     void setSystematicWeights();
     std::vector<const ISyst*> IAllSysts; // TODO update later
+
+    std::vector<std::string> genieMultisigmaKnobNames;
     std::vector<const ISyst*> IGENIESysts;
     std::vector<const ISyst*> IGENIEMorphSysts;
 
