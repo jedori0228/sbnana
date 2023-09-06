@@ -1154,14 +1154,29 @@ void HistoProducer::saveHistograms(){
         continue;
       }
 
-      for(unsigned int i=0; i<vec_Trees.size(); i++){
-        vec_Trees.at(i)->SaveTo(dir);
+      // special case for merging
+      if(vec_Trees.size()==1 && vec_NSigmasTrees.size()==1){
+
+        vec_NSigmasTrees[0]->MergeTree( *vec_Trees[0] );
+
+        if(nSigmasSaveMode==kVector) vec_NSigmasTrees[0]->SaveTo(dir);
+        else if(nSigmasSaveMode==kSpline) vec_NSigmasTrees[0]->SaveToSplines(dir);
+        else if(nSigmasSaveMode==kGraph) vec_NSigmasTrees[0]->SaveToGraphs(dir);
+
       }
-      for(unsigned int i=0; i<vec_NSigmasTrees.size(); i++){
-        if(nSigmasSaveMode==kVector) vec_NSigmasTrees.at(i)->SaveTo(dir);
-        else if(nSigmasSaveMode==kSpline) vec_NSigmasTrees.at(i)->SaveToSplines(dir);
-        else if(nSigmasSaveMode==kGraph) vec_NSigmasTrees.at(i)->SaveToGraphs(dir);
+      else{
+
+        for(unsigned int i=0; i<vec_Trees.size(); i++){
+          vec_Trees.at(i)->SaveTo(dir);
+        }
+        for(unsigned int i=0; i<vec_NSigmasTrees.size(); i++){
+          if(nSigmasSaveMode==kVector) vec_NSigmasTrees.at(i)->SaveTo(dir);
+          else if(nSigmasSaveMode==kSpline) vec_NSigmasTrees.at(i)->SaveToSplines(dir);
+          else if(nSigmasSaveMode==kGraph) vec_NSigmasTrees.at(i)->SaveToGraphs(dir);
+        }
+
       }
+
       for(unsigned int i=0; i<vec_NUniversesTrees.size(); i++){
         vec_NUniversesTrees.at(i)->SaveTo(dir);
       }
