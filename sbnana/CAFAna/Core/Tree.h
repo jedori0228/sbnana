@@ -59,6 +59,7 @@ namespace ana
     /// Function to update protected members (the exposures). DO NOT USE outside of the filling.
     void UpdateExposure ( const double pot, const double livetime );
     // Utilities
+    std::string Name() const{return fTreeName;}
     double POT() const {return fPOT;} // as in Spectrum
     double Livetime() const {return fLivetime;} // as in Spectrum
     long long Entries() const {return fNEntries;}
@@ -118,6 +119,7 @@ namespace ana
     /// Function to update protected members (the exposures). DO NOT USE outside of the filling.
     void UpdateExposure ( const double pot, const double livetime );
     // Utilities
+    std::string Name() const{return fTreeName;}
     double POT() const {return fPOT;} // as in Spectrum
     double Livetime() const {return fLivetime;} // as in Spectrum
     long long Entries() const {return fNEntries;}
