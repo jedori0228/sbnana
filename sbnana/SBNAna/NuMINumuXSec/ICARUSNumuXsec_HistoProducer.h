@@ -113,6 +113,13 @@ namespace ICARUSNumuXsec{
     std::map< TString, vector<Spectrum *> > map_cutName_to_vec_Spectrums;
     std::map< TString, std::vector<ana::Tree *> > map_cutName_to_vec_TrueTrees; // true
     std::map< TString, std::vector<ana::Tree *> > map_cutName_to_vec_Trees; // reco
+    enum NSigmasSaveMode
+    {
+      kVector=0,
+      kSpline=1,
+      kGraph=2,
+    };
+    NSigmasSaveMode nSigmasSaveMode;
     std::map< TString, std::vector<ana::NSigmasTree *> > map_cutName_to_vec_NSigmasTrees;
     std::map< TString, std::vector<ana::NUniversesTree *> > map_cutName_to_vec_NUniversesTrees;
 

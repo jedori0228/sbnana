@@ -14,6 +14,8 @@ HistoProducer::HistoProducer(){
   map_cutName_to_vec_Spectrums.clear();
   map_cutName_to_vec_SystEnsembleSpectrumPairs.clear();
 
+  nSigmasSaveMode = kVector;
+
   ApplyNuMIPPFXCVWeight = false;
 
   FillMetaData = true;
@@ -930,7 +932,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       kTruthCut_IsSignal,
       kNuMISelection_1muNp0pi,
       kNoShift,
-      false
+      true
     )
 
   );
@@ -944,7 +946,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       this_NSigmasISysts,
       this_NSigmasPairs,
       kTruthCut_IsSignal,
-      kNoShift, true
+      kNoShift, false
     )
 
   );
@@ -955,10 +957,10 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       "trueEvents_NUniverses",
       this_NUniversesPsetNames,
       loader,
-      this_NUniversesVarVectors,
+      this_NUniversesTruthVarVectors,
       this_NUniversesNUnivs,
-      spillCut, cut,
-      kNoShift, true, true
+      kTruthCut_IsSignal,
+      kNoShift, false
     )
 
   );
@@ -1156,7 +1158,9 @@ void HistoProducer::saveHistograms(){
         vec_Trees.at(i)->SaveTo(dir);
       }
       for(unsigned int i=0; i<vec_NSigmasTrees.size(); i++){
-        vec_NSigmasTrees.at(i)->SaveTo(dir);
+        if(nSigmasSaveMode==kVector) vec_NSigmasTrees.at(i)->SaveTo(dir);
+        else if(nSigmasSaveMode==kSpline) vec_NSigmasTrees.at(i)->SaveToSplines(dir);
+        else if(nSigmasSaveMode==kGraph) vec_NSigmasTrees.at(i)->SaveToGraphs(dir);
       }
       for(unsigned int i=0; i<vec_NUniversesTrees.size(); i++){
         vec_NUniversesTrees.at(i)->SaveTo(dir);
