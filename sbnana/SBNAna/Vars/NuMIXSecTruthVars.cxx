@@ -1,4 +1,4 @@
-#include "sbnana/SBNAna/Vars/NuMITruthVar.h"
+#include "sbnana/SBNAna/Vars/NuMIXSecTruthVars.h"
 
 namespace ana{
 
@@ -64,6 +64,9 @@ namespace ana{
       if ( abs(prim.pdg) == 111 ) NPtl++;
     }
     return NPtl;
+  });
+  const TruthVar kTruth_IsFHC([](const caf::SRTrueInteractionProxy *nu) -> int {
+    return 1;
   });
 
   // Muon
