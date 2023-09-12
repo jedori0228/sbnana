@@ -15,6 +15,7 @@ HistoProducer::HistoProducer(){
   map_cutName_to_vec_SystEnsembleSpectrumPairs.clear();
 
   nSigmasSaveMode = kVector;
+  MakeGUNDAMTree = false;
 
   ApplyNuMIPPFXCVWeight = false;
 
@@ -883,7 +884,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
   map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
 
     new ana::NSigmasTree(
-      (currentCutName+"_NSigmas").Data(),
+      "selectedEvents_NSigmas",
       this_NSigmasPsetNames,
       loader,
       this_NSigmasISysts,
@@ -909,7 +910,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
   map_cutName_to_vec_NUniversesTrees[currentCutName].push_back(
 
     new ana::NUniversesTree(
-      (currentCutName+"_NUniverses").Data(),
+      "selectedEvents_NUniverses",
       this_NUniversesPsetNames,
       loader,
       this_NUniversesVarVectors,
@@ -923,7 +924,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
   // TrueTree
   if(TrueTreeFilled) return;
 
-  map_cutName_to_vec_TrueTrees[currentCutName].push_back(
+  map_cutName_to_vec_Trees[currentCutName].push_back(
 
     new ana::Tree(
       "trueEvents", GetNuMITrueTreeLabels(),
@@ -968,6 +969,145 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
   TrueTreeFilled = true;
 
 
+
+
+}
+
+void HistoProducer::NuMIXSecBkgdStudy(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  FillCVSpectrum(loader, "NChargedPionMatchedTracks", kNuMINChargedPionMatchedTracks, Binning::Simple(10, 0., 10.), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionMatchedTrackScores", kNuMIChargedPionMatchedTrackScores, Binning::Simple(10, 0., 1.), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionEndProcess", kNuMIChargedPionTrueEndProcess, Binning::Simple(65, 0., 65.), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionMatchedTrackLengths", kNuMIChargedPionMatchedTrackLengths, Binning::Simple(20, 0., 200.), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionMatchedTrackChi2Muons", kNuMIChargedPionMatchedTrackChi2Muons, Binning::Simple(100, 0., 100.), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionMatchedTrackChi2Protons", kNuMIChargedPionMatchedTrackChi2Protons, Binning::Simple(200, 0., 200.), spillCut, cut);
+
+  FillCVSpectrum(loader, "NChargedPionMatchedShowers", kNuMINChargedPionMatchedShowers, Binning::Simple(10, 0., 10.), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionMatchedShowerScores", kNuMIChargedPionMatchedShowerScores, Binning::Simple(10, 0., 1.), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionMatchedShowerGaps", kNuMIChargedPionMatchedShowerGaps, Binning::Simple(30, 0., 30.), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionMatchedShowerIsPrimaries", kNuMIChargedPionMatchedShowerIsPrimaries, Binning::Simple(2, 0., 2.), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionMatchedShowerEnergies", kNuMIChargedPionMatchedShowerEnergies, Binning::Simple(100, 0., 1.), spillCut, cut);
+
+}
+
+// - 230908_PIDStudy
+void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  std::vector<std::string> labels = {
+    // Weight
+    "FluxWeight",
+    // Muon
+    "MuonSelection/i",
+    "MuonMatchType/i",
+    "MuonLength",
+    "MuonMatchedTruthPDG/i",
+    "MuonMatchedTruthIntID/i",
+    "MuonMatchedTruthContained/i",
+    // TagMuon
+    "TagMuonLength",
+    // Proton
+    "ProtonSelection/i",
+    "ProtonMatchType/i",
+    "ProtonP",
+    "ProtonMatchedTruthPDG/i",
+    "ProtonMatchedTruthIntID/i",
+    "ProtonMatchedTruthContained/i",
+    // ChargedPion
+    "ChargedPionSelection/i",
+    "ChargedPionMatchType/i",
+    "ChargedPionLength",
+    "ChargedPionMatchedTruthPDG/i",
+    "ChargedPionMatchedTruthIntID/i",
+    "ChargedPionMatchedTruthContained/i",
+  };
+  std::vector<Var> varlists = {
+    // Weight
+    kGetNuMIFluxWeight,
+    // Muon
+    kNuMIIsRelaxedMuonSelection,
+    kNuMIRelaxedMuonTrackMatchType,
+    kNuMIRelaxedMuonTrackLength,
+    kNuMIRelaxedMuonTrackMatchedTruthPDG,
+    kNuMIRelaxedMuonTrackMatchedTruthIntID,
+    kNuMIRelaxedMuonTrackMatchedTruthContained,
+    // TagMuon
+    kNuMITagMuonLength,
+    // Proton
+    kNuMIIsRelaxedProtonSelection,
+    kNuMIRelaxedProtonTrackMatchType,
+    kNuMIRelaxedProtonTrackP,
+    kNuMIRelaxedProtonTrackMatchedTruthPDG,
+    kNuMIRelaxedProtonTrackMatchedTruthIntID,
+    kNuMIRelaxedProtonTrackMatchedTruthContained,
+    // ChargedPion
+    kNuMIIsRelaxedChargedPionSelection,
+    kNuMIRelaxedChargedPionTrackMatchType,
+    kNuMIRelaxedChargedPionTrackLength,
+    kNuMIRelaxedChargedPionTrackMatchedTruthPDG,
+    kNuMIRelaxedChargedPionTrackMatchedTruthIntID,
+    kNuMIRelaxedChargedPionTrackMatchedTruthContained,
+  };
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      ("PIDStudyTree_"+currentCutName).Data(), labels,
+      loader,
+      varlists,
+      spillCut, cut,
+      kNoShift, true, true
+    )
+  );
+
+  if(!FillSystematics) return;
+
+  // NSigmas
+  std::vector<std::string> this_NSigmasPsetNames;
+  std::vector<const ISyst*> this_NSigmasISysts;
+  std::vector<std::pair<int,int>> this_NSigmasPairs;
+  for(unsigned int i=0; i<genieMultisigmaKnobNames.size(); i++){
+    this_NSigmasPsetNames.push_back( genieMultisigmaKnobNames.at(i) );
+    this_NSigmasISysts.push_back( IGENIESysts.at(i) );
+    this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
+  }
+  for(unsigned int i=0; i<IFluxSysts.size(); i++){
+    this_NSigmasPsetNames.push_back( IFluxSysts.at(i)->ShortName() );
+    this_NSigmasISysts.push_back( IFluxSysts.at(i) );
+    this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
+  }
+  map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
+    new ana::NSigmasTree(
+      ("PIDStudyTree_NSigmas_"+currentCutName).Data(),
+      this_NSigmasPsetNames,
+      loader,
+      this_NSigmasISysts,
+      this_NSigmasPairs,
+      spillCut, cut,
+      kNoShift, true, true
+    )
+  );
+
+  // NUniverses
+  std::vector<std::string> this_NUniversesPsetNames;
+  std::vector<std::vector<Var>> this_NUniversesVarVectors;
+  std::vector<std::vector<TruthVar>> this_NUniversesTruthVarVectors;
+  std::vector<unsigned int> this_NUniversesNUnivs;
+  for(const std::string& name: genieDependentKnobNames){
+    this_NUniversesPsetNames.push_back( name );
+    this_NUniversesVarVectors.push_back( map_DepDialName_to_UniverseWeights[name] );
+    this_NUniversesTruthVarVectors.push_back( map_DepDialName_to_TruthUniverseWeights[name] );
+    this_NUniversesNUnivs.push_back( 100 );
+  }
+  map_cutName_to_vec_NUniversesTrees[currentCutName].push_back(
+    new ana::NUniversesTree(
+      ("PIDStudyTree_NUniverses_"+currentCutName).Data(),
+      this_NUniversesPsetNames,
+      loader,
+      this_NUniversesVarVectors,
+      this_NUniversesNUnivs,
+      spillCut, cut,
+      kNoShift, true, true
+    )
+  );
 
 
 }
@@ -1026,7 +1166,6 @@ void HistoProducer::saveHistograms(){
       vector<Spectrum *> vec_Spectrums = map_cutName_to_vec_Spectrums[cutName];
       vector< pair<TString, EnsembleSpectrum *> > vec_SystEnsembleSpectrumPairs = map_cutName_to_vec_SystEnsembleSpectrumPairs[cutName];
       vector< pair<TString, Spectrum *> > vec_SystSpectrumPairs = map_cutName_to_vec_SystSpectrumPairs[cutName];
-      vector<ana::Tree *> vec_TrueTrees = map_cutName_to_vec_TrueTrees[cutName];
       vector<ana::Tree *> vec_Trees = map_cutName_to_vec_Trees[cutName];
       vector<ana::NSigmasTree *> vec_NSigmasTrees = map_cutName_to_vec_NSigmasTrees[cutName];
       vector<ana::NUniversesTree *> vec_NUniversesTrees = map_cutName_to_vec_NUniversesTrees[cutName];
@@ -1139,101 +1278,60 @@ void HistoProducer::saveHistograms(){
 
       // Tree
 
-      // TODO For now, I am saving weights to TrueTree
-      // No need to merge.. Write TrueTree first without merging
-      for(unsigned int i=0; i<vec_TrueTrees.size(); i++){
-
-        cout << "[HistoProducer::saveHistograms]   " << i << "-th TrueTree.." << endl;
-
-        vec_TrueTrees.at(i)->SaveTo(dir);
-
-      }
-
       // If no Tree, continue;
       if(vec_Trees.size()==0){
         continue;
       }
 
-      // special case for merging
-      if(vec_Trees.size()==1 && vec_NSigmasTrees.size()==1){
-
-        vec_NSigmasTrees[0]->MergeTree( *vec_Trees[0] );
-
-        if(nSigmasSaveMode==kVector) vec_NSigmasTrees[0]->SaveTo(dir);
-        else if(nSigmasSaveMode==kSpline) vec_NSigmasTrees[0]->SaveToSplines(dir);
-        else if(nSigmasSaveMode==kGraph) vec_NSigmasTrees[0]->SaveToGraphs(dir);
-
-      }
-      else{
+      if(MakeGUNDAMTree){
 
         for(unsigned int i=0; i<vec_Trees.size(); i++){
+          if(vec_Trees.at(i)->Name()=="selectedEvents"){
+            cout << "[HistoProducer::saveHistograms]   Skipping Tree:" << vec_Trees.at(i)->Name() << "; will be merged to NSigmasTree" << std::endl;
+            continue;
+          }
+  cout << "[HistoProducer::saveHistograms]   Writing Tree:" << vec_Trees.at(i)->Name() << std::endl;
           vec_Trees.at(i)->SaveTo(dir);
         }
         for(unsigned int i=0; i<vec_NSigmasTrees.size(); i++){
+          if(vec_NSigmasTrees.at(i)->Name()=="selectedEvents_NSigmas"){
+            for(unsigned int j=0; j<vec_Trees.size(); j++){
+              if(vec_Trees.at(j)->Name()=="selectedEvents"){
+                cout << "[HistoProducer::saveHistograms]   Merging " << vec_Trees.at(j)->Name() << " to " << vec_NSigmasTrees.at(i)->Name() << std::endl;
+                vec_NSigmasTrees.at(i)->MergeTree( *vec_Trees.at(j) );
+                break;
+              }
+            }
+          }
+  cout << "[HistoProducer::saveHistograms]   Writing NSigmasTree: " << vec_NSigmasTrees.at(i)->Name() << " (save mode = " << nSigmasSaveMode << ")" << std::endl;
           if(nSigmasSaveMode==kVector) vec_NSigmasTrees.at(i)->SaveTo(dir);
           else if(nSigmasSaveMode==kSpline) vec_NSigmasTrees.at(i)->SaveToSplines(dir);
           else if(nSigmasSaveMode==kGraph) vec_NSigmasTrees.at(i)->SaveToGraphs(dir);
         }
-
-      }
-
-      for(unsigned int i=0; i<vec_NUniversesTrees.size(); i++){
-        vec_NUniversesTrees.at(i)->SaveTo(dir);
-      }
-
-
-/*
-      // Now we can assume we have at least one Tree
-      // If we have WeightTrees, merge everything there
-      WeightsTree *MergedTree = 0;
-      if(vec_NSigmasTrees.size()>0){
-        printf("[HistoProducer::saveHistograms]   Using NSigmasTrees, %s, for mering\n", vec_NSigmasTrees.at(0)->Name());
-        MergedTree = (WeightsTree *)vec_NSigmasTrees.at(0);
-      }
-      else if(vec_NUniversesTrees.size()>0){
-        printf("[HistoProducer::saveHistograms]   Using NUniversesTrees, %s, for mering\n", vec_NUniversesTrees.at(0)->Name());
-        MergedTree = (WeightsTree *)vec_NUniversesTrees.at(0);
-      }
-
-      // If no WeightTree, simply save individual Tree
-      if(MergedTree==0){
-
-        cout << "[HistoProducer::saveHistograms]   No Weight, tree, so saving individual Trees" << std::endl;
-        cout << "[HistoProducer::saveHistograms]   Number of Trees = " << vec_Trees.size() << endl;
-        for(unsigned int i=0; i<vec_Trees.size(); i++){
-          printf("[HistoProducer::saveHistograms]   Saving Tree; name = %s\n", vec_Trees.at(i)->Name());
-          vec_Trees.at(i)->SaveTo(dir);
+        for(unsigned int i=0; i<vec_NUniversesTrees.size(); i++){
+  cout << "[HistoProducer::saveHistograms]   Writing UniversesTree: " << vec_NUniversesTrees.at(i)->Name() << std::endl;
+          vec_NUniversesTrees.at(i)->SaveTo(dir);
         }
+
       }
-      // If we have WeightTree, merge
       else{
 
         for(unsigned int i=0; i<vec_Trees.size(); i++){
-          printf("[HistoProducer::saveHistograms]   Merging Tree; name = %s\n", vec_Trees.at(i)->Name());
-          MergedTree->MergeTree( *vec_Trees.at(i) );
+           cout << "[HistoProducer::saveHistograms]   Writing Tree:" << vec_Trees.at(i)->Name() << std::endl;
+          vec_Trees.at(i)->SaveTo(dir);
         }
         for(unsigned int i=0; i<vec_NSigmasTrees.size(); i++){
-          if(MergedTree==(WeightsTree *)vec_NSigmasTrees.at(i)){
-            printf("[HistoProducer::saveHistograms]   Skipping this NSigmasTree; name = %s\n", vec_NSigmasTrees.at(i)->Name());
-            continue;
-          }
-          printf("[HistoProducer::saveHistograms]   Merging NSigmasTree; name = %s\n", vec_NSigmasTrees.at(i)->Name());
-          MergedTree->MergeTree( * (Tree *)vec_NSigmasTrees.at(i) );
+          cout << "[HistoProducer::saveHistograms]   Writing NSigmasTree: " << vec_NSigmasTrees.at(i)->Name() << " (save mode = " << nSigmasSaveMode << ")" << std::endl;
+          if(nSigmasSaveMode==kVector) vec_NSigmasTrees.at(i)->SaveTo(dir);
+          else if(nSigmasSaveMode==kSpline) vec_NSigmasTrees.at(i)->SaveToSplines(dir);
+          else if(nSigmasSaveMode==kGraph) vec_NSigmasTrees.at(i)->SaveToGraphs(dir);
         }
         for(unsigned int i=0; i<vec_NUniversesTrees.size(); i++){
-          if(MergedTree==(WeightsTree *)vec_NUniversesTrees.at(i)){
-            printf("[HistoProducer::saveHistograms]   Skipping this NUniversesTree; name = %s\n", vec_NUniversesTrees.at(i)->Name());
-            continue;
-          }
-          printf("[HistoProducer::saveHistograms]   Merging NUniversesTree; name = %s\n", vec_NUniversesTrees.at(i)->Name());
+          cout <<  "[HistoProducer::saveHistograms]   Writing UniversesTree: " << vec_NUniversesTrees.at(i)->Name() << std::endl;
           vec_NUniversesTrees.at(i)->SaveTo(dir);
-          MergedTree->MergeTree( * (Tree *)vec_NUniversesTrees.at(i) );
         }
 
-        MergedTree->SaveTo(dir);
-
       }
-*/
 
       outputfile->cd();
 

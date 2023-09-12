@@ -25,6 +25,7 @@
 
 // SBNANA
 #include "sbnana/SBNAna/Vars/NuMIFlux.h"
+#include "sbnana/SBNAna/Cuts/NuMIRelaxedVars.h"
 #include "sbnana/SBNAna/Cuts/NuMIXSecTreeHelper.h"
 
 // NuMINumuXSec
@@ -76,6 +77,10 @@ namespace ICARUSNumuXsec{
     // - 230814_MakeTree
     bool TrueTreeFilled;
     void MakeTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    void NuMIXSecBkgdStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    // - 230908_PIDStudy
+    void MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+
 
     void Test(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
@@ -111,8 +116,8 @@ namespace ICARUSNumuXsec{
     TString currentCutName;
     vector<TString> vec_cutNames;
     std::map< TString, vector<Spectrum *> > map_cutName_to_vec_Spectrums;
-    std::map< TString, std::vector<ana::Tree *> > map_cutName_to_vec_TrueTrees; // true
-    std::map< TString, std::vector<ana::Tree *> > map_cutName_to_vec_Trees; // reco
+    std::map< TString, std::vector<ana::Tree *> > map_cutName_to_vec_Trees;
+    bool MakeGUNDAMTree; // very spcial case for GUNDAM usage
     enum NSigmasSaveMode
     {
       kVector=0,

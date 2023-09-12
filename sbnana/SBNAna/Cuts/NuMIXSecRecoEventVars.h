@@ -35,10 +35,28 @@ namespace ana{
   extern const Var kNuMIProtonNuCosineTheta; //!< True muon cosine angle w.r.t. neutrino
   // - Charged pion
   extern const Var kNuMIChargedPionTrueKE; //!< True pi+- kinetic energy
+  extern const Var kNuMIChargedPionTrueEndProcess;
 
   // Reco
   // - Muon
   extern const Var kNuMIRecoMuonContained; //!< 0: Muon candidate track exiting, 1: Muon candidate track contained (-1: no muon candidate)
+  // - Charged pion
+  //   - Track Var
+  extern const MultiVar kNuMIChargedPionMatchedTrackIndices;
+  extern const Var kNuMINChargedPionMatchedTracks;
+  extern const MultiVar kNuMIChargedPionMatchedTrackScores;
+  extern const MultiVar kNuMIChargedPionMatchedTrackLengths;
+  extern const MultiVar kNuMIChargedPionMatchedTrackChi2Muons;
+  extern const MultiVar kNuMIChargedPionMatchedTrackChi2Protons;
+  //   - Shower Var
+  extern const MultiVar kNuMIChargedPionMatchedShowerIndices;
+  extern const Var kNuMINChargedPionMatchedShowers;
+  extern const MultiVar kNuMIChargedPionMatchedShowerScores;
+  extern const MultiVar kNuMIChargedPionMatchedShowerGaps;
+  extern const MultiVar kNuMIChargedPionMatchedShowerIsPrimaries;
+  extern const MultiVar kNuMIChargedPionMatchedShowerEnergies;
+  //   - Cut
+  extern const Cut kNuMIOtherCCWithChargedPion;
 
 
 }

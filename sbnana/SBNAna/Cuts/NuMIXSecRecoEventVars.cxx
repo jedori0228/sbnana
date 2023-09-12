@@ -125,6 +125,16 @@ namespace ana{
     if ( slc->truth.index < 0 ) return -5.; //TODO Define better dummy value
     return kTruth_ChargedPionKE(&slc->truth);
   });
+  const Var kNuMIChargedPionTrueEndProcess([](const caf::SRSliceProxy* slc) -> int {
+    int truthChargedPionIndex = kTruth_ChargedPionIndex(&slc->truth);
+    if( truthChargedPionIndex >= 0 ){
+      const auto& prim_ChargedPion = slc->truth.prim.at(truthChargedPionIndex);
+      return prim_ChargedPion.end_process;
+    }
+    else{
+      return -5;
+    }
+  });
 
   // 0: Muon candidate track exiting, 1: Muon candidate track contained (-1: no muon candidate)
   const Var kNuMIRecoMuonContained([](const caf::SRSliceProxy* slc) -> int {
@@ -137,6 +147,124 @@ namespace ana{
     else{
       return -1;
     }
+  });
+
+  // - Charged pion
+  const MultiVar kNuMIChargedPionMatchedTrackIndices([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> rets;
+    int truthChargedPionIndex = kTruth_ChargedPionIndex(&slc->truth);
+    if( truthChargedPionIndex >= 0 ){
+      const auto& prim_ChargedPion = slc->truth.prim.at(truthChargedPionIndex);
+      for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); i_pfp++){
+        auto const& pfp = slc->reco.pfp.at(i_pfp);
+        if(pfp.trk.truth.p.G4ID==prim_ChargedPion.G4ID){
+          rets.push_back(i_pfp);
+        }
+      }
+    }
+    return rets;
+  });
+  const Var kNuMINChargedPionMatchedTracks([](const caf::SRSliceProxy* slc) -> int {
+    return kNuMIChargedPionMatchedTrackIndices(slc).size();
+  });
+
+  const MultiVar kNuMIChargedPionMatchedTrackScores([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedTrackIndices = kNuMIChargedPionMatchedTrackIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedTrackIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      rets.push_back( pfp.trackScore );
+    }
+    return rets;
+  });
+  const MultiVar kNuMIChargedPionMatchedTrackLengths([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedTrackIndices = kNuMIChargedPionMatchedTrackIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedTrackIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      rets.push_back( pfp.trk.len );
+    }
+    return rets;
+  });
+  const MultiVar kNuMIChargedPionMatchedTrackChi2Muons([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedTrackIndices = kNuMIChargedPionMatchedTrackIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedTrackIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      rets.push_back( pfp.trk.chi2pid[2].chi2_muon );
+    }
+    return rets;
+  });
+  const MultiVar kNuMIChargedPionMatchedTrackChi2Protons([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedTrackIndices = kNuMIChargedPionMatchedTrackIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedTrackIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      rets.push_back( pfp.trk.chi2pid[2].chi2_proton );
+    }
+    return rets;
+  });
+  //   - Shower Var
+  const MultiVar kNuMIChargedPionMatchedShowerIndices([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> rets;
+    int truthChargedPionIndex = kTruth_ChargedPionIndex(&slc->truth);
+    if( truthChargedPionIndex >= 0 ){
+      const auto& prim_ChargedPion = slc->truth.prim.at(truthChargedPionIndex);
+      for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); i_pfp++){
+        auto const& pfp = slc->reco.pfp.at(i_pfp);
+        if(pfp.shw.truth.p.G4ID==prim_ChargedPion.G4ID){
+          rets.push_back(i_pfp);
+        }
+      }
+    }
+    return rets;
+  });
+  const Var kNuMINChargedPionMatchedShowers([](const caf::SRSliceProxy* slc) -> int {
+    return kNuMIChargedPionMatchedShowerIndices(slc).size();
+  });
+  const MultiVar kNuMIChargedPionMatchedShowerScores([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedShowerIndices = kNuMIChargedPionMatchedShowerIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedShowerIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      rets.push_back( pfp.trackScore );
+    }
+    return rets;
+  });
+  const MultiVar kNuMIChargedPionMatchedShowerGaps([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedShowerIndices = kNuMIChargedPionMatchedShowerIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedShowerIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      rets.push_back( pfp.shw.conversion_gap );
+    }
+    return rets;
+  });
+  const MultiVar kNuMIChargedPionMatchedShowerIsPrimaries([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedShowerIndices = kNuMIChargedPionMatchedShowerIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedShowerIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      if( pfp.parent_is_primary ) rets.push_back( 1 );
+      else rets.push_back( 0 );
+    }
+    return rets;
+  });
+  const MultiVar kNuMIChargedPionMatchedShowerEnergies([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedShowerIndices = kNuMIChargedPionMatchedShowerIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedShowerIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      rets.push_back( pfp.shw.plane[2].energy );
+    }
+    return rets;
+  });
+
+  const Cut kNuMIOtherCCWithChargedPion([](const caf::SRSliceProxy* slc) {
+    if(!kNuMI_1muNp0piStudy_OtherNuCC(slc)) return false;
+    int n_chargedpion = kNuMITrueNpip(slc)+kNuMITrueNpim(slc);
+    if( n_chargedpion== 0 ) return false;
+    return true;
   });
 
 }
