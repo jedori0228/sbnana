@@ -28,7 +28,7 @@ parser.add_argument('--server',dest='Server',default="")
 parser.add_argument('--jobsubopt',dest='JobsubOpt',default="")
 parser.add_argument('--syst',action='store_true')
 parser.add_argument('--verbos',dest="Verbos",default="INFO")
-parser.add_argument('--extra_lines',dest="ExtraLines",default="")
+parser.add_argument('--extra_lines', dest="ExtraLines", nargs='+', default=[], help='Extra lines')
 args = parser.parse_args()
 
 logger = Logger.Logger("create-batch", args.Verbos)
@@ -301,15 +301,18 @@ void run_%d(){
 '''%(ssDefLines, esDefLines,InputSample))
 
 
-    if args.ExtraLines!="":
-      if it_job==0:
-        logger.LOG("INFO", "Adding extra lines to cafe script from %s:"%(args.ExtraLines))
+    if len(args.ExtraLines)>0:
 
-      lines_extralines = open(args.ExtraLines).readlines()
-      for line_extralines in lines_extralines:
+      for el in args.ExtraLines:
+
         if it_job==0:
-          logger.LOG("INFO", "%s"%(line_extralines.strip('\n')))
-        cafeScriptFile.write(line_extralines)
+          logger.LOG("INFO", "Adding extra lines to cafe script from %s:"%(el))
+
+        lines_extralines = open(el).readlines()
+        for line_extralines in lines_extralines:
+          if it_job==0:
+            logger.LOG("INFO", "%s"%(line_extralines.strip('\n')))
+          cafeScriptFile.write(line_extralines)
 
     cafeScriptFile.write('  m.initialize();\n')
     if args.syst:
