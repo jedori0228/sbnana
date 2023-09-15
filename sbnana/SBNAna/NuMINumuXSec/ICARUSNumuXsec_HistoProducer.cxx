@@ -947,7 +947,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       this_NSigmasISysts,
       this_NSigmasPairs,
       kTruthCut_IsSignal,
-      kNoShift, false
+      kNoShift, true
     )
 
   );
@@ -961,7 +961,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       this_NUniversesTruthVarVectors,
       this_NUniversesNUnivs,
       kTruthCut_IsSignal,
-      kNoShift, false
+      kNoShift, true
     )
 
   );
