@@ -127,11 +127,11 @@ void HistoProducer::TruthStudy(SpectrumLoader& loader, SpillCut spillCut, Cut cu
 
   // Muon
 
-  FillCVSpectrum(loader, "TruthMuonKE", kNuMIMuonTrueKE, Binning::Simple(300, 0., 3.), spillCut, cut);
+  FillCVSpectrum(loader, "TruthMuonKE", kNuMITrueMuonKE, Binning::Simple(300, 0., 3.), spillCut, cut);
   FillCVSpectrum(loader, "TruthMuonP", kNuMIMuonTrueP, Binning::Simple(50, 0., 5.), spillCut, cut);
   FillCVSpectrum(loader, "TruthMuonPt", kNuMITrueMuonPt, Binning::Simple(20, 0., 2.), spillCut, cut);
   FillCVSpectrum(loader, "TruthMuonLength", TruthMuonLength, Binning::Simple(500, 0., 500), spillCut, cut);
-  FillCVSpectrum(loader, "TruthMuonNuCosineTheta", kNuMIMuonNuCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
+  FillCVSpectrum(loader, "TruthMuonNuCosineTheta", kNuMITrueMuonNuCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
   FillCVSpectrum(loader, "TruthMuonMatchedTrackCustomChi2InelasticPionCollection", TruthMuonMatchedTrackCustomChi2InelasticPionCollection, Binning::Simple(80, 0., 80), spillCut, cut);
 
   FillCVSpectrum(loader, "TruthMuonMichelStartProcess", TruthMuonMichelStartProcess, Binning::Simple(65, 0., 65.), spillCut, cut);
@@ -141,10 +141,10 @@ void HistoProducer::TruthStudy(SpectrumLoader& loader, SpillCut spillCut, Cut cu
 
   // Proton
 
-  FillCVSpectrum(loader, "TruthProtonKE", kNuMIProtonTrueKE, Binning::Simple(100, 0., 1.0), spillCut, cut);
+  FillCVSpectrum(loader, "TruthProtonKE", kNuMITrueProtonKE, Binning::Simple(100, 0., 1.0), spillCut, cut);
   FillCVSpectrum(loader, "TruthProtonP", kNuMIProtonTrueP, Binning::Simple(100, 0., 1.0), spillCut, cut);
   FillCVSpectrum(loader, "TruthProtonLength", TruthProtonLength, Binning::Simple(100, 0., 100.), spillCut, cut);
-  FillCVSpectrum(loader, "TruthProtonNuCosineTheta", kNuMIProtonNuCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
+  FillCVSpectrum(loader, "TruthProtonNuCosineTheta", kNuMITrueProtonNuCosineTheta, Binning::Simple(40, -1., 1.), spillCut, cut);
   FillCVSpectrum(loader, "TruthProtonMatchedTrackCustomChi2InelasticPionCollection", TruthProtonMatchedTrackCustomChi2InelasticPionCollection, Binning::Simple(80, 0., 80), spillCut, cut);
 
   // Muon+Proton
@@ -975,9 +975,30 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
 
 void HistoProducer::NuMIXSecBkgdStudy(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
+  FillCVSpectrum(loader, "ChargedPionMichelMatchedPfpScores", kNuMIChargedPionMichelMatchedPfpScores, Binning::Simple(40, 0., 1.), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionMichelMatchedPfpTrackLengths", kNuMIChargedPionMichelMatchedPfpTrackLengths, Binning::Simple(50, 0., 50.), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionMichelMatchedPfpTrackDistances", kNuMIChargedPionMichelMatchedPfpTrackDistances, Binning::Simple(200, 0., 200.), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionMichelMatchedPfpShowerEnergies", kNuMIChargedPionMichelMatchedPfpShowerEnergies, Binning::Simple(109, 0., 0.1), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionMichelMatchedPfpShowerLengths", kNuMIChargedPionMichelMatchedPfpShowerLengths, Binning::Simple(50, 0., 50.), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionMichelMatchedPfpShowerGaps", kNuMIChargedPionMichelMatchedPfpShowerGaps, Binning::Simple(50, 0., 50.), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionMichelMatchedPfpShowerEnergySum", kNuMIChargedPionMichelMatchedPfpShowerEnergySum, Binning::Simple(200, 0., 0.2), spillCut, cut);
+
+  FillCVSpectrum(loader, "TrueChargedPionMichelEnergy", kNuMITrueChargedPionMichelEnergy, Binning::Simple(109, 0., 0.1), spillCut, cut);
+
+
+  FillCVSpectrum(loader, "ChargedPionMichelMatchedPfpTrackIsPrimaries", kNuMIChargedPionMichelMatchedPfpTrackIsPrimaries, Binning::Simple(2, 0., 2.), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionMichelMatchedPfpTrackHitPurities", kNuMIChargedPionMichelMatchedPfpTrackHitPurities, Binning::Simple(40., 0., 1.), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionMichelMatchedPfpTrackHitCompletenesses", kNuMIChargedPionMichelMatchedPfpTrackHitCompletenesses, Binning::Simple(40., 0., 1.), spillCut, cut);
+
+  FillCVSpectrum(loader, "ChargedPionMichelMatchedPfpShowerOpeningAngles", kNuMIChargedPionMichelMatchedPfpShowerOpeningAngles, Binning::Simple(100, -1., M_PI), spillCut, cut);
+
+  //FillCVSpectrum(loader, "MichelCandidateShowerEnergySum", kNuMIMichelCandidateShowerEnergySum, Binning::Simple(200, 0., 0.2), spillCut, cut);
+
+
+/*
   FillCVSpectrum(loader, "NChargedPionMatchedTracks", kNuMINChargedPionMatchedTracks, Binning::Simple(10, 0., 10.), spillCut, cut);
   FillCVSpectrum(loader, "ChargedPionMatchedTrackScores", kNuMIChargedPionMatchedTrackScores, Binning::Simple(10, 0., 1.), spillCut, cut);
-  FillCVSpectrum(loader, "ChargedPionEndProcess", kNuMIChargedPionTrueEndProcess, Binning::Simple(65, 0., 65.), spillCut, cut);
+  FillCVSpectrum(loader, "ChargedPionEndProcess", kNuMITrueChargedPionEndProcess, Binning::Simple(65, 0., 65.), spillCut, cut);
   FillCVSpectrum(loader, "ChargedPionMatchedTrackLengths", kNuMIChargedPionMatchedTrackLengths, Binning::Simple(20, 0., 200.), spillCut, cut);
   FillCVSpectrum(loader, "ChargedPionMatchedTrackChi2Muons", kNuMIChargedPionMatchedTrackChi2Muons, Binning::Simple(100, 0., 100.), spillCut, cut);
   FillCVSpectrum(loader, "ChargedPionMatchedTrackChi2Protons", kNuMIChargedPionMatchedTrackChi2Protons, Binning::Simple(200, 0., 200.), spillCut, cut);
@@ -987,6 +1008,22 @@ void HistoProducer::NuMIXSecBkgdStudy(SpectrumLoader& loader, SpillCut spillCut,
   FillCVSpectrum(loader, "ChargedPionMatchedShowerGaps", kNuMIChargedPionMatchedShowerGaps, Binning::Simple(30, 0., 30.), spillCut, cut);
   FillCVSpectrum(loader, "ChargedPionMatchedShowerIsPrimaries", kNuMIChargedPionMatchedShowerIsPrimaries, Binning::Simple(2, 0., 2.), spillCut, cut);
   FillCVSpectrum(loader, "ChargedPionMatchedShowerEnergies", kNuMIChargedPionMatchedShowerEnergies, Binning::Simple(100, 0., 1.), spillCut, cut);
+
+  FillCVSpectrum(loader, "NChargedPionShowerCandidates", kNuMINChargedPionShowerCandidates, Binning::Simple(10, 0., 10.), spillCut, cut);
+*/
+
+/*
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum(
+      "TEST",
+      Binning::Simple(1, 0., 1.),
+      loader,
+      kTruth_ChargedPionMichelIndexTEST,
+      kNoTruthCut,
+      kNoSpillCut
+    )
+  );
+*/
 
 }
 
@@ -1290,7 +1327,11 @@ void HistoProducer::saveHistograms(){
             cout << "[HistoProducer::saveHistograms]   Skipping Tree:" << vec_Trees.at(i)->Name() << "; will be merged to NSigmasTree" << std::endl;
             continue;
           }
-  cout << "[HistoProducer::saveHistograms]   Writing Tree:" << vec_Trees.at(i)->Name() << std::endl;
+          if(vec_Trees.at(i)->Name()=="trueEvents"){
+            cout << "[HistoProducer::saveHistograms]   Skipping Tree:" << vec_Trees.at(i)->Name() << "; will be merged to NSigmasTree" << std::endl;
+            continue;
+          }
+          cout << "[HistoProducer::saveHistograms]   Writing Tree:" << vec_Trees.at(i)->Name() << std::endl;
           vec_Trees.at(i)->SaveTo(dir);
         }
         for(unsigned int i=0; i<vec_NSigmasTrees.size(); i++){
@@ -1303,13 +1344,22 @@ void HistoProducer::saveHistograms(){
               }
             }
           }
-  cout << "[HistoProducer::saveHistograms]   Writing NSigmasTree: " << vec_NSigmasTrees.at(i)->Name() << " (save mode = " << nSigmasSaveMode << ")" << std::endl;
+          if(vec_NSigmasTrees.at(i)->Name()=="trueEvents_NSigmas"){
+            for(unsigned int j=0; j<vec_Trees.size(); j++){
+              if(vec_Trees.at(j)->Name()=="trueEvents"){
+                cout << "[HistoProducer::saveHistograms]   Merging " << vec_Trees.at(j)->Name() << " to " << vec_NSigmasTrees.at(i)->Name() << std::endl;
+                vec_NSigmasTrees.at(i)->MergeTree( *vec_Trees.at(j) );
+                break;
+              }
+            }
+          }
+          cout << "[HistoProducer::saveHistograms]   Writing NSigmasTree: " << vec_NSigmasTrees.at(i)->Name() << " (save mode = " << nSigmasSaveMode << ")" << std::endl;
           if(nSigmasSaveMode==kVector) vec_NSigmasTrees.at(i)->SaveTo(dir);
           else if(nSigmasSaveMode==kSpline) vec_NSigmasTrees.at(i)->SaveToSplines(dir);
           else if(nSigmasSaveMode==kGraph) vec_NSigmasTrees.at(i)->SaveToGraphs(dir);
         }
         for(unsigned int i=0; i<vec_NUniversesTrees.size(); i++){
-  cout << "[HistoProducer::saveHistograms]   Writing UniversesTree: " << vec_NUniversesTrees.at(i)->Name() << std::endl;
+          cout << "[HistoProducer::saveHistograms]   Writing UniversesTree: " << vec_NUniversesTrees.at(i)->Name() << std::endl;
           vec_NUniversesTrees.at(i)->SaveTo(dir);
         }
 
