@@ -28,7 +28,7 @@ parser.add_argument('--server',dest='Server',default="")
 parser.add_argument('--jobsubopt',dest='JobsubOpt',default="")
 parser.add_argument('--syst',action='store_true')
 parser.add_argument('--verbos',dest="Verbos",default="INFO")
-parser.add_argument('--extra_lines', dest="ExtraLines", nargs='+', default=[], help='Extra lines')
+parser.add_argument('--extra_lines', dest="ExtraLines", action="append", default=[], help='Extra lines')
 args = parser.parse_args()
 
 logger = Logger.Logger("create-batch", args.Verbos)
@@ -187,7 +187,7 @@ for InputSample in InputSamples:
 
   tmpfilepath = gridDataDir+'/Sample/Data/%s_Run%s.txt'%(DataStream,DataRunNum) if IsDATA else gridDataDir+'/Sample/MC/'+InputSample+'.txt' 
   lines_files = os.popen("sed 's/#.*//' "+tmpfilepath+"|grep '.root'").readlines()
-  os.system('cp '+tmpfilepath+' '+base_rundir+'/input_filelist.txt')
+  os.system('ifdh cp '+tmpfilepath+' '+base_rundir+'/input_filelist.txt')
 
   NTotalFiles = len(lines_files)
 
@@ -699,7 +699,7 @@ try:
             logger.LOG("DEBUG", "Removing the output file if exist already")
             os.system('ifdh rm %s/%s.root &> /dev/null'%(FinalOutputPath,outputname))
             logger.LOG("DEBUG", "Copying the merged file to %s"%(FinalOutputPath))
-            os.system('cp %s.root %s/'%(outputname,FinalOutputPath))
+            os.system('ifdh cp %s.root %s/'%(outputname,FinalOutputPath))
             os.chdir(cwd)
 
           logger.LOG("DEBUG", "PostJob finished")
