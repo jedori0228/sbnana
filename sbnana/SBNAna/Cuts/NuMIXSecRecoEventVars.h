@@ -35,6 +35,9 @@ namespace ana{
   extern const Var kNuMITrueProtonNuCosineTheta; //!< True muon cosine angle w.r.t. neutrino
   // - Charged pion
   extern const Var kNuMITrueChargedPionKE; //!< True pi+- kinetic energy
+  extern const Var kNuMITrueChargedPionEndProcess;
+  extern const Var kNuMITrueChargedPionLength;
+  extern const Var kNuMITrueChargedPionHasMichel;
 
   // Reco
   // - Muon
@@ -47,6 +50,13 @@ namespace ana{
   extern const MultiVar kNuMIChargedPionMatchedTrackLengths;
   extern const MultiVar kNuMIChargedPionMatchedTrackChi2Muons;
   extern const MultiVar kNuMIChargedPionMatchedTrackChi2Protons;
+  extern const Var kNuMINChargedPionBestMatchedTrackByHitCompletenessIdx;
+  extern const Var kNuMINChargedPionBestMatchedTrackByHitPurityIdx;
+  extern const Var kNuMINChargedPionBestMatchedTrackHitCompleteness;
+  extern const Var kNuMINChargedPionBestMatchedTrackHitPurity;
+  extern const Var kNuMINChargedPionBestMatchedTrackByHitPurityChi2Muon;
+  extern const Var kNuMINChargedPionBestMatchedTrackByHitPurityChi2Proton;
+  extern const Var kNuMINChargedPionBestMatchedTrackByHitPurityChi2MIP;
   //   - Shower Var
   extern const MultiVar kNuMIChargedPionMatchedShowerIndices;
   extern const Var kNuMINChargedPionMatchedShowers;
@@ -56,6 +66,21 @@ namespace ana{
   extern const MultiVar kNuMIChargedPionMatchedShowerEnergies;
   //   - Cut
   extern const Cut kNuMIOtherCCWithChargedPion;
-
+  //   - Michel from pion (kTruth_ChargedPionMichelIndex)
+  extern const Var kNuMITrueChargedPionMichelEnergy;
+  extern const MultiVar kNuMIChargedPionMichelMatchedPfpIndices;
+  extern const MultiVar kNuMIChargedPionMichelMatchedPfpScores;
+  extern const MultiVar kNuMIChargedPionMichelMatchedPfpTrackLengths;
+  extern const MultiVar kNuMIChargedPionMichelMatchedPfpTrackDistances;
+  extern const MultiVar kNuMIChargedPionMichelMatchedPfpTrackIsPrimaries;
+  extern const MultiVar kNuMIChargedPionMichelMatchedPfpTrackHitPurities;
+  extern const MultiVar kNuMIChargedPionMichelMatchedPfpTrackHitCompletenesses;
+  extern const MultiVar kNuMIChargedPionMichelMatchedPfpShowerEnergies;
+  extern const MultiVar kNuMIChargedPionMichelMatchedPfpShowerLengths;
+  extern const MultiVar kNuMIChargedPionMichelMatchedPfpShowerGaps;
+  extern const MultiVar kNuMIChargedPionMichelMatchedPfpShowerOpeningAngles;
+  extern const Var kNuMIChargedPionMichelMatchedPfpShowerEnergySum;
+  // - Proton
+  extern const Var kNuMIRecoProtonMatchedToTrueProton;
 
 }

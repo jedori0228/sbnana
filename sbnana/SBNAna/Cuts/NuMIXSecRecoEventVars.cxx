@@ -125,7 +125,7 @@ namespace ana{
     if ( slc->truth.index < 0 ) return -5.; //TODO Define better dummy value
     return kTruth_ChargedPionKE(&slc->truth);
   });
-  const Var kNuMIChargedPionTrueEndProcess([](const caf::SRSliceProxy* slc) -> int {
+  const Var kNuMITrueChargedPionEndProcess([](const caf::SRSliceProxy* slc) -> int {
     int truthChargedPionIndex = kTruth_ChargedPionIndex(&slc->truth);
     if( truthChargedPionIndex >= 0 ){
       const auto& prim_ChargedPion = slc->truth.prim.at(truthChargedPionIndex);
@@ -134,6 +134,21 @@ namespace ana{
     else{
       return -5;
     }
+  });
+  const Var kNuMITrueChargedPionLength([](const caf::SRSliceProxy* slc) -> int {
+    int truthChargedPionIndex = kTruth_ChargedPionIndex(&slc->truth);
+    if( truthChargedPionIndex >= 0 ){
+      const auto& prim_ChargedPion = slc->truth.prim.at(truthChargedPionIndex);
+      return prim_ChargedPion.length;
+    }
+    else{
+      return -5;
+    }
+  });
+  const Var kNuMITrueChargedPionHasMichel([](const caf::SRSliceProxy* slc) -> int {
+    int michelidx = kTruth_ChargedPionMichelIndex(&slc->truth);
+    if(michelidx>=0) return 1;
+    else return 0;
   });
 
   // 0: Muon candidate track exiting, 1: Muon candidate track contained (-1: no muon candidate)
@@ -204,6 +219,138 @@ namespace ana{
     }
     return rets;
   });
+  const Var kNuMINChargedPionBestMatchedTrackByHitCompletenessIdx([](const caf::SRSliceProxy* slc) -> int {
+    int idx = -1;
+    double max_match_val = -1.;
+    int truthChargedPionIndex = kTruth_ChargedPionIndex(&slc->truth);
+    if( truthChargedPionIndex >= 0 ){
+      const auto& prim_ChargedPion = slc->truth.prim.at(truthChargedPionIndex);
+      for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); i_pfp++){
+        auto const& pfp = slc->reco.pfp.at(i_pfp);
+        auto const& trk = pfp.trk;
+        double this_pfp_match_val = -1.;
+        for(const auto& match: trk.truth.matches){
+          if(match.G4ID==prim_ChargedPion.G4ID){
+            this_pfp_match_val = match.hit_completeness;
+            break;
+          }
+        }
+
+        if(this_pfp_match_val > max_match_val){
+          max_match_val = this_pfp_match_val;
+          idx = i_pfp;
+        }
+
+      }
+    }
+    return idx;
+  });
+  const Var kNuMINChargedPionBestMatchedTrackByHitPurityIdx([](const caf::SRSliceProxy* slc) -> int {
+    int idx = -1;
+    double max_match_val = -1.;
+    int truthChargedPionIndex = kTruth_ChargedPionIndex(&slc->truth);
+    if( truthChargedPionIndex >= 0 ){
+      const auto& prim_ChargedPion = slc->truth.prim.at(truthChargedPionIndex);
+      for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); i_pfp++){
+        auto const& pfp = slc->reco.pfp.at(i_pfp);
+        auto const& trk = pfp.trk;
+        double this_pfp_match_val = -1.;
+        for(const auto& match: trk.truth.matches){
+          if(match.G4ID==prim_ChargedPion.G4ID){
+            this_pfp_match_val = match.hit_purity;
+            break;
+          }
+        }
+
+        if(this_pfp_match_val > max_match_val){
+          max_match_val = this_pfp_match_val;
+          idx = i_pfp;
+        }
+
+      }
+    }
+    return idx;
+  });
+  const Var kNuMINChargedPionBestMatchedTrackHitCompleteness([](const caf::SRSliceProxy* slc) -> double {
+    double max_match_val = -1.;
+    int truthChargedPionIndex = kTruth_ChargedPionIndex(&slc->truth);
+    if( truthChargedPionIndex >= 0 ){
+      const auto& prim_ChargedPion = slc->truth.prim.at(truthChargedPionIndex);
+      for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); i_pfp++){
+        auto const& pfp = slc->reco.pfp.at(i_pfp);
+        auto const& trk = pfp.trk;
+        double this_pfp_match_val = -1.;
+        for(const auto& match: trk.truth.matches){
+          if(match.G4ID==prim_ChargedPion.G4ID){
+            this_pfp_match_val = match.hit_completeness;
+            break;
+          }
+        }
+
+        if(this_pfp_match_val > max_match_val){
+          max_match_val = this_pfp_match_val;
+        }
+
+      }
+    }
+    return max_match_val;
+  });
+  const Var kNuMINChargedPionBestMatchedTrackHitPurity([](const caf::SRSliceProxy* slc) -> double {
+    double max_match_val = -1.;
+    int truthChargedPionIndex = kTruth_ChargedPionIndex(&slc->truth);
+    if( truthChargedPionIndex >= 0 ){
+      const auto& prim_ChargedPion = slc->truth.prim.at(truthChargedPionIndex);
+      for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); i_pfp++){
+        auto const& pfp = slc->reco.pfp.at(i_pfp);
+        auto const& trk = pfp.trk;
+        double this_pfp_match_val = -1.;
+        for(const auto& match: trk.truth.matches){
+          if(match.G4ID==prim_ChargedPion.G4ID){
+            this_pfp_match_val = match.hit_purity;
+            break;
+          }
+        }
+
+        if(this_pfp_match_val > max_match_val){
+          max_match_val = this_pfp_match_val;
+        }
+
+      }
+    }
+    return max_match_val;
+  });
+  const Var kNuMINChargedPionBestMatchedTrackByHitPurityChi2Muon([](const caf::SRSliceProxy* slc) -> double {
+    int trackIdx = kNuMINChargedPionBestMatchedTrackByHitPurityIdx(slc);
+    if(trackIdx>=0){
+      auto const& pfp = slc->reco.pfp.at(trackIdx);
+      const auto& trk = pfp.trk;
+      return trk.chi2pid[2].chi2_muon;
+    }
+    else{
+      return -5.;
+    }
+  });
+  const Var kNuMINChargedPionBestMatchedTrackByHitPurityChi2Proton([](const caf::SRSliceProxy* slc) -> double {
+    int trackIdx = kNuMINChargedPionBestMatchedTrackByHitPurityIdx(slc);
+    if(trackIdx>=0){
+      auto const& pfp = slc->reco.pfp.at(trackIdx);
+      const auto& trk = pfp.trk;
+      return trk.chi2pid[2].chi2_proton;
+    }
+    else{
+      return -5.;
+    }
+  });
+  const Var kNuMINChargedPionBestMatchedTrackByHitPurityChi2MIP([](const caf::SRSliceProxy* slc) -> double {
+    int trackIdx = kNuMINChargedPionBestMatchedTrackByHitPurityIdx(slc);
+    if(trackIdx>=0){
+      return GetChi2MIP(slc->reco.pfp[trackIdx].trk.calo[2]);
+    }
+    else{
+      return -5.;
+    }
+  });
+
   //   - Shower Var
   const MultiVar kNuMIChargedPionMatchedShowerIndices([](const caf::SRSliceProxy* slc) -> std::vector<double> {
     std::vector<double> rets;
@@ -259,12 +406,175 @@ namespace ana{
     }
     return rets;
   });
-
+  //   - Cut
   const Cut kNuMIOtherCCWithChargedPion([](const caf::SRSliceProxy* slc) {
     if(!kNuMI_1muNp0piStudy_OtherNuCC(slc)) return false;
     int n_chargedpion = kNuMITrueNpip(slc)+kNuMITrueNpim(slc);
     if( n_chargedpion== 0 ) return false;
     return true;
+  });
+  const Var kNuMITrueChargedPionMichelEnergy([](const caf::SRSliceProxy* slc) -> double {
+    double ret = -5.;
+    int truthChargedPionMichelIndex = kTruth_ChargedPionMichelIndex(&slc->truth);
+    if( truthChargedPionMichelIndex >= 0 ){
+      const auto& prim_ChargedPionMichel = slc->truth.prim.at(truthChargedPionMichelIndex);
+      ret = prim_ChargedPionMichel.genE;
+    }
+    return ret;
+  });
+  //   - Michel from pion (kTruth_ChargedPionMichelIndex)
+  const MultiVar kNuMIChargedPionMichelMatchedPfpIndices([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> rets;
+    int truthChargedPionMichelIndex = kTruth_ChargedPionMichelIndex(&slc->truth);
+    if( truthChargedPionMichelIndex >= 0 ){
+      const auto& prim_ChargedPionMichel = slc->truth.prim.at(truthChargedPionMichelIndex);
+      for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); i_pfp++){
+        auto const& pfp = slc->reco.pfp.at(i_pfp);
+        if(pfp.trk.truth.p.G4ID==prim_ChargedPionMichel.G4ID){
+          rets.push_back(i_pfp);
+        }
+      }
+    }
+    return rets;
+  });
+  const MultiVar kNuMIChargedPionMichelMatchedPfpScores([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedPfpIndices = kNuMIChargedPionMichelMatchedPfpIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedPfpIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      rets.push_back( pfp.trackScore );
+    }
+    return rets;
+  });
+  const MultiVar kNuMIChargedPionMichelMatchedPfpTrackLengths([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedPfpIndices = kNuMIChargedPionMichelMatchedPfpIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedPfpIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      rets.push_back( pfp.trk.len );
+    }
+    return rets;
+  });
+  const MultiVar kNuMIChargedPionMichelMatchedPfpTrackDistances([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedPfpIndices = kNuMIChargedPionMichelMatchedPfpIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedPfpIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      const float Atslc = std::hypot(slc->vertex.x - pfp.trk.start.x,
+                                    slc->vertex.y - pfp.trk.start.y,
+                                    slc->vertex.z - pfp.trk.start.z);
+      rets.push_back( Atslc );
+    }
+    return rets;
+  });
+  const MultiVar kNuMIChargedPionMichelMatchedPfpTrackIsPrimaries([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedPfpIndices = kNuMIChargedPionMichelMatchedPfpIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedPfpIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      if(pfp.parent_is_primary) rets.push_back(1);
+      else rets.push_back(0);
+    }
+    return rets;
+  });
+  const MultiVar kNuMIChargedPionMichelMatchedPfpTrackHitPurities([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedPfpIndices = kNuMIChargedPionMichelMatchedPfpIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedPfpIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+
+      auto const& bestmatch = pfp.trk.truth.p;
+      auto const& matches = pfp.trk.truth.matches;
+      double this_match_val = -1.;
+      for(const auto& match: matches){
+        if(match.G4ID == bestmatch.G4ID){
+          this_match_val = match.hit_purity;
+        }
+      }
+      rets.push_back(this_match_val);
+    }
+    return rets;
+  });
+  const MultiVar kNuMIChargedPionMichelMatchedPfpTrackHitCompletenesses([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedPfpIndices = kNuMIChargedPionMichelMatchedPfpIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedPfpIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+
+      auto const& bestmatch = pfp.trk.truth.p;
+      auto const& matches = pfp.trk.truth.matches;
+      double this_match_val = -1.;
+      for(const auto& match: matches){
+        if(match.G4ID == bestmatch.G4ID){
+          this_match_val = match.hit_completeness;
+        }
+      }
+      rets.push_back(this_match_val);
+    }
+    return rets;
+  });
+  const MultiVar kNuMIChargedPionMichelMatchedPfpShowerEnergies([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedPfpIndices = kNuMIChargedPionMichelMatchedPfpIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedPfpIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      rets.push_back( pfp.shw.plane[2].energy );
+    }
+    return rets;
+  });
+  const MultiVar kNuMIChargedPionMichelMatchedPfpShowerLengths([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedPfpIndices = kNuMIChargedPionMichelMatchedPfpIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedPfpIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      rets.push_back( pfp.shw.len );
+    }
+    return rets;
+  });
+  const MultiVar kNuMIChargedPionMichelMatchedPfpShowerGaps([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedPfpIndices = kNuMIChargedPionMichelMatchedPfpIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedPfpIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      rets.push_back( pfp.shw.conversion_gap );
+    }
+    return rets;
+  });
+  const MultiVar kNuMIChargedPionMichelMatchedPfpShowerOpeningAngles([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> matchedPfpIndices = kNuMIChargedPionMichelMatchedPfpIndices(slc);
+    std::vector<double> rets;
+    for(const auto& idx: matchedPfpIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      rets.push_back( pfp.shw.open_angle );
+    }
+    return rets;
+  });
+  const Var kNuMIChargedPionMichelMatchedPfpShowerEnergySum([](const caf::SRSliceProxy* slc) -> double {
+    std::vector<double> matchedPfpIndices = kNuMIChargedPionMichelMatchedPfpIndices(slc);
+    if(matchedPfpIndices.size()==0) return -1.;
+
+    double sumE = 0.;
+    for(const auto& idx: matchedPfpIndices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      sumE += pfp.shw.plane[2].energy;
+    }
+
+    return sumE;
+
+  });
+  // - Proton
+  const Var kNuMIRecoProtonMatchedToTrueProton([](const caf::SRSliceProxy* slc) -> int {
+    int true_leading_proton_index = kTruth_ProtonIndex(&slc->truth);
+    if(true_leading_proton_index<0) return -1;
+    const auto& prim_leading_proton = slc->truth.prim.at(true_leading_proton_index);
+
+    int reco_proton_index = kNuMIProtonCandidateIdx(slc);
+    if(reco_proton_index<0) return -2;
+    const auto& trk = slc->reco.pfp.at(reco_proton_index).trk;
+    const auto& bestmatched = trk.truth.p;
+
+    if( prim_leading_proton.G4ID == bestmatched.G4ID ) return 1;
+    else return 0;
   });
 
 }
