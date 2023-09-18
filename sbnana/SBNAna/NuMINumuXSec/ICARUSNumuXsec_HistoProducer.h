@@ -27,6 +27,7 @@
 #include "sbnana/SBNAna/Vars/NuMIFlux.h"
 #include "sbnana/SBNAna/Cuts/NuMIRelaxedVars.h"
 #include "sbnana/SBNAna/Cuts/NuMIXSecTreeHelper.h"
+#include "sbnana/SBNAna/Cuts/NuMIDetSystStudy.h"
 
 // NuMINumuXSec
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Contants.h"
@@ -80,7 +81,8 @@ namespace ICARUSNumuXsec{
     void NuMIXSecBkgdStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     // - 230908_PIDStudy
     void MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
-
+    // - 230918_DetSyst
+    void MakeDetSystStudyTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
     void Test(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
@@ -123,6 +125,7 @@ namespace ICARUSNumuXsec{
       kVector=0,
       kSpline=1,
       kGraph=2,
+      kTClonesArrays=3,
     };
     NSigmasSaveMode nSigmasSaveMode;
     std::map< TString, std::vector<ana::NSigmasTree *> > map_cutName_to_vec_NSigmasTrees;

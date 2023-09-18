@@ -1149,6 +1149,37 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
 
 }
 
+// - 230918_DetSyst
+void HistoProducer::MakeDetSystStudyTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  std::vector<std::string> labels = {
+    "dedx",
+    "dqdx",
+    "integral",
+    "sumadc",
+    "t",
+  };
+
+  std::vector<MultiVar> varlists = {
+    Hit_dedx,
+    Hit_dqdx,
+    Hit_integral,
+    Hit_sumadc,
+    Hit_t,
+  };
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      ("DetStudyStudyTree_"+currentCutName).Data(), labels,
+      loader,
+      varlists,
+      spillCut, cut,
+      kNoShift, true, true
+    )
+  );
+
+}
+
 void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
   //map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("spillvarTest", Binning::Simple(1, 0., 1.), loader, spillvarTest, spillCut) );
@@ -1357,6 +1388,7 @@ void HistoProducer::saveHistograms(){
           if(nSigmasSaveMode==kVector) vec_NSigmasTrees.at(i)->SaveTo(dir);
           else if(nSigmasSaveMode==kSpline) vec_NSigmasTrees.at(i)->SaveToSplines(dir);
           else if(nSigmasSaveMode==kGraph) vec_NSigmasTrees.at(i)->SaveToGraphs(dir);
+          else if(nSigmasSaveMode==kTClonesArrays) vec_NSigmasTrees.at(i)->SaveToTClonesArrays(dir);
         }
         for(unsigned int i=0; i<vec_NUniversesTrees.size(); i++){
           cout << "[HistoProducer::saveHistograms]   Writing UniversesTree: " << vec_NUniversesTrees.at(i)->Name() << std::endl;
@@ -1375,6 +1407,7 @@ void HistoProducer::saveHistograms(){
           if(nSigmasSaveMode==kVector) vec_NSigmasTrees.at(i)->SaveTo(dir);
           else if(nSigmasSaveMode==kSpline) vec_NSigmasTrees.at(i)->SaveToSplines(dir);
           else if(nSigmasSaveMode==kGraph) vec_NSigmasTrees.at(i)->SaveToGraphs(dir);
+          else if(nSigmasSaveMode==kTClonesArrays) vec_NSigmasTrees.at(i)->SaveToTClonesArrays(dir);
         }
         for(unsigned int i=0; i<vec_NUniversesTrees.size(); i++){
           cout <<  "[HistoProducer::saveHistograms]   Writing UniversesTree: " << vec_NUniversesTrees.at(i)->Name() << std::endl;
