@@ -2,6 +2,7 @@
 #include "sbnana/SBNAna/Vars/NuMIXSecVars.h"
 
 #include "TVector3.h"
+#include "TLorentzVector.h"
 
 namespace ana {
 
@@ -203,6 +204,229 @@ namespace ana {
 
     return rets;
 
+  });
+
+  /// \ref MultiVar for michel electrons
+  const MultiVar kNuMIMichelCandidateIdxs([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+
+    std::vector<double> rets;
+
+    int primaryInd = kNuMIMuonCandidateIdx(slc);
+    int primaryProtonInd = kNuMIProtonCandidateIdx(slc);
+
+    for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); ++i_pfp){
+
+      if ( i_pfp == (unsigned int)primaryInd || i_pfp == (unsigned int)primaryProtonInd ) {
+        continue; // skip the particle which is the muon or leading proton candidate!
+      }
+
+      // go track fit
+
+      auto const& trk = slc->reco.pfp.at(i_pfp).trk;
+
+      bool IsTrackFitValid = true;
+      if ( std::isnan(trk.start.x) || std::isnan(trk.len) || trk.len <= 0. ) IsTrackFitValid = false;
+      if ( std::isnan(slc->vertex.x) || std::isnan(slc->vertex.y) || std::isnan(slc->vertex.z) ) IsTrackFitValid = false;
+
+      bool IsTrackLikeMichel = false;
+      if(IsTrackFitValid){
+        const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
+                                       slc->vertex.y - trk.start.y,
+                                       slc->vertex.z - trk.start.z);
+        IsTrackLikeMichel = (trk.len<30.) && (Atslc<20.) && (!slc->reco.pfp.at(i_pfp).parent_is_primary);
+        if(primaryInd>=0){
+          const auto& muon_pfp = slc->reco.pfp.at(primaryInd);
+          const float DistFromMuonEnd = std::hypot(muon_pfp.trk.end.x - trk.start.x,
+                                                   muon_pfp.trk.end.y - trk.start.y,
+                                                   muon_pfp.trk.end.z - trk.start.z);
+          IsTrackLikeMichel = IsTrackLikeMichel && DistFromMuonEnd>20.;
+        }
+      }
+      if(IsTrackLikeMichel){
+        rets.push_back( i_pfp );
+      }
+
+/*
+      // go shower fit
+
+      auto const& shw = slc->reco.pfp.at(i_pfp).shw;
+
+      bool IsShowerFitValid = true;
+      if ( std::isnan(shw.plane[2].energy) || std::isinf(shw.plane[2].energy) || shw.plane[2].energy<0. ) IsShowerFitValid = false;
+      // and... if it meets then then we're not going to cut on it...
+      if ( std::isnan(shw.conversion_gap) || std::isinf(shw.conversion_gap) || shw.conversion_gap<0. ) IsShowerFitValid = false;
+
+      bool IsShowerLikeMichel = false;
+      if(IsShowerFitValid){
+        IsShowerLikeMichel = (shw.plane[2].energy<0.04) && (shw.conversion_gap<10.);
+      }
+
+
+      if(IsTrackLikeMichel&&IsShowerLikeMichel){
+        rets.push_back( i_pfp );
+      }
+*/
+    }
+
+    // guess we're not cutting anything
+    return rets;
+
+  });
+  const Var kNuMINMichelCandidates([](const caf::SRSliceProxy* slc) -> int {
+    return kNuMIMichelCandidateIdxs(slc).size();
+  });
+  const Var kNuMIMichelCandidateTrackLength([](const caf::SRSliceProxy* slc) -> double {
+    std::vector<double> indices = kNuMIMichelCandidateIdxs(slc);
+    if(indices.size()!=1) return -1.;
+
+    const auto& pfp = slc->reco.pfp.at(indices[0]);
+    return pfp.trk.len;
+
+  });
+  const Var kNuMIMichelCandidateTrackChi2Proton([](const caf::SRSliceProxy* slc) -> double {
+    std::vector<double> indices = kNuMIMichelCandidateIdxs(slc);
+    if(indices.size()!=1) return -1.;
+
+    const auto& pfp = slc->reco.pfp.at(indices[0]);
+    return pfp.trk.chi2pid[2].chi2_proton;
+
+  });
+  const Var kNuMIMichelCandidateTrackEnergyDensity([](const caf::SRSliceProxy* slc) -> double {
+    std::vector<double> indices = kNuMIMichelCandidateIdxs(slc);
+    if(indices.size()!=1) return -1.;
+
+    const auto& pfp = slc->reco.pfp.at(indices[0]);
+
+    double ESum = 0.;
+    for(const auto& calopt: pfp.trk.calo[2].points){
+      ESum += calopt.dedx*calopt.pitch;
+    }
+
+    return ESum/pfp.trk.len;
+
+  });
+  const Var kNuMIMichelCandidateTrackEnergySum([](const caf::SRSliceProxy* slc) -> double {
+    std::vector<double> indices = kNuMIMichelCandidateIdxs(slc);
+    if(indices.size()!=1) return -1.;
+
+    const auto& pfp = slc->reco.pfp.at(indices[0]);
+
+    return pfp.trk.calo[2].ke;
+
+  });
+  const Var kNuMIMichelCandidateTrackMatchedPDG([](const caf::SRSliceProxy* slc) -> int {
+    std::vector<double> indices = kNuMIMichelCandidateIdxs(slc);
+    if(indices.size()!=1) return -1.;
+
+    const auto& pfp = slc->reco.pfp.at(indices[0]);
+    return pfp.trk.truth.p.pdg;
+
+  });
+  const Var kNuMIMichelCandidateShowerEnergySum([](const caf::SRSliceProxy* slc) -> double {
+    std::vector<double> indices = kNuMIMichelCandidateIdxs(slc);
+    if(indices.size()==0) return -1.;
+
+    double sumE = 0.;
+    for(const auto& idx: indices){
+      auto const& pfp = slc->reco.pfp.at(round(idx));
+      std::cout << pfp.shw.plane[2].energy << std::endl;
+      sumE += pfp.shw.plane[2].energy;
+    }
+
+    return sumE;
+
+  });
+  const Var kNuMIMichelCandidateShowerOpeningAngle([](const caf::SRSliceProxy* slc) -> double {
+    std::vector<double> indices = kNuMIMichelCandidateIdxs(slc);
+    if(indices.size()!=1) return -1.;
+    
+    const auto& pfp = slc->reco.pfp.at(indices[0]);
+    return pfp.shw.open_angle;
+    
+  });
+  const Var kNuMIMichelCandidateShowerLength([](const caf::SRSliceProxy* slc) -> double {
+    std::vector<double> indices = kNuMIMichelCandidateIdxs(slc);
+    if(indices.size()!=1) return -1.;
+    
+    const auto& pfp = slc->reco.pfp.at(indices[0]);
+    return pfp.shw.len;
+    
+  });
+
+  const MultiVar kNuMIInelasticChargedPionCandidateIdxs([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+
+    std::vector<double> rets;
+
+    int primaryInd = kNuMIMuonCandidateIdx(slc);
+    int primaryProtonInd = kNuMIProtonCandidateIdx(slc);
+
+    for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); ++i_pfp){
+
+      if ( i_pfp == (unsigned int)primaryInd || i_pfp == (unsigned int)primaryProtonInd ) {
+        continue; // skip the particle which is the muon or leading proton candidate!
+      }
+
+      auto const& trk = slc->reco.pfp.at(i_pfp).trk;
+
+      if ( std::isnan(trk.start.x) || std::isnan(trk.len) || trk.len <= 0. ) continue;
+      if ( std::isnan(slc->vertex.x) || std::isnan(slc->vertex.y) || std::isnan(slc->vertex.z) ) continue;
+      const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
+                                     slc->vertex.y - trk.start.y,
+                                     slc->vertex.z - trk.start.z);
+      const bool isPrimCandidate = (Atslc < 10. && IsPrimaryPFP(slc,i_pfp));
+
+      if ( !isPrimCandidate || trk.calo[2].nhit < 5 ) continue;
+
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      const float Chi2MIP = GetChi2MIP(trk.calo[2]);
+      if ( Contained && Chi2MIP<20. ){
+        rets.push_back( i_pfp );
+      }
+    }
+
+    return rets;
+
+  });
+
+  const Var kNuMINInelasticChargedPionCandidateIdxs([](const caf::SRSliceProxy* slc) -> double {
+    return kNuMIInelasticChargedPionCandidateIdxs(slc).size();
+  });
+
+  const MultiVar kNuMIChargedPionShowerCandidateIdxs([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> rets;
+
+    int primaryInd = kNuMIMuonCandidateIdx(slc);
+    int primaryProtonInd = kNuMIProtonCandidateIdx(slc);
+
+    for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); ++i_pfp){
+
+      if ( i_pfp == (unsigned int)primaryInd || i_pfp == (unsigned int)primaryProtonInd ) {
+        continue; // skip the particle which is the muon or leading proton candidate!
+      }
+      auto const& shw = slc->reco.pfp.at(i_pfp).shw;
+
+      if ( !IsPrimaryPFP(slc,i_pfp) ) continue;
+
+      // Check if shower fit even seems kind-of valid:
+      if ( std::isnan(shw.start.x) || (shw.start.x > -5.5 && shw.start.x < -4.5) ||
+           std::isnan(shw.len) || shw.len <= 0. ) continue;
+
+      // if it meets this then we're not going to cut on it...
+      if ( std::isnan(shw.plane[2].energy) || std::isinf(shw.plane[2].energy) || shw.plane[2].energy > 0.04 ) continue;
+
+      // and... if it meets then then we're not going to cut on it...
+      if ( std::isnan(shw.conversion_gap) || std::isinf(shw.conversion_gap) || shw.conversion_gap > 5. ) continue;
+
+      // if we got here, then it should be the case that the fit seems valid and:
+      // shwE > 0.040 GeV
+      // trackScore < 0.45 (technically <= 0.45)
+      // conversionGap > 5. cm
+
+      rets.push_back( i_pfp );
+
+    }
+
+    return rets;
   });
 
   // MultiVar for the proton candidate indices
@@ -824,6 +1048,49 @@ namespace ana {
     if (std::isinf(openAngle) || std::isnan(openAngle)) return -5.f;
 
     return openAngle;
+  });
+  const Var kNuMIDiPhotonMass([](const caf::SRSliceProxy* slc) -> double {
+    std::vector<double> photon_indices = kNuMIPhotonCandidateIdxs(slc);
+    if(photon_indices.size()<=1) return -5.f;
+
+    // Find 2 most energetic:
+    unsigned int idxMaxE = 0;
+    float maxE = -5.;
+    unsigned int idxScdy = 0;
+    float scdy = -5.;
+    for ( auto const& photon_idx : photon_indices ) {
+      unsigned int idxI = (unsigned int)std::lround(photon_idx);
+      if ( slc->reco.pfp[idxI].shw.plane[2].energy > maxE ) {
+        idxScdy = idxMaxE;
+        scdy = maxE;
+        idxMaxE = idxI;
+        maxE = slc->reco.pfp[idxI].shw.plane[2].energy;
+      }
+      else if ( slc->reco.pfp[idxI].shw.plane[2].energy > scdy ) {
+        idxScdy = idxI;
+        scdy = slc->reco.pfp[idxI].shw.plane[2].energy;
+      }
+    }
+
+    if ( idxMaxE == idxScdy ) return -5.f;
+    if ( maxE < 0. || scdy < 0. ) return -5.f;
+
+    // Now get the quantities we want from this, following results of Jamie's w.r.t. the opening angle:
+    // Uses vertex to shower:
+    auto const& shw1 = slc->reco.pfp[idxMaxE].shw;
+    double shw1E =  shw1.plane[2].energy * 1/0.83;
+    TLorentzVector fourvec_shw1(shw1.dir.x, shw1.dir.y, shw1.dir.z, 1);
+    fourvec_shw1 = fourvec_shw1*shw1E;
+
+    auto const& shw2 = slc->reco.pfp[idxScdy].shw;
+    double shw2E = shw2.plane[2].energy * 1/0.83;
+    TLorentzVector fourvec_shw2(shw2.dir.x, shw2.dir.y, shw2.dir.z, 1);
+    fourvec_shw2 = fourvec_shw2*shw2E;
+
+    TLorentzVector fourvec_pi0 = fourvec_shw1+fourvec_shw2;
+
+    return fourvec_pi0.M();
+
   });
 
   // Sideband vars: pi+-

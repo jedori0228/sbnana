@@ -34,6 +34,18 @@ namespace ana
   /// \ref MultiVar for the charged pion candidate index
   extern const MultiVar kNuMIChargedPionCandidateIdxs;
 
+  /// \ref MultiVar for michel electrons
+  extern const MultiVar kNuMIMichelCandidateIdxs;
+  extern const Var kNuMINMichelCandidates;
+  extern const Var kNuMIMichelCandidateTrackLength;
+  extern const Var kNuMIMichelCandidateTrackChi2Proton;
+  extern const Var kNuMIMichelCandidateTrackEnergyDensity;
+  extern const Var kNuMIMichelCandidateTrackEnergySum;
+  extern const Var kNuMIMichelCandidateTrackMatchedPDG;
+  extern const Var kNuMIMichelCandidateShowerEnergySum;
+  extern const Var kNuMIMichelCandidateShowerOpeningAngle;
+  extern const Var kNuMIMichelCandidateShowerLength;
+
   /// \ref MultiVar for the proton candidate indices
   extern const MultiVar kNuMIPhotonCandidateIdxs;
 
@@ -93,6 +105,7 @@ namespace ana
   extern const Var kNuMILeadingPhotonCandidateE;
   extern const Var kNuMISecondaryPhotonCandidateE;
   extern const Var kNuMIPhotonCandidatesOpeningAngle;
+  extern const Var kNuMIDiPhotonMass;
 
   // Sideband vars: pi+-
   extern const Var kNuMILeadingChargedPionCandidateInd;
