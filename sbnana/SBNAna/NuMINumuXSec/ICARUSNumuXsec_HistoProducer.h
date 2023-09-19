@@ -34,9 +34,7 @@
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Cuts.h"
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Weights.h"
 
-// ThreeTrack
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_TwoTrack_Cuts.h"
-#include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_ThreeTrack_Cuts.h"
 
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_TruthMatch_Cuts.h"
 
