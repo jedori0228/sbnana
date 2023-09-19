@@ -85,6 +85,8 @@ namespace ana{
       "TrueNpipAll/i", "TrueNpimAll/i", "TrueNpi0All/i",
       // True muon
       "TrueMuonContained/i",
+      // True proton
+      "RecoProtonMatchedToTrueProton/i",
       // Is Signal
       "IsSignal/i",
       // Weight
@@ -120,6 +122,14 @@ namespace ana{
       // pi+-
       // - True,
       "TrueChargedPionKE",
+      "TrueChargedPionLength",
+      "TrueChargedPionEndProcess/i",
+      "TrueChargedPionHasMichel/i",
+      "TrueChargedPionBestMatchedTrackHitCompleteness",
+      "TrueChargedPionBestMatchedTrackHitPurity",
+      "TrueChargedPionBestMatchedTrackHitPurityChi2Muon",
+      "TrueChargedPionBestMatchedTrackHitPurityChi2Proton",
+      "TrueChargedPionBestMatchedTrackHitPurityChi2MIP",
       // - Reco
       //   - Track
       "LeadingChargedPionCandidateLength",
@@ -127,10 +137,21 @@ namespace ana{
       "LeadingChargedPionCandidateMatchedPDG/i",
       "LeadingChargedPionCandidateNCollectionHit/i",
       "LeadingChargedPionCandidateMIPChi2",
+      // Michel
+      "NMichelCandidates/i",
+      "MichelCandidateTrackLength",
+      "MichelCandidateTrackChi2Proton",
+      "MichelCandidateTrackEnergyDensity",
+      "MichelCandidateTrackEnergySum",
+      "MichelCandidateTrackMatchedPDG/i",
+      "MichelCandidateShowerOpeningAngle",
+      "MichelCandidateShowerLength",
+      "MichelCandidateShowerEnergySum",
       // pi0
       "LeadingPhotonCandidateE",
       "SecondaryPhotonCandidateE",
       "PhotonCandidatesOpeningAngle",
+      "DiPhotonMass",
     };
 
   }
@@ -148,6 +169,8 @@ namespace ana{
       kNuMITrueNpip_All, kNuMITrueNpim_All, kNuMITrueNpi0_All,
       // True muon
       kNuMITrueMuonContained,
+      // True proton
+      kNuMIRecoProtonMatchedToTrueProton,
       // Is Signal
       kNuMISliceSignalType,
       // Weight
@@ -183,6 +206,14 @@ namespace ana{
       // pi+-
       // - True
       kNuMITrueChargedPionKE,
+      kNuMITrueChargedPionLength,
+      kNuMITrueChargedPionEndProcess,
+      kNuMITrueChargedPionHasMichel,
+      kNuMINChargedPionBestMatchedTrackHitCompleteness,
+      kNuMINChargedPionBestMatchedTrackHitPurity,
+      kNuMINChargedPionBestMatchedTrackByHitPurityChi2Muon,
+      kNuMINChargedPionBestMatchedTrackByHitPurityChi2Proton,
+      kNuMINChargedPionBestMatchedTrackByHitPurityChi2MIP,
       // - Reco
       //   - Track
       kNuMILeadingChargedPionCandidateLength,
@@ -190,10 +221,21 @@ namespace ana{
       kNuMILeadingChargedPionCandidateMatchedPDG,
       kNuMILeadingChargedPionCandidateNCollectionHit,
       kNuMILeadingChargedPionCandidateMIPChi2,
+      // Michel
+      kNuMINMichelCandidates,
+      kNuMIMichelCandidateTrackLength,
+      kNuMIMichelCandidateTrackChi2Proton,
+      kNuMIMichelCandidateTrackEnergyDensity,
+      kNuMIMichelCandidateTrackEnergySum,
+      kNuMIMichelCandidateTrackMatchedPDG,
+      kNuMIMichelCandidateShowerOpeningAngle,
+      kNuMIMichelCandidateShowerLength,
+      kNuMIMichelCandidateShowerEnergySum,
       // pi0
       kNuMILeadingPhotonCandidateE,
       kNuMISecondaryPhotonCandidateE,
       kNuMIPhotonCandidatesOpeningAngle,
+      kNuMIDiPhotonMass,
     };
 
   }
