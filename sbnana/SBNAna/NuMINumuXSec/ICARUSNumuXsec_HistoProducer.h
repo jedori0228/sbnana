@@ -20,8 +20,11 @@
 #include "sbnana/CAFAna/Core/Tree.h"
 #include "sbnana/CAFAna/Core/SpectrumLoader.h"
 #include "sbnana/CAFAna/Core/EnsembleSpectrum.h"
+#include "sbnana/CAFAna/Core/SystShifts.h"
 #include "sbnana/CAFAna/Systs/SBNWeightSysts.h"
 #include "sbnana/CAFAna/Systs/NuMIFluxSysts.h"
+#include "sbnana/CAFAna/Systs/CalorimetrySysts.h"
+
 
 // SBNANA
 #include "sbnana/SBNAna/Vars/NuMIFlux.h"
@@ -97,6 +100,9 @@ namespace ICARUSNumuXsec{
     std::vector<std::string> genieDependentKnobNames;
     std::map<std::string, std::vector<Var>> map_DepDialName_to_UniverseWeights;
     std::map<std::string, std::vector<TruthVar>> map_DepDialName_to_TruthUniverseWeights;
+
+    std::vector<std::string> geant4DependentKnobNames;
+
 
     int NNuMIFluxPCA;
     std::vector<const ISyst*> IFluxSysts;

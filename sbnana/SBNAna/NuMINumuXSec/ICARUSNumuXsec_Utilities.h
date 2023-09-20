@@ -226,6 +226,7 @@ namespace ICARUSNumuXsec{
   std::vector<std::string> GetGENIEMorphKnobNames();
   std::vector<std::string> GetGENIEDependentKnobNames();
   std::vector<std::string> GetGENIEMultisimKnobNames();
+  std::vector<std::string> GetGEANT4MultisimKnobNames();
 
   //---------------------------------------------------
   bool IsPFPTrack(const caf::SRPFPProxy& pfp);

@@ -854,8 +854,9 @@ void HistoProducer::MichelStudy(SpectrumLoader& loader, SpillCut spillCut, Cut c
 
 void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
-  map_cutName_to_vec_Trees[currentCutName].push_back(
+  // CV
 
+  map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
       "selectedEvents", GetNuMIRecoTreeLabels(),
       loader,
@@ -863,8 +864,29 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       spillCut, cut,
       kNoShift, true, true
     )
-
   );
+
+  // Shift
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "selectedEvents_BetaUp", GetNuMIRecoTreeLabels(),
+      loader,
+      GetNuMIRecoTreeVars(),
+      spillCut, cut,
+      SystShifts(&CalorimetrySyst_BetaUp, 1.), true, true, true, true
+    )
+  );
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "selectedEvents_BetaDown", GetNuMIRecoTreeLabels(),
+      loader,
+      GetNuMIRecoTreeVars(),
+      spillCut, cut,
+      SystShifts(&CalorimetrySyst_BetaDown, 1.), true, true, true, true
+    )
+  );
+
+  // NSigma
 
   std::vector<std::string> this_NSigmasPsetNames;
   std::vector<const ISyst*> this_NSigmasISysts;
@@ -882,7 +904,6 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
   }
 
   map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
-
     new ana::NSigmasTree(
       "selectedEvents_NSigmas",
       this_NSigmasPsetNames,
@@ -892,8 +913,9 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       spillCut, cut,
       kNoShift, true, true
     )
-
   );
+
+  // NUniverses
 
   std::vector<std::string> this_NUniversesPsetNames;
   std::vector<std::vector<Var>> this_NUniversesVarVectors;
@@ -905,6 +927,12 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
     this_NUniversesVarVectors.push_back( map_DepDialName_to_UniverseWeights[name] );
     this_NUniversesTruthVarVectors.push_back( map_DepDialName_to_TruthUniverseWeights[name] );
     this_NUniversesNUnivs.push_back( 100 );
+  }
+  for(const std::string& name: geant4DependentKnobNames){
+    this_NUniversesPsetNames.push_back( name );
+    this_NUniversesVarVectors.push_back( map_DepDialName_to_UniverseWeights[name] );
+    this_NUniversesTruthVarVectors.push_back( map_DepDialName_to_TruthUniverseWeights[name] );
+    this_NUniversesNUnivs.push_back( 1000 );
   }
 
   map_cutName_to_vec_NUniversesTrees[currentCutName].push_back(
@@ -925,7 +953,6 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
   if(TrueTreeFilled) return;
 
   map_cutName_to_vec_Trees[currentCutName].push_back(
-
     new ana::Tree(
       "trueEvents", GetNuMITrueTreeLabels(),
       loader,
@@ -935,11 +962,33 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       kNoShift,
       true
     )
-
   );
 
-  map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "trueEvents_BetaUp", GetNuMITrueTreeLabels(),
+      loader,
+      GetNuMITrueTreeVars(), kNuMIValidTrigger,
+      kTruthCut_IsSignal,
+      kNuMISelection_1muNp0pi,
+      SystShifts(&CalorimetrySyst_BetaUp, 1.),
+      true
+    )
+  );
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "trueEvents_BetaDown", GetNuMITrueTreeLabels(),
+      loader,
+      GetNuMITrueTreeVars(), kNuMIValidTrigger,
+      kTruthCut_IsSignal,
+      kNuMISelection_1muNp0pi,
+      SystShifts(&CalorimetrySyst_BetaDown, 1.),
+      true
+    )
+  );
 
+
+  map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
     new ana::NSigmasTree(
       "trueEvents_NSigmas",
       this_NSigmasPsetNames,
@@ -949,11 +998,9 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       kTruthCut_IsSignal,
       kNoShift, true
     )
-
   );
 
   map_cutName_to_vec_NUniversesTrees[currentCutName].push_back(
-
     new ana::NUniversesTree(
       "trueEvents_NUniverses",
       this_NUniversesPsetNames,
@@ -963,7 +1010,6 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       kTruthCut_IsSignal,
       kNoShift, true
     )
-
   );
 
   TrueTreeFilled = true;
@@ -1037,6 +1083,8 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     "MuonSelection/i",
     "MuonMatchType/i",
     "MuonLength",
+    "MuonChi2Muon",
+    "MuonChi2Proton",
     "MuonMatchedTruthPDG/i",
     "MuonMatchedTruthIntID/i",
     "MuonMatchedTruthContained/i",
@@ -1064,6 +1112,8 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     kNuMIIsRelaxedMuonSelection,
     kNuMIRelaxedMuonTrackMatchType,
     kNuMIRelaxedMuonTrackLength,
+    kNuMIRelaxedMuonTrackChi2Muon,
+    kNuMIRelaxedMuonTrackChi2Proton,
     kNuMIRelaxedMuonTrackMatchedTruthPDG,
     kNuMIRelaxedMuonTrackMatchedTruthIntID,
     kNuMIRelaxedMuonTrackMatchedTruthContained,
@@ -1094,6 +1144,82 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
       kNoShift, true, true
     )
   );
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      ("PIDStudyTree_AlphaUp_"+currentCutName).Data(), labels,
+      loader,
+      varlists,
+      spillCut, cut,
+      SystShifts(&CalorimetrySyst_AlphaUp, 1.), true, true
+    )
+  );
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      ("PIDStudyTree_AlphaDown_"+currentCutName).Data(), labels,
+      loader,
+      varlists,
+      spillCut, cut,
+      SystShifts(&CalorimetrySyst_AlphaDown, 1.), true, true
+    )
+  );
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      ("PIDStudyTree_BetaUp_"+currentCutName).Data(), labels,
+      loader,
+      varlists,
+      spillCut, cut,
+      SystShifts(&CalorimetrySyst_BetaUp, 1.), true, true
+    )
+  );
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      ("PIDStudyTree_BetaDown_"+currentCutName).Data(), labels,
+      loader,
+      varlists,
+      spillCut, cut,
+      SystShifts(&CalorimetrySyst_BetaDown, 1.), true, true
+    )
+  );
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      ("PIDStudyTree_GainUp_"+currentCutName).Data(), labels,
+      loader,
+      varlists,
+      spillCut, cut,
+      SystShifts(&CalorimetrySyst_GainUp, 1.), true, true
+    )
+  );
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      ("PIDStudyTree_GainDown_"+currentCutName).Data(), labels,
+      loader,
+      varlists,
+      spillCut, cut,
+      SystShifts(&CalorimetrySyst_GainDown, 1.), true, true
+    )
+  );
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      ("PIDStudyTree_GainUpBetaDown_"+currentCutName).Data(), labels,
+      loader,
+      varlists,
+      spillCut, cut,
+      SystShifts(&CalorimetrySyst_GainUpBetaDown, 1.), true, true
+    )
+  );
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      ("PIDStudyTree_GainDownBetaUp_"+currentCutName).Data(), labels,
+      loader,
+      varlists,
+      spillCut, cut,
+      SystShifts(&CalorimetrySyst_GainDownBetaUp, 1.), true, true
+    )
+  );
+
+
 
   if(!FillSystematics) return;
 
@@ -1188,6 +1314,8 @@ void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
   using namespace ICARUSNumuXsec::TwoTrack;
   using namespace ICARUSNumuXsec::TruthMatch;
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("chi2muon", Binning::Simple(1, 0., 1.), loader, kNuMIRelaxedMuonTrackChi2Muon, kNoSpillCut, kNoCut, SystShifts(&CalorimetrySyst_NoShift, 1.) ) );
 
   //map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("spillvarTest", Binning::Simple(1, 0., 1.), loader, TestVar, spillCut) );
 
@@ -1493,6 +1621,19 @@ void HistoProducer::setSystematicWeights(){
       std::string psetname = SystProviderPrefix+"_multisim_"+name;
       std::cout << "[HistoProducer::setSystematicWeights] Dependent dial, " << name << " (psetname = " << psetname << ")" << std::endl;
       for(int u=0; u<100; u++){
+        map_DepDialName_to_UniverseWeights[name].push_back( GetUniverseWeight(psetname, u) );
+        map_DepDialName_to_TruthUniverseWeights[name].push_back( GetTruthUniverseWeight(psetname, u) );
+      }
+    }
+
+    // GEANT4
+    geant4DependentKnobNames = ICARUSNumuXsec::GetGEANT4MultisimKnobNames();
+    for(const std::string& name: geant4DependentKnobNames){
+      map_DepDialName_to_UniverseWeights[name] = {};
+      map_DepDialName_to_TruthUniverseWeights[name] = {};
+      std::string psetname = name;
+      std::cout << "[HistoProducer::setSystematicWeights] GEANT4 multisim dial, " << name << " (psetname = " << psetname << ")" << std::endl;
+      for(int u=0; u<1000; u++){
         map_DepDialName_to_UniverseWeights[name].push_back( GetUniverseWeight(psetname, u) );
         map_DepDialName_to_TruthUniverseWeights[name].push_back( GetTruthUniverseWeight(psetname, u) );
       }

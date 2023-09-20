@@ -689,6 +689,16 @@ std::vector<std::string> ICARUSNumuXsec::GetGENIEMultisimKnobNames(){
 
 }
 
+std::vector<std::string> ICARUSNumuXsec::GetGEANT4MultisimKnobNames(){
+
+  return {
+"reinteractions_piminus_Geant4",
+"reinteractions_piplus_Geant4",
+"reinteractions_proton_Geant4",
+  };
+
+}
+
 //---------------------------------------------------
 static double TrackScoreCutValue = 0.45;
 bool ICARUSNumuXsec::IsPFPTrack(const caf::SRPFPProxy& pfp){

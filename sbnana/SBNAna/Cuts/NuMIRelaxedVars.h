@@ -11,6 +11,8 @@ namespace ana{
   // - Var
   extern const Var kNuMIRelaxedMuonTrackIdx;
   extern const Var kNuMIRelaxedMuonTrackLength;
+  extern const Var kNuMIRelaxedMuonTrackChi2Muon;
+  extern const Var kNuMIRelaxedMuonTrackChi2Proton;
   extern const Var kNuMIRelaxedMuonTrackMatchedTruthPDG;
   extern const Var kNuMIRelaxedMuonTrackMatchedTruthIntID;
   extern const Var kNuMIRelaxedMuonTrackMatchedTruthContained;

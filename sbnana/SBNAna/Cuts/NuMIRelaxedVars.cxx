@@ -54,6 +54,24 @@ namespace ana {
       return -999.;
     }
   });
+  const Var kNuMIRelaxedMuonTrackChi2Muon([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = kNuMIRelaxedMuonTrackIdx(slc);
+    if(muonTrackIndex>=0){
+      return slc->reco.pfp.at(muonTrackIndex).trk.chi2pid[2].chi2_muon;
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var kNuMIRelaxedMuonTrackChi2Proton([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = kNuMIRelaxedMuonTrackIdx(slc);
+    if(muonTrackIndex>=0){
+      return slc->reco.pfp.at(muonTrackIndex).trk.chi2pid[2].chi2_proton;
+    }
+    else{
+      return -999.;
+    }
+  });
   const Var kNuMIRelaxedMuonTrackMatchedTruthPDG([](const caf::SRSliceProxy* slc) -> int {
     int muonTrackIndex = kNuMIRelaxedMuonTrackIdx(slc);
     if(muonTrackIndex>=0){
