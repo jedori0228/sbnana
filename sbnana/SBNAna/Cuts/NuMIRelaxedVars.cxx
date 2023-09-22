@@ -280,6 +280,24 @@ namespace ana {
       return -999.;
     }
   });
+  const Var kNuMIRelaxedProtonTrackChi2Muon([](const caf::SRSliceProxy* slc) -> double {
+    int protonTrackIndex = kNuMIRelaxedProtonTrackIdx(slc);
+    if(protonTrackIndex>=0){
+      return slc->reco.pfp.at(protonTrackIndex).trk.chi2pid[2].chi2_muon;
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var kNuMIRelaxedProtonTrackChi2Proton([](const caf::SRSliceProxy* slc) -> double {
+    int protonTrackIndex = kNuMIRelaxedProtonTrackIdx(slc);
+    if(protonTrackIndex>=0){
+      return slc->reco.pfp.at(protonTrackIndex).trk.chi2pid[2].chi2_proton;
+    }
+    else{
+      return -999.;
+    }
+  });
   const Var kNuMIRelaxedProtonTrackMatchedTruthPDG([](const caf::SRSliceProxy* slc) -> int {
     int protonTrackIndex = kNuMIRelaxedProtonTrackIdx(slc);
     if(protonTrackIndex>=0){
