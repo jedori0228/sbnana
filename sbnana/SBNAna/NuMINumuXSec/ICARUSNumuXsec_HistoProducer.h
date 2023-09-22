@@ -170,6 +170,7 @@ namespace ICARUSNumuXsec{
     bool FillSystematics;
     bool FillGENIESyst;
     bool FillFlux;
+    bool FillGEANT4;
 
 
   private:

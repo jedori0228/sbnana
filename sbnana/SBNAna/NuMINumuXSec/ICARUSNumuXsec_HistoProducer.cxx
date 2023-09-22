@@ -24,6 +24,7 @@ HistoProducer::HistoProducer(){
 
   FillGENIESyst = true;
   FillFlux = true;
+  FillGEANT4 = true;
 
   cout << "[HistoProducer::HistoProducer] Finished" << endl;
 
@@ -873,7 +874,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       loader,
       GetNuMIRecoTreeVars(),
       spillCut, cut,
-      SystShifts(&CalorimetrySyst_BetaUp, 1.), true, true, true, true
+      SystShifts(&CalorimetrySyst_BetaUp, 1.), true, true
     )
   );
   map_cutName_to_vec_Trees[currentCutName].push_back(
@@ -882,7 +883,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       loader,
       GetNuMIRecoTreeVars(),
       spillCut, cut,
-      SystShifts(&CalorimetrySyst_BetaDown, 1.), true, true, true, true
+      SystShifts(&CalorimetrySyst_BetaDown, 1.), true, true
     )
   );
 
@@ -1094,6 +1095,8 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     "ProtonSelection/i",
     "ProtonMatchType/i",
     "ProtonP",
+    "ProtonChi2Muon",
+    "ProtonChi2Proton",
     "ProtonMatchedTruthPDG/i",
     "ProtonMatchedTruthIntID/i",
     "ProtonMatchedTruthContained/i",
@@ -1123,6 +1126,8 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     kNuMIIsRelaxedProtonSelection,
     kNuMIRelaxedProtonTrackMatchType,
     kNuMIRelaxedProtonTrackP,
+    kNuMIRelaxedProtonTrackChi2Muon,
+    kNuMIRelaxedProtonTrackChi2Proton,
     kNuMIRelaxedProtonTrackMatchedTruthPDG,
     kNuMIRelaxedProtonTrackMatchedTruthIntID,
     kNuMIRelaxedProtonTrackMatchedTruthContained,
@@ -1625,7 +1630,9 @@ void HistoProducer::setSystematicWeights(){
         map_DepDialName_to_TruthUniverseWeights[name].push_back( GetTruthUniverseWeight(psetname, u) );
       }
     }
+  }
 
+  if(FillGEANT4){
     // GEANT4
     geant4DependentKnobNames = ICARUSNumuXsec::GetGEANT4MultisimKnobNames();
     for(const std::string& name: geant4DependentKnobNames){
@@ -1638,12 +1645,10 @@ void HistoProducer::setSystematicWeights(){
         map_DepDialName_to_TruthUniverseWeights[name].push_back( GetTruthUniverseWeight(psetname, u) );
       }
     }
-
   }
 
   if(FillFlux){
     cout << "[HistoProducer::setSystematicWeights] Setting flux systematics" << endl;
-    //IFluxSysts = GetNuMIPCAFluxSysts(NNuMIFluxPCA);
     IFluxSysts = GetAllNuMIFluxSysts(NNuMIFluxPCA);
     for(unsigned int i=0; i<IFluxSysts.size(); i++){
       cout << "[HistoProducer::setSystematicWeights] Syst = " << IFluxSysts.at(i)->ShortName() << endl;
