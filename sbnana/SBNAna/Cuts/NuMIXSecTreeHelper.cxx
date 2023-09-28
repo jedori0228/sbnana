@@ -97,6 +97,7 @@ namespace ana{
       "MuonTrackType/i",
       // Muon momentum
       "RecoMuonP", "TrueMuonP",
+      "RecoMuonRangeP", "TrueMuonMCSP",
       "RecoMuonPt", "TrueMuonPt",
       // Muon length
       "RecoMuonLength", "TrueMuonLength",
@@ -181,6 +182,7 @@ namespace ana{
       kNuMIRecoMuonContained,
       // Muon momentum
       kNuMIMuonCandidateRecoP, kNuMIMuonTrueP,
+      kNuMIMuonRecoRangeP, kNuMIMuonRecoMCSP,
       kNuMIRecoMuonPt, kNuMITrueMuonPt,
       // Muon length
       kNuMIRecoMuonLength, kNuMITrueMuonLength,

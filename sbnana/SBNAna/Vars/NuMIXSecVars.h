@@ -52,6 +52,8 @@ namespace ana
   /// kinematic/output variables
   // Muon momentum
   extern const Var kNuMIMuonCandidateRecoP;
+  extern const Var kNuMIMuonRecoRangeP;
+  extern const Var kNuMIMuonRecoMCSP;
   extern const Var kNuMIMuonTrueP;
   // Muon length
   extern const Var kNuMIRecoMuonLength;

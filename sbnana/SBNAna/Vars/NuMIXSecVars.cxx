@@ -484,6 +484,26 @@ namespace ana {
     }
     return p;
   });
+  const Var kNuMIMuonRecoRangeP([](const caf::SRSliceProxy* slc) -> float {
+    float p(-5.f);
+
+    if ( kNuMIMuonCandidateIdx(slc) >= 0 )
+    {
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      p = trk.rangeP.p_muon;
+    }
+    return p;
+  });
+  const Var kNuMIMuonRecoMCSP([](const caf::SRSliceProxy* slc) -> float {
+    float p(-5.f);
+
+    if ( kNuMIMuonCandidateIdx(slc) >= 0 )
+    {
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      p = trk.mcsP.fwdP_muon;
+    }
+    return p;
+  });
 
   // True muon momentum
   const Var kNuMIMuonTrueP([](const caf::SRSliceProxy* slc) -> float {
