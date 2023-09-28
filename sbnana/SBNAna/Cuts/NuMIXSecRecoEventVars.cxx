@@ -94,6 +94,11 @@ namespace ana{
     return kTruth_IsFHC(&slc->truth);
   });
 
+  // Muon
+  const Cut kNuMIHasTrueMuon([](const caf::SRSliceProxy* slc){
+    if( kTruth_MuonIndex(&slc->truth)>=0 ) return true;
+    else return false;
+  });
   // True muon kinetic energy
   const Var kNuMITrueMuonKE([](const caf::SRSliceProxy* slc) -> double {
     if ( slc->truth.index < 0 ) return -5.; //TODO Define better dummy value
@@ -109,6 +114,12 @@ namespace ana{
     if ( slc->truth.index < 0 ) return -1; //TODO Define better dummy value
     return kTruth_MuonContained(&slc->truth);
   });
+
+  // Proton
+  const Cut kNuMIHasTrueProton([](const caf::SRSliceProxy* slc){
+    if( kTruth_ProtonIndex(&slc->truth)>=0 ) return true;
+    else return false;
+  });
   // True proton kinetic energy
   const Var kNuMITrueProtonKE([](const caf::SRSliceProxy* slc) -> double {
     if ( slc->truth.index < 0 ) return -5.; //TODO Define better dummy value
@@ -120,6 +131,11 @@ namespace ana{
     return kTruth_ProtonNuCosineTheta(&slc->truth);
   });
 
+  // Chargedpion
+  const Cut kNuMIHasTrueChargedPion([](const caf::SRSliceProxy* slc){
+    if( kTruth_ChargedPionIndex(&slc->truth)>=0 ) return true;
+    else return false;
+  });
   // True Charged pion kinetic energy
   const Var kNuMITrueChargedPionKE([](const caf::SRSliceProxy* slc) -> double {
     if ( slc->truth.index < 0 ) return -5.; //TODO Define better dummy value

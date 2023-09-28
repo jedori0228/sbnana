@@ -1150,6 +1150,8 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     )
   );
 
+  if(!FillSystematics) return;
+
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
       ("PIDStudyTree_AlphaUp_"+currentCutName).Data(), labels,
@@ -1224,10 +1226,6 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     )
   );
 
-
-
-  if(!FillSystematics) return;
-
   // NSigmas
   std::vector<std::string> this_NSigmasPsetNames;
   std::vector<const ISyst*> this_NSigmasISysts;
@@ -1264,6 +1262,12 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     this_NUniversesVarVectors.push_back( map_DepDialName_to_UniverseWeights[name] );
     this_NUniversesTruthVarVectors.push_back( map_DepDialName_to_TruthUniverseWeights[name] );
     this_NUniversesNUnivs.push_back( 100 );
+  }
+  for(const std::string& name: geant4DependentKnobNames){
+    this_NUniversesPsetNames.push_back( name );
+    this_NUniversesVarVectors.push_back( map_DepDialName_to_UniverseWeights[name] );
+    this_NUniversesTruthVarVectors.push_back( map_DepDialName_to_TruthUniverseWeights[name] );
+    this_NUniversesNUnivs.push_back( 1000 );
   }
   map_cutName_to_vec_NUniversesTrees[currentCutName].push_back(
     new ana::NUniversesTree(
@@ -1308,6 +1312,56 @@ void HistoProducer::MakeDetSystStudyTree(SpectrumLoader& loader, SpillCut spillC
       kNoShift, true, true
     )
   );
+
+}
+
+// - 230922_MomentumPerformance
+void HistoProducer::MomentumPerformanceTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  std::vector<std::string> labels = {
+    // Weight
+    "FluxWeight",
+    // Muon
+    // - Track type
+    "MuonTrackType/i", // notfound/contained/exiting
+    // - Truth contained
+    "TrueMuonContained/i",
+    // - Momentum
+    "TrueMuonP",
+    "RecoMuonRangeP",
+    "RecoMuonMCSP",
+    // - Length
+    "TrueMuonLength",
+    "RecoMuonLength",
+  };
+
+  std::vector<Var> varlists = {
+    // Weight
+    kGetNuMIFluxWeight,
+    // Muon
+    // - Track type
+    kNuMIRecoMuonContained, // notfound/contained/exiting
+    // - Truth contained
+    kNuMITrueMuonContained,
+    // - Momentum
+    kNuMIMuonTrueP,
+    kNuMIMuonRecoRangeP,
+    kNuMIMuonRecoMCSP,
+    // - Length
+    kNuMITrueMuonLength,
+    kNuMIRecoMuonLength,
+  };
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "MomentumPerformanceTree", labels,
+      loader,
+      varlists,
+      spillCut, cut,
+      kNoShift, true, true
+    )
+  );
+
 
 }
 
