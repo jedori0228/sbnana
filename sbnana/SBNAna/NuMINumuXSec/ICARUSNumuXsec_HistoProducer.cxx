@@ -796,61 +796,27 @@ void HistoProducer::TriggerEffStudy(SpectrumLoader& loader, SpillCut spillCut, C
 // - 230524_MichelStudy
 void HistoProducer::MichelStudy(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
-  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("TruthMuonMichelIndex", Binning::Simple(1, 0., 1.0), loader, ICARUSNumuXsec::TruthMatch::TruthMuonMichelIndex, spillCut, cut) );
+  FillCVSpectrum(loader, "CountSlice", varCountSlice, Binning::Simple(1, 0.,1.), spillCut, cut);
 
-/*
-  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("TruthChargedPionWithMichel_TruthChargedPionKEs", Binning::Simple(100, 0., 1.), loader, ICARUSNumuXsec::MichelStudy::TruthChargedPionWithMichel_TruthChargedPionKEs, spillCut) );
-
-  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("TruthChargedPionWithMichel_TruthMichelElectronKEs", Binning::Simple(100, 0., 0.1), loader, ICARUSNumuXsec::MichelStudy::TruthChargedPionWithMichel_TruthMichelElectronKEs, spillCut) );
-
-  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("TruthChargedPionWithMichel_TruthMichelElectronMatchedRecoShowerEnergies", Binning::Simple(100, 0., 0.1), loader, ICARUSNumuXsec::MichelStudy::TruthChargedPionWithMichel_TruthMichelElectronMatchedRecoShowerEnergies, spillCut) );
-
-  map_cutName_to_vec_Spectrums[currentCutName].push_back( 
-    new Spectrum(
-      "TruthChargedPionWithMichel_TruthMichelElectronKEs_vs_TruthMichelElectronMatchedRecoShowerEnergies", loader,
-      Binning::Simple(100, 0., 0.1), ICARUSNumuXsec::MichelStudy::TruthChargedPionWithMichel_TruthMichelElectronKEs,
-      Binning::Simple(100, 0., 0.1), ICARUSNumuXsec::MichelStudy::TruthChargedPionWithMichel_TruthMichelElectronMatchedRecoShowerEnergies,
-      spillCut
-    )
-  );
-  */
-
-  //map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("MichelTest", Binning::Simple(1, 0., 1.), loader, ICARUSNumuXsec::MichelStudy::MichelTest, spillCut) );
-
-/*
-
-  using namespace ICARUSNumuXsec::TruthMatch;
-
-  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("TruthChargedPionLength", Binning::Simple(500, 0., 500.), loader, TruthChargedPionLength, spillCut, cut) );
-  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("TruthChargedPionKE", Binning::Simple(100, 0., 1.0), loader, TruthChargedPionKE, spillCut, cut) );
-
-  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("TruthChargedPionMatchedTrackContainedness", Binning::Simple(2, 0., 2.), loader, TruthChargedPionMatchedTrackContainedness, spillCut, cut) );
-
-  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("TruthChargedPionMatchedTrackEndProcess", Binning::Simple(65, 0., 65.), loader, TruthChargedPionMatchedTrackEndProcess, spillCut, cut) );
-
-  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("TruthChargedPionNDaughters", Binning::Simple(10, 0., 10), loader, TruthChargedPionNDaughters, spillCut, cut) );
-
-  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("TruthChargedPionDaughterPDGs", Binning::Simple(6000, -3000, 3000.), loader, TruthChargedPionDaughterPDGs, spillCut, cut) );
-
-  // 2D
   map_cutName_to_vec_Spectrums[currentCutName].push_back(
     new Spectrum(
-      "TruthChargedPionKE_vs_TruthChargedPionMatchedTrackEndProcess", loader,
-      Binning::Simple(100, 0., 1.0), TruthChargedPionKE,
-      Binning::Simple(65, 0., 65.), TruthChargedPionMatchedTrackEndProcess,
+      "MuonRR_vs_MuondEdX", loader,
+      Binning::Simple(30, 0., 30.), kNuMIMuonCandidateRR,
+      Binning::Simple(100., 0., 10.), kNuMIMuonCandidatedEdX,
       spillCut, cut
     )
   );
 
   map_cutName_to_vec_Spectrums[currentCutName].push_back(
     new Spectrum(
-      "TruthChargedPionLength_vs_TruthChargedPionMatchedTrackEndProcess", loader,
-      Binning::Simple(500, 0., 500.), TruthChargedPionLength,
-      Binning::Simple(65, 0., 65.), TruthChargedPionMatchedTrackEndProcess,
-      spillCut, cut
+      "MuonRR_vs_MuondEdX_Shifted", loader, 
+      Binning::Simple(30, 0., 30.), kNuMIMuonCandidateRR,
+      Binning::Simple(100., 0., 10.), kNuMIMuonCandidatedEdX,
+      spillCut, cut,
+      SystShifts(&CalorimetrySyst_GainUp, 1.)
     )
   );
-*/
+
 }
 
 void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
@@ -1324,6 +1290,8 @@ void HistoProducer::MomentumPerformanceTree(SpectrumLoader& loader, SpillCut spi
     // Muon
     // - Track type
     "MuonTrackType/i", // notfound/contained/exiting
+    // - Match
+    "MuonTrackMatched/i",
     // - Truth contained
     "TrueMuonContained/i",
     // - Momentum
@@ -1341,6 +1309,8 @@ void HistoProducer::MomentumPerformanceTree(SpectrumLoader& loader, SpillCut spi
     // Muon
     // - Track type
     kNuMIRecoMuonContained, // notfound/contained/exiting
+    // - Match
+    kNuMIMuonCandMatched,
     // - Truth contained
     kNuMITrueMuonContained,
     // - Momentum

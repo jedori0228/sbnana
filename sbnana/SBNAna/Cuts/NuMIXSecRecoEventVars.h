@@ -45,6 +45,11 @@ namespace ana{
   // Reco
   // - Muon
   extern const Var kNuMIRecoMuonContained; //!< 0: Muon candidate track exiting, 1: Muon candidate track contained (-1: no muon candidate)
+  extern const Var kNuMIRecoMuonTrackMatchType;
+  extern const Cut kNuMIRecoMuonTrackMatchContainedNuMu;
+  //   - Michel from muon (kTruth_MuonMichelIndex)
+  extern const MultiVar kNuMIMuonMichelMatchedPfpIndices;
+  extern const Cut kNuMIHasTrueMuonMichel;
   // - Charged pion
   //   - Track Var
   extern const MultiVar kNuMIChargedPionMatchedTrackIndices;
@@ -85,5 +90,8 @@ namespace ana{
   extern const Var kNuMIChargedPionMichelMatchedPfpShowerEnergySum;
   // - Proton
   extern const Var kNuMIRecoProtonMatchedToTrueProton;
+
+  // - Selection enum
+  extern const Var kNuMIRecoSelectionFlag;
 
 }

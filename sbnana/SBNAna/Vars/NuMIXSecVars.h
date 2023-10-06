@@ -27,6 +27,8 @@ namespace ana
 
   /// \ref Var for the muon candidate index
   extern const Var kNuMIMuonCandidateIdx;
+  extern const MultiVar kNuMIMuonCandidateRR;
+  extern const MultiVar kNuMIMuonCandidatedEdX;
 
   /// \ref Var for the proton candidate index
   extern const Var kNuMIProtonCandidateIdx;

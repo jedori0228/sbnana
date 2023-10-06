@@ -28,6 +28,15 @@ namespace ana {
     return ( kNuMIMuonCandidateIdx(slc) >= 0 );
   });
 
+  const Var kNuMIMuonCandMatched([](const caf::SRSliceProxy* slc) -> int {
+    int muonCandIdx = kNuMIMuonCandidateIdx(slc);
+    int muonTrueIdx = kTruth_MuonIndex(&slc->truth);
+    if(muonCandIdx<0) return -2;
+    if(muonTrueIdx<0) return -1;
+    if(slc->reco.pfp.at(muonCandIdx).trk.truth.p.G4ID == slc->truth.prim.at(muonTrueIdx).G4ID) return 1;
+    else return 0;
+  });
+
   // Proton candidate
   const Cut kNuMIHasProtonCandidate([](const caf::SRSliceProxy* slc) {
     return ( kNuMIProtonCandidateIdx(slc) >= 0 );

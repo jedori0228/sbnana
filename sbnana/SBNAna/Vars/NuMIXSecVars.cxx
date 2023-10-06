@@ -125,6 +125,28 @@ namespace ana {
 
       return PTrackInd;
     });
+  const MultiVar kNuMIMuonCandidateRR([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    int muonCanIdx = kNuMIMuonCandidateIdx(slc);
+    std::vector<double> rets;
+    if(muonCanIdx>=0){
+      const auto& trk = slc->reco.pfp.at(muonCanIdx).trk;
+      for(const auto& pt: trk.calo[2].points){
+        rets.push_back( pt.rr );
+      }
+    }
+    return rets;
+  });
+  const MultiVar kNuMIMuonCandidatedEdX([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    int muonCanIdx = kNuMIMuonCandidateIdx(slc);
+    std::vector<double> rets;
+    if(muonCanIdx>=0){
+      const auto& trk = slc->reco.pfp.at(muonCanIdx).trk;
+      for(const auto& pt: trk.calo[2].points){
+        rets.push_back( pt.dedx );
+      }
+    }
+    return rets;
+  });
 
   // Proton candidate
   const Var kNuMIProtonCandidateIdx([](const caf::SRSliceProxy* slc) -> int {

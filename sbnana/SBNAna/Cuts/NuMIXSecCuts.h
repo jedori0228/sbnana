@@ -16,6 +16,8 @@ namespace ana
   /// \ref Cut on having muon candidate
   extern const Cut kNuMIHasMuonCandidate;
 
+  extern const Var kNuMIMuonCandMatched;
+
   /// \ref Cut on having proton candidate
   extern const Cut kNuMIHasProtonCandidate;
   extern const Cut kNuMIProtonCandidateRecoPTreshold;

@@ -76,6 +76,8 @@ namespace ana{
     return {
       // CutType
       "CutType/i",
+      // Selection flags for each step
+      "SelectionFlag/i",
       // Intercation
       "TruePDG/i", "TrueMode/i", "TrueTarget/i", "TrueIsCC/i",
       "TrueIsFHC/i",
@@ -161,6 +163,8 @@ namespace ana{
     return {
       // CutType
       kNuMICutType,
+      // Selection flags for each step
+      kNuMIRecoSelectionFlag,
       // Intercation
       kNuMITruePDG, kNuMITrueMode, kNuMITrueTarget, kNuMITrueIsCC,
       kNuMIIsFHC,

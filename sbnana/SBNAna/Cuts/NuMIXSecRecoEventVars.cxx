@@ -179,6 +179,71 @@ namespace ana{
       return -1;
     }
   });
+  const Var kNuMIRecoMuonTrackMatchType([](const caf::SRSliceProxy* slc) -> int {
+    int muonTrackIndex = kNuMIMuonCandidateIdx(slc);
+    if(muonTrackIndex>=0){
+      const auto& trk = slc->reco.pfp.at(muonTrackIndex).trk;
+      const auto& trk_truth = trk.truth.p;
+      int intID = trk_truth.interaction_id;
+      int trk_truth_pdg = trk_truth.pdg;
+      bool isTrkTruthContained = ( isnan(trk_truth.end.x) || isnan(trk_truth.end.y) || isnan(trk_truth.end.z) ) ? false : isContainedVol(trk_truth.end.x, trk_truth.end.y, trk_truth.end.z);
+      const int& endProc = trk_truth.end_process;
+      bool isStopped = (endProc==2);
+      bool isProtonInel = (endProc==7);
+      bool isChargedPionInel = (endProc==9) || (endProc==10);
+  
+      // 0: Contained nu-mu
+      if( intID!= -1 && abs(trk_truth_pdg)==13 && isTrkTruthContained ) return 0;
+      // 1: Exiting nu-mu
+      else if( intID!= -1 && abs(trk_truth_pdg)==13 && !isTrkTruthContained ) return 1;
+      // 2: Cosmic muon
+      else if( intID==-1 && abs(trk_truth_pdg)==13 ) return 2;
+      // 3: stoppting proton
+      else if( trk_truth_pdg==2212 && isTrkTruthContained && isStopped ) return 3;
+      // 4: Inel. proton
+      else if( trk_truth_pdg==2212 && isTrkTruthContained && isProtonInel ) return 4;
+      // 5: Other proton
+      else if( trk_truth_pdg==2212 && ( !(isTrkTruthContained && isStopped) && !(isTrkTruthContained && isProtonInel) ) ) return 5;
+      // 6: Stopping charged pion
+      else if( abs(trk_truth_pdg)==211 && isTrkTruthContained && isStopped ) return 6;
+      // 7: Inel. charged pion
+      else if( abs(trk_truth_pdg)==211 && isTrkTruthContained && isChargedPionInel ) return 7;
+      // 8: Other charged pion
+      else if( abs(trk_truth_pdg)==211 && ( !(isTrkTruthContained && isStopped) && !(isTrkTruthContained && isChargedPionInel) ) ) return 8;
+      // 9: Other
+      else return 9;
+    }
+    else{
+      return -1;
+    }
+
+  });
+  const Cut kNuMIRecoMuonTrackMatchContainedNuMu([](const caf::SRSliceProxy* slc){
+    int muonMatchType = kNuMIRecoMuonTrackMatchType(slc);
+    if(muonMatchType==0) return true;
+    else return false;
+  });
+
+  //   - Michel from muon (kTruth_MuonMichelIndex)
+  const MultiVar kNuMIMuonMichelMatchedPfpIndices([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    std::vector<double> rets;
+    int truthMuonMichelIndex = kTruth_MuonMichelIndex(&slc->truth);
+    if( truthMuonMichelIndex >= 0 ){
+      const auto& prim_MuonMichel = slc->truth.prim.at(truthMuonMichelIndex);
+      for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); i_pfp++){
+        auto const& pfp = slc->reco.pfp.at(i_pfp);
+        if(pfp.trk.truth.p.G4ID==prim_MuonMichel.G4ID){
+          rets.push_back(i_pfp);
+        }
+      }
+    }
+    return rets;
+  });
+  const Cut kNuMIHasTrueMuonMichel([](const caf::SRSliceProxy* slc){
+    int truthMuonMichelIndex = kTruth_MuonMichelIndex(&slc->truth);
+    if(truthMuonMichelIndex>=0) return true;
+    else return false;
+  });
 
   // - Charged pion
   const MultiVar kNuMIChargedPionMatchedTrackIndices([](const caf::SRSliceProxy* slc) -> std::vector<double> {
@@ -591,6 +656,33 @@ namespace ana{
 
     if( prim_leading_proton.G4ID == bestmatched.G4ID ) return 1;
     else return 0;
+  });
+
+  // - Selection enum
+  const Var kNuMIRecoSelectionFlag([](const caf::SRSliceProxy* slc) -> int {
+
+    bool Pass_VertexInFV = kNuMIVertexInFV(slc);
+    bool Pass_NotClearCosmic = kNuMINotClearCosmic(slc);
+    bool Pass_HasMuonCandidate = kNuMIHasMuonCandidate(slc);
+    bool Pass_HasProtonCandidate = kNuMIHasProtonCandidate(slc);
+    bool Pass_ProtonCandidateRecoPTreshold = kNuMIProtonCandidateRecoPTreshold(slc);
+    bool Pass_AllPrimaryHadronsContained = kNuMIAllPrimaryHadronsContained(slc);
+    bool Pass_NoSecondPrimaryMuonlikeTracks = kNuMINoSecondPrimaryMuonlikeTracks(slc);
+    bool Pass_CutPhotons = kNuMICutPhotons(slc);
+
+    int result = 0;
+
+    result |= Pass_VertexInFV << 7;                    // Bit 7 represents Pass_VertexInFV
+    result |= Pass_NotClearCosmic << 6;                // Bit 6 represents Pass_NotClearCosmic
+    result |= Pass_HasMuonCandidate << 5;              // Bit 5 represents Pass_HasMuonCandidate
+    result |= Pass_HasProtonCandidate << 4;            // Bit 4 represents Pass_HasProtonCandidate
+    result |= Pass_ProtonCandidateRecoPTreshold << 3;  // Bit 3 represents Pass_ProtonCandidateRecoPTreshold
+    result |= Pass_AllPrimaryHadronsContained << 2;    // Bit 2 represents Pass_AllPrimaryHadronsContained
+    result |= Pass_NoSecondPrimaryMuonlikeTracks << 1; // Bit 1 represents Pass_NoSecondPrimaryMuonlikeTracks
+    result |= Pass_CutPhotons;                        // Bit 0 represents Pass_CutPhotons
+
+    return result;
+
   });
 
 }
