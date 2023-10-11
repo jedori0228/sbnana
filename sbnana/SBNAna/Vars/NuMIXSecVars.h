@@ -108,6 +108,8 @@ namespace ana
   // Sideband vars: pi0
   extern const Var kNuMILeadingPhotonCandidateE;
   extern const Var kNuMISecondaryPhotonCandidateE;
+  extern const Var kNuMILeadingPhotonCandidateConvGap;
+  extern const Var kNuMISecondaryPhotonCandidateConvGap;
   extern const Var kNuMIPhotonCandidatesOpeningAngle;
   extern const Var kNuMIDiPhotonMass;
 
