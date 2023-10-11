@@ -26,6 +26,9 @@ namespace ana{
   extern const Var kNuMITrueq3; //!< q3; momentum transfer
   extern const Var kNuMITruew; //!< w; hadronic mass
   extern const Var kNuMIIsFHC; //!< 0: RHC, 1: FHC
+  extern const Var kNuMITrueProdVtxX;
+  extern const Var kNuMITrueProdVtxY;
+  extern const Var kNuMITrueProdVtxZ;
   // - Muon
   extern const Cut kNuMIHasTrueMuon;
   extern const Var kNuMITrueMuonKE; //!< True muon kinetic energy
@@ -43,10 +46,16 @@ namespace ana{
   extern const Var kNuMITrueChargedPionHasMichel;
 
   // Reco
+  // - Slice
+  extern const Var kNuMIRecoVtxTPC;
+  extern const Var kNuMIRecoVtxX;
+  extern const Var kNuMIRecoVtxY;
+  extern const Var kNuMIRecoVtxZ;
   // - Muon
   extern const Var kNuMIRecoMuonContained; //!< 0: Muon candidate track exiting, 1: Muon candidate track contained (-1: no muon candidate)
   extern const Var kNuMIRecoMuonTrackMatchType;
   extern const Cut kNuMIRecoMuonTrackMatchContainedNuMu;
+  extern const Var kNuMISplitMuonCut;
   //   - Michel from muon (kTruth_MuonMichelIndex)
   extern const MultiVar kNuMIMuonMichelMatchedPfpIndices;
   extern const Cut kNuMIHasTrueMuonMichel;

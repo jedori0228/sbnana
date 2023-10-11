@@ -93,6 +93,18 @@ namespace ana{
     if ( slc->truth.index < 0 ) return -5; //TODO Define better dummy value
     return kTruth_IsFHC(&slc->truth);
   });
+  const Var kNuMITrueProdVtxX([](const caf::SRSliceProxy* slc) -> double {
+    if ( slc->truth.index < 0 ) return -999999.; //TODO Define better dummy value
+    return slc->truth.prod_vtx.x;
+  });
+  const Var kNuMITrueProdVtxY([](const caf::SRSliceProxy* slc) -> double {
+    if ( slc->truth.index < 0 ) return -999999.; //TODO Define better dummy value
+    return slc->truth.prod_vtx.y;
+  });
+  const Var kNuMITrueProdVtxZ([](const caf::SRSliceProxy* slc) -> double {
+    if ( slc->truth.index < 0 ) return -999999.; //TODO Define better dummy value
+    return slc->truth.prod_vtx.z;
+  });
 
   // Muon
   const Cut kNuMIHasTrueMuon([](const caf::SRSliceProxy* slc){
@@ -167,6 +179,35 @@ namespace ana{
     else return 0;
   });
 
+  // - Slice
+  const Var kNuMIRecoVtxTPC([](const caf::SRSliceProxy* slc) -> int {
+    if( std::isnan(slc->vertex.x) || std::isnan(slc->vertex.y) || std::isnan(slc->vertex.z) ) return -1;
+
+    // East cryo
+    if( slc->vertex.x < 0 ){
+      if( slc->vertex.x < -210.21500 ) return 0; // EE TPC
+      else return 1; // EW TPC
+    }
+    // West cryo
+    else{
+      if( slc->vertex.x < +210.21500 ) return 2; // WE TPC
+      else return 3; // WW TPC
+    }
+
+  });
+  const Var kNuMIRecoVtxX([](const caf::SRSliceProxy* slc) -> int {
+    if( std::isnan(slc->vertex.x) ) return -99999.;
+    else return slc->vertex.x;
+  });
+  const Var kNuMIRecoVtxY([](const caf::SRSliceProxy* slc) -> int {
+    if( std::isnan(slc->vertex.y) ) return -99999.;
+    else return slc->vertex.y;
+  });
+  const Var kNuMIRecoVtxZ([](const caf::SRSliceProxy* slc) -> int {
+    if( std::isnan(slc->vertex.z) ) return -99999.;
+    else return slc->vertex.z;
+  });
+
   // 0: Muon candidate track exiting, 1: Muon candidate track contained (-1: no muon candidate)
   const Var kNuMIRecoMuonContained([](const caf::SRSliceProxy* slc) -> int {
     if( kNuMIMuonCandidateIdx(slc) >= 0 ){
@@ -222,6 +263,10 @@ namespace ana{
     int muonMatchType = kNuMIRecoMuonTrackMatchType(slc);
     if(muonMatchType==0) return true;
     else return false;
+  });
+  const Var kNuMISplitMuonCut([](const caf::SRSliceProxy* slc) -> int {
+    if( kNuMIRejectSplitMuons(slc) ) return 1;
+    else return 0;
   });
 
   //   - Michel from muon (kTruth_MuonMichelIndex)

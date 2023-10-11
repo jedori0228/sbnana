@@ -95,11 +95,17 @@ namespace ana{
       "FluxWeight",
       // NuE
       "TrueE",
+      // Vertex
+      "RecoVtxTPC/i",
+      "RecoVtxX", "RecoVtxY", "RecoVtxZ",
+      "TrueProdVtxX", "TrueProdVtxY", "TrueProdVtxZ",
       // RecoMuon track notfound/contained/exiting
       "MuonTrackType/i",
+      // Split muon cut
+      "SplitMuonCut/i",
       // Muon momentum
       "RecoMuonP", "TrueMuonP",
-      "RecoMuonRangeP", "TrueMuonMCSP",
+      "RecoMuonRangeP", "RecoMuonMCSP",
       "RecoMuonPt", "TrueMuonPt",
       // Muon length
       "RecoMuonLength", "TrueMuonLength",
@@ -153,6 +159,8 @@ namespace ana{
       // pi0
       "LeadingPhotonCandidateE",
       "SecondaryPhotonCandidateE",
+      "LeadingPhotonCandidateConvGap",
+      "SecondaryPhotonCandidateConvGap",
       "PhotonCandidatesOpeningAngle",
       "DiPhotonMass",
     };
@@ -182,8 +190,14 @@ namespace ana{
       kGetNuMIFluxWeight,
       // NuE
       kNuMITrueNuE,
+      // Vertex
+      kNuMIRecoVtxTPC,
+      kNuMIRecoVtxX, kNuMIRecoVtxY, kNuMIRecoVtxZ,
+      kNuMITrueProdVtxX, kNuMITrueProdVtxY, kNuMITrueProdVtxZ,
       // RecoMuon track notfound/contained/exiting
       kNuMIRecoMuonContained,
+      // Split muon cut
+      kNuMISplitMuonCut,
       // Muon momentum
       kNuMIMuonCandidateRecoP, kNuMIMuonTrueP,
       kNuMIMuonRecoRangeP, kNuMIMuonRecoMCSP,
@@ -240,6 +254,8 @@ namespace ana{
       // pi0
       kNuMILeadingPhotonCandidateE,
       kNuMISecondaryPhotonCandidateE,
+      kNuMILeadingPhotonCandidateConvGap,
+      kNuMISecondaryPhotonCandidateConvGap,
       kNuMIPhotonCandidatesOpeningAngle,
       kNuMIDiPhotonMass,
     };
