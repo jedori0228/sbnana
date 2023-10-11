@@ -72,6 +72,15 @@ namespace ana {
       return -999.;
     }
   });
+  const Var kNuMIRelaxedMuonTrackScore([](const caf::SRSliceProxy* slc) -> double {
+    int muonTrackIndex = kNuMIRelaxedMuonTrackIdx(slc);
+    if(muonTrackIndex>=0){
+      return slc->reco.pfp.at(muonTrackIndex).trackScore;
+    }
+    else{
+      return -999.;
+    }
+  });
   const Var kNuMIRelaxedMuonTrackMatchedTruthPDG([](const caf::SRSliceProxy* slc) -> int {
     int muonTrackIndex = kNuMIRelaxedMuonTrackIdx(slc);
     if(muonTrackIndex>=0){
@@ -298,6 +307,15 @@ namespace ana {
       return -999.;
     }
   });
+  const Var kNuMIRelaxedProtonTrackScore([](const caf::SRSliceProxy* slc) -> double {
+    int protonTrackIndex = kNuMIRelaxedProtonTrackIdx(slc);
+    if(protonTrackIndex>=0){
+      return slc->reco.pfp.at(protonTrackIndex).trackScore;
+    }
+    else{
+      return -999.;
+    }
+  });
   const Var kNuMIRelaxedProtonTrackMatchedTruthPDG([](const caf::SRSliceProxy* slc) -> int {
     int protonTrackIndex = kNuMIRelaxedProtonTrackIdx(slc);
     if(protonTrackIndex>=0){
@@ -449,6 +467,33 @@ namespace ana {
     int cpionTrackIndex = kNuMIRelaxedChargedPionTrackIdx(slc);
     if(cpionTrackIndex>=0){
       return slc->reco.pfp.at(cpionTrackIndex).trk.len;
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var kNuMIRelaxedChargedPionTrackChi2Muon([](const caf::SRSliceProxy* slc) -> double {
+    int cpionTrackIndex = kNuMIRelaxedChargedPionTrackIdx(slc);
+    if(cpionTrackIndex>=0){
+      return slc->reco.pfp.at(cpionTrackIndex).trk.chi2pid[2].chi2_muon;
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var kNuMIRelaxedChargedPionTrackChi2Proton([](const caf::SRSliceProxy* slc) -> double {
+    int cpionTrackIndex = kNuMIRelaxedChargedPionTrackIdx(slc);
+    if(cpionTrackIndex>=0){
+      return slc->reco.pfp.at(cpionTrackIndex).trk.chi2pid[2].chi2_proton;
+    }
+    else{
+      return -999.;
+    }
+  });
+  const Var kNuMIRelaxedChargedPionTrackScore([](const caf::SRSliceProxy* slc) -> double {
+    int cpionTrackIndex = kNuMIRelaxedChargedPionTrackIdx(slc);
+    if(cpionTrackIndex>=0){
+      return slc->reco.pfp.at(cpionTrackIndex).trackScore;
     }
     else{
       return -999.;

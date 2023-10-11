@@ -13,6 +13,7 @@ namespace ana{
   extern const Var kNuMIRelaxedMuonTrackLength;
   extern const Var kNuMIRelaxedMuonTrackChi2Muon;
   extern const Var kNuMIRelaxedMuonTrackChi2Proton;
+  extern const Var kNuMIRelaxedMuonTrackScore;
   extern const Var kNuMIRelaxedMuonTrackMatchedTruthPDG;
   extern const Var kNuMIRelaxedMuonTrackMatchedTruthIntID;
   extern const Var kNuMIRelaxedMuonTrackMatchedTruthContained;
@@ -34,6 +35,7 @@ namespace ana{
   extern const Var kNuMIRelaxedProtonTrackP;
   extern const Var kNuMIRelaxedProtonTrackChi2Muon;
   extern const Var kNuMIRelaxedProtonTrackChi2Proton;
+  extern const Var kNuMIRelaxedProtonTrackScore;
   extern const Var kNuMIRelaxedProtonTrackMatchedTruthPDG;
   extern const Var kNuMIRelaxedProtonTrackMatchedTruthIntID;
   extern const Var kNuMIRelaxedProtonTrackMatchedTruthContained;
@@ -48,6 +50,9 @@ namespace ana{
   // - Var
   extern const Var kNuMIRelaxedChargedPionTrackIdx;
   extern const Var kNuMIRelaxedChargedPionTrackLength;
+  extern const Var kNuMIRelaxedChargedPionTrackChi2Muon;
+  extern const Var kNuMIRelaxedChargedPionTrackChi2Proton;
+  extern const Var kNuMIRelaxedChargedPionTrackScore;
   extern const Var kNuMIRelaxedChargedPionTrackMatchedTruthPDG;
   extern const Var kNuMIRelaxedChargedPionTrackMatchedTruthIntID;
   extern const Var kNuMIRelaxedChargedPionTrackMatchedTruthContained;
