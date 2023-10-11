@@ -41,8 +41,6 @@
 
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_TruthMatch_Cuts.h"
 
-#include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_MichelStudy.h"
-
 using namespace ana;
 using namespace std;
 using namespace ICARUSNumuXsec;

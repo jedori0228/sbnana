@@ -821,6 +821,58 @@ void HistoProducer::MichelStudy(SpectrumLoader& loader, SpillCut spillCut, Cut c
 
 void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
+  // Some spectrums
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum(
+      "OpFlashFirstTime", Binning::Simple(500, -20., 30.),
+      loader,
+      OpFlashFirstTime,
+      kNoSpillCut
+    )
+  );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum(
+      "OpFlashTime", Binning::Simple(500, -20., 30.),
+      loader,
+      OpFlashTime,
+      kNoSpillCut
+    )
+  );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum(
+      "TriggerTime", Binning::Simple(500, -20., 30.),
+      loader,
+      kNuMISpillTriggerTime,
+      kNoSpillCut
+    )
+  );
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum(
+      "OpFlashFirstTime_ValidTrig", Binning::Simple(500, -20., 30.),
+      loader,
+      OpFlashFirstTime,
+      kNuMIValidTrigger
+    )
+  );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum(
+      "OpFlashTime_ValidTrig", Binning::Simple(500, -20., 30.),
+      loader,
+      OpFlashTime,
+      kNuMIValidTrigger
+    )
+  );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum(
+      "TriggerTime_ValidTrig", Binning::Simple(500, -20., 30.),
+      loader,
+      kNuMISpillTriggerTime,
+      kNuMIValidTrigger
+    )
+  );
+
   // CV
 
   map_cutName_to_vec_Trees[currentCutName].push_back(
@@ -930,6 +982,31 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       true
     )
   );
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "trueEvents_ContainedSelection", GetNuMITrueTreeLabels(),
+      loader,
+      GetNuMITrueTreeVars(), kNuMIValidTrigger,
+      kTruthCut_IsSignal,
+      kNuMISelection_1muNp0pi && kNuMIMuonCandidateContained,
+      kNoShift,
+      true
+    )
+  );
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "trueEvents_ContainedSelection_NoSplitMuon", GetNuMITrueTreeLabels(),
+      loader,
+      GetNuMITrueTreeVars(), kNuMIValidTrigger,
+      kTruthCut_IsSignal,
+      kNuMISelection_1muNp0pi && kNuMIMuonCandidateContained && kNuMIRejectSplitMuons,
+      kNoShift,
+      true
+    )
+  );
+
 
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
@@ -1052,6 +1129,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     "MuonLength",
     "MuonChi2Muon",
     "MuonChi2Proton",
+    "MuonTrackScore",
     "MuonMatchedTruthPDG/i",
     "MuonMatchedTruthIntID/i",
     "MuonMatchedTruthContained/i",
@@ -1063,6 +1141,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     "ProtonP",
     "ProtonChi2Muon",
     "ProtonChi2Proton",
+    "ProtonTrackScore",
     "ProtonMatchedTruthPDG/i",
     "ProtonMatchedTruthIntID/i",
     "ProtonMatchedTruthContained/i",
@@ -1070,6 +1149,9 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     "ChargedPionSelection/i",
     "ChargedPionMatchType/i",
     "ChargedPionLength",
+    "ChargedPionChi2Muon",
+    "ChargedPionChi2Proton",
+    "ChargedPionTrackScore",
     "ChargedPionMatchedTruthPDG/i",
     "ChargedPionMatchedTruthIntID/i",
     "ChargedPionMatchedTruthContained/i",
@@ -1083,6 +1165,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     kNuMIRelaxedMuonTrackLength,
     kNuMIRelaxedMuonTrackChi2Muon,
     kNuMIRelaxedMuonTrackChi2Proton,
+    kNuMIRelaxedMuonTrackScore,
     kNuMIRelaxedMuonTrackMatchedTruthPDG,
     kNuMIRelaxedMuonTrackMatchedTruthIntID,
     kNuMIRelaxedMuonTrackMatchedTruthContained,
@@ -1094,6 +1177,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     kNuMIRelaxedProtonTrackP,
     kNuMIRelaxedProtonTrackChi2Muon,
     kNuMIRelaxedProtonTrackChi2Proton,
+    kNuMIRelaxedProtonTrackScore,
     kNuMIRelaxedProtonTrackMatchedTruthPDG,
     kNuMIRelaxedProtonTrackMatchedTruthIntID,
     kNuMIRelaxedProtonTrackMatchedTruthContained,
@@ -1101,6 +1185,9 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     kNuMIIsRelaxedChargedPionSelection,
     kNuMIRelaxedChargedPionTrackMatchType,
     kNuMIRelaxedChargedPionTrackLength,
+    kNuMIRelaxedChargedPionTrackChi2Muon,
+    kNuMIRelaxedChargedPionTrackChi2Proton,
+    kNuMIRelaxedChargedPionTrackScore,
     kNuMIRelaxedChargedPionTrackMatchedTruthPDG,
     kNuMIRelaxedChargedPionTrackMatchedTruthIntID,
     kNuMIRelaxedChargedPionTrackMatchedTruthContained,
@@ -1334,6 +1421,7 @@ void HistoProducer::MomentumPerformanceTree(SpectrumLoader& loader, SpillCut spi
 
 
 }
+
 
 void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
