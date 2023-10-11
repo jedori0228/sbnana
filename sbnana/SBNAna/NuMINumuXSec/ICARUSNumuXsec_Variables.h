@@ -20,6 +20,10 @@ using namespace ana;
 
 namespace ICARUSNumuXsec{
 
+  // - PMT
+  extern const SpillMultiVar OpFlashFirstTime;
+  extern const SpillMultiVar OpFlashTime;
+
   // - Test
   extern const SpillMultiVar spillvarTest;
 

@@ -5,6 +5,29 @@ using namespace ana;
 
 namespace ICARUSNumuXsec{
 
+
+  // - PMT
+  const SpillMultiVar OpFlashFirstTime([](const caf::SRSpillProxy *sr) -> vector<double> {
+
+    std::vector<double> rets;
+
+    for(const auto& opflash : sr->opflashes){
+      rets.push_back( opflash.firsttime );
+    }
+
+    return rets;
+
+  });
+  const SpillMultiVar OpFlashTime([](const caf::SRSpillProxy *sr) -> vector<double> {
+
+    std::vector<double> rets;
+    for(const auto& opflash : sr->opflashes){
+      rets.push_back( opflash.time );
+    }
+    return rets;
+
+  });
+
   // - Test
   const SpillMultiVar spillvarTest([](const caf::SRSpillProxy *sr) -> vector<double> {
 
