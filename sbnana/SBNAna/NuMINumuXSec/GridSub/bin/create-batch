@@ -440,7 +440,7 @@ echo "@@ Done!"
 
   submitcmd = 'jobsub_submit -G icarus --role=Analysis \\\n'
   submitcmd += '--resource-provides="usage_model=DEDICATED,OPPORTUNISTIC" \\\n'
-  submitcmd += '''-l '+SingularityImage=\\\"/cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest\\\"' \\\n'''
+  submitcmd += '''--singularity-image /cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest \\\n'''
   submitcmd += '''--lines '+FERMIHTC_AutoRelease=True' --lines '+FERMIHTC_GraceMemory=1000' --lines '+FERMIHTC_GraceLifetime=3600' \\\n'''
   submitcmd += '''--append_condor_requirements='(TARGET.HAS_SINGULARITY=?=true)' \\\n'''
   submitcmd += '''--tar_file_name "dropbox://$(pwd)/ToGrid.tar" \\\n'''
