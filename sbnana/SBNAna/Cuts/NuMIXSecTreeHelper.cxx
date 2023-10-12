@@ -112,6 +112,8 @@ namespace ana{
       // Muon angle
       "RecoMuonCos", "TrueMuonCos",
       "RecoMuonCosBeam", "TrueMuonCosBeam",
+      // Muon track direction
+      "RecoMuonDirX", "RecoMuonDirY", "RecoMuonDirZ",
       // Proton momentum
       "RecoProtonP", "TrueProtonP",
       "RecoProtonPt", "TrueProtonPt",
@@ -207,6 +209,8 @@ namespace ana{
       // Muon angle
       kNuMIRecoCosThVtx, kNuMITrueCosThVtx,
       kNuMIRecoCosThBeam, kNuMITrueCosThBeam,
+      // Muon track direction
+      kNuMIRecoMuonTrackDirX, kNuMIRecoMuonTrackDirY, kNuMIRecoMuonTrackDirZ,
       // Proton momentum
       kNuMIProtonCandidateRecoP, kNuMIProtonTrueP,
       kNuMIRecoProtonPt, kNuMITrueProtonPt,

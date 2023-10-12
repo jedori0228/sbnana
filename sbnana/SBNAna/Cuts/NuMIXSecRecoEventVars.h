@@ -56,6 +56,9 @@ namespace ana{
   extern const Var kNuMIRecoMuonTrackMatchType;
   extern const Cut kNuMIRecoMuonTrackMatchContainedNuMu;
   extern const Var kNuMISplitMuonCut;
+  extern const Var kNuMIRecoMuonTrackDirX;
+  extern const Var kNuMIRecoMuonTrackDirY;
+  extern const Var kNuMIRecoMuonTrackDirZ;
   //   - Michel from muon (kTruth_MuonMichelIndex)
   extern const MultiVar kNuMIMuonMichelMatchedPfpIndices;
   extern const Cut kNuMIHasTrueMuonMichel;

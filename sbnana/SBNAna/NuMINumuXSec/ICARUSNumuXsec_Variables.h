@@ -23,6 +23,7 @@ namespace ICARUSNumuXsec{
   // - PMT
   extern const SpillMultiVar OpFlashFirstTime;
   extern const SpillMultiVar OpFlashTime;
+  extern const SpillMultiVar OpFlashTimeAfterSignalSelection;
 
   // - Test
   extern const SpillMultiVar spillvarTest;

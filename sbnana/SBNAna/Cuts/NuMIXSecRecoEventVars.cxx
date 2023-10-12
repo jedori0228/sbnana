@@ -268,6 +268,33 @@ namespace ana{
     if( kNuMIRejectSplitMuons(slc) ) return 1;
     else return 0;
   });
+  const Var kNuMIRecoMuonTrackDirX([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      return trk.dir.x;
+    }
+    else{
+      return -5.;
+    }
+  });
+  const Var kNuMIRecoMuonTrackDirY([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      return trk.dir.y;
+    }
+    else{
+      return -5.;
+    }
+  });
+  const Var kNuMIRecoMuonTrackDirZ([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      return trk.dir.z;
+    }
+    else{
+      return -5.;
+    }
+  });
 
   //   - Michel from muon (kTruth_MuonMichelIndex)
   const MultiVar kNuMIMuonMichelMatchedPfpIndices([](const caf::SRSliceProxy* slc) -> std::vector<double> {

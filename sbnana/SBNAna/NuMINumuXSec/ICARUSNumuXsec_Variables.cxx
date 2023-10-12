@@ -11,8 +11,11 @@ namespace ICARUSNumuXsec{
 
     std::vector<double> rets;
 
+    double manual_shift = 0.;
+    if(!sr->hdr.ismc) manual_shift -= 4.;
+
     for(const auto& opflash : sr->opflashes){
-      rets.push_back( opflash.firsttime );
+      rets.push_back( opflash.firsttime + manual_shift );
     }
 
     return rets;
@@ -21,8 +24,39 @@ namespace ICARUSNumuXsec{
   const SpillMultiVar OpFlashTime([](const caf::SRSpillProxy *sr) -> vector<double> {
 
     std::vector<double> rets;
+
+    double manual_shift = 0.;
+    if(!sr->hdr.ismc) manual_shift -= 4.;
+
     for(const auto& opflash : sr->opflashes){
-      rets.push_back( opflash.time );
+      rets.push_back( opflash.time + manual_shift );
+    }
+    return rets;
+
+  });
+
+  const SpillMultiVar OpFlashTimeAfterSignalSelection([](const caf::SRSpillProxy *sr) -> vector<double> {
+
+    std::vector<double> rets;
+
+    // First check if there is a slice that pass signal selection
+    bool HasSlicePassSelection = false;
+    for(std::size_t i(0); i < sr->slc.size(); ++i){
+      const auto& slc = sr->slc.at(i);
+      if( kNuMISelection_1muNp0pi(&slc) ){
+        HasSlicePassSelection = true;
+        break;
+      }
+    }
+
+    if(HasSlicePassSelection){
+
+      double manual_shift = 0.;
+      if(!sr->hdr.ismc) manual_shift -= 4.;
+
+      for(const auto& opflash : sr->opflashes){
+        rets.push_back( opflash.time + manual_shift );
+      }
     }
     return rets;
 
