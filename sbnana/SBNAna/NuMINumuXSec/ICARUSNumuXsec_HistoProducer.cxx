@@ -809,11 +809,20 @@ void HistoProducer::MichelStudy(SpectrumLoader& loader, SpillCut spillCut, Cut c
 
   map_cutName_to_vec_Spectrums[currentCutName].push_back(
     new Spectrum(
-      "MuonRR_vs_MuondEdX_Shifted", loader, 
+      "MuonRR_vs_MuondEdX_CaloSystUp", loader, 
       Binning::Simple(30, 0., 30.), kNuMIMuonCandidateRR,
       Binning::Simple(100., 0., 10.), kNuMIMuonCandidatedEdX,
       spillCut, cut,
-      SystShifts(&CalorimetrySyst_GainUp, 1.)
+      SystShifts(&kCaloSyst, +1.)
+    )
+  );
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum(
+      "MuonRR_vs_MuondEdX_CaloSystDown", loader,
+      Binning::Simple(30, 0., 30.), kNuMIMuonCandidateRR,
+      Binning::Simple(100., 0., 10.), kNuMIMuonCandidatedEdX,
+      spillCut, cut,
+      SystShifts(&kCaloSyst, -1.)
     )
   );
 
@@ -907,39 +916,20 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
   // Shift
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
-      "selectedEvents_BetaUp", GetNuMIRecoTreeLabels(),
+      "selectedEvents_CaloSystUp", GetNuMIRecoTreeLabels(),
       loader,
       GetNuMIRecoTreeVars(),
       spillCut, cut,
-      SystShifts(&CalorimetrySyst_BetaUp, 1.), true, true
+      SystShifts(&kCaloSyst, +1.), true, true
     )
   );
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
-      "selectedEvents_BetaDown", GetNuMIRecoTreeLabels(),
+      "selectedEvents_CaloSystDown", GetNuMIRecoTreeLabels(),
       loader,
       GetNuMIRecoTreeVars(),
       spillCut, cut,
-      SystShifts(&CalorimetrySyst_BetaDown, 1.), true, true
-    )
-  );
-
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      "selectedEvents_GainUp", GetNuMIRecoTreeLabels(),
-      loader,
-      GetNuMIRecoTreeVars(),
-      spillCut, cut,
-      SystShifts(&CalorimetrySyst_GainUp, 1.), true, true
-    )
-  );
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      "selectedEvents_GainDown", GetNuMIRecoTreeLabels(),
-      loader,
-      GetNuMIRecoTreeVars(),
-      spillCut, cut,
-      SystShifts(&CalorimetrySyst_GainDown, 1.), true, true
+      SystShifts(&kCaloSyst, -1.), true, true
     )
   );
 
@@ -1048,23 +1038,23 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
 
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
-      "trueEvents_BetaUp", GetNuMITrueTreeLabels(),
+      "trueEvents_CaloSystUp", GetNuMITrueTreeLabels(),
       loader,
       GetNuMITrueTreeVars(), kNuMIValidTrigger,
       kTruthCut_IsSignal,
       kNuMISelection_1muNp0pi,
-      SystShifts(&CalorimetrySyst_BetaUp, 1.),
+      SystShifts(&kCaloSyst, +1.),
       true
     )
   );
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
-      "trueEvents_BetaDown", GetNuMITrueTreeLabels(),
+      "trueEvents_CaloSystDown", GetNuMITrueTreeLabels(),
       loader,
       GetNuMITrueTreeVars(), kNuMIValidTrigger,
       kTruthCut_IsSignal,
       kNuMISelection_1muNp0pi,
-      SystShifts(&CalorimetrySyst_BetaDown, 1.),
+      SystShifts(&kCaloSyst, -1.),
       true
     )
   );
@@ -1245,75 +1235,20 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
 
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
-      ("PIDStudyTree_AlphaUp_"+currentCutName).Data(), labels,
+      ("PIDStudyTree_CaloSystUp_"+currentCutName).Data(), labels,
       loader,
       varlists,
       spillCut, cut,
-      SystShifts(&CalorimetrySyst_AlphaUp, 1.), true, true
+      SystShifts(&kCaloSyst, +1.), true, true
     )
   );
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
-      ("PIDStudyTree_AlphaDown_"+currentCutName).Data(), labels,
+      ("PIDStudyTree_CaloSystDown_"+currentCutName).Data(), labels,
       loader,
       varlists,
       spillCut, cut,
-      SystShifts(&CalorimetrySyst_AlphaDown, 1.), true, true
-    )
-  );
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      ("PIDStudyTree_BetaUp_"+currentCutName).Data(), labels,
-      loader,
-      varlists,
-      spillCut, cut,
-      SystShifts(&CalorimetrySyst_BetaUp, 1.), true, true
-    )
-  );
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      ("PIDStudyTree_BetaDown_"+currentCutName).Data(), labels,
-      loader,
-      varlists,
-      spillCut, cut,
-      SystShifts(&CalorimetrySyst_BetaDown, 1.), true, true
-    )
-  );
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      ("PIDStudyTree_GainUp_"+currentCutName).Data(), labels,
-      loader,
-      varlists,
-      spillCut, cut,
-      SystShifts(&CalorimetrySyst_GainUp, 1.), true, true
-    )
-  );
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      ("PIDStudyTree_GainDown_"+currentCutName).Data(), labels,
-      loader,
-      varlists,
-      spillCut, cut,
-      SystShifts(&CalorimetrySyst_GainDown, 1.), true, true
-    )
-  );
-
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      ("PIDStudyTree_GainUpBetaDown_"+currentCutName).Data(), labels,
-      loader,
-      varlists,
-      spillCut, cut,
-      SystShifts(&CalorimetrySyst_GainUpBetaDown, 1.), true, true
-    )
-  );
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      ("PIDStudyTree_GainDownBetaUp_"+currentCutName).Data(), labels,
-      loader,
-      varlists,
-      spillCut, cut,
-      SystShifts(&CalorimetrySyst_GainDownBetaUp, 1.), true, true
+      SystShifts(&kCaloSyst, -1.), true, true
     )
   );
 
@@ -1470,7 +1405,6 @@ void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
   using namespace ICARUSNumuXsec::TwoTrack;
   using namespace ICARUSNumuXsec::TruthMatch;
 
-  map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("chi2muon", Binning::Simple(1, 0., 1.), loader, kNuMIRelaxedMuonTrackChi2Muon, kNoSpillCut, kNoCut, SystShifts(&CalorimetrySyst_NoShift, 1.) ) );
 
   //map_cutName_to_vec_Spectrums[currentCutName].push_back( new Spectrum("spillvarTest", Binning::Simple(1, 0., 1.), loader, TestVar, spillCut) );
 
