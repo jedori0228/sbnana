@@ -6,6 +6,7 @@
 #include "TFile.h"
 #include "TGraph2D.h"
 #include "TProfile.h"
+#include "TMath.h"
 
 #include <vector>
 
@@ -40,5 +41,6 @@ namespace ana
 
   };
 
+  extern const CalorimetrySyst kCaloSyst;
 
 }
