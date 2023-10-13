@@ -1235,6 +1235,15 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
 
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
+      ("PIDStudyTree_CaloSystNoShift_"+currentCutName).Data(), labels,
+      loader,
+      varlists,
+      spillCut, cut,
+      SystShifts(&kCaloSyst, 0.), true, true
+    )
+  );
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
       ("PIDStudyTree_CaloSystUp_"+currentCutName).Data(), labels,
       loader,
       varlists,
