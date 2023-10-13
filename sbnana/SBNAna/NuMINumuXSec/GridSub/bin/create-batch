@@ -407,6 +407,12 @@ echo "@@ Using temporal SBNDATA_DIR"
 echo "@@ ${SBNDATA_DIR}/beamData/NuMIdata/"
 ls ${SBNDATA_DIR}/beamData/NuMIdata/
 
+##  TEMPORARY FOR THIS RELEASE (v09_75_03)
+cd ${nodeBaseDir}
+export FW_SEARCH_PATH=${nodeBaseDir}/CaloSyst/:${FW_SEARCH_PATH}
+mkdir -p ${nodeBaseDir}/CaloSyst/
+ifdh cp /pnfs/icarus/persistent/users/jskim/NuMINumuXSec/CaloSyst/template_dEdXUncertainty.root ${nodeBaseDir}/CaloSyst/template_dEdXUncertainty.root
+
 echo "@@ Now go to "${thisOutputCreationDir}
 cd ${thisOutputCreationDir}
 
