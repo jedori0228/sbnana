@@ -355,7 +355,6 @@ namespace ana {
     double sumE = 0.;
     for(const auto& idx: indices){
       auto const& pfp = slc->reco.pfp.at(round(idx));
-      std::cout << pfp.shw.plane[2].energy << std::endl;
       sumE += pfp.shw.plane[2].energy;
     }
 
