@@ -247,6 +247,14 @@ namespace ana {
   const Cut kNuMI_IsSlcNotNu([](const caf::SRSliceProxy* slc) {
     return ( slc->truth.index < 0 );
   });
+  const Var kNuMITrueInteractionInFV([](const caf::SRSliceProxy* slc) -> int {
+    if ( slc->truth.index < 0 ) return -2;
+    if ( std::isnan(slc->truth.position.x) || std::isnan(slc->truth.position.y) || std::isnan(slc->truth.position.z) ) return -1;
+
+    if ( isInFV(slc->truth.position.x, slc->truth.position.y, slc->truth.position.z) ) return 1;
+    else return 0;
+
+  });
   /// \ref Check 1muNp0pi using vector of primaries
   bool Is1muNp0pi(const caf::Proxy<caf::SRTrueInteraction>& true_int, bool ApplyPhaseSpcaeCut){
 
@@ -298,6 +306,9 @@ namespace ana {
   });
   const TruthCut kTruthCut_IsSignal([](const caf::SRTrueInteractionProxy* nu) {
     return Is1muNp0pi(*nu, true);
+  });
+  const TruthCut kTruthCut_IsSignalWithoutPhaseSpaceCut([](const caf::SRTrueInteractionProxy* nu) {
+    return Is1muNp0pi(*nu, false);
   });
   /// \ref Signal but fails phase space cut = "out of phase space" (OOPS)
   const Cut kNuMI_1muNp0piStudy_Signal_FailPhaseSpaceCut = kNuMI_1muNp0piStudy_Signal_WithoutPhaseSpaceCut && // signal,

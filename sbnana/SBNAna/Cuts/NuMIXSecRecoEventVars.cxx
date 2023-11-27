@@ -28,6 +28,11 @@ namespace ana{
     if ( slc->truth.index < 0 ) return -1;
     return kTruth_NProton_Primary(&slc->truth);
   });
+  // Number of all proton
+  const Var kNuMITrueNProton_All([](const caf::SRSliceProxy* slc) -> int {
+    if ( slc->truth.index < 0 ) return -1;
+    return kTruth_NProton_All(&slc->truth);
+  });
   // Number of primary neutron
   const Var kNuMITrueNNeutron([](const caf::SRSliceProxy* slc) -> int {
     if ( slc->truth.index < 0 ) return -1;
@@ -105,6 +110,18 @@ namespace ana{
     if ( slc->truth.index < 0 ) return -999999.; //TODO Define better dummy value
     return slc->truth.prod_vtx.z;
   });
+  const Var kNuMITrueIntPosX([](const caf::SRSliceProxy* slc) -> double {
+    if ( slc->truth.index < 0 ) return -999999.; //TODO Define better dummy value
+    return slc->truth.position.x;
+  });
+  const Var kNuMITrueIntPosY([](const caf::SRSliceProxy* slc) -> double {
+    if ( slc->truth.index < 0 ) return -999999.; //TODO Define better dummy value
+    return slc->truth.position.y;
+  });
+  const Var kNuMITrueIntPosZ([](const caf::SRSliceProxy* slc) -> double {
+    if ( slc->truth.index < 0 ) return -999999.; //TODO Define better dummy value
+    return slc->truth.position.z;
+  });
 
   // Muon
   const Cut kNuMIHasTrueMuon([](const caf::SRSliceProxy* slc){
@@ -141,6 +158,11 @@ namespace ana{
   const Var kNuMITrueProtonNuCosineTheta([](const caf::SRSliceProxy* slc) -> double {
     if ( slc->truth.index < 0 ) return -5.; //TODO Define better dummy value
     return kTruth_ProtonNuCosineTheta(&slc->truth);
+  });
+  //   - Leading out of all proton
+  const Var kNuMITrueG4ProtonP([](const caf::SRSliceProxy* slc) -> double {
+    if ( slc->truth.index < 0 ) return -5.; //TODO Define better dummy value
+    return kTruth_G4ProtonP(&slc->truth);
   });
 
   // Chargedpion
@@ -206,6 +228,28 @@ namespace ana{
   const Var kNuMIRecoVtxZ([](const caf::SRSliceProxy* slc) -> int {
     if( std::isnan(slc->vertex.z) ) return -99999.;
     else return slc->vertex.z;
+  });
+  // - Stub
+  const Var kNuMINStub([](const caf::SRSliceProxy* slc) -> int {
+    return slc->reco.stub.size();
+  });
+  const Var kNuMINExtraStub([](const caf::SRSliceProxy* slc) -> int {
+    int muonInd = kNuMIMuonCandidateIdx(slc);
+    int protonInd = kNuMIProtonCandidateIdx(slc);
+
+    int muon_pfpid = muonInd>=0 ? slc->reco.pfp.at(muonInd).id.GetValue() : -2;
+    int proton_pfpif = protonInd>=0 ?  slc->reco.pfp.at(protonInd).id.GetValue() : -2;
+
+    int ret = 0;
+    for(const auto& stub: slc->reco.stub){
+      int stub_pfpid = stub.pfpid;
+      if(stub_pfpid!=-1){
+        if(stub_pfpid==muon_pfpid) continue;
+        if(stub_pfpid==proton_pfpif) continue;
+      }
+      ret++;
+    }
+    return ret;
   });
 
   // 0: Muon candidate track exiting, 1: Muon candidate track contained (-1: no muon candidate)
@@ -295,6 +339,26 @@ namespace ana{
       return -5.;
     }
   });
+  const Var kNuMIRecoMuonTrackChi2Muon([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      if ( trk.calo[2].nhit < 5 ) return -5.;
+      return trk.chi2pid[2].chi2_muon;
+    }
+    else{
+      return -5.;
+    }
+  });
+  const Var kNuMIRecoMuonTrackChi2Proton([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      if ( trk.calo[2].nhit < 5 ) return -5.;
+      return trk.chi2pid[2].chi2_proton;
+    }
+    else{
+      return -5.;
+    }
+  });
 
   //   - Michel from muon (kTruth_MuonMichelIndex)
   const MultiVar kNuMIMuonMichelMatchedPfpIndices([](const caf::SRSliceProxy* slc) -> std::vector<double> {
@@ -315,6 +379,32 @@ namespace ana{
     int truthMuonMichelIndex = kTruth_MuonMichelIndex(&slc->truth);
     if(truthMuonMichelIndex>=0) return true;
     else return false;
+  });
+  const Var kNuMIRecoMuonChi2MIP5cm([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      if(Contained){
+        return GetChi2MIP(trk.calo[2], 5.);
+      }
+      else return -5;
+    }
+    else{
+      return -1;
+    }
+  });
+  const Var kNuMIRecoMuonChi2MIP10cm([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      if(Contained){
+        return GetChi2MIP(trk.calo[2], 10.);
+      }
+      else return -5;
+    }
+    else{
+      return -1;
+    }
   });
 
   // - Charged pion

@@ -13,6 +13,7 @@ namespace ana{
   extern const Var kNuMITrueMode; //!< GENIE interaction code (https://internal.dunescience.org/doxygen/namespacesimb.html#a2cce734d1b71408bbc7d98d148ac4360)
   extern const Var kNuMITrueIsCC; //!< IsCC (0:NC, 1:CC, -1:Not neutrino)
   extern const Var kNuMITrueNProton; //!< Number of primary proton
+  extern const Var kNuMITrueNProton_All; //!< Number of primary proton
   extern const Var kNuMITrueNNeutron; //!< Number of primary neutron
   extern const Var kNuMITrueNpip; //!< Number of primary pi+
   extern const Var kNuMITrueNpip_All; //!< Number of ALL pi+ (not just primary)
@@ -29,6 +30,9 @@ namespace ana{
   extern const Var kNuMITrueProdVtxX;
   extern const Var kNuMITrueProdVtxY;
   extern const Var kNuMITrueProdVtxZ;
+  extern const Var kNuMITrueIntPosX;
+  extern const Var kNuMITrueIntPosY;
+  extern const Var kNuMITrueIntPosZ;
   // - Muon
   extern const Cut kNuMIHasTrueMuon;
   extern const Var kNuMITrueMuonKE; //!< True muon kinetic energy
@@ -38,6 +42,9 @@ namespace ana{
   extern const Cut kNuMIHasTrueProton;
   extern const Var kNuMITrueProtonKE; //!< True proton kinetic energy
   extern const Var kNuMITrueProtonNuCosineTheta; //!< True muon cosine angle w.r.t. neutrino
+  //   - Leading out of all proton
+  extern const Var kNuMITrueG4ProtonP;
+
   // - Charged pion
   extern const Cut kNuMIHasTrueChargedPion;
   extern const Var kNuMITrueChargedPionKE; //!< True pi+- kinetic energy
@@ -51,6 +58,9 @@ namespace ana{
   extern const Var kNuMIRecoVtxX;
   extern const Var kNuMIRecoVtxY;
   extern const Var kNuMIRecoVtxZ;
+  // - Stub
+  extern const Var kNuMINStub;
+  extern const Var kNuMINExtraStub;
   // - Muon
   extern const Var kNuMIRecoMuonContained; //!< 0: Muon candidate track exiting, 1: Muon candidate track contained (-1: no muon candidate)
   extern const Var kNuMIRecoMuonTrackMatchType;
@@ -59,9 +69,13 @@ namespace ana{
   extern const Var kNuMIRecoMuonTrackDirX;
   extern const Var kNuMIRecoMuonTrackDirY;
   extern const Var kNuMIRecoMuonTrackDirZ;
+  extern const Var kNuMIRecoMuonTrackChi2Muon;
+  extern const Var kNuMIRecoMuonTrackChi2Proton;
   //   - Michel from muon (kTruth_MuonMichelIndex)
   extern const MultiVar kNuMIMuonMichelMatchedPfpIndices;
   extern const Cut kNuMIHasTrueMuonMichel;
+  extern const Var kNuMIRecoMuonChi2MIP5cm;
+  extern const Var kNuMIRecoMuonChi2MIP10cm;
   // - Charged pion
   //   - Track Var
   extern const MultiVar kNuMIChargedPionMatchedTrackIndices;

@@ -3,7 +3,7 @@
 using namespace ana;
 
 namespace ana{
-
+/*
   std::vector<string> GetNuMITrueTreeLabels(){
 
     return {
@@ -76,13 +76,12 @@ namespace ana{
     return {
       // CutType
       "CutType/i",
-      // Selection flags for each step
-      "SelectionFlag/i",
       // Intercation
       "TruePDG/i", "TrueMode/i", "TrueTarget/i", "TrueIsCC/i",
       "TrueIsFHC/i",
       // Number of primary particles
       "TrueNProton/i", "TrueNNeutron/i",
+      "TrueNProtonAll/i",
       "TrueNpip/i", "TrueNpim/i", "TrueNpi0/i",
       "TrueNpipAll/i", "TrueNpimAll/i", "TrueNpi0All/i",
       // True muon
@@ -99,6 +98,10 @@ namespace ana{
       "RecoVtxTPC/i",
       "RecoVtxX", "RecoVtxY", "RecoVtxZ",
       "TrueProdVtxX", "TrueProdVtxY", "TrueProdVtxZ",
+      "TrueIntInFV/i",
+      // Stub
+      "NStub/i",
+      "NExtraStub/i",
       // RecoMuon track notfound/contained/exiting
       "MuonTrackType/i",
       // Split muon cut
@@ -114,9 +117,14 @@ namespace ana{
       "RecoMuonCosBeam", "TrueMuonCosBeam",
       // Muon track direction
       "RecoMuonDirX", "RecoMuonDirY", "RecoMuonDirZ",
+      // Muon track chi2
+      "RecoMuonChi2Muon", 
+      "RecoMuonChi2Proton",
       // Proton momentum
       "RecoProtonP", "TrueProtonP",
       "RecoProtonPt", "TrueProtonPt",
+      // G4Proton for G4 cov
+      "TrueG4ProtonP",
       // Proton length
       "RecoProtonLength", "TrueProtonLength",
       // Proton angle
@@ -146,8 +154,13 @@ namespace ana{
       "LeadingChargedPionCandidateLength",
       "LeadingChargedPionCandidateNDaughter/i",
       "LeadingChargedPionCandidateMatchedPDG/i",
+      "LeadingChargedPionCandidateMatchedEndProcess/i",
+      "LeadingChargedPionCandidateMatchedLength",
       "LeadingChargedPionCandidateNCollectionHit/i",
       "LeadingChargedPionCandidateMIPChi2",
+      "LeadingChargedPionCandidateChi2Muon",
+      "LeadingChargedPionCandidateChi2Proton",
+      "LeadingChargedPionCandidateMindEdX",
       // Michel
       "NMichelCandidates/i",
       "MichelCandidateTrackLength",
@@ -173,13 +186,12 @@ namespace ana{
     return {
       // CutType
       kNuMICutType,
-      // Selection flags for each step
-      kNuMIRecoSelectionFlag,
       // Intercation
       kNuMITruePDG, kNuMITrueMode, kNuMITrueTarget, kNuMITrueIsCC,
       kNuMIIsFHC,
       // Number of primary particles
       kNuMITrueNProton, kNuMITrueNNeutron,
+      kNuMITrueNProton_All,
       kNuMITrueNpip, kNuMITrueNpim, kNuMITrueNpi0,
       kNuMITrueNpip_All, kNuMITrueNpim_All, kNuMITrueNpi0_All,
       // True muon
@@ -196,6 +208,10 @@ namespace ana{
       kNuMIRecoVtxTPC,
       kNuMIRecoVtxX, kNuMIRecoVtxY, kNuMIRecoVtxZ,
       kNuMITrueProdVtxX, kNuMITrueProdVtxY, kNuMITrueProdVtxZ,
+      kNuMITrueInteractionInFV,
+      // Stub
+      kNuMINStub,
+      kNuMINExtraStub,
       // RecoMuon track notfound/contained/exiting
       kNuMIRecoMuonContained,
       // Split muon cut
@@ -211,9 +227,14 @@ namespace ana{
       kNuMIRecoCosThBeam, kNuMITrueCosThBeam,
       // Muon track direction
       kNuMIRecoMuonTrackDirX, kNuMIRecoMuonTrackDirY, kNuMIRecoMuonTrackDirZ,
+      // Muon track chi2
+      kNuMIRecoMuonTrackChi2Muon,
+      kNuMIRecoMuonTrackChi2Proton,
       // Proton momentum
       kNuMIProtonCandidateRecoP, kNuMIProtonTrueP,
       kNuMIRecoProtonPt, kNuMITrueProtonPt,
+      // G4Proton for G4 cov
+      kNuMITrueG4ProtonP,
       // Proton legnth
       kNuMIRecoProtonLength, kNuMITrueProtonLength,
       // Proton angle
@@ -243,8 +264,13 @@ namespace ana{
       kNuMILeadingChargedPionCandidateLength,
       kNuMILeadingChargedPionCandidateNDaughter,
       kNuMILeadingChargedPionCandidateMatchedPDG,
+      kNuMILeadingChargedPionCandidateMatchedEndProcess,
+      kNuMILeadingChargedPionCandidateMatchedLength,
       kNuMILeadingChargedPionCandidateNCollectionHit,
       kNuMILeadingChargedPionCandidateMIPChi2,
+      kNuMILeadingChargedPionCandidateChi2Muon,
+      kNuMILeadingChargedPionCandidateChi2Proton,
+      kNuMILeadingChargedPionCandidateMindEdX,
       // Michel
       kNuMINMichelCandidates,
       kNuMIMichelCandidateTrackLength,
@@ -265,5 +291,5 @@ namespace ana{
     };
 
   }
-
+*/
 }
