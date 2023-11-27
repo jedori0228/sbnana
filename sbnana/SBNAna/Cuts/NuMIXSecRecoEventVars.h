@@ -51,6 +51,8 @@ namespace ana{
   extern const Var kNuMITrueChargedPionEndProcess;
   extern const Var kNuMITrueChargedPionLength;
   extern const Var kNuMITrueChargedPionHasMichel;
+  // - Signal def
+  extern const Var kNuMIIsSignal; //!< 0: not signal, 1: signal
 
   // Reco
   // - Slice

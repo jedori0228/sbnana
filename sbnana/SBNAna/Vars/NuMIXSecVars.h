@@ -9,6 +9,7 @@ namespace ana
 {
   /// bool to determine if object is in fiducial volume
   bool isInFV (double x, double y, double z);
+  bool isInAV (double x, double y, double z);
 
   /// bool to determine if object is in containment volume
   bool isContainedVol (double x, double y, double z);
@@ -18,6 +19,10 @@ namespace ana
   bool IsTracklikeTrack( const caf::SRSliceProxy* slice, const unsigned int idxTrk );
   bool IsShowerlike( const caf::SRSliceProxy* slice, const unsigned int idxShw );
   bool IsPrimaryPFP( const caf::SRSliceProxy* slice, const unsigned int idxTrk );
+
+  /// \ref Var that is a dummy var that returns 1 for "IsFHC" or 0 for "!IsFHC" for example
+  extern const Var kNuMIDummyVar1;
+  extern const Var kNuMIDummyVar0;
 
   //// Utilities for chi2
   double GetChi2MIP(const caf::Proxy<caf::SRTrackCalo>& calo, double length=26.);
@@ -107,9 +112,11 @@ namespace ana
 
   // Sideband vars: pi0
   extern const Var kNuMILeadingPhotonCandidateE;
-  extern const Var kNuMISecondaryPhotonCandidateE;
+  extern const Var kNuMILeadingPhotonCandidateTrueE;
   extern const Var kNuMILeadingPhotonCandidateConvGap;
+  extern const Var kNuMISecondaryPhotonCandidateE;
   extern const Var kNuMISecondaryPhotonCandidateConvGap;
+  extern const Var kNuMISecondaryPhotonCandidateTrueE;
   extern const Var kNuMIPhotonCandidatesOpeningAngle;
   extern const Var kNuMIDiPhotonMass;
 
@@ -135,4 +142,12 @@ namespace ana
   extern const MultiVar kNuMILeadingChargedPionCandidatedEdXs;
   extern const MultiVar kNuMILeadingChargedPionCandidateRRs;
 
+  // Investigate shower vars for the cut
+  extern const MultiVar kNuMIShowerCandidateIdxs;
+  extern const Var kNuMILeadingShowerCandidateLen;
+  extern const Var kNuMILeadingShowerCandidateGap;
+  extern const Var kNuMILeadingShowerCandidateEColl;
+  extern const Var kNuMILeadingShowerCandidateNHitsColl;
+  extern const Var kNuMILeadingShowerCandidateOpenAngle;
+  extern const Var kNuMILeadingShowerCandidateTrkFitEColl;
 }
