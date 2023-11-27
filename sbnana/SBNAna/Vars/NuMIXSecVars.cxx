@@ -205,16 +205,7 @@ namespace ana {
       const float Chi2Proton = trk.chi2pid[2].chi2_proton;
       const float Chi2Muon = trk.chi2pid[2].chi2_muon;
 
-      // reject back-to-back from muon
-      float angle = -5.0;
-      if ( primaryInd >= 0 ) {
-        const unsigned int idxPrim = (unsigned int)primaryInd;
-        TVector3 muDir( slc->reco.pfp[idxPrim].trk.dir.x, slc->reco.pfp[idxPrim].trk.dir.y, slc->reco.pfp[idxPrim].trk.dir.z );
-        TVector3 pDir( trk.dir.x, trk.dir.y, trk.dir.z );
-        angle = TMath::Cos(muDir.Angle(pDir));
-      }
-
-      if ( Contained && Chi2Proton>0. && Chi2Proton < 90. && Chi2Muon > 30. && angle >= -0.9) {
+      if ( Contained && Chi2Proton>0. && Chi2Proton < 90. && Chi2Muon > 30. ) {
         if ( trk.len <= Longest ) continue;
         Longest = trk.len;
         PTrackInd = thisIdx;
