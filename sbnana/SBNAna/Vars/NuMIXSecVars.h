@@ -20,7 +20,7 @@ namespace ana
   bool IsPrimaryPFP( const caf::SRSliceProxy* slice, const unsigned int idxTrk );
 
   //// Utilities for chi2
-  double GetChi2MIP(const caf::Proxy<caf::SRTrackCalo>& calo);
+  double GetChi2MIP(const caf::Proxy<caf::SRTrackCalo>& calo, double length=26.);
 
   /// \ref SpillVar for trigger time (check if the implementation is only comaptible for emulated trigger and fix if so...)
   extern const SpillVar kNuMISpillTriggerTime;
@@ -118,8 +118,21 @@ namespace ana
   extern const Var kNuMILeadingChargedPionCandidateLength;
   extern const Var kNuMILeadingChargedPionCandidateNDaughter;
   extern const Var kNuMILeadingChargedPionCandidateMatchedPDG;
+  extern const Var kNuMILeadingChargedPionCandidateMatchedEndProcess;
+  extern const Var kNuMILeadingChargedPionCandidateMatchedLength;
+  extern const Var kNuMILeadingChargedPionCandidateMatchedDirX;
+  extern const Var kNuMILeadingChargedPionCandidateMatchedDirY;
+  extern const Var kNuMILeadingChargedPionCandidateMatchedDirZ;
   extern const Var kNuMILeadingChargedPionCandidateNCollectionHit;
   extern const Var kNuMILeadingChargedPionCandidateMIPChi2;
-
+  extern const Var kNuMILeadingChargedPionCandidateChi2Muon;
+  extern const Var kNuMILeadingChargedPionCandidateChi2Proton;
+  extern const Var kNuMILeadingChargedPionCandidateChi2MuonInd1;
+  extern const Var kNuMILeadingChargedPionCandidateChi2ProtonInd1;
+  extern const Var kNuMILeadingChargedPionCandidateChi2MuonInd2;
+  extern const Var kNuMILeadingChargedPionCandidateChi2ProtonInd2;
+  extern const Var kNuMILeadingChargedPionCandidateMindEdX;
+  extern const MultiVar kNuMILeadingChargedPionCandidatedEdXs;
+  extern const MultiVar kNuMILeadingChargedPionCandidateRRs;
 
 }

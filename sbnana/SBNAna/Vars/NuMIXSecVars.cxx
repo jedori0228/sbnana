@@ -44,7 +44,7 @@ namespace ana {
   }
 
   //// Utilities for chi2
-  double GetChi2MIP(const caf::Proxy<caf::SRTrackCalo>& calo){
+  double GetChi2MIP(const caf::Proxy<caf::SRTrackCalo>& calo, double length){
 
     int npt = 0;
     double chi2 = -5.f;
@@ -52,7 +52,7 @@ namespace ana {
       const auto& pt = calo.points[i];
       if (i == 0 || i == calo.points.size() - 1) continue;
 
-      if( pt.rr>=26. ) continue;
+      if( pt.rr>=length ) continue;
       //if( pt.rr<=3. ) continue;
 
       static double dedx = 1.8814277274698800;
@@ -120,7 +120,7 @@ namespace ana {
         const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
         const float Chi2Proton = trk.chi2pid[2].chi2_proton;
         const float Chi2Muon = trk.chi2pid[2].chi2_muon;
-        if ( (!Contained && trk.len > 50.) || (Contained && trk.len > 50. && Chi2Proton > 60. && Chi2Muon < 30.) ) {
+        if ( (!Contained && trk.len > 50.) || (Contained && trk.len > 50. && Chi2Proton > 60. && Chi2Muon>0. && Chi2Muon < 30.) ) {
           if ( trk.len <= Longest ) continue;
           Longest = trk.len;
           PTrackInd = thisIdx;
@@ -185,7 +185,17 @@ namespace ana {
       const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
       const float Chi2Proton = trk.chi2pid[2].chi2_proton;
       const float Chi2Muon = trk.chi2pid[2].chi2_muon;
-      if ( Contained && Chi2Proton < 90. && Chi2Muon > 30. ) {
+
+      // reject back-to-back from muon
+      float angle = -5.0;
+      if ( primaryInd >= 0 ) {
+        const unsigned int idxPrim = (unsigned int)primaryInd;
+        TVector3 muDir( slc->reco.pfp[idxPrim].trk.dir.x, slc->reco.pfp[idxPrim].trk.dir.y, slc->reco.pfp[idxPrim].trk.dir.z );
+        TVector3 pDir( trk.dir.x, trk.dir.y, trk.dir.z );
+        angle = TMath::Cos(muDir.Angle(pDir));
+      }
+
+      if ( Contained && Chi2Proton>0. && Chi2Proton < 90. && Chi2Muon > 30. && angle >= -0.9) {
         if ( trk.len <= Longest ) continue;
         Longest = trk.len;
         PTrackInd = thisIdx;
@@ -223,7 +233,7 @@ namespace ana {
       const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
       const float Chi2Proton = trk.chi2pid[2].chi2_proton;
       const float Chi2Muon = trk.chi2pid[2].chi2_muon;
-      if ( Contained && Chi2Proton > 60. && Chi2Muon < 30. ){
+      if ( Contained && Chi2Proton > 60. && Chi2Muon>0. && Chi2Muon < 30. ){
         rets.push_back( i_pfp );
       }
     }
@@ -404,7 +414,7 @@ namespace ana {
 
       const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
       const float Chi2MIP = GetChi2MIP(trk.calo[2]);
-      if ( Contained && Chi2MIP<20. ){
+      if ( Contained && Chi2MIP>0. && Chi2MIP<20. ){
         rets.push_back( i_pfp );
       }
     }
@@ -1233,6 +1243,62 @@ namespace ana {
 
     return ret;
   });
+  const Var kNuMILeadingChargedPionCandidateMatchedEndProcess([](const caf::SRSliceProxy* slc) -> int {
+    int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
+    int ret = -999999; // PDG can be negative using this instead of -5
+    if(chargedpion_index>=0) ret = slc->reco.pfp[chargedpion_index].trk.truth.p.end_process;
+
+    return ret;
+  });
+  const Var kNuMILeadingChargedPionCandidateMatchedLength([](const caf::SRSliceProxy* slc) -> double {
+    int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
+    int ret = -999999; // PDG can be negative using this instead of -5
+    if(chargedpion_index>=0) ret = slc->reco.pfp[chargedpion_index].trk.truth.p.length;
+
+    return ret;
+  });
+  const Var kNuMILeadingChargedPionCandidateMatchedDirX([](const caf::SRSliceProxy* slc) -> double {
+    int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
+    double ret = -5.; // PDG can be negative using this instead of -5
+    if(chargedpion_index>=0){
+      const auto& trk = slc->reco.pfp[chargedpion_index].trk;
+      double x = trk.truth.p.genp.x;
+      double y = trk.truth.p.genp.y;
+      double z = trk.truth.p.genp.z;
+      if(isnan(x) || isnan(y) || isnan(z)) return -4.;
+      TVector3 vec_genp(x,y,z);
+      ret = vec_genp.Unit().X();
+    }
+    return ret;
+  });
+  const Var kNuMILeadingChargedPionCandidateMatchedDirY([](const caf::SRSliceProxy* slc) -> double {
+    int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
+    double ret = -999999; // PDG can be negative using this instead of -5
+    if(chargedpion_index>=0){
+      const auto& trk = slc->reco.pfp[chargedpion_index].trk;
+      double x = trk.truth.p.genp.x;
+      double y = trk.truth.p.genp.y;
+      double z = trk.truth.p.genp.z;
+      if(isnan(x) || isnan(y) || isnan(z)) return -4.;
+      TVector3 vec_genp(x,y,z);
+      ret = vec_genp.Unit().Y();
+    }
+    return ret;
+  });
+  const Var kNuMILeadingChargedPionCandidateMatchedDirZ([](const caf::SRSliceProxy* slc) -> double {
+    int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
+    double ret = -999999; // PDG can be negative using this instead of -5
+    if(chargedpion_index>=0){
+      const auto& trk = slc->reco.pfp[chargedpion_index].trk;
+      double x = trk.truth.p.genp.x;
+      double y = trk.truth.p.genp.y;
+      double z = trk.truth.p.genp.z;
+      if(isnan(x) || isnan(y) || isnan(z)) return -4.;
+      TVector3 vec_genp(x,y,z);
+      ret = vec_genp.Unit().Z();
+    }
+    return ret;
+  });
   const Var kNuMILeadingChargedPionCandidateNCollectionHit([](const caf::SRSliceProxy* slc) -> int {
     int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
     int ret = -5;
@@ -1248,6 +1314,95 @@ namespace ana {
     }
 
     return ret;
+  });
+  const Var kNuMILeadingChargedPionCandidateChi2Muon([](const caf::SRSliceProxy* slc) -> double {
+    int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
+    double ret = -5.f;
+    if(chargedpion_index>=0){
+      ret = slc->reco.pfp[chargedpion_index].trk.chi2pid[2].chi2_muon;
+    }
+    return ret;
+  });
+  const Var kNuMILeadingChargedPionCandidateChi2Proton([](const caf::SRSliceProxy* slc) -> double {
+    int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
+    double ret = -5.f;
+    if(chargedpion_index>=0){
+      ret = slc->reco.pfp[chargedpion_index].trk.chi2pid[2].chi2_proton;
+    }
+    return ret;
+  });
+  const Var kNuMILeadingChargedPionCandidateChi2MuonInd1([](const caf::SRSliceProxy* slc) -> double {
+    int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
+    double ret = -5.f;
+    if(chargedpion_index>=0){
+      ret = slc->reco.pfp[chargedpion_index].trk.chi2pid[0].chi2_muon;
+    }
+    return ret;
+  });
+  const Var kNuMILeadingChargedPionCandidateChi2ProtonInd1([](const caf::SRSliceProxy* slc) -> double {
+    int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
+    double ret = -5.f;
+    if(chargedpion_index>=0){
+      ret = slc->reco.pfp[chargedpion_index].trk.chi2pid[0].chi2_proton;
+    }
+    return ret;
+  });
+  const Var kNuMILeadingChargedPionCandidateChi2MuonInd2([](const caf::SRSliceProxy* slc) -> double {
+    int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
+    double ret = -5.f;
+    if(chargedpion_index>=0){
+      ret = slc->reco.pfp[chargedpion_index].trk.chi2pid[1].chi2_muon;
+    }
+    return ret;
+  });
+  const Var kNuMILeadingChargedPionCandidateChi2ProtonInd2([](const caf::SRSliceProxy* slc) -> double {
+    int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
+    double ret = -5.f;
+    if(chargedpion_index>=0){
+      ret = slc->reco.pfp[chargedpion_index].trk.chi2pid[1].chi2_proton;
+    }
+    return ret;
+  });
+  const Var kNuMILeadingChargedPionCandidateMindEdX([](const caf::SRSliceProxy* slc) -> double {
+    int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
+    double ret = -5.f;
+    if(chargedpion_index>=0){
+      float min_dedx = -1.;
+      for(const auto& pt: slc->reco.pfp[chargedpion_index].trk.calo[2].points){
+        if(isnan(pt.dedx) || isinf(pt.dedx)) continue;
+        if(pt.dedx<0) continue;
+
+        if(min_dedx<0) min_dedx = pt.dedx.GetValue();
+        else min_dedx = std::min(min_dedx, pt.dedx.GetValue());
+
+      }
+      if(min_dedx>0) ret = min_dedx;
+    }
+    return ret;
+  });
+  const MultiVar kNuMILeadingChargedPionCandidatedEdXs([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
+    std::vector<double> rets;
+    if(chargedpion_index>=0){
+      for(const auto& pt: slc->reco.pfp[chargedpion_index].trk.calo[2].points){
+        if(isnan(pt.dedx) || isinf(pt.dedx)) continue;
+        if(pt.dedx<0) continue;
+        rets.push_back( pt.dedx );
+      }
+    }
+    return rets;
+  });
+  const MultiVar kNuMILeadingChargedPionCandidateRRs([](const caf::SRSliceProxy* slc) -> std::vector<double> {
+    int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
+    std::vector<double> rets;
+    if(chargedpion_index>=0){
+      for(const auto& pt: slc->reco.pfp[chargedpion_index].trk.calo[2].points){
+        if(isnan(pt.dedx) || isinf(pt.dedx)) continue;
+        if(pt.dedx<0) continue;
+        rets.push_back( pt.rr );
+      }
+    }
+    return rets;
   });
 
 }
