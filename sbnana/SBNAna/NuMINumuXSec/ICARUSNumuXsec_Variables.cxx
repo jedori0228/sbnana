@@ -62,10 +62,272 @@ namespace ICARUSNumuXsec{
 
   });
 
+  // - Recalc chi2
+
+  const Var kNuMIRecoMuonChi2MuonPlusMichel5cmShift([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      if(Contained){
+        return dedxtempt.CalculateChi2MuonPlusMichel(trk.calo[2], 5., true);
+      }
+      else return -5;
+    }
+    else{
+      return -1;
+    }
+  });
+  const Var kNuMIRecoMuonChi2MuonPlusMichel5cmNoShift([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      if(Contained){
+        return dedxtempt.CalculateChi2MuonPlusMichel(trk.calo[2], 5., false);
+      }
+      else return -5;
+    }
+    else{
+      return -1;
+    }
+  });
+
+  const Var kNuMIRecoMuonChi2MuonPlusMichel10cmShift([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      if(Contained){
+        return dedxtempt.CalculateChi2MuonPlusMichel(trk.calo[2], 10., true);
+      }
+      else return -5;
+    }
+    else{
+      return -1;
+    }
+  });
+  const Var kNuMIRecoMuonChi2MuonPlusMichel10cmNoShift([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      if(Contained){
+        return dedxtempt.CalculateChi2MuonPlusMichel(trk.calo[2], 10., false);
+      }
+      else return -5;
+    }
+    else{
+      return -1;
+    }
+  });
+
+  const Var kNuMIRecoMuonFloatChi2MuonPlusMichel1cm([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      if(Contained){
+        return dedxtempt.CalculateFloatingChi2MuonPlusMichel(trk.calo[2], 1.);
+      }
+      else return -5;
+    }
+    else{
+      return -1;
+    }
+  });
+  const Var kNuMIRecoMuonFloatChi2MuonPlusMichel2cm([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      if(Contained){
+        return dedxtempt.CalculateFloatingChi2MuonPlusMichel(trk.calo[2], 2.);
+      }
+      else return -5;
+    }
+    else{
+      return -1;
+    }
+  });
+  const Var kNuMIRecoMuonFloatChi2MuonPlusMichel3cm([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      if(Contained){
+        return dedxtempt.CalculateFloatingChi2MuonPlusMichel(trk.calo[2], 3.);
+      }
+      else return -5;
+    }
+    else{
+      return -1;
+    }
+  });
+  const Var kNuMIRecoMuonFloatChi2MuonPlusMichel4cm([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      if(Contained){
+        return dedxtempt.CalculateFloatingChi2MuonPlusMichel(trk.calo[2], 4.);
+      }
+      else return -5;
+    }
+    else{
+      return -1;
+    }
+  });
+  const Var kNuMIRecoMuonFloatChi2MuonPlusMichel5cm([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      if(Contained){
+        return dedxtempt.CalculateFloatingChi2MuonPlusMichel(trk.calo[2], 5.);
+      }
+      else return -5;
+    }
+    else{
+      return -1;
+    }
+  });
+  const Var kNuMIRecoMuonFloatChi2MuonPlusMichel10cm([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      if(Contained){
+        //return dedxtempt.CalculateFloatingChi2MuonPlusMichel(trk.calo[2], 10.);
+
+
+        double new_chi2 = dedxtempt.CalculateFloatingChi2MuonPlusMichel(trk.calo[2], 10.);
+        double old_chi2 = trk.chi2pid[2].chi2_muon;
+        printf("[kNuMIRecoMuonFloatChi2MuonPlusMichel10cm] chi2 (original, fitted) = (%1.3f, %1.3f)\n", old_chi2, new_chi2);
+        return new_chi2;
+
+      }
+      else return -5;
+    }
+    else{
+      return -1;
+    }
+  });
+  const Var kNuMIRecoMuonFloatChi2MuonPlusMichel15cm([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      if(Contained){
+        return dedxtempt.CalculateFloatingChi2MuonPlusMichel(trk.calo[2], 15.);
+      }
+      else return -5;
+    }
+    else{
+      return -1;
+    }
+  });
+  const Var kNuMIRecoMuonFloatChi2MuonPlusMichelDebug([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      if(Contained){
+        return dedxtempt.CalculateFloatingChi2MuonPlusMichel(trk.calo[2], -1.);
+      }
+      else return -5;
+    }
+    else{
+      return -1;
+    }
+  });
+  const Var kNuMIRecoMuonFloatChi2MuonPlusMichel15cmDelta([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      if(Contained){
+        double chi2muon_original = trk.chi2pid[2].chi2_muon;
+        double chi2muon_fited = dedxtempt.CalculateFloatingChi2MuonPlusMichel(trk.calo[2], 15.);
+        return chi2muon_original-chi2muon_fited;
+      }
+      else return -5;
+    }
+    else{
+      return -1;
+    }
+  });
+  const Var kNuMIRecoMuonFloatChi2MuonPlusMichelDebugDelta([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      if(Contained){
+        double chi2muon_original = trk.chi2pid[2].chi2_muon;
+        double chi2muon_fited = dedxtempt.CalculateFloatingChi2MuonPlusMichel(trk.calo[2], -1.); 
+        return chi2muon_original-chi2muon_fited;
+      }
+      else return -5;
+    }
+    else{
+      return -1;
+    }
+  });
+
+  const Var kNuMILeadingChargedPionCandidateChi2MuonRecalc0p5([](const caf::SRSliceProxy* slc) -> double {
+    int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
+    double ret = -5.f;
+    if(chargedpion_index>=0){
+      auto const& trk = slc->reco.pfp.at(chargedpion_index).trk;
+      ret = dedxtempt.CalculateChi2(trk.calo[2], 3, 0.5);
+    }
+    return ret;
+  });
+  const Var kNuMILeadingChargedPionCandidateChi2MuonRecalc1p0([](const caf::SRSliceProxy* slc) -> double {
+    int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
+    double ret = -5.f;
+    if(chargedpion_index>=0){
+      auto const& trk = slc->reco.pfp.at(chargedpion_index).trk;
+      ret = dedxtempt.CalculateChi2(trk.calo[2], 3, 1.0);
+    }
+    return ret;
+  });
+
+
+
   // - Test
   const SpillMultiVar spillvarTest([](const caf::SRSpillProxy *sr) -> vector<double> {
 
     std::vector<double> rets;
+
+    if(! kNuMIValidTrigger(sr) ){
+      printf("\n(run, subrun, event) = (%d, %d, %d)", sr->hdr.run.GetValue(), sr->hdr.subrun.GetValue(), sr->hdr.evt.GetValue());
+    }
+    return rets;
+
+    for(std::size_t i(0); i < sr->slc.size(); ++i){
+      const auto& slc = sr->slc.at(i);
+
+      double MuonRecoP = kNuMIMuonCandidateRecoP(&slc);
+      double MuonTrueP = kNuMIMuonTrueP(&slc);
+      if(MuonRecoP<0 || MuonTrueP<0) continue;
+
+      if( !kNuMIMuonCandidateContained(&slc) ) continue;
+
+      int MuonIdx = kNuMIMuonCandidateIdx(&slc);
+      const auto& trk = slc.reco.pfp[MuonIdx].trk;
+
+      printf("\n(run, subrun, event) = (%d, %d, %d)", sr->hdr.run.GetValue(), sr->hdr.subrun.GetValue(), sr->hdr.evt.GetValue());
+      printf("- Slice index = %ld\n", i);
+      printf("- Muon P (reco, true) = (%1.1f, %1.1f)\n", MuonRecoP, MuonTrueP);
+      printf("- Muon track start (x,y,z) = (%1.2f, %1.2f, %1.2f)\n", trk.start.x.GetValue(), trk.start.y.GetValue(), trk.start.z.GetValue());
+      printf("- Muon track end (x,y,z) = (%1.2f, %1.2f, %1.2f)\n", trk.end.x.GetValue(), trk.end.y.GetValue(), trk.end.z.GetValue());
+/*
+      double FracDiff = (MuonRecoP-MuonTrueP)/MuonTrueP;
+      if( FracDiff<-0.4 ){
+
+        double trk_end_x = fabs(trk.end.x);
+        double dCathode = fabs( trk_end_x - 210.21500 );
+
+        if( dCathode < 5 ){
+
+          printf("\n(run, subrun, event) = (%d, %d, %d)", sr->hdr.run.GetValue(), sr->hdr.subrun.GetValue(), sr->hdr.evt.GetValue());
+          printf("- Slice index = %ld\n", i);
+          printf("- Muon P (reco, true) = (%1.1f, %1.1f)\n", MuonRecoP, MuonTrueP);
+          printf("- Muon track start (x,y,z) = (%1.2f, %1.2f, %1.2f)\n", trk.start.x.GetValue(), trk.start.y.GetValue(), trk.start.z.GetValue());
+          printf("- Muon track end (x,y,z) = (%1.2f, %1.2f, %1.2f)\n", trk.end.x.GetValue(), trk.end.y.GetValue(), trk.end.z.GetValue());
+
+        }
+      }
+*/
+
+    }
 
     return rets;
 
@@ -521,57 +783,22 @@ namespace ICARUSNumuXsec{
   // - Test
   const Var SliceTestVar([](const caf::SRSliceProxy* slc) -> double {
 /*
-    std::cout << "[JSKIMDEBUG][cutIsQELike] called" << std::endl;
-    printf("- genie_mode: %d\n",slc->truth.genie_mode.GetValue());
-    int n_proton=0;
-    int n_neutron=0;
-    int n_pip=0;
-    int n_pim=0;
-    int n_pi0=0;
-    for(unsigned i=0; i<slc->truth.ghepptl.size(); i++){
-      const auto& ghepptl = slc->truth.ghepptl.at(i);
-      if(ghepptl.gstatus!=1) continue;
-      const int& pdg = ghepptl.pdg;
-      if( pdg==2212 ) n_proton++;
-      else if( pdg==2112 ) n_neutron++;
-      else if( pdg==211 ) n_pip++;
-      else if( pdg==-211 ) n_pim++;
-      else if( pdg==111 ) n_pi0++;
-      else{
-
-      }
-
-    } // END ghep loop
-
-    printf("(p, n, pi+, pi-, pi0) = (%d, %d, %d, %d, %d)\n", n_proton, n_neutron, n_pip, n_pim, n_pi0);
+    int chargedpion_index = kNuMILeadingChargedPionCandidateInd(slc);
+    int ret = -5.; // PDG can be negative using this instead of -5
+    if(chargedpion_index>=0){
+      const auto& trk = slc->reco.pfp[chargedpion_index].trk;
+      double x = trk.truth.p.genp.x;
+      double y = trk.truth.p.genp.y;
+      double z = trk.truth.p.genp.z;
+      if(isnan(x) || isnan(y) || isnan(z)) return -4.;
+      printf("gen p (x,y,z) = (%1.3f, %1.3f, %1.3f)\n",x,y,z);
+      TVector3 vec_genp(x,y,z);
+      ret = vec_genp.Unit().X();
+      printf("-> ret = %1.3f\n"%(ret));
+    }
+    return ret;
 */
-
-    std::cout << "[JSKIMDEBUG][cutIsQELike] called" << std::endl;
-    printf("- genie_mode: %d\n",slc->truth.genie_mode.GetValue());
-    int n_muon=0;
-    int n_proton=0;
-    int n_neutron=0;
-    int n_pip=0;
-    int n_pim=0;
-    int n_pi0=0;
-
-    for(const auto& prm: slc->truth.prim){
-      const int pdg = prm.pdg;
-      const int apdg = abs(pdg);
-      if(apdg==13) n_muon++;
-
-      if( pdg==2212 ) n_proton++;
-      else if( pdg==2112 ) n_neutron++;
-      else if( pdg==211 ) n_pip++;
-      else if( pdg==-211 ) n_pim++;
-      else if( pdg==111 ) n_pi0++;
-
-    } // END prim loop
-
-    printf("(mu, p, n, pi+, pi-, pi0) = (%d, %d, %d, %d, %d, %d)\n", n_muon, n_proton, n_neutron, n_pip, n_pim, n_pi0);
-
-
-    return 0;
+return 0.;
   });
 
   // - For trigger eff study

@@ -178,7 +178,7 @@ double dEdXTemplateTool::GetdEdX(double rr, int ptlType) const {
 
   }
   else{
-    std::cout << "[dEdXTemplateTool::GetdEdX] rr = " << rr << ", bin = " << bin << std::endl;
+    //std::cout << "[dEdXTemplateTool::GetdEdX] rr = " << rr << ", bin = " << bin << std::endl;
     return -1.;
   }
 
@@ -225,7 +225,7 @@ double dEdXTemplateTool::GetdEdXErr(double rr, int ptlType) const {
 
 }
 
-double dEdXTemplateTool::CalculateChi2(const caf::Proxy<caf::SRTrackCalo>& calo, int ptlType) const {
+double dEdXTemplateTool::CalculateChi2(const caf::Proxy<caf::SRTrackCalo>& calo, int ptlType, double min_dedx) const {
 
   int npt = 0;
   double chi2 = 0;
@@ -238,8 +238,7 @@ double dEdXTemplateTool::CalculateChi2(const caf::Proxy<caf::SRTrackCalo>& calo,
     double dedx = GetdEdX(pt.rr, ptlType);
     double dedx_err = GetdEdXErr(pt.rr, ptlType);
 
-    bool UseThisPoint = (dedx>0.5) && (dedx_err>0);
-    //bool UseThisPoint = (dedx>0.) && (dedx_err>0);
+    bool UseThisPoint = (pt.dedx>min_dedx);
 
     if(UseThisPoint){
       double errdedx = 0.04231 + 0.0001783 * pt.dedx * pt.dedx; //resolution on dE/dx
@@ -287,6 +286,135 @@ double dEdXTemplateTool::CalculateInelasticPionChi2(const caf::Proxy<caf::SRTrac
   }
 
   return chi2;
+
+}
+
+double dEdXTemplateTool::CalculateChi2MuonPlusMichel(const caf::Proxy<caf::SRTrackCalo>& calo, double michel_len, bool shift_muon_rr) const {
+
+  int npt = 0;
+  double chi2 = 0;
+
+  static double mip_dedx = 1.8814277274698800;
+  static double mip_dedx_err = 0.3903743442373010;
+
+  for(unsigned i = 0; i < calo.points.size(); ++i) { //hits
+    const auto& pt = calo.points[i];
+    if (i == 0 || i == calo.points.size() - 1) continue;
+
+    if( pt.rr>=26. ) continue;
+
+    bool IsMichelRange = pt.rr.GetValue()<michel_len;
+
+    double rr = IsMichelRange ? pt.rr.GetValue() : (shift_muon_rr ? pt.rr-michel_len: pt.rr.GetValue());
+    double dedx = IsMichelRange ? mip_dedx : GetdEdX(rr, 3);
+    double dedx_err = IsMichelRange ? mip_dedx_err : GetdEdXErr(rr, 3);
+
+    if(dedx<0 || dedx_err<0) continue;
+
+    double errdedx = 0.04231 + 0.0001783 * pt.dedx * pt.dedx; //resolution on dE/dx
+    errdedx *= pt.dedx;
+
+    chi2 += pow( (pt.dedx-dedx)/std::sqrt( pow(dedx_err, 2) + pow(errdedx, 2) ), 2);
+
+    npt++;
+
+  }
+  if(npt){
+    chi2 /= npt;
+  }
+
+  return chi2;
+
+}
+
+double dEdXTemplateTool::CalculateFloatingChi2MuonPlusMichel(const caf::Proxy<caf::SRTrackCalo>& calo, double michel_len) const {
+
+  bool DoDebug = false;
+
+  double dedx_mip = 1.8814277274698800;
+  double dedx_err_mip = 0.3903743442373010;
+
+  double shift_min = -1.*michel_len;
+  double shift_max = +1.*michel_len;
+  double dshift = 1.;
+  int NShift = (shift_max-shift_min)/dshift;
+
+  // Debug
+  if(michel_len<=0.){
+    shift_min = 0.;
+    shift_max = 1.;
+    dshift = 1.;
+    NShift = 1;
+  }
+
+  bool Found = false;
+  double LeastChi2 = 9999999999.;
+
+  if(DoDebug){
+    std::cout << "[dEdXTemplateTool::CalculateFloatingChi2MuonPlusMichel] Looping over shifts" << std::endl;
+  }
+
+  for(int i_shift=0; i_shift<NShift; i_shift++){
+
+    double this_shift = shift_min + dshift * i_shift;
+    bool IsForward = this_shift>0.;
+
+    if(DoDebug){
+      printf("[dEdXTemplateTool::CalculateFloatingChi2MuonPlusMichel] - shift = %1.2fcm (IsForward=%d)\n", this_shift, IsForward);
+    }
+
+    int npt = 0;
+    double chi2 = 0.;
+
+    for(unsigned i = 0; i < calo.points.size(); ++i) { //hits
+      const auto& pt = calo.points[i];
+      if (i == 0 || i == calo.points.size() - 1) continue;
+
+      double rr = pt.rr.GetValue();
+      if(rr>=26.) continue;
+
+      double dedx_muon = GetdEdX(rr-this_shift, 3);
+      double dedx_err_muon = GetdEdXErr(rr-this_shift, 3);
+      if(dedx_muon<0. || dedx_err_muon<0.) continue;
+
+      double dedx = rr<fabs(this_shift) ?
+                    ( IsForward ? dedx_mip : dedx_mip+dedx_muon ):
+                    dedx_muon;
+      double dedx_err = rr<fabs(this_shift) ?
+                        ( IsForward ? dedx_err_mip : std::sqrt(dedx_err_mip*dedx_err_mip+dedx_err_muon*dedx_err_muon) ):
+                        dedx_err_muon;
+
+      if(DoDebug){
+        printf("[dEdXTemplateTool::CalculateFloatingChi2MuonPlusMichel]   - (rr, rr-this_shift, dedx) = (%1.3f, %1.3f, %1.3f)\n", rr, rr-this_shift, dedx);
+      }
+
+
+      if(dedx<0 || dedx_err<0) continue;
+
+      double errdedx = 0.04231 + 0.0001783 * pt.dedx * pt.dedx; //resolution on dE/dx
+      errdedx *= pt.dedx;
+
+      chi2 += std::pow( (pt.dedx-dedx)/std::sqrt( pow(dedx_err, 2) + pow(errdedx, 2) ), 2);
+
+      npt++;
+
+    }
+    if(npt){
+      if(DoDebug){
+        printf("[dEdXTemplateTool::CalculateFloatingChi2MuonPlusMichel]     - (chi2, npt) = (%1.3f, %d)\n", chi2, npt);
+      }
+      chi2 /= npt;
+      Found = true;
+      if(DoDebug){
+        printf("[dEdXTemplateTool::CalculateFloatingChi2MuonPlusMichel]     - (chi2/npt, LeastChi2) = (%1.3f, %1.3f)\n", chi2, LeastChi2);
+      }
+      LeastChi2 = std::min(LeastChi2, chi2);
+    }
+
+  }
+
+  if(Found) return LeastChi2;
+  else return -5.;
 
 }
 

@@ -134,8 +134,11 @@ namespace ICARUSNumuXsec{
     double GetdEdX(double rr, int ptlType) const;
     double GetdEdXErr(double rr, int ptlType) const;
 
-    double CalculateChi2(const caf::Proxy<caf::SRTrackCalo>& calo, int ptlType) const;
+    double CalculateChi2(const caf::Proxy<caf::SRTrackCalo>& calo, int ptlType, double min_dedx=0.5) const;
     double CalculateInelasticPionChi2(const caf::Proxy<caf::SRTrackCalo>& calo, int ptlType) const;
+
+    double CalculateChi2MuonPlusMichel(const caf::Proxy<caf::SRTrackCalo>& calo, double michel_len, bool shift_muon_rr) const;
+    double CalculateFloatingChi2MuonPlusMichel(const caf::Proxy<caf::SRTrackCalo>& calo, double michel_len) const;
 
     static dEdXTemplateTool& Instance();
 

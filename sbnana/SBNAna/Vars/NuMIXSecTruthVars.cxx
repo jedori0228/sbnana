@@ -12,6 +12,13 @@ namespace ana{
     }
     return NPtl;
   });
+  const TruthVar kTruth_NProton_All([](const caf::SRTrueInteractionProxy *nu) -> int {
+    int NPtl = 0;
+    for ( auto const& prim : nu->prim ) {
+      if ( prim.pdg == 2212 ) NPtl++;
+    }
+    return NPtl;
+  });
   const TruthVar kTruth_NNeutron_Primary([](const caf::SRTrueInteractionProxy *nu) -> int {
     int NPtl = 0;
     for ( auto const& prim : nu->prim ) {
@@ -192,7 +199,7 @@ namespace ana{
     return ret;
   });
 
-  // (Leading) Proton
+  // Leading primarh proton
 
   const TruthVar kTruth_ProtonIndex([](const caf::SRTrueInteractionProxy *nu) -> int {
     double max_E(-999);
@@ -298,6 +305,38 @@ namespace ana{
     int truth_idx = kTruth_ProtonIndex(nu);
     if(truth_idx>=0){
       ret = nu->prim.at(truth_idx).length;
+    }
+
+    return ret;
+  });
+
+  // Leading all proton
+
+  const TruthVar kTruth_G4ProtonIndex([](const caf::SRTrueInteractionProxy *nu) -> int {
+    double max_E(-999);
+    int truth_idx(-1);
+    for(std::size_t i(0); i < nu->prim.size(); ++i){
+      // proton
+      if( abs(nu->prim.at(i).pdg)!=2212 ) continue;
+      // non-nan genE
+      if(isnan(nu->prim.at(i).genE)) continue;
+
+      double this_E = nu->prim.at(i).genE;
+      // if larger E, update
+      if(this_E>max_E){
+        max_E = this_E;
+        truth_idx = i;
+      }
+    }
+    return truth_idx;
+  });
+  const TruthVar kTruth_G4ProtonP([](const caf::SRTrueInteractionProxy *nu) -> double {
+    double ret(-5.f);
+
+    int truth_idx = kTruth_G4ProtonIndex(nu);
+    if(truth_idx>=0){
+      const auto& pro_p = nu->prim.at(truth_idx).genp;
+      ret = sqrt(pro_p.x*pro_p.x + pro_p.y*pro_p.y + pro_p.z*pro_p.z);
     }
 
     return ret;

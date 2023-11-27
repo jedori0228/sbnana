@@ -25,6 +25,28 @@ namespace ICARUSNumuXsec{
   extern const SpillMultiVar OpFlashTime;
   extern const SpillMultiVar OpFlashTimeAfterSignalSelection;
 
+  // - Recalc chi2
+
+  extern const Var kNuMIRecoMuonChi2MuonPlusMichel5cmShift;
+  extern const Var kNuMIRecoMuonChi2MuonPlusMichel5cmNoShift;
+  extern const Var kNuMIRecoMuonChi2MuonPlusMichel10cmShift;
+  extern const Var kNuMIRecoMuonChi2MuonPlusMichel10cmNoShift;
+
+  extern const Var kNuMIRecoMuonFloatChi2MuonPlusMichel1cm;
+  extern const Var kNuMIRecoMuonFloatChi2MuonPlusMichel2cm;
+  extern const Var kNuMIRecoMuonFloatChi2MuonPlusMichel3cm;
+  extern const Var kNuMIRecoMuonFloatChi2MuonPlusMichel4cm;
+  extern const Var kNuMIRecoMuonFloatChi2MuonPlusMichel5cm;
+  extern const Var kNuMIRecoMuonFloatChi2MuonPlusMichel10cm;
+  extern const Var kNuMIRecoMuonFloatChi2MuonPlusMichel15cm;
+  extern const Var kNuMIRecoMuonFloatChi2MuonPlusMichelDebug;
+
+  extern const Var kNuMIRecoMuonFloatChi2MuonPlusMichel15cmDelta;
+  extern const Var kNuMIRecoMuonFloatChi2MuonPlusMichelDebugDelta;
+
+  extern const Var kNuMILeadingChargedPionCandidateChi2MuonRecalc0p5;
+  extern const Var kNuMILeadingChargedPionCandidateChi2MuonRecalc1p0;
+
   // - Test
   extern const SpillMultiVar spillvarTest;
 
