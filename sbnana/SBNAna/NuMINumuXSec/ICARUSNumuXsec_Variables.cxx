@@ -286,11 +286,6 @@ namespace ICARUSNumuXsec{
 
     std::vector<double> rets;
 
-    if(! kNuMIValidTrigger(sr) ){
-      printf("\n(run, subrun, event) = (%d, %d, %d)", sr->hdr.run.GetValue(), sr->hdr.subrun.GetValue(), sr->hdr.evt.GetValue());
-    }
-    return rets;
-
     for(std::size_t i(0); i < sr->slc.size(); ++i){
       const auto& slc = sr->slc.at(i);
 
@@ -303,12 +298,14 @@ namespace ICARUSNumuXsec{
       int MuonIdx = kNuMIMuonCandidateIdx(&slc);
       const auto& trk = slc.reco.pfp[MuonIdx].trk;
 
+/*
       printf("\n(run, subrun, event) = (%d, %d, %d)", sr->hdr.run.GetValue(), sr->hdr.subrun.GetValue(), sr->hdr.evt.GetValue());
       printf("- Slice index = %ld\n", i);
       printf("- Muon P (reco, true) = (%1.1f, %1.1f)\n", MuonRecoP, MuonTrueP);
       printf("- Muon track start (x,y,z) = (%1.2f, %1.2f, %1.2f)\n", trk.start.x.GetValue(), trk.start.y.GetValue(), trk.start.z.GetValue());
       printf("- Muon track end (x,y,z) = (%1.2f, %1.2f, %1.2f)\n", trk.end.x.GetValue(), trk.end.y.GetValue(), trk.end.z.GetValue());
-/*
+*/
+
       double FracDiff = (MuonRecoP-MuonTrueP)/MuonTrueP;
       if( FracDiff<-0.4 ){
 
@@ -323,9 +320,11 @@ namespace ICARUSNumuXsec{
           printf("- Muon track start (x,y,z) = (%1.2f, %1.2f, %1.2f)\n", trk.start.x.GetValue(), trk.start.y.GetValue(), trk.start.z.GetValue());
           printf("- Muon track end (x,y,z) = (%1.2f, %1.2f, %1.2f)\n", trk.end.x.GetValue(), trk.end.y.GetValue(), trk.end.z.GetValue());
 
+          printf("- Neutrino time = %1.2f\n", slc.truth.time.GetValue());
+
         }
       }
-*/
+
 
     }
 

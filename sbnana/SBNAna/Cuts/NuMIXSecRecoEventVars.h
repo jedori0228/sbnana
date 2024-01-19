@@ -13,6 +13,7 @@ namespace ana{
   extern const Var kNuMITrueMode; //!< GENIE interaction code (https://internal.dunescience.org/doxygen/namespacesimb.html#a2cce734d1b71408bbc7d98d148ac4360)
   extern const Var kNuMITrueIsCC; //!< IsCC (0:NC, 1:CC, -1:Not neutrino)
   extern const Var kNuMITrueNProton; //!< Number of primary proton
+  extern const Var kNuMITrueNProton_Threshold; //!< Number of primary proton with T>70 MeV
   extern const Var kNuMITrueNProton_All; //!< Number of primary proton
   extern const Var kNuMITrueNNeutron; //!< Number of primary neutron
   extern const Var kNuMITrueNpip; //!< Number of primary pi+
@@ -118,6 +119,8 @@ namespace ana{
   extern const Var kNuMIChargedPionMichelMatchedPfpShowerEnergySum;
   // - Proton
   extern const Var kNuMIRecoProtonMatchedToTrueProton;
+  extern const Var kNuMIRecoProtonTrackChi2Muon;
+  extern const Var kNuMIRecoProtonTrackChi2Proton;
 
   // - Selection enum
   extern const Var kNuMIRecoSelectionFlag;

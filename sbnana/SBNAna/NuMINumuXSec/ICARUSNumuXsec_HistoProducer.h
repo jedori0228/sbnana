@@ -85,6 +85,8 @@ namespace ICARUSNumuXsec{
     void MakeDetSystStudyTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     // - 231015_CutFlow
     void MakeCutFlow(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    // - 231217_CountNuMINu
+    void MakeNuMINuCountTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
     void Test(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 

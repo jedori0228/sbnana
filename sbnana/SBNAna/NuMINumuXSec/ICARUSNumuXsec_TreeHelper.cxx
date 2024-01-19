@@ -21,6 +21,9 @@ namespace ana{
       "TrueMuonCosBeam",
       "TrueMuonLength",
       "TrueMuonContained/i",
+      "TrueMuonDirX",
+      "TrueMuonDirY",
+      "TrueMuonDirZ",
       // Proton
       "TrueProtonP",
       "TrueProtonPt",
@@ -54,6 +57,9 @@ namespace ana{
       kTruth_MuonCosThBeam,
       kTruth_MuonLength,
       kTruth_MuonContained,
+      kTruth_MuonDirX,
+      kTruth_MuonDirY,
+      kTruth_MuonDirZ,
       // Proton
       kTruth_ProtonP,
       kTruth_ProtonPt,
@@ -81,6 +87,7 @@ namespace ana{
       "TrueIsFHC/i",
       // Number of primary particles
       "TrueNProton/i", "TrueNNeutron/i",
+      "TrueNProtonThreshold/i",
       "TrueNProtonAll/i",
       "TrueNpip/i", "TrueNpim/i", "TrueNpi0/i",
       "TrueNpipAll/i", "TrueNpimAll/i", "TrueNpi0All/i",
@@ -129,6 +136,9 @@ namespace ana{
       "RecoProtonLength", "TrueProtonLength",
       // Proton angle
       "RecoProtonCos", "TrueProtonCos",
+      // Proton track chi2
+      "RecoProtonChi2Muon",
+      "RecoProtonChi2Proton",
       // Muon,Proton angle
       "RecoMuonProtonCos", "TrueMuonProtonCos",
       // TKI
@@ -187,6 +197,9 @@ namespace ana{
       "SecondaryPhotonCandidateConvGap",
       "PhotonCandidatesOpeningAngle",
       "DiPhotonMass",
+      // Nu
+      "ENu_Muon_LeadingProton",
+      "ENu_Muon_AllProtons"
     };
 
   }
@@ -200,6 +213,7 @@ namespace ana{
       kNuMIIsFHC,
       // Number of primary particles
       kNuMITrueNProton, kNuMITrueNNeutron,
+      kNuMITrueNProton_Threshold,
       kNuMITrueNProton_All,
       kNuMITrueNpip, kNuMITrueNpim, kNuMITrueNpi0,
       kNuMITrueNpip_All, kNuMITrueNpim_All, kNuMITrueNpi0_All,
@@ -248,6 +262,9 @@ namespace ana{
       kNuMIRecoProtonLength, kNuMITrueProtonLength,
       // Proton angle
       kNuMIProtonRecoCosThVtx, kNuMIProtonTrueCosThVtx,
+      // Proton track chi2
+      kNuMIRecoProtonTrackChi2Muon,
+      kNuMIRecoProtonTrackChi2Proton,
       // Muon,Proton angle
       kNuMIRecoCosThMuP, kNuMITrueCosThMuP,
       // TKI
@@ -306,6 +323,9 @@ namespace ana{
       kNuMISecondaryPhotonCandidateConvGap,
       kNuMIPhotonCandidatesOpeningAngle,
       kNuMIDiPhotonMass,
+      // Nu
+      kNuMIRecoENu_Muon_LeadingProton,
+      kNuMIRecoENu_Muon_AllProtons,
     };
 
   }

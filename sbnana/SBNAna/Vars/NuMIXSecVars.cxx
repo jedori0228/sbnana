@@ -1022,6 +1022,88 @@ namespace ana {
     return ret;
   });
 
+  // Neutrino energy estimator
+  const Var kNuMIRecoENu_Muon_LeadingProton([](const caf::SRSliceProxy* slc) -> float {
+    float ret(-999.f); // acos is in the interval of [0,pi]
+
+    static double M_Muon = 0.1057;
+    static double M_Proton = 0.938272;
+
+    // Reco
+    double MuonRecoP = kNuMIMuonCandidateRecoP(slc);
+    double MuonRecoE = std::hypot(MuonRecoP, M_Muon);
+
+    double LeadingProtonRecoP = kNuMIProtonCandidateRecoP(slc);
+    double LeadingProtonRecoE = std::hypot(LeadingProtonRecoP, M_Proton);
+    double LeadingProtonRecoKE = LeadingProtonRecoE - M_Proton;
+
+    if(MuonRecoP>0. && LeadingProtonRecoP>0.){
+      ret = MuonRecoE + LeadingProtonRecoKE;
+    }
+
+    return ret;
+
+  });
+
+  const Var kNuMIRecoENu_Muon_AllProtons([](const caf::SRSliceProxy* slc) -> float {
+    float ret(-999.f); // acos is in the interval of [0,pi]
+
+    static double M_Muon = 0.1057;
+    static double M_Proton = 0.938272;
+
+    // Reco
+    double MuonRecoP = kNuMIMuonCandidateRecoP(slc);
+    double MuonRecoE = std::hypot(MuonRecoP, M_Muon);
+
+    // Sum all reco proton
+    int primaryInd = kNuMIMuonCandidateIdx(slc);
+    double SumAllProtonRecoKE = 0.;
+    unsigned int idxTrk = 0;
+    while ( IsValidTrkIdx(slc, idxTrk) ) {
+      int thisIdxInt = idxTrk;
+      if ( thisIdxInt == primaryInd ) {
+        idxTrk+=1;
+        continue; // skip the particle which is the muon candidate!
+      }
+      if ( !IsTracklikeTrack(slc, idxTrk) ) {
+        idxTrk+=1;
+        continue;
+      }
+      auto const& trk = slc->reco.pfp.at(idxTrk).trk; //GetTrack( slc, idxTrk );
+      unsigned int thisIdx = idxTrk;
+      idxTrk+=1;
+
+      if ( std::isnan(trk.start.x) || std::isnan(trk.len) || trk.len <= 0. ) continue;
+      if ( std::isnan(slc->vertex.x) || std::isnan(slc->vertex.y) || std::isnan(slc->vertex.z) ) return -1;
+      const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
+                                     slc->vertex.y - trk.start.y,
+                                     slc->vertex.z - trk.start.z);
+      const bool isPrimCandidate = (Atslc < 10. && IsPrimaryPFP(slc,thisIdx));
+
+      if ( !isPrimCandidate || trk.calo[2].nhit < 5 ) continue;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+      const float Chi2Proton = trk.chi2pid[2].chi2_proton;
+      const float Chi2Muon = trk.chi2pid[2].chi2_muon;
+
+      if ( Contained && Chi2Proton>0. && Chi2Proton < 90. && Chi2Muon > 30. ) {
+
+        double ThisProtonP = trk.rangeP.p_proton;
+        double ThisProtonE = std::hypot(ThisProtonP, M_Proton);
+        double ThisProtonKE = ThisProtonE - M_Proton;
+
+        SumAllProtonRecoKE += ThisProtonKE;
+
+      }
+    }
+
+    if(MuonRecoP>0. && SumAllProtonRecoKE>0.){
+      ret = MuonRecoE + SumAllProtonRecoKE;
+    }
+
+    return ret;
+  });
+  //const Var kNuMIRecoENu_Muon_AllProtons
+
   const Var kNuMILeadingPhotonCandidateE([](const caf::SRSliceProxy* slc) -> float {
     std::vector<double> photon_indices = kNuMIPhotonCandidateIdxs(slc);
     if(photon_indices.size()==0) return -5.f;

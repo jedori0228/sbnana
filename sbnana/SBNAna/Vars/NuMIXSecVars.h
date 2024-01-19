@@ -110,6 +110,10 @@ namespace ana
   extern const Var kNuMIRecodeltaphiT;
   extern const Var kNuMITruedeltaphiT;
 
+  // Neutrino energy estimator
+  extern const Var kNuMIRecoENu_Muon_LeadingProton;
+  extern const Var kNuMIRecoENu_Muon_AllProtons;
+
   // Sideband vars: pi0
   extern const Var kNuMILeadingPhotonCandidateE;
   extern const Var kNuMILeadingPhotonCandidateTrueE;

@@ -28,6 +28,11 @@ namespace ana{
     if ( slc->truth.index < 0 ) return -1;
     return kTruth_NProton_Primary(&slc->truth);
   });
+  // Number of primary proton
+  const Var kNuMITrueNProton_Threshold([](const caf::SRSliceProxy* slc) -> int {
+    if ( slc->truth.index < 0 ) return -1;
+    return kTruth_NProton_Threshold(&slc->truth);
+  });
   // Number of all proton
   const Var kNuMITrueNProton_All([](const caf::SRSliceProxy* slc) -> int {
     if ( slc->truth.index < 0 ) return -1;
@@ -823,6 +828,26 @@ namespace ana{
 
     if( prim_leading_proton.G4ID == bestmatched.G4ID ) return 1;
     else return 0;
+  });
+  const Var kNuMIRecoProtonTrackChi2Muon([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIProtonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIProtonCandidateIdx(slc)).trk;
+      if ( trk.calo[2].nhit < 5 ) return -5.;
+      return trk.chi2pid[2].chi2_muon;
+    }
+    else{
+      return -5.;
+    }
+  });
+  const Var kNuMIRecoProtonTrackChi2Proton([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIProtonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIProtonCandidateIdx(slc)).trk;
+      if ( trk.calo[2].nhit < 5 ) return -5.;
+      return trk.chi2pid[2].chi2_proton;
+    }
+    else{
+      return -5.;
+    }
   });
 
   // - Selection enum

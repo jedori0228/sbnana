@@ -30,6 +30,7 @@ namespace ana{
   const TruthVar kTruth_q3 = SIMPLETRUTHVAR(modq_lab);
   const TruthVar kTruth_w = SIMPLETRUTHVAR(w);
   extern const TruthVar kTruth_NProton_Primary;
+  extern const TruthVar kTruth_NProton_Threshold;
   extern const TruthVar kTruth_NProton_All;
   extern const TruthVar kTruth_NNeutron_Primary;
   extern const TruthVar kTruth_Npip_Primary;
@@ -57,6 +58,9 @@ namespace ana{
   extern const TruthVar kTruth_MuonKE;
   extern const TruthVar kTruth_MuonLength;
   extern const TruthVar kTruth_MuonContained; // 1: contained, 0: not contained (-1: muon not found)
+  extern const TruthVar kTruth_MuonDirX;
+  extern const TruthVar kTruth_MuonDirY;
+  extern const TruthVar kTruth_MuonDirZ;
 
   // Leading primary proton
 

@@ -1030,120 +1030,65 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
   // TrueTree
   if(TrueTreeFilled) return;
 
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      "trueEvents", GetNuMITrueTreeLabels(),
-      loader,
-      GetNuMITrueTreeVars(), kNuMIValidTrigger,
-      kTruthCut_IsSignal,
-      kNuMISelection_1muNp0pi,
-      kNoShift,
-      true
-    )
-  );
+  std::vector< std::pair<std::string, Cut> > RecoCutsForEffs = {
+    std::make_pair("", kNuMISelection_1muNp0pi),
+    std::make_pair("_Contained", kNuMISelection_1muNp0pi && kNuMIMuonCandidateContained),
+    std::make_pair("_Exiting", kNuMISelection_1muNp0pi && !kNuMIMuonCandidateContained),
+  };
 
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      "trueEvents_ContainedSelection_NoSplitMuon", GetNuMITrueTreeLabels(),
-      loader,
-      GetNuMITrueTreeVars(), kNuMIValidTrigger,
-      kTruthCut_IsSignal,
-      kNuMISelection_1muNp0pi && kNuMIMuonCandidateContained && kNuMIRejectSplitMuons,
-      kNoShift,
-      true
-    )
-  );
+  for(unsigned i_Cut=0; i_Cut<RecoCutsForEffs.size(); i_Cut++){
 
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      "trueEvents_CalodEdXShiftUp", GetNuMITrueTreeLabels(),
-      loader,
-      GetNuMITrueTreeVars(), kNuMIValidTrigger,
-      kTruthCut_IsSignal,
-      kNuMISelection_1muNp0pi,
-      SystShifts(&kCalodEdXShiftSyst, +1.),
-      true
-    )
-  );
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      "trueEvents_CalodEdXShiftDown", GetNuMITrueTreeLabels(),
-      loader,
-      GetNuMITrueTreeVars(), kNuMIValidTrigger,
-      kTruthCut_IsSignal,
-      kNuMISelection_1muNp0pi,
-      SystShifts(&kCalodEdXShiftSyst, -1.),
-      true
-    )
-  );
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      "trueEvents_CaloGainShiftUp", GetNuMITrueTreeLabels(),
-      loader,
-      GetNuMITrueTreeVars(), kNuMIValidTrigger,
-      kTruthCut_IsSignal,
-      kNuMISelection_1muNp0pi,
-      SystShifts(&kCaloGainShiftSyst, +1.),
-      true
-    )
-  );
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      "trueEvents_CaloGainShiftDown", GetNuMITrueTreeLabels(),
-      loader,
-      GetNuMITrueTreeVars(), kNuMIValidTrigger,
-      kTruthCut_IsSignal,
-      kNuMISelection_1muNp0pi,
-      SystShifts(&kCaloGainShiftSyst, -1.),
-      true
-    )
-  );
+    map_cutName_to_vec_Trees[currentCutName].push_back(
+      new ana::Tree(
+        "trueEvents"+RecoCutsForEffs[i_Cut].first, 
+        GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
+        RecoCutsForEffs[i_Cut].second,
+        kNoShift,
+        true
+      )
+    );
 
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      "trueEvents_ContainedSelection_NoSplitMuon_CalodEdXShiftUp", GetNuMITrueTreeLabels(),
-      loader,
-      GetNuMITrueTreeVars(), kNuMIValidTrigger,
-      kTruthCut_IsSignal,
-      kNuMISelection_1muNp0pi && kNuMIMuonCandidateContained && kNuMIRejectSplitMuons,
-      SystShifts(&kCalodEdXShiftSyst, +1.),
-      true
-    )
-  );
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      "trueEvents_ContainedSelection_NoSplitMuon_CalodEdXShiftDown", GetNuMITrueTreeLabels(),
-      loader,
-      GetNuMITrueTreeVars(), kNuMIValidTrigger,
-      kTruthCut_IsSignal,
-      kNuMISelection_1muNp0pi && kNuMIMuonCandidateContained && kNuMIRejectSplitMuons,
-      SystShifts(&kCalodEdXShiftSyst, -1.),
-      true
-    )
-  );
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      "trueEvents_ContainedSelection_NoSplitMuon_CaloGainShiftUp", GetNuMITrueTreeLabels(),
-      loader,
-      GetNuMITrueTreeVars(), kNuMIValidTrigger,
-      kTruthCut_IsSignal,
-      kNuMISelection_1muNp0pi && kNuMIMuonCandidateContained && kNuMIRejectSplitMuons,
-      SystShifts(&kCaloGainShiftSyst, +1.),
-      true
-    )
-  );
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      "trueEvents_ContainedSelection_NoSplitMuon_CaloGainShiftDown", GetNuMITrueTreeLabels(),
-      loader,
-      GetNuMITrueTreeVars(), kNuMIValidTrigger,
-      kTruthCut_IsSignal,
-      kNuMISelection_1muNp0pi && kNuMIMuonCandidateContained && kNuMIRejectSplitMuons,
-      SystShifts(&kCaloGainShiftSyst, -1.),
-      true
-    )
-  );
+    map_cutName_to_vec_Trees[currentCutName].push_back(
+      new ana::Tree(
+        "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CalodEdXShiftUp",
+        GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
+        RecoCutsForEffs[i_Cut].second,
+        SystShifts(&kCalodEdXShiftSyst, +1.),
+        true
+      )
+    );
 
+    map_cutName_to_vec_Trees[currentCutName].push_back(
+      new ana::Tree(
+        "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CalodEdXShiftDown",
+        GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
+        RecoCutsForEffs[i_Cut].second,
+        SystShifts(&kCalodEdXShiftSyst, -1.),
+        true
+      )
+    );
+
+    map_cutName_to_vec_Trees[currentCutName].push_back(
+      new ana::Tree(
+        "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CaloGainShiftUp",
+        GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
+        RecoCutsForEffs[i_Cut].second,
+        SystShifts(&kCaloGainShiftSyst, +1.),
+        true
+      )
+    );
+
+    map_cutName_to_vec_Trees[currentCutName].push_back(
+      new ana::Tree(
+        "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CaloGainShiftDown",
+        GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
+        RecoCutsForEffs[i_Cut].second,
+        SystShifts(&kCaloGainShiftSyst, -1.),
+        true
+      )
+    );
+
+  }
 
   map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
     new ana::NSigmasTree(
@@ -1543,6 +1488,41 @@ void HistoProducer::MakeCutFlow(SpectrumLoader& loader, SpillCut spillCut, Cut c
 
 }
 
+// - 231217_CountNuMINu
+void HistoProducer::MakeNuMINuCountTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  std::vector<std::string> labels = {
+    "NuPDG/I",
+    "NuMode/I",
+    "NuCC/I",
+    "NuE",
+    "MuonLength",
+  };
+
+  std::vector<TruthVar> varlists = {
+    kTruth_NeutrinoPDG,
+    kTruth_NeutrinoMode,
+    kTruth_IsCC,
+    kTruth_NeutrinoE,
+    kTruth_MuonLength,
+  };
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "NuMINuCount",
+      labels,
+      loader,
+      varlists,
+      kNoSpillCut,
+      kTruth_VertexInFV,
+      kNoCut,
+      kNoShift,
+      true
+    )
+  );
+
+}
+
 void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 /*
   map_cutName_to_vec_Spectrums[currentCutName].push_back(
@@ -1555,8 +1535,8 @@ void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
   );
 */
 
-  //FillCVSpectrum(loader, "CountSpill", spillvarTest, Binning::Simple(1, 0.,1.), spillCut);
-  FillCVSpectrum(loader, "CountSlice", varCountSlice, Binning::Simple(1, 0.,1.), spillCut, cut);
+  FillCVSpectrum(loader, "CountSpill", spillvarTest, Binning::Simple(1, 0.,1.), spillCut);
+  //FillCVSpectrum(loader, "CountSlice", varCountSlice, Binning::Simple(1, 0.,1.), spillCut, cut);
 
   //FillCVSpectrum(loader, "SliceTestVar", SliceTestVar, Binning::Simple(1, 0.,1.), spillCut, cut);
 

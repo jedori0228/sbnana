@@ -12,6 +12,21 @@ namespace ana{
     }
     return NPtl;
   });
+  const TruthVar kTruth_NProton_Threshold([](const caf::SRTrueInteractionProxy *nu) -> int {
+    int NPtl = 0;
+    for ( auto const& prim : nu->prim ) {
+      if ( prim.start_process != 0 ) continue;
+      if ( isnan(prim.genE) ) continue;
+      if ( prim.pdg == 2212 ){
+        double genE = prim.genE;
+        double kinE = genE-M_PROTON;
+        if(kinE>0.070){
+          NPtl++;
+        }
+      }
+    }
+    return NPtl;
+  });
   const TruthVar kTruth_NProton_All([](const caf::SRTrueInteractionProxy *nu) -> int {
     int NPtl = 0;
     for ( auto const& prim : nu->prim ) {
@@ -210,6 +225,50 @@ namespace ana{
 
     return ret;
   });
+
+  const TruthVar kTruth_MuonDirX([](const caf::SRTrueInteractionProxy *nu) -> double {
+
+    double ret(-5.f);
+
+    int truth_idx = kTruth_MuonIndex(nu);
+    if(truth_idx>=0){
+      const auto& p_mu = nu->prim.at(truth_idx).genp;
+      TVector3 vec_p_mu(p_mu.x, p_mu.y, p_mu.z);
+      ret = vec_p_mu.Unit().X();
+    }
+
+    return ret;
+
+  });
+  const TruthVar kTruth_MuonDirY([](const caf::SRTrueInteractionProxy *nu) -> double {
+
+    double ret(-5.f);
+
+    int truth_idx = kTruth_MuonIndex(nu);
+    if(truth_idx>=0){
+      const auto& p_mu = nu->prim.at(truth_idx).genp;
+      TVector3 vec_p_mu(p_mu.x, p_mu.y, p_mu.z);
+      ret = vec_p_mu.Unit().Y();
+    }
+
+    return ret;
+
+  });
+  const TruthVar kTruth_MuonDirZ([](const caf::SRTrueInteractionProxy *nu) -> double {
+
+    double ret(-5.f);
+
+    int truth_idx = kTruth_MuonIndex(nu);
+    if(truth_idx>=0){
+      const auto& p_mu = nu->prim.at(truth_idx).genp;
+      TVector3 vec_p_mu(p_mu.x, p_mu.y, p_mu.z);
+      ret = vec_p_mu.Unit().Z();
+    }
+
+    return ret;
+
+  });
+
 
   // Leading primarh proton
 
