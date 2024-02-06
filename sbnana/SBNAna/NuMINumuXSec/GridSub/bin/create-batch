@@ -403,6 +403,7 @@ cd ${nodeBaseDir}
 export SBNDATA_DIR=${nodeBaseDir}/sbndata_local/
 mkdir -p ${SBNDATA_DIR}/beamData/NuMIdata/
 ifdh cp /pnfs/icarus/persistent/users/jskim/NuMINumuXSec/Flux/beamData/NuMIdata/2023-07-31_out_450.37_7991.98_79512.66_QEL11.root ${SBNDATA_DIR}/beamData/NuMIdata/2023-07-31_out_450.37_7991.98_79512.66_QEL11.root
+ifdh cp /pnfs/icarus/persistent/users/jskim/NuMINumuXSec/Flux/beamData/NuMIdata/bad_triggered_spills.csv ${SBNDATA_DIR}/beamData/NuMIdata/bad_triggered_spills.csv
 echo "@@ Using temporal SBNDATA_DIR"
 echo "@@ ${SBNDATA_DIR}/beamData/NuMIdata/"
 ls ${SBNDATA_DIR}/beamData/NuMIdata/
@@ -493,7 +494,7 @@ echo "@@ Done!"
 
     killcmd_file = open(base_rundir+'/killcmd.sh','w')
     for it_job in range(0,NJobs):
-      killcmd_file.write('jobsub_rm user jskim -J%s.%d@%s\n'%(jobID_Cluster,it_job,jobID_Schedd))
+      killcmd_file.write('jobsub_rm -J%s.%d@%s\n'%(jobID_Cluster,it_job,jobID_Schedd))
     killcmd_file.close()
 
   gridJobInfos.append(this_GridJobInfo)
