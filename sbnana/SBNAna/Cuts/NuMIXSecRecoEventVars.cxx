@@ -349,6 +349,37 @@ namespace ana{
       return -5.;
     }
   });
+  const Var kNuMIRecoMuonTrackStartX([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      return trk.start.x;
+    }
+    else{
+      return -9999999.;
+    }
+  });
+  const Var kNuMIRecoMuonTrackEndX([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      return trk.end.x;
+    }
+    else{
+      return -9999999.;
+    }
+  });
+
+  const Var kNuMIRecoMuonTrackThetaXW_Plane0([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      double trk_dir_x = trk.dir.x;
+      double trk_dir_y = trk.dir.y;
+      return trk_dir_y==0 ? 90. : atan(trk_dir_x/trk_dir_y) * 180./M_PI;
+
+    }
+    else{
+      return -5.;
+    }
+  });
   const Var kNuMIRecoMuonTrackChi2Muon([](const caf::SRSliceProxy* slc) -> double {
     if( kNuMIMuonCandidateIdx(slc) >= 0 ){
       auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
@@ -844,6 +875,17 @@ namespace ana{
       auto const& trk = slc->reco.pfp.at(kNuMIProtonCandidateIdx(slc)).trk;
       if ( trk.calo[2].nhit < 5 ) return -5.;
       return trk.chi2pid[2].chi2_proton;
+    }
+    else{
+      return -5.;
+    }
+  });
+  const Var kNuMIRecoProtonTrackThetaXW_Plane0([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIProtonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIProtonCandidateIdx(slc)).trk;
+      double trk_dir_x = trk.dir.x;
+      double trk_dir_y = trk.dir.y;
+      return trk_dir_y==0 ? 90. : atan(trk_dir_x/trk_dir_y) * 180./M_PI;
     }
     else{
       return -5.;

@@ -72,6 +72,9 @@ namespace ana{
   extern const Var kNuMIRecoMuonTrackDirX;
   extern const Var kNuMIRecoMuonTrackDirY;
   extern const Var kNuMIRecoMuonTrackDirZ;
+  extern const Var kNuMIRecoMuonTrackStartX;
+  extern const Var kNuMIRecoMuonTrackEndX;
+  extern const Var kNuMIRecoMuonTrackThetaXW_Plane0;
   extern const Var kNuMIRecoMuonTrackChi2Muon;
   extern const Var kNuMIRecoMuonTrackChi2Proton;
   //   - Michel from muon (kTruth_MuonMichelIndex)
@@ -121,6 +124,7 @@ namespace ana{
   extern const Var kNuMIRecoProtonMatchedToTrueProton;
   extern const Var kNuMIRecoProtonTrackChi2Muon;
   extern const Var kNuMIRecoProtonTrackChi2Proton;
+  extern const Var kNuMIRecoProtonTrackThetaXW_Plane0;
 
   // - Selection enum
   extern const Var kNuMIRecoSelectionFlag;
