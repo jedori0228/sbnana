@@ -289,6 +289,15 @@ namespace ana {
       return -999.;
     }
   });
+  const Var kNuMIRelaxedProtonTrackLength([](const caf::SRSliceProxy* slc) -> double {
+    int protonTrackIndex = kNuMIRelaxedProtonTrackIdx(slc);
+    if(protonTrackIndex>=0){
+      return slc->reco.pfp.at(protonTrackIndex).trk.len;
+    }
+    else{
+      return -999.;
+    }
+  });
   const Var kNuMIRelaxedProtonTrackChi2Muon([](const caf::SRSliceProxy* slc) -> double {
     int protonTrackIndex = kNuMIRelaxedProtonTrackIdx(slc);
     if(protonTrackIndex>=0){

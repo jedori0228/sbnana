@@ -33,6 +33,7 @@ namespace ana{
   // - Var
   extern const Var kNuMIRelaxedProtonTrackIdx;
   extern const Var kNuMIRelaxedProtonTrackP;
+  extern const Var kNuMIRelaxedProtonTrackLength;
   extern const Var kNuMIRelaxedProtonTrackChi2Muon;
   extern const Var kNuMIRelaxedProtonTrackChi2Proton;
   extern const Var kNuMIRelaxedProtonTrackScore;
