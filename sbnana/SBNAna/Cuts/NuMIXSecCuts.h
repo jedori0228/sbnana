@@ -7,6 +7,9 @@ namespace ana
   /// \ref SpillCut on valid trigger
   extern const SpillCut kNuMIValidTrigger;
 
+  /// \ref Good run
+  extern const SpillCut kNuMIGoodRun;
+
   /// \ref Cut on vertex reconstruced in FV
   extern const Cut kNuMIVertexInFV;
 
