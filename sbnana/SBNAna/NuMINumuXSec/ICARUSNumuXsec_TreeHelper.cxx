@@ -124,6 +124,8 @@ namespace ana{
       "RecoMuonCosBeam", "TrueMuonCosBeam",
       // Muon track direction
       "RecoMuonDirX", "RecoMuonDirY", "RecoMuonDirZ",
+      "RecoMuonStartX", "RecoMuonEndX",
+      "RecoMuonThetaXW_Plane0",
       // Muon track chi2
       "RecoMuonChi2Muon", 
       "RecoMuonChi2Proton",
@@ -139,6 +141,8 @@ namespace ana{
       // Proton track chi2
       "RecoProtonChi2Muon",
       "RecoProtonChi2Proton",
+      // Proton angle
+      "RecoProtonThetaXW_Plane0",
       // Muon,Proton angle
       "RecoMuonProtonCos", "TrueMuonProtonCos",
       // TKI
@@ -250,6 +254,8 @@ namespace ana{
       kNuMIRecoCosThBeam, kNuMITrueCosThBeam,
       // Muon track direction
       kNuMIRecoMuonTrackDirX, kNuMIRecoMuonTrackDirY, kNuMIRecoMuonTrackDirZ,
+      kNuMIRecoMuonTrackStartX, kNuMIRecoMuonTrackEndX,
+      kNuMIRecoMuonTrackThetaXW_Plane0,
       // Muon track chi2
       kNuMIRecoMuonTrackChi2Muon,
       kNuMIRecoMuonTrackChi2Proton,
@@ -265,6 +271,8 @@ namespace ana{
       // Proton track chi2
       kNuMIRecoProtonTrackChi2Muon,
       kNuMIRecoProtonTrackChi2Proton,
+      // Proton angle
+      kNuMIRecoProtonTrackThetaXW_Plane0,
       // Muon,Proton angle
       kNuMIRecoCosThMuP, kNuMITrueCosThMuP,
       // TKI

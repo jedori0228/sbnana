@@ -31,6 +31,7 @@
 #include "sbnana/SBNAna/Cuts/NuMIRelaxedVars.h"
 #include "sbnana/SBNAna/Cuts/NuMIXSecTreeHelper.h"
 #include "sbnana/SBNAna/Cuts/NuMIDetSystStudy.h"
+#include "sbnana/SBNAna/Cuts/NuMIQuality.h"
 
 // NuMINumuXSec
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Contants.h"

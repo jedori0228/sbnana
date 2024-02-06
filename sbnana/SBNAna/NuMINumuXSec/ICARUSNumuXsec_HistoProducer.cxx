@@ -1197,6 +1197,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     "ProtonSelection/i",
     "ProtonMatchType/i",
     "ProtonP",
+    "ProtonLength",
     "ProtonChi2Muon",
     "ProtonChi2Proton",
     "ProtonTrackScore",
@@ -1233,6 +1234,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     kNuMIIsRelaxedProtonSelection,
     kNuMIRelaxedProtonTrackMatchType,
     kNuMIRelaxedProtonTrackP,
+    kNuMIRelaxedProtonTrackLength,
     kNuMIRelaxedProtonTrackChi2Muon,
     kNuMIRelaxedProtonTrackChi2Proton,
     kNuMIRelaxedProtonTrackScore,
@@ -1261,17 +1263,6 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     )
   );
 
-  if(!FillSystematics) return;
-
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      ("PIDStudyTree_CaloSystNoShift_"+currentCutName).Data(), labels,
-      loader,
-      varlists,
-      spillCut, cut,
-      SystShifts(&kCalodEdXShiftSyst, 0.), true, true
-    )
-  );
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
       ("PIDStudyTree_CalodEdXShiftUp_"+currentCutName).Data(), labels,
@@ -1308,6 +1299,8 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
       SystShifts(&kCaloGainShiftSyst, -1.), true, true
     )
   );
+
+  if(!FillSystematics) return;
 
   // NSigmas
   std::vector<std::string> this_NSigmasPsetNames;
