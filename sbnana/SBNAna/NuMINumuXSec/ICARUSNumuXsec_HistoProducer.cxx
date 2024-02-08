@@ -980,6 +980,11 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
     this_NSigmasISysts.push_back( IFluxSysts.at(i) );
     this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
   }
+  for(unsigned int i=0; i<IDetectorSysts.size(); i++){
+    this_NSigmasPsetNames.push_back( IDetectorSysts.at(i)->ShortName() );
+    this_NSigmasISysts.push_back( IDetectorSysts.at(i) );
+    this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
+  }
 
   map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
     new ana::NSigmasTree(
@@ -1314,6 +1319,11 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
   for(unsigned int i=0; i<IFluxSysts.size(); i++){
     this_NSigmasPsetNames.push_back( IFluxSysts.at(i)->ShortName() );
     this_NSigmasISysts.push_back( IFluxSysts.at(i) );
+    this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
+  }
+  for(unsigned int i=0; i<IDetectorSysts.size(); i++){
+    this_NSigmasPsetNames.push_back( IDetectorSysts.at(i)->ShortName() );
+    this_NSigmasISysts.push_back( IDetectorSysts.at(i) );
     this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
   }
   map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
@@ -1847,8 +1857,35 @@ void HistoProducer::setSystematicWeights(){
     }
   }
 
-  //cout << "[HistoProducer::setSystematicWeights] Setting detector systematics" << endl;
-  //IDetectorSysts.push_back( new MuonMomentumScaleSyst(0.02) );
+  cout << "[HistoProducer::setSystematicWeights] Setting detector systematics" << endl;
+  IDetectorSysts.push_back(
+    new NuMIXSecDetectorSysts(
+			NuMIXSecDetectorSysts::kFrontIndPlaneGain,
+			"NuMIXSecFrontIndPlaneGainSyst",
+			"Front ind. plane gain #pm10%"
+    )
+  );
+  IDetectorSysts.push_back(
+    new NuMIXSecDetectorSysts(
+    NuMIXSecDetectorSysts::kFrontIndPlaneNoise,
+    "NuMIXSecFrontIndPlaneNoiseSyst",
+    "Front ind. plane noise +10%"
+    )
+  );
+  IDetectorSysts.push_back(
+    new NuMIXSecDetectorSysts(
+    NuMIXSecDetectorSysts::kFrontIndPlaneSignalShape,
+    "NuMIXSecFrontIndPlaneSignalShapeSyst",
+    "Front ind. plane signal shape"
+    )
+  );
+  IDetectorSysts.push_back(
+    new NuMIXSecDetectorSysts(
+    NuMIXSecDetectorSysts::kMiddleIndPlaneTransparency,
+    "NuMIXSecMiddleIndPlaneTransparencySyst",
+    "Middle ind. plane transparency"
+    )
+  );
 
 }
 

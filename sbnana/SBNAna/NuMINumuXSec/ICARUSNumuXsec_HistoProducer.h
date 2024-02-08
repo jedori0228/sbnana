@@ -32,6 +32,7 @@
 #include "sbnana/SBNAna/Cuts/NuMIXSecTreeHelper.h"
 #include "sbnana/SBNAna/Cuts/NuMIDetSystStudy.h"
 #include "sbnana/SBNAna/Cuts/NuMIQuality.h"
+#include "sbnana/SBNAna/Cuts/NuMIXSecDetectorSysts.h"
 
 // NuMINumuXSec
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Contants.h"
