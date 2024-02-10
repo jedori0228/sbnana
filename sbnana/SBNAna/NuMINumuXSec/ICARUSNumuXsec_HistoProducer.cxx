@@ -1805,6 +1805,10 @@ void HistoProducer::setSystematicWeights(){
       std::cout << "[HistoProducer::setSystematicWeights] Multisigma, " << name << " (psetname = " << psetname << ")" << std::endl;
       IGENIESysts.push_back( new SBNWeightSyst(psetname) );
     }
+    // Adding custom
+    // 1) pi syst
+    genieMultisigmaKnobNames.push_back( "CC1piTPi" );
+    IGENIESysts.push_back( new NuMIXSecPiSyst("CC1piTPi", "CC1piTpi") );
 
     // Shape morphs
     cout << "[HistoProducer::setSystematicWeights] - Adding morphing dials" << std::endl;

@@ -33,6 +33,7 @@
 #include "sbnana/SBNAna/Cuts/NuMIDetSystStudy.h"
 #include "sbnana/SBNAna/Cuts/NuMIQuality.h"
 #include "sbnana/SBNAna/Cuts/NuMIXSecDetectorSysts.h"
+#include "sbnana/SBNAna/Cuts/NuMIXSecSysts.h"
 
 // NuMINumuXSec
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Contants.h"
