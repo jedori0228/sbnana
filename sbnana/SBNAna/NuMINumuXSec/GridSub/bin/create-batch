@@ -500,7 +500,7 @@ echo "@@ Done!"
     mergecmd_file = open(base_rundir+'/mergecmd.sh','w')
     mergecmd_file.write('# FinalOutputPath = %s\n'%(FinalOutputPath))
     mergecmd_file.write('# outputname = %s.root\n'%(outputname))
-    mergecmd_file.write('hadd -f %s/output/*.root %s/%s.root'%(base_rundir, FinalOutputPath, outputname))
+    mergecmd_file.write('hadd -f %s/output/*.root %s/%s.root\n'%(base_rundir, FinalOutputPath, outputname))
     mergecmd_file.close()
 
   gridJobInfos.append(this_GridJobInfo)
