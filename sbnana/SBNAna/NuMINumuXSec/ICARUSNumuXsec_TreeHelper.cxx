@@ -85,6 +85,7 @@ namespace ana{
       // Intercation
       "TruePDG/i", "TrueMode/i", "TrueTarget/i", "TrueIsCC/i",
       "TrueIsFHC/i",
+      "TrueQ2",
       // Number of primary particles
       "TrueNProton/i", "TrueNNeutron/i",
       "TrueNProtonThreshold/i",
@@ -215,6 +216,7 @@ namespace ana{
       // Intercation
       kNuMITruePDG, kNuMITrueMode, kNuMITrueTarget, kNuMITrueIsCC,
       kNuMIIsFHC,
+      kNuMITrueQ2,
       // Number of primary particles
       kNuMITrueNProton, kNuMITrueNNeutron,
       kNuMITrueNProton_Threshold,
