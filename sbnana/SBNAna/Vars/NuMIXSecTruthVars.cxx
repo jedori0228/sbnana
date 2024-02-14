@@ -383,6 +383,20 @@ namespace ana{
 
   // Leading all proton
 
+  const TruthVar kTruth_NProton_G4([](const caf::SRTrueInteractionProxy *nu) -> int {
+    int NG4Proton = 0;
+    for(std::size_t i(0); i < nu->prim.size(); ++i){
+      // proton
+      if( abs(nu->prim.at(i).pdg)!=2212 ) continue;
+
+      const auto& pro_p = nu->prim.at(i).genp;
+      double mom = sqrt(pro_p.x*pro_p.x + pro_p.y*pro_p.y + pro_p.z*pro_p.z);
+      if(mom>=0.4) NG4Proton++;
+    }
+    return NG4Proton;
+  });
+
+
   const TruthVar kTruth_G4ProtonIndex([](const caf::SRTrueInteractionProxy *nu) -> int {
     double max_E(-999);
     int truth_idx(-1);

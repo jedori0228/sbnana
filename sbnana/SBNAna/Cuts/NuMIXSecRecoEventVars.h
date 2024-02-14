@@ -15,6 +15,7 @@ namespace ana{
   extern const Var kNuMITrueNProton; //!< Number of primary proton
   extern const Var kNuMITrueNProton_Threshold; //!< Number of primary proton with T>70 MeV
   extern const Var kNuMITrueNProton_All; //!< Number of primary proton
+  extern const Var kNuMITrueNProton_G4; //!< Number of primary proton for G4 covariance
   extern const Var kNuMITrueNNeutron; //!< Number of primary neutron
   extern const Var kNuMITrueNpip; //!< Number of primary pi+
   extern const Var kNuMITrueNpip_All; //!< Number of ALL pi+ (not just primary)

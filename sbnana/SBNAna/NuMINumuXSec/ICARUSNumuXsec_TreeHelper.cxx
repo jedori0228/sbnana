@@ -10,6 +10,10 @@ namespace ana{
       // Interaction
       "TruePDG/i", "TrueMode/i", "TrueTarget/i", "TrueIsCC/i",
       "TrueIsFHC/i",
+      // Number of primary particles
+      "TrueNProton/i",
+      "TrueNProtonAll/i",
+      "TrueNProtonG4/i",
       // Weight
       "FluxWeight",
       // Nu E
@@ -46,6 +50,10 @@ namespace ana{
       // Interaction
       kTruth_NeutrinoPDG, kTruth_NeutrinoMode, kTruth_Target, kTruth_IsCC,
       kTruth_IsFHC,
+      // Number of primary particles
+      kTruth_NProton_Primary,
+      kTruth_NProton_All,
+      kTruth_NProton_G4,
       // Weight
       kGetTruthNuMIFluxWeight,
       // Nu E
@@ -90,6 +98,7 @@ namespace ana{
       "TrueNProton/i", "TrueNNeutron/i",
       "TrueNProtonThreshold/i",
       "TrueNProtonAll/i",
+      "TrueNProtonG4/i",
       "TrueNpip/i", "TrueNpim/i", "TrueNpi0/i",
       "TrueNpipAll/i", "TrueNpimAll/i", "TrueNpi0All/i",
       // True muon
@@ -221,6 +230,7 @@ namespace ana{
       kNuMITrueNProton, kNuMITrueNNeutron,
       kNuMITrueNProton_Threshold,
       kNuMITrueNProton_All,
+      kNuMITrueNProton_G4,
       kNuMITrueNpip, kNuMITrueNpim, kNuMITrueNpi0,
       kNuMITrueNpip_All, kNuMITrueNpim_All, kNuMITrueNpi0_All,
       // True muon

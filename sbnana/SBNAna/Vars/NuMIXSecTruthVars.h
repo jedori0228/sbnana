@@ -74,6 +74,7 @@ namespace ana{
 
   // Leading all proton
 
+  extern const TruthVar kTruth_NProton_G4;
   extern const TruthVar kTruth_G4ProtonIndex;
   extern const TruthVar kTruth_G4ProtonP;
 

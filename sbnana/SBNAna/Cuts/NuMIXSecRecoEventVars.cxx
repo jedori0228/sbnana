@@ -38,6 +38,11 @@ namespace ana{
     if ( slc->truth.index < 0 ) return -1;
     return kTruth_NProton_All(&slc->truth);
   });
+  // Number of protons for G4 covariance
+  const Var kNuMITrueNProton_G4([](const caf::SRSliceProxy* slc) -> int {
+    if ( slc->truth.index < 0 ) return -1;
+    return kTruth_NProton_G4(&slc->truth);
+  });
   // Number of primary neutron
   const Var kNuMITrueNNeutron([](const caf::SRSliceProxy* slc) -> int {
     if ( slc->truth.index < 0 ) return -1;
