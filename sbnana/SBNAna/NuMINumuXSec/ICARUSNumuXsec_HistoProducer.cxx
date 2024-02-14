@@ -975,6 +975,11 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
     this_NSigmasISysts.push_back( IGENIESysts.at(i) );
     this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
   }
+  for(unsigned int i=0; i<genieMorphKnobNames.size(); i++){
+    this_NSigmasPsetNames.push_back( genieMorphKnobNames.at(i) );
+    this_NSigmasISysts.push_back( IGENIEMorphSysts.at(i) );
+    this_NSigmasPairs.push_back( std::make_pair(0, 1) );
+  }
   for(unsigned int i=0; i<IFluxSysts.size(); i++){
     this_NSigmasPsetNames.push_back( IFluxSysts.at(i)->ShortName() );
     this_NSigmasISysts.push_back( IFluxSysts.at(i) );
@@ -1812,7 +1817,7 @@ void HistoProducer::setSystematicWeights(){
 
     // Shape morphs
     cout << "[HistoProducer::setSystematicWeights] - Adding morphing dials" << std::endl;
-    const std::vector<std::string> genieMorphKnobNames = ICARUSNumuXsec::GetGENIEMorphKnobNames();
+    genieMorphKnobNames = ICARUSNumuXsec::GetGENIEMorphKnobNames();
     for(const std::string& name: genieMorphKnobNames){
       if(name=="FormZone"){
        std::cout << "[HistoProducer::setSystematicWeights] Skipping FormZone" << std::endl;

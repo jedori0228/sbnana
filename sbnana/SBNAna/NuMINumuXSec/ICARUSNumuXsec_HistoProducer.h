@@ -102,6 +102,7 @@ namespace ICARUSNumuXsec{
 
     std::vector<std::string> genieMultisigmaKnobNames;
     std::vector<const ISyst*> IGENIESysts;
+    std::vector<std::string> genieMorphKnobNames;
     std::vector<const ISyst*> IGENIEMorphSysts;
     std::vector<std::string> genieDependentKnobNames;
     std::map<std::string, std::vector<Var>> map_DepDialName_to_UniverseWeights;
