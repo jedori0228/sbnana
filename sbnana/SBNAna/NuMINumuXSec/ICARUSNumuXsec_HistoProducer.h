@@ -176,6 +176,7 @@ namespace ICARUSNumuXsec{
     bool FillMetaData;
     bool FillSystematics;
     bool FillGENIESyst;
+    bool FillNuSyst;
     bool FillFlux;
     bool FillGEANT4;
 

@@ -23,6 +23,7 @@ HistoProducer::HistoProducer(){
   FillSystematics = false;
 
   FillGENIESyst = true;
+  FillNuSyst = false;
   FillFlux = true;
   FillGEANT4 = true;
 
@@ -1814,6 +1815,18 @@ void HistoProducer::setSystematicWeights(){
     // 1) pi syst
     genieMultisigmaKnobNames.push_back( "CC1piTPi" );
     IGENIESysts.push_back( new NuMIXSecPiSyst("CC1piTPi", "CC1piTpi") );
+    // 2) nusyst
+    if(FillNuSyst){
+      genieMultisigmaKnobNames.push_back( "ZExpPCAB1" );
+      IGENIESysts.push_back( new SBNWeightSyst("ZExpPCAWeighter_myreweighter_b1") );
+      genieMultisigmaKnobNames.push_back( "ZExpPCAB2" );
+      IGENIESysts.push_back( new SBNWeightSyst("ZExpPCAWeighter_myreweighter_b2") );
+      genieMultisigmaKnobNames.push_back( "ZExpPCAB3" );
+      IGENIESysts.push_back( new SBNWeightSyst("ZExpPCAWeighter_myreweighter_b3") );
+      genieMultisigmaKnobNames.push_back( "ZExpPCAB4" );
+      IGENIESysts.push_back( new SBNWeightSyst("ZExpPCAWeighter_myreweighter_b4") );
+    }
+
 
     // Shape morphs
     cout << "[HistoProducer::setSystematicWeights] - Adding morphing dials" << std::endl;
@@ -1869,9 +1882,9 @@ void HistoProducer::setSystematicWeights(){
   cout << "[HistoProducer::setSystematicWeights] Setting detector systematics" << endl;
   IDetectorSysts.push_back(
     new NuMIXSecDetectorSysts(
-			NuMIXSecDetectorSysts::kFrontIndPlaneGain,
-			"NuMIXSecFrontIndPlaneGainSyst",
-			"Front ind. plane gain #pm10%"
+      NuMIXSecDetectorSysts::kFrontIndPlaneGain,
+      "NuMIXSecFrontIndPlaneGainSyst",
+      "Front ind. plane gain #pm10%"
     )
   );
   IDetectorSysts.push_back(
