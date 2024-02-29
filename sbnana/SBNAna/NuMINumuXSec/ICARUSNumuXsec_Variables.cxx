@@ -851,4 +851,50 @@ return 0.;
 
   });
 
+  const Var Pass_VtxInFV([](const caf::SRSliceProxy* slc) -> int {
+    bool Pass = kNuMIVertexInFV(slc);
+    if(Pass) return 1;
+    else return 0;
+  });
+  const Var Pass_NotClearCosmic([](const caf::SRSliceProxy* slc) -> int {
+    bool Pass = kNuMINotClearCosmic(slc);
+    if(Pass) return 1;
+    else return 0;
+  });
+  const Var Pass_HasMuon([](const caf::SRSliceProxy* slc) -> int {
+    bool Pass = kNuMIHasMuonCandidate(slc);
+    if(Pass) return 1;
+    else return 0;
+  });
+  const Var Pass_HasProton([](const caf::SRSliceProxy* slc) -> int {
+    bool Pass = kNuMIHasProtonCandidate(slc);
+    if(Pass) return 1;
+    else return 0;
+  });
+  const Var Pass_ProtonPCut([](const caf::SRSliceProxy* slc) -> int {
+    bool Pass = kNuMIProtonCandidateRecoPTreshold(slc);
+    if(Pass) return 1;
+    else return 0;
+  });
+  const Var Pass_PrimaryHadronContained([](const caf::SRSliceProxy* slc) -> int {
+    bool Pass = kNuMIAllPrimaryHadronsContained(slc);
+    if(Pass) return 1;
+    else return 0;
+  });
+  const Var Pass_NoChargedPionTrack([](const caf::SRSliceProxy* slc) -> int {
+    bool Pass = kNuMINoSecondPrimaryMuonlikeTracks(slc);
+    if(Pass) return 1;
+    else return 0;
+  });
+  const Var Pass_NoNeutralPionShower([](const caf::SRSliceProxy* slc) -> int {
+    bool Pass = kNuMICutPhotons(slc);
+    if(Pass) return 1;
+    else return 0;
+  });
+  const Var Pass_MuonContained([](const caf::SRSliceProxy* slc) -> int {
+    bool Pass = kNuMIMuonCandidateContained(slc);
+    if(Pass) return 1;
+    else return 0;
+  });
+
 }

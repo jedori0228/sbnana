@@ -133,4 +133,14 @@ namespace ICARUSNumuXsec{
   extern const SpillVar NuMuSliceLongestTrackLenForTriggerEff;
   extern const SpillVar InTimeCosmicSliceLongestTrackLenForTriggerEff;
 
+  extern const Var Pass_VtxInFV;
+  extern const Var Pass_NotClearCosmic;
+  extern const Var Pass_HasMuon;
+  extern const Var Pass_HasProton;
+  extern const Var Pass_ProtonPCut;
+  extern const Var Pass_PrimaryHadronContained;
+  extern const Var Pass_NoChargedPionTrack;
+  extern const Var Pass_NoNeutralPionShower;
+  extern const Var Pass_MuonContained;
+
 }
