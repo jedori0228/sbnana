@@ -1189,6 +1189,15 @@ void HistoProducer::NuMIXSecBkgdStudy(SpectrumLoader& loader, SpillCut spillCut,
 // - 230908_PIDStudy
 void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum(
+      "OpFlashFirstTime", Binning::Simple(500, -20., 30.),
+      loader,
+      OpFlashFirstTime,
+      kNoSpillCut
+    )
+  );
+
   std::vector<std::string> labels = {
     // Weight
     "FluxWeight",
@@ -1321,6 +1330,11 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     this_NSigmasPsetNames.push_back( genieMultisigmaKnobNames.at(i) );
     this_NSigmasISysts.push_back( IGENIESysts.at(i) );
     this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
+  }
+  for(unsigned int i=0; i<genieMorphKnobNames.size(); i++){
+    this_NSigmasPsetNames.push_back( genieMorphKnobNames.at(i) );
+    this_NSigmasISysts.push_back( IGENIEMorphSysts.at(i) );
+    this_NSigmasPairs.push_back( std::make_pair(0, 1) );
   }
   for(unsigned int i=0; i<IFluxSysts.size(); i++){
     this_NSigmasPsetNames.push_back( IFluxSysts.at(i)->ShortName() );
@@ -1493,6 +1507,51 @@ void HistoProducer::MakeCutFlow(SpectrumLoader& loader, SpillCut spillCut, Cut c
     );
 
   }
+
+
+}
+void HistoProducer::MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum(
+      "OpFlashFirstTime", Binning::Simple(500, -20., 30.),
+      loader,
+      OpFlashFirstTime,
+      kNoSpillCut
+    )
+  );
+
+  std::vector<std::string> baseLabels = GetNuMIRecoTreeLabels();
+  baseLabels.push_back( "Pass_VtxInFV" );
+  baseLabels.push_back( "Pass_NotClearCosmic" );
+  baseLabels.push_back( "Pass_HasMuon" );
+  baseLabels.push_back( "Pass_HasProton" );
+  baseLabels.push_back( "Pass_ProtonPCut" );
+  baseLabels.push_back( "Pass_PrimaryHadronContained" );
+  baseLabels.push_back( "Pass_NoChargedPionTrack" );
+  baseLabels.push_back( "Pass_NoNeutralPionShower" );
+  baseLabels.push_back( "Pass_MuonContained" );
+
+  std::vector<Var> baseVars = GetNuMIRecoTreeVars();
+  baseVars.push_back( Pass_VtxInFV );
+  baseVars.push_back( Pass_NotClearCosmic );
+  baseVars.push_back( Pass_HasMuon );
+  baseVars.push_back( Pass_HasProton );
+  baseVars.push_back( Pass_ProtonPCut );
+  baseVars.push_back( Pass_PrimaryHadronContained );
+  baseVars.push_back( Pass_NoChargedPionTrack );
+  baseVars.push_back( Pass_NoNeutralPionShower );
+  baseVars.push_back( Pass_MuonContained );
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "selectedEvents", baseLabels,
+      loader,
+      baseVars,
+      spillCut, cut,
+      kNoShift, true, true
+    )
+  );
 
 
 }
