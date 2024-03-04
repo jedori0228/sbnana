@@ -1521,35 +1521,69 @@ void HistoProducer::MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut, C
     )
   );
 
-  std::vector<std::string> baseLabels = GetNuMIRecoTreeLabels();
-  baseLabels.push_back( "Pass_VtxInFV" );
-  baseLabels.push_back( "Pass_NotClearCosmic" );
-  baseLabels.push_back( "Pass_HasMuon" );
-  baseLabels.push_back( "Pass_HasProton" );
-  baseLabels.push_back( "Pass_ProtonPCut" );
-  baseLabels.push_back( "Pass_PrimaryHadronContained" );
-  baseLabels.push_back( "Pass_NoChargedPionTrack" );
-  baseLabels.push_back( "Pass_NoNeutralPionShower" );
-  baseLabels.push_back( "Pass_MuonContained" );
+  std::vector<std::string> labels = {
+    // Weight
+    "FluxWeight",
+    // Nu E
+    "TrueE",
+    // Muon
+    "TrueMuonP",
+    "TrueMuonCos",
+    "TrueMuonLength",
+    // Proton
+    "TrueProtonP",
+    "TrueProtonCos",
+    "TrueProtonLength",
+    // Muon+Proton
+    "TrueMuonProtonCos",
+    // TKI
+    "TruedeltaPT",
+    "TruedeltaPTx",
+    "TruedeltaPTy",
+    "TruedeltaalphaT",
+    "TruedeltaphiT",
+  };
 
-  std::vector<Var> baseVars = GetNuMIRecoTreeVars();
-  baseVars.push_back( Pass_VtxInFV );
-  baseVars.push_back( Pass_NotClearCosmic );
-  baseVars.push_back( Pass_HasMuon );
-  baseVars.push_back( Pass_HasProton );
-  baseVars.push_back( Pass_ProtonPCut );
-  baseVars.push_back( Pass_PrimaryHadronContained );
-  baseVars.push_back( Pass_NoChargedPionTrack );
-  baseVars.push_back( Pass_NoNeutralPionShower );
-  baseVars.push_back( Pass_MuonContained );
+  std::vector<TruthVar> truvars = {
+    // Weight
+    kGetTruthNuMIFluxWeight,
+    // Nu E
+    kTruth_NeutrinoE,
+    // Muon
+    kTruth_MuonP,
+    kTruth_MuonNuCosineTheta,
+    kTruth_MuonLength,
+    // Proton
+    kTruth_ProtonP,
+    kTruth_ProtonNuCosineTheta,
+    kTruth_ProtonLength,
+    // Muon+Proton
+    kTruth_CosThMuonProton,
+    // TKI
+    kTruth_deltaPT,
+    kTruth_deltaPTx,
+    kTruth_deltaPTy,
+    kTruth_deltaalphaT,
+    kTruth_deltaphiT,
+  };
 
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
-      "selectedEvents", baseLabels,
-      loader,
-      baseVars,
-      spillCut, cut,
-      kNoShift, true, true
+      ("trueEvents_WithPhaseSpaceCut_"+currentCutName).Data(),
+      labels, loader, truvars, kNuMIValidTrigger, kTruthCut_IsSignal,
+      cut,
+      kNoShift,
+      true
+    )
+  );
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      ("trueEvents_WithoutPhaseSpaceCut_"+currentCutName).Data(),
+      labels, loader, truvars, kNuMIValidTrigger, kTruthCut_IsSignalWithoutPhaseSpaceCut,
+      cut,
+      kNoShift,
+      true
     )
   );
 
