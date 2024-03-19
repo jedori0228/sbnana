@@ -21,6 +21,7 @@ parser.add_argument('-o', dest='Outputdir', default="")
 parser.add_argument('--userflags', dest='Userflags', default="")
 parser.add_argument('--args', dest='ArgsToPass', default="")
 parser.add_argument('--memory', dest='Memory', default="2GB")
+parser.add_argument('--disk', dest='Disk', default="10GB")
 parser.add_argument('--no_exec', action='store_true')
 parser.add_argument('--batchname',dest='BatchName', default="")
 parser.add_argument('--lifetime',dest='Lifetime',default="2h")
@@ -404,6 +405,7 @@ export SBNDATA_DIR=${nodeBaseDir}/sbndata_local/
 mkdir -p ${SBNDATA_DIR}/beamData/NuMIdata/
 ifdh cp /pnfs/icarus/persistent/users/jskim/NuMINumuXSec/Flux/beamData/NuMIdata/2023-07-31_out_450.37_7991.98_79512.66_QEL11.root ${SBNDATA_DIR}/beamData/NuMIdata/2023-07-31_out_450.37_7991.98_79512.66_QEL11.root
 ifdh cp /pnfs/icarus/persistent/users/jskim/NuMINumuXSec/Flux/beamData/NuMIdata/bad_triggered_spills.csv ${SBNDATA_DIR}/beamData/NuMIdata/bad_triggered_spills.csv
+ifdh cp /pnfs/icarus/persistent/users/jskim/NuMINumuXSec/Flux/beamData/NuMIdata/g3Chase_weights_rewritten.root ${SBNDATA_DIR}/beamData/NuMIdata/g3Chase_weights_rewritten.root
 echo "@@ Using temporal SBNDATA_DIR"
 echo "@@ ${SBNDATA_DIR}/beamData/NuMIdata/"
 ls ${SBNDATA_DIR}/beamData/NuMIdata/
@@ -455,6 +457,7 @@ echo "@@ Done!"
   submitcmd += '''-e LC_ALL=C \\\n'''
   submitcmd += '''--expected-lifetime %s \\\n'''%(args.Lifetime)
   submitcmd += '''--memory %s \\\n'''%(args.Memory)
+  submitcmd += '''--disk %s \\\n'''%(args.Disk)
   submitcmd += '''-N %d \\\n'''%(NJobs)
   if args.Server!="":
     submitcmd += '''--jobsub-server %s \\\n'''%(args.Server)
