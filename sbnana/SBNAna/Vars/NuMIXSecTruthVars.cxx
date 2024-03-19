@@ -100,7 +100,7 @@ namespace ana{
               ( ( nu->position.y > -181.86 + 25 && nu->position.y < 134.96 - 25 ) &&
                 ( nu->position.z > -894.95 + 30 && nu->position.z < 894.95 - 50 ) ));
     }
-    return (isFV ? 1 : 0);
+    return isFV;
   });
 
   // Muon
