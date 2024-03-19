@@ -897,4 +897,11 @@ return 0.;
     else return 0;
   });
 
+  const TruthVar kTruth_BNBDefaultWeight([](const caf::SRTrueInteractionProxy *nu) -> double {
+    // For NuMI, we have a CV correction, PPFX
+    // If BNB has simialr thing, use that here
+    // For now we are returning 1.
+    return 1.;
+  });
+
 }

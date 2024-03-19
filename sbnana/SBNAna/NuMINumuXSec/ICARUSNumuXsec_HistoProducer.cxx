@@ -1201,6 +1201,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
   std::vector<std::string> labels = {
     // Weight
     "FluxWeight",
+    "FluxWeightWithG3Chase",
     // Muon
     "MuonSelection/i",
     "MuonMatchType/i",
@@ -1238,6 +1239,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
   std::vector<Var> varlists = {
     // Weight
     kGetNuMIFluxWeight,
+    kGetNuMIFluxWeightWithG3Chase,
     // Muon
     kNuMIIsRelaxedMuonSelection,
     kNuMIRelaxedMuonTrackMatchType,
@@ -1524,6 +1526,7 @@ void HistoProducer::MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut, C
   std::vector<std::string> labels = {
     // Weight
     "FluxWeight",
+    "FluxWeightWithG3Chase",
     // Nu E
     "TrueE",
     // Muon
@@ -1547,6 +1550,7 @@ void HistoProducer::MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut, C
   std::vector<TruthVar> truvars = {
     // Weight
     kGetTruthNuMIFluxWeight,
+    kGetTruthNuMIFluxWeightWithG3Chase,
     // Nu E
     kTruth_NeutrinoE,
     // Muon
@@ -1620,6 +1624,153 @@ void HistoProducer::MakeNuMINuCountTree(SpectrumLoader& loader, SpillCut spillCu
       kNoCut,
       kNoShift,
       true
+    )
+  );
+
+}
+// - 240307_BNBFlux
+void HistoProducer::MakeBNBFluxTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  std::vector<std::string> truthvar_labels = {
+    "TrueE",
+    "TrueIsFHC/i",
+    "TruePDG/i",
+    "Weight",
+  };
+  std::vector<TruthVar> truthvar_vars = {
+    kTruth_NeutrinoE,
+    kTruth_IsFHC,
+    kTruth_NeutrinoPDG,
+    kTruth_BNBDefaultWeight,
+  };
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "trueEvents",
+      truthvar_labels, loader, truthvar_vars,
+      kNoSpillCut, kNoTruthCut,
+      kNoCut,
+      kNoShift,
+      true
+    )
+  );
+
+  std::vector<std::string> systNames = {
+"expskin",
+"horncurrent",
+"kminus",
+"kplus",
+"kzero",
+"nucleoninexsec",
+"nucleonqexsec",
+"nucleontotxsec",
+"piminus",
+"pioninexsec",
+"piontotxsec",
+  };
+  std::vector<std::vector<TruthVar>> systTruthVarVectors;
+  std::vector<unsigned int> systNUnivs;
+
+  for(auto& systName: systNames){
+    std::vector<TruthVar> vec_VarVector;
+    for(int u=0; u<1000; u++){
+      std::string psetname = systName+"_Flux";
+      vec_VarVector.push_back( GetTruthUniverseWeight(psetname, u) );
+    }
+    systTruthVarVectors.push_back( vec_VarVector );
+    systNUnivs.push_back( 1000 );
+  }
+
+
+  map_cutName_to_vec_NUniversesTrees[currentCutName].push_back(
+    new ana::NUniversesTree(
+      "trueEvents_NUniverses",
+      systNames,
+      loader,
+      systTruthVarVectors,
+      systNUnivs,
+      kNoTruthCut,
+      kNoShift, true
+    )
+  );
+
+
+}
+
+// - 240315_FSICovTree
+void HistoProducer::MakeFSICovTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  std::vector<std::string> truthvar_labels = {
+    // Weight
+    "FluxWeight",
+    // Muon
+    "TrueMuonCos",
+    // Proton
+    "TrueProtonCos",
+    // Muon+Proton
+    "TrueMuonProtonCos",
+    // TKI
+    "TruedeltaPT",
+    "TruedeltaPTx",
+    "TruedeltaPTy",
+    "TruedeltaalphaT",
+    "TruedeltaphiT",
+  };
+  std::vector<TruthVar> truthvar_vars = {
+    // Weight
+    kGetTruthNuMIFluxWeight,
+    // Muon
+    kTruth_MuonNuCosineTheta,
+    // Proton
+    kTruth_ProtonNuCosineTheta,
+    // Muon+Proton
+    kTruth_CosThMuonProton,
+    // TKI
+    kTruth_deltaPT,
+    kTruth_deltaPTx,
+    kTruth_deltaPTy,
+    kTruth_deltaalphaT,
+    kTruth_deltaphiT,
+  };
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "trueEvents",
+      truthvar_labels, loader, truthvar_vars,
+      kNoSpillCut, kNuMITrueNuMuCCInFV,
+      kNoCut,
+      kNoShift,
+      true
+    )
+  );
+
+  std::vector<std::string> systNames = {
+"FSI_pi_VariationResponse",
+"FSI_N_VariationResponse",
+  };
+  std::vector<std::vector<TruthVar>> systTruthVarVectors;
+  std::vector<unsigned int> systNUnivs;
+
+  for(auto& systName: systNames){
+    std::vector<TruthVar> vec_VarVector;
+    for(int u=0; u<100; u++){
+      std::string psetname = SystProviderPrefix+"_multisim_"+systName;
+      vec_VarVector.push_back( GetTruthUniverseWeight(psetname, u) );
+    }
+    systTruthVarVectors.push_back( vec_VarVector );
+    systNUnivs.push_back( 100 );
+  }
+
+
+  map_cutName_to_vec_NUniversesTrees[currentCutName].push_back(
+    new ana::NUniversesTree(
+      "trueEvents_NUniverses",
+      systNames,
+      loader,
+      systTruthVarVectors,
+      systNUnivs,
+      kNuMITrueNuMuCCInFV,
+      kNoShift, true
     )
   );
 
@@ -1906,8 +2057,8 @@ void HistoProducer::setSystematicWeights(){
     }
     // Adding custom
     // 1) pi syst
-    genieMultisigmaKnobNames.push_back( "CC1piTPi" );
-    IGENIESysts.push_back( new NuMIXSecPiSyst("CC1piTPi", "CC1piTpi") );
+    //genieMultisigmaKnobNames.push_back( "CC1piTPi" );
+    //IGENIESysts.push_back( new NuMIXSecPiSyst("CC1piTPi", "CC1piTpi") );
     // 2) nusyst
     if(FillNuSyst){
       genieMultisigmaKnobNames.push_back( "ZExpPCAB1" );
@@ -1933,6 +2084,9 @@ void HistoProducer::setSystematicWeights(){
       std::cout << "[HistoProducer::setSystematicWeights] Multisigma, " << name << " (psetname = " << psetname << ")" << std::endl;
       IGENIEMorphSysts.push_back( new SBNWeightSyst(psetname) );
     }
+    // 1) pi syst
+    genieMorphKnobNames.push_back( "CC1piTPi" );
+    IGENIEMorphSysts.push_back( new NuMIXSecPiSyst("CC1piTPi", "CC1piTpi") );
 
     // Multisim for dependent dials
     cout << "[HistoProducer::setSystematicWeights] - Adding dependent dials by multisim" << std::endl;

@@ -4,6 +4,7 @@
 #include "sbnana/CAFAna/Core/SpectrumLoader.h"
 #include "sbnana/SBNAna/Cuts/NuMIXSecRecoEventVars.h"
 #include "sbnana/SBNAna/Cuts/NuMIXSecTrueEventVars.h"
+#include "sbnana/SBNAna/Cuts/NuMIXSecSysts.h"
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Variables.h"
 
 using namespace ana;

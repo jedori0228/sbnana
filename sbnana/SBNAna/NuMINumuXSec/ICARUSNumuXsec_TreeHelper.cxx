@@ -16,6 +16,7 @@ namespace ana{
       "TrueNProtonG4/i",
       // Weight
       "FluxWeight",
+      "FluxWeightWithG3Chase",
       // Nu E
       "TrueE",
       // Muon
@@ -56,6 +57,7 @@ namespace ana{
       kTruth_NProton_G4,
       // Weight
       kGetTruthNuMIFluxWeight,
+      kGetTruthNuMIFluxWeightWithG3Chase,
       // Nu E
       kTruth_NeutrinoE,
       // Muon
@@ -109,6 +111,13 @@ namespace ana{
       "IsSignal/i",
       // Weight
       "FluxWeight",
+      "FluxWeightWithG3Chase",
+      "IsSPP/i",
+      "SPPQ2RW",
+      "SPPTpiMINERvARW",
+      "SPPTpiCHRW",
+      "SPPTpiIronRW",
+      "SPPTpiLeadRW",
       // NuE
       "TrueE",
       // Vertex
@@ -241,6 +250,13 @@ namespace ana{
       kNuMISliceSignalType,
       // Weight
       kGetNuMIFluxWeight,
+      kGetNuMIFluxWeightWithG3Chase,
+      kNuMITrueIsSPP,
+      kNuMISPPQ2RW,
+      kNuMISPPTpiMINERvARW,
+      kNuMISPPTpiCHRW,
+      kNuMISPPTpiIronRW,
+      kNuMISPPTpiLeadRW,
       // NuE
       kNuMITrueNuE,
       // Vertex

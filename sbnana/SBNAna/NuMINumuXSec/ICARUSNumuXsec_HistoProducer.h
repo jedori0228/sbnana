@@ -91,6 +91,10 @@ namespace ICARUSNumuXsec{
     void MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     // - 231217_CountNuMINu
     void MakeNuMINuCountTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    // - 240307_BNBFlux
+    void MakeBNBFluxTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    // - 240315_FSICovTree
+    void MakeFSICovTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
     void Test(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 

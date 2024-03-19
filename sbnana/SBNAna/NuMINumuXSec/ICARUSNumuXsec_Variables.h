@@ -143,4 +143,6 @@ namespace ICARUSNumuXsec{
   extern const Var Pass_NoNeutralPionShower;
   extern const Var Pass_MuonContained;
 
+  extern const TruthVar kTruth_BNBDefaultWeight;
+
 }
