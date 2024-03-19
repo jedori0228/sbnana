@@ -415,4 +415,16 @@ namespace ana {
 
     return true;
   }
+
+
+  // FSI cov
+  const TruthCut kNuMITrueNuMuCCInFV([](const caf::SRTrueInteractionProxy* nu) {
+
+    if ( abs(nu->pdg) != 14 ||
+         !nu->iscc ||
+         std::isnan(nu->position.x) || std::isnan(nu->position.y) || std::isnan(nu->position.z) ||
+         !isInFV(nu->position.x, nu->position.y, nu->position.z) ) return false;
+    else return true;
+  });
+
 }

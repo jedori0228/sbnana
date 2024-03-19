@@ -93,4 +93,7 @@ namespace ana
   /// \ref Var for slice type (CutType; 1=Signal, 2=OOPS, 3=OtherCC, 4=NuNC, 5=NotNu)
   extern const Var kNuMISliceSignalType;
   extern const Var kNuMISliceSignalTypeWithPrintouts;
+
+  // FSI cov
+  extern const TruthCut kNuMITrueNuMuCCInFV;
 }
