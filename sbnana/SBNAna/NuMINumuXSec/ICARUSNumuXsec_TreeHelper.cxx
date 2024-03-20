@@ -17,8 +17,12 @@ namespace ana{
       // Weight
       "FluxWeight",
       "FluxWeightWithG3Chase",
-      // Nu E
+      // Interaction
       "TrueE",
+      "TrueQ2",
+      "Trueq0",
+      "Trueq3",
+      "TrueW",
       // Muon
       "TrueMuonP",
       "TrueMuonPt",
@@ -58,8 +62,12 @@ namespace ana{
       // Weight
       kGetTruthNuMIFluxWeight,
       kGetTruthNuMIFluxWeightWithG3Chase,
-      // Nu E
+      // Interaction
       kTruth_NeutrinoE,
+      kTruth_Q2,
+      kTruth_q0,
+      kTruth_q3,
+      kTruth_w,
       // Muon
       kTruth_MuonP,
       kTruth_MuonPt,
@@ -112,12 +120,14 @@ namespace ana{
       // Weight
       "FluxWeight",
       "FluxWeightWithG3Chase",
+      // SPP Syst
       "IsSPP/i",
       "SPPQ2RW",
-      "SPPTpiMINERvARW",
-      "SPPTpiCHRW",
-      "SPPTpiIronRW",
-      "SPPTpiLeadRW",
+      "SPPTpiCHLinearFitWR",
+      "SPPTpiFeLinearFitWR",
+      "SPPTpiPbLinearFitWR",
+      "SPPTpiMINERvATemplateReweight",
+      "SPPTpiMINERvAFittedReweight",
       // NuE
       "TrueE",
       // Vertex
@@ -251,12 +261,14 @@ namespace ana{
       // Weight
       kGetNuMIFluxWeight,
       kGetNuMIFluxWeightWithG3Chase,
+      // SPP Syst
       kNuMITrueIsSPP,
       kNuMISPPQ2RW,
-      kNuMISPPTpiMINERvARW,
-      kNuMISPPTpiCHRW,
-      kNuMISPPTpiIronRW,
-      kNuMISPPTpiLeadRW,
+      kNuMISPPTpiCHLinearFitReweight,
+      kNuMISPPTpiFeLinearFitReweight,
+      kNuMISPPTpiPbLinearFitReweight,
+      kNuMISPPTpiMINERvATemplateReweight,
+      kNuMISPPTpiMINERvAFittedReweight,
       // NuE
       kNuMITrueNuE,
       // Vertex
