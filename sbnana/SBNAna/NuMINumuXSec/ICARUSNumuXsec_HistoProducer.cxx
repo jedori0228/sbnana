@@ -1203,6 +1203,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     "FluxWeight",
     "FluxWeightWithG3Chase",
     "FluxWeightWithG4Updated",
+    "SPPCVCorrection",
     // Muon
     "MuonSelection/i",
     "MuonMatchType/i",
@@ -1242,6 +1243,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     kGetNuMIFluxWeight,
     kGetNuMIFluxWeightG3Chase,
     kGetNuMIFluxWeightUpdated,
+    kNuMISPPCVCorrection,
     // Muon
     kNuMIIsRelaxedMuonSelection,
     kNuMIRelaxedMuonTrackMatchType,
@@ -2065,8 +2067,8 @@ void HistoProducer::setSystematicWeights(){
     }
     // Adding custom
     // 1) pi syst
-    //genieMultisigmaKnobNames.push_back( "CC1piTPi" );
-    //IGENIESysts.push_back( new NuMIXSecPiSyst("CC1piTPi", "CC1piTpi") );
+    genieMultisigmaKnobNames.push_back( "CC1piTPi" );
+    IGENIESysts.push_back( new NuMIXSecPiSyst("CC1piTPi", "CC1piTpi") );
     // 2) nusyst
     if(FillNuSyst){
       genieMultisigmaKnobNames.push_back( "ZExpPCAB1" );
@@ -2093,8 +2095,8 @@ void HistoProducer::setSystematicWeights(){
       IGENIEMorphSysts.push_back( new SBNWeightSyst(psetname) );
     }
     // 1) pi syst
-    genieMorphKnobNames.push_back( "CC1piTPi" );
-    IGENIEMorphSysts.push_back( new NuMIXSecPiSyst("CC1piTPi", "CC1piTpi") );
+    //genieMorphKnobNames.push_back( "CC1piTPi" );
+    //IGENIEMorphSysts.push_back( new NuMIXSecPiSyst("CC1piTPi", "CC1piTpi") );
 
     // Multisim for dependent dials
     cout << "[HistoProducer::setSystematicWeights] - Adding dependent dials by multisim" << std::endl;
