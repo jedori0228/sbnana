@@ -1202,6 +1202,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     // Weight
     "FluxWeight",
     "FluxWeightWithG3Chase",
+    "FluxWeightWithG4Updated",
     // Muon
     "MuonSelection/i",
     "MuonMatchType/i",
@@ -1239,7 +1240,8 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
   std::vector<Var> varlists = {
     // Weight
     kGetNuMIFluxWeight,
-    kGetNuMIFluxWeightWithG3Chase,
+    kGetNuMIFluxWeightG3Chase,
+    kGetNuMIFluxWeightUpdated,
     // Muon
     kNuMIIsRelaxedMuonSelection,
     kNuMIRelaxedMuonTrackMatchType,
@@ -1527,6 +1529,7 @@ void HistoProducer::MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut, C
     // Weight
     "FluxWeight",
     "FluxWeightWithG3Chase",
+    "FluxWeightWithG4Updated",
     // Nu E
     "TrueE",
     // Muon
@@ -1550,7 +1553,8 @@ void HistoProducer::MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut, C
   std::vector<TruthVar> truvars = {
     // Weight
     kGetTruthNuMIFluxWeight,
-    kGetTruthNuMIFluxWeightWithG3Chase,
+    kGetTruthNuMIFluxWeightG3Chase,
+    kGetTruthNuMIFluxWeightUpdated,
     // Nu E
     kTruth_NeutrinoE,
     // Muon
@@ -1703,6 +1707,8 @@ void HistoProducer::MakeFSICovTree(SpectrumLoader& loader, SpillCut spillCut, Cu
   std::vector<std::string> truthvar_labels = {
     // Weight
     "FluxWeight",
+    "FluxWeightWithG3Chase",
+    "FluxWeightWithG4Updated",
     // Muon
     "TrueMuonCos",
     // Proton
@@ -1719,6 +1725,8 @@ void HistoProducer::MakeFSICovTree(SpectrumLoader& loader, SpillCut spillCut, Cu
   std::vector<TruthVar> truthvar_vars = {
     // Weight
     kGetTruthNuMIFluxWeight,
+    kGetTruthNuMIFluxWeightG3Chase,
+    kGetTruthNuMIFluxWeightUpdated,
     // Muon
     kTruth_MuonNuCosineTheta,
     // Proton
@@ -2121,6 +2129,8 @@ void HistoProducer::setSystematicWeights(){
   if(FillFlux){
     cout << "[HistoProducer::setSystematicWeights] Setting flux systematics" << endl;
     IFluxSysts = GetAllNuMIFluxSysts(NNuMIFluxPCA);
+    IFluxSysts.push_back( GetNuMIBeamShiftSyst() );
+
     for(unsigned int i=0; i<IFluxSysts.size(); i++){
       cout << "[HistoProducer::setSystematicWeights] Syst = " << IFluxSysts.at(i)->ShortName() << endl;
     }
