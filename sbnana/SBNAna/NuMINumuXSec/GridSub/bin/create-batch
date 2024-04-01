@@ -406,6 +406,7 @@ mkdir -p ${SBNDATA_DIR}/beamData/NuMIdata/
 ifdh cp /pnfs/icarus/persistent/users/jskim/NuMINumuXSec/Flux/beamData/NuMIdata/2023-07-31_out_450.37_7991.98_79512.66_QEL11.root ${SBNDATA_DIR}/beamData/NuMIdata/2023-07-31_out_450.37_7991.98_79512.66_QEL11.root
 ifdh cp /pnfs/icarus/persistent/users/jskim/NuMINumuXSec/Flux/beamData/NuMIdata/bad_triggered_spills.csv ${SBNDATA_DIR}/beamData/NuMIdata/bad_triggered_spills.csv
 ifdh cp /pnfs/icarus/persistent/users/jskim/NuMINumuXSec/Flux/beamData/NuMIdata/g3Chase_weights_rewritten.root ${SBNDATA_DIR}/beamData/NuMIdata/g3Chase_weights_rewritten.root
+ifdh cp /pnfs/icarus/persistent/users/jskim/NuMINumuXSec/Flux/beamData/NuMIdata/g4_10_4_weights_rewritten.root ${SBNDATA_DIR}/beamData/NuMIdata/g4_10_4_weights_rewritten.root
 echo "@@ Using temporal SBNDATA_DIR"
 echo "@@ ${SBNDATA_DIR}/beamData/NuMIdata/"
 ls ${SBNDATA_DIR}/beamData/NuMIdata/
