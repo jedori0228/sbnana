@@ -17,6 +17,7 @@ namespace ana{
       // Weight
       "FluxWeight",
       "FluxWeightWithG3Chase",
+      "FluxWeightWithG4Updated",
       // Interaction
       "TrueE",
       "TrueQ2",
@@ -61,7 +62,8 @@ namespace ana{
       kTruth_NProton_G4,
       // Weight
       kGetTruthNuMIFluxWeight,
-      kGetTruthNuMIFluxWeightWithG3Chase,
+      kGetTruthNuMIFluxWeightG3Chase,
+      kGetTruthNuMIFluxWeightUpdated,
       // Interaction
       kTruth_NeutrinoE,
       kTruth_Q2,
@@ -120,6 +122,7 @@ namespace ana{
       // Weight
       "FluxWeight",
       "FluxWeightWithG3Chase",
+      "FluxWeightWithG4Updated",
       // SPP Syst
       "IsSPP/i",
       "SPPQ2RW",
@@ -260,7 +263,8 @@ namespace ana{
       kNuMISliceSignalType,
       // Weight
       kGetNuMIFluxWeight,
-      kGetNuMIFluxWeightWithG3Chase,
+      kGetNuMIFluxWeightG3Chase,
+      kGetNuMIFluxWeightUpdated,
       // SPP Syst
       kNuMITrueIsSPP,
       kNuMISPPQ2RW,
