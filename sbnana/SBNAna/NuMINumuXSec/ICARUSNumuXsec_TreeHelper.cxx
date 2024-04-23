@@ -10,10 +10,12 @@ namespace ana{
       // Interaction
       "TruePDG/i", "TrueMode/i", "TrueTarget/i", "TrueIsCC/i",
       "TrueIsFHC/i",
+      "TrueParentPDG/i",
       // Number of primary particles
       "TrueNProton/i",
       "TrueNProtonAll/i",
       "TrueNProtonG4/i",
+      "TrueNpipAll/i", "TrueNpimAll/i", "TrueNpi0All/i",
       // Weight
       "FluxWeight",
       "FluxWeightWithG3Chase",
@@ -47,6 +49,10 @@ namespace ana{
       "TruedeltaPTy",
       "TruedeltaalphaT",
       "TruedeltaphiT",
+      // For extraction
+      "IsSignal/i",
+      // G4Proton for G4 cov
+      "TrueG4ProtonP",
     };
 
   }
@@ -56,10 +62,12 @@ namespace ana{
       // Interaction
       kTruth_NeutrinoPDG, kTruth_NeutrinoMode, kTruth_Target, kTruth_IsCC,
       kTruth_IsFHC,
+      kTruth_ParentPDG,
       // Number of primary particles
       kTruth_NProton_Primary,
       kTruth_NProton_All,
       kTruth_NProton_G4,
+      kTruth_Npip_All, kTruth_Npim_All, kTruth_Npi0_All,
       // Weight
       kGetTruthNuMIFluxWeight,
       kGetTruthNuMIFluxWeightG3Chase,
@@ -93,6 +101,10 @@ namespace ana{
       kTruth_deltaPTy,
       kTruth_deltaalphaT,
       kTruth_deltaphiT,
+      // For extraction
+      kTruth_IsSignal,
+      // G4Proton for G4 cov
+      kTruth_G4ProtonP,
     };
 
   }
@@ -105,6 +117,7 @@ namespace ana{
       // Intercation
       "TruePDG/i", "TrueMode/i", "TrueTarget/i", "TrueIsCC/i",
       "TrueIsFHC/i",
+      "TrueParentPDG/i",
       "TrueQ2",
       // Number of primary particles
       "TrueNProton/i", "TrueNNeutron/i",
@@ -247,6 +260,7 @@ namespace ana{
       // Intercation
       kNuMITruePDG, kNuMITrueMode, kNuMITrueTarget, kNuMITrueIsCC,
       kNuMIIsFHC,
+      kNuMITrueParentPDG,
       kNuMITrueQ2,
       // Number of primary particles
       kNuMITrueNProton, kNuMITrueNNeutron,
