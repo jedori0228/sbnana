@@ -362,6 +362,12 @@ namespace ana {
   const TruthCut kTruthCut_IsSignalWithoutPhaseSpaceCut([](const caf::SRTrueInteractionProxy* nu) {
     return Is1muNp0pi(*nu, false);
   });
+  const TruthVar kTruth_IsSignal([](const caf::SRTrueInteractionProxy *nu) -> int {
+    if( kTruthCut_IsSignal(nu) ) return 1;
+    else return 0;
+  });
+
+
   /// \ref Signal but fails phase space cut = "out of phase space" (OOPS)
   const Cut kNuMI_1muNp0piStudy_Signal_FailPhaseSpaceCut = kNuMI_1muNp0piStudy_Signal_WithoutPhaseSpaceCut && // signal,
                                                            !kNuMI_1muNp0piStudy_Signal_WithPhaseSpaceCut; // but fail phase cut
