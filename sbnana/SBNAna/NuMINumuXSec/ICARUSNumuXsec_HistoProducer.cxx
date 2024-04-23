@@ -912,14 +912,29 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
     )
   );
 
+  std::vector<std::string> this_reco_labels = GetNuMIRecoTreeLabels();
+  std::vector<Var> this_reco_vars = GetNuMIRecoTreeVars();
+
+  if(Add_Run1OffbeamDataLivetimeSF){
+    this_reco_labels.push_back( "OffbeamOnlyWeight" );
+    this_reco_vars.push_back( Run1OffbeamDataLivetimeSF );
+  }
+  else if(Add_Run2OffbeamDataLivetimeSF){
+    this_reco_labels.push_back( "OffbeamOnlyWeight" );
+    this_reco_vars.push_back( Run2OffbeamDataLivetimeSF );
+  }
+  else{
+    this_reco_labels.push_back( "OffbeamOnlyWeight" );
+    this_reco_vars.push_back( AlwaysOne );
+  }
 
   // CV
 
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
-      "selectedEvents", GetNuMIRecoTreeLabels(),
+      "selectedEvents", this_reco_labels,
       loader,
-      GetNuMIRecoTreeVars(),
+      this_reco_vars,
       spillCut, cut,
       kNoShift, true, true
     )
@@ -929,18 +944,18 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
   // Shift
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
-      "selectedEvents_CalodEdXShiftUp", GetNuMIRecoTreeLabels(),
+      "selectedEvents_CalodEdXShiftUp", this_reco_labels,
       loader,
-      GetNuMIRecoTreeVars(),
+      this_reco_vars,
       spillCut, cut,
       SystShifts(&kCalodEdXShiftSyst, +1.), true, true
     )
   );
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
-      "selectedEvents_CalodEdXShiftDown", GetNuMIRecoTreeLabels(),
+      "selectedEvents_CalodEdXShiftDown", this_reco_labels,
       loader,
-      GetNuMIRecoTreeVars(),
+      this_reco_vars,
       spillCut, cut,
       SystShifts(&kCalodEdXShiftSyst, -1.), true, true
     )
@@ -948,18 +963,18 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
 
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
-      "selectedEvents_CaloGainShiftUp", GetNuMIRecoTreeLabels(),
+      "selectedEvents_CaloGainShiftUp", this_reco_labels,
       loader,
-      GetNuMIRecoTreeVars(),
+      this_reco_vars,
       spillCut, cut,
       SystShifts(&kCaloGainShiftSyst, +1.), true, true
     )
   );
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
-      "selectedEvents_CaloGainShiftDown", GetNuMIRecoTreeLabels(),
+      "selectedEvents_CaloGainShiftDown", this_reco_labels,
       loader,
-      GetNuMIRecoTreeVars(),
+      this_reco_vars,
       spillCut, cut,
       SystShifts(&kCaloGainShiftSyst, -1.), true, true
     )
@@ -1099,6 +1114,28 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       )
     );
 
+    for(unsigned int i=0; i<IDetectorSysts.size(); i++){
+      map_cutName_to_vec_Trees[currentCutName].push_back(
+        new ana::Tree(
+          "trueEvents"+RecoCutsForEffs[i_Cut].first+"_"+IDetectorSysts.at(i)->ShortName()+"Up",
+          {"Dummy"}, loader, {DummyTruthVar}, kNuMIValidTrigger, kTruthCut_IsSignal,
+          RecoCutsForEffs[i_Cut].second,
+          SystShifts(IDetectorSysts.at(i), +1.),
+          true
+        )
+      );
+      map_cutName_to_vec_Trees[currentCutName].push_back(
+        new ana::Tree(
+          "trueEvents"+RecoCutsForEffs[i_Cut].first+"_"+IDetectorSysts.at(i)->ShortName()+"Down",
+          {"Dummy"}, loader, {DummyTruthVar}, kNuMIValidTrigger, kTruthCut_IsSignal,
+          RecoCutsForEffs[i_Cut].second,
+          SystShifts(IDetectorSysts.at(i), -1.),
+          true
+        )
+      );
+
+    }
+
   }
 
   map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
@@ -1199,6 +1236,8 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
   );
 
   std::vector<std::string> labels = {
+    // IsCosmicSlice, for cosmic slice reweight
+    "IsCosmicSlice/i",
     // Weight
     "FluxWeight",
     "FluxWeightWithG3Chase",
@@ -1239,6 +1278,8 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     "ChargedPionMatchedTruthContained/i",
   };
   std::vector<Var> varlists = {
+    // IsCosmicSlice, for cosmic slice reweight
+    IsCosmicSlice,
     // Weight
     kGetNuMIFluxWeight,
     kGetNuMIFluxWeightG3Chase,
@@ -1711,6 +1752,7 @@ void HistoProducer::MakeFSICovTree(SpectrumLoader& loader, SpillCut spillCut, Cu
     "FluxWeight",
     "FluxWeightWithG3Chase",
     "FluxWeightWithG4Updated",
+    "SPPCVCorrection",
     // Muon
     "TrueMuonCos",
     // Proton
@@ -1729,6 +1771,7 @@ void HistoProducer::MakeFSICovTree(SpectrumLoader& loader, SpillCut spillCut, Cu
     kGetTruthNuMIFluxWeight,
     kGetTruthNuMIFluxWeightG3Chase,
     kGetTruthNuMIFluxWeightUpdated,
+    kTruth_NuMISPPCVCorrection,
     // Muon
     kTruth_MuonNuCosineTheta,
     // Proton
