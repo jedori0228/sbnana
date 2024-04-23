@@ -108,6 +108,10 @@ namespace ana{
     if ( slc->truth.index < 0 ) return -5; //TODO Define better dummy value
     return kTruth_IsFHC(&slc->truth);
   });
+  const Var kNuMITrueParentPDG([](const caf::SRSliceProxy* slc) -> int {
+    if ( slc->truth.index < 0 ) return -999999; //TODO Define better dummy value
+    return kTruth_ParentPDG(&slc->truth);
+  });
   const Var kNuMITrueProdVtxX([](const caf::SRSliceProxy* slc) -> double {
     if ( slc->truth.index < 0 ) return -999999.; //TODO Define better dummy value
     return slc->truth.prod_vtx.x;

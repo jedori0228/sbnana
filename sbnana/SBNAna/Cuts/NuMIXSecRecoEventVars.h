@@ -29,6 +29,7 @@ namespace ana{
   extern const Var kNuMITrueq3; //!< q3; momentum transfer
   extern const Var kNuMITruew; //!< w; hadronic mass
   extern const Var kNuMIIsFHC; //!< 0: RHC, 1: FHC
+  extern const Var kNuMITrueParentPDG;
   extern const Var kNuMITrueProdVtxX;
   extern const Var kNuMITrueProdVtxY;
   extern const Var kNuMITrueProdVtxZ;
