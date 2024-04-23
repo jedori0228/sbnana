@@ -90,6 +90,9 @@ namespace ana{
   const TruthVar kTruth_IsFHC([](const caf::SRTrueInteractionProxy *nu) -> int {
     return 1;
   });
+  const TruthVar kTruth_ParentPDG([](const caf::SRTrueInteractionProxy *nu) -> int {
+    return nu->parent_pdg;
+  });
 
   // Vertex
   const TruthCut kTruth_VertexInFV([](const caf::SRTrueInteractionProxy* nu) {
