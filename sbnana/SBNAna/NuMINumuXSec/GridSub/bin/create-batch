@@ -8,6 +8,8 @@ import subprocess
 import JobStatusTool
 import Logger
 
+sys.path.insert(0, os.path.abspath('.'))
+
 ## Arguments
 
 parser = argparse.ArgumentParser(description='jobsub script creation')
@@ -36,8 +38,12 @@ logger = Logger.Logger("create-batch", args.Verbos)
 
 ## Parse sample and cuts
 
-exec('from %s import *'%(args.SampleSelectionConfigFileName.removesuffix('.py').replace('/','.')))
-exec('from %s import *'%(args.EventSelectionConfigFileName.removesuffix('.py').replace('/','.')))
+SampleSelectionModuleImportLine = 'from %s import *'%(args.SampleSelectionConfigFileName.removesuffix('.py').replace('/','.'))
+print('@@ Executing "%s"'%(SampleSelectionModuleImportLine))
+exec(SampleSelectionModuleImportLine)
+EventSelectionModuleImportLine = 'from %s import *'%(args.EventSelectionConfigFileName.removesuffix('.py').replace('/','.'))
+print('@@ Executing "%s"'%(EventSelectionModuleImportLine))
+exec(EventSelectionModuleImportLine)
 
 ssDefLines = ""
 for SampleSelectionInfo in SampleSelectionInfos:
@@ -504,7 +510,7 @@ echo "@@ Done!"
     mergecmd_file = open(base_rundir+'/mergecmd.sh','w')
     mergecmd_file.write('# FinalOutputPath = %s\n'%(FinalOutputPath))
     mergecmd_file.write('# outputname = %s.root\n'%(outputname))
-    mergecmd_file.write('hadd -f %s/output/*.root %s/%s.root\n'%(base_rundir, FinalOutputPath, outputname))
+    mergecmd_file.write('hadd -f %s/%s.root %s/output/*.root\n'%(FinalOutputPath, outputname, base_rundir))
     mergecmd_file.close()
 
   gridJobInfos.append(this_GridJobInfo)
