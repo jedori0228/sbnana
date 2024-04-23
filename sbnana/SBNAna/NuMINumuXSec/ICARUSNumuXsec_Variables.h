@@ -15,6 +15,8 @@
 #include <iostream>
 #include <climits>
 
+#include "sbnana/SBNAna/Cuts/NuMIXSecSysts.h"
+
 using namespace std;
 using namespace ana;
 
@@ -144,5 +146,11 @@ namespace ICARUSNumuXsec{
   extern const Var Pass_MuonContained;
 
   extern const TruthVar kTruth_BNBDefaultWeight;
+
+  extern const Var IsCosmicSlice;
+  extern const TruthVar DummyTruthVar;
+  extern const Var AlwaysOne;
+  extern const Var Run1OffbeamDataLivetimeSF;
+  extern const Var Run2OffbeamDataLivetimeSF;
 
 }

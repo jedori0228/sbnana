@@ -286,48 +286,9 @@ namespace ICARUSNumuXsec{
 
     std::vector<double> rets;
 
-    for(std::size_t i(0); i < sr->slc.size(); ++i){
-      const auto& slc = sr->slc.at(i);
-
-      double MuonRecoP = kNuMIMuonCandidateRecoP(&slc);
-      double MuonTrueP = kNuMIMuonTrueP(&slc);
-      if(MuonRecoP<0 || MuonTrueP<0) continue;
-
-      if( !kNuMIMuonCandidateContained(&slc) ) continue;
-
-      int MuonIdx = kNuMIMuonCandidateIdx(&slc);
-      const auto& trk = slc.reco.pfp[MuonIdx].trk;
-
-/*
-      printf("\n(run, subrun, event) = (%d, %d, %d)", sr->hdr.run.GetValue(), sr->hdr.subrun.GetValue(), sr->hdr.evt.GetValue());
-      printf("- Slice index = %ld\n", i);
-      printf("- Muon P (reco, true) = (%1.1f, %1.1f)\n", MuonRecoP, MuonTrueP);
-      printf("- Muon track start (x,y,z) = (%1.2f, %1.2f, %1.2f)\n", trk.start.x.GetValue(), trk.start.y.GetValue(), trk.start.z.GetValue());
-      printf("- Muon track end (x,y,z) = (%1.2f, %1.2f, %1.2f)\n", trk.end.x.GetValue(), trk.end.y.GetValue(), trk.end.z.GetValue());
-*/
-
-      double FracDiff = (MuonRecoP-MuonTrueP)/MuonTrueP;
-      if( FracDiff<-0.4 ){
-
-        double trk_end_x = fabs(trk.end.x);
-        double dCathode = fabs( trk_end_x - 210.21500 );
-
-        if( dCathode < 5 ){
-
-          printf("\n(run, subrun, event) = (%d, %d, %d)", sr->hdr.run.GetValue(), sr->hdr.subrun.GetValue(), sr->hdr.evt.GetValue());
-          printf("- Slice index = %ld\n", i);
-          printf("- Muon P (reco, true) = (%1.1f, %1.1f)\n", MuonRecoP, MuonTrueP);
-          printf("- Muon track start (x,y,z) = (%1.2f, %1.2f, %1.2f)\n", trk.start.x.GetValue(), trk.start.y.GetValue(), trk.start.z.GetValue());
-          printf("- Muon track end (x,y,z) = (%1.2f, %1.2f, %1.2f)\n", trk.end.x.GetValue(), trk.end.y.GetValue(), trk.end.z.GetValue());
-
-          printf("- Neutrino time = %1.2f\n", slc.truth.time.GetValue());
-
-        }
-      }
-
-
+    for(const auto& nu: sr->mc.nu){
+      kTruth_NuMISPPCVCorrection(&nu);
     }
-
     return rets;
 
 
@@ -902,6 +863,37 @@ return 0.;
     // If BNB has simialr thing, use that here
     // For now we are returning 1.
     return 1.;
+  });
+
+
+  const Var IsCosmicSlice([](const caf::SRSliceProxy* slc) -> int {
+    if( slc->truth.index < 0 ) return 1;
+    else return 0;
+  });
+
+  const TruthVar DummyTruthVar([](const caf::SRTrueInteractionProxy *nu) -> int {
+    return 1;
+  });
+
+  const Var AlwaysOne([](const caf::SRSliceProxy* slc) -> int {
+    return 1.;
+  });
+
+  const Var Run1OffbeamDataLivetimeSF([](const caf::SRSliceProxy* slc) -> int {
+    // (15% onbeam)/(all offbeam)
+    // We want a SF that matches MC full POT
+    double NormToOnBeam = 0.171122;
+    double MCFullPOT = 8.074617826911222e+20;
+    double DataRun1POT_15perct = 6.983230011348827e+18;
+    return NormToOnBeam * MCFullPOT/DataRun1POT_15perct;
+  });
+  const Var Run2OffbeamDataLivetimeSF([](const caf::SRSliceProxy* slc) -> int {
+    // (15% onbeam)/(all offbeam)
+    // We want a SF that matches MC full POT
+    double NormToOnBeam = 0.138717;
+    double MCFullPOT = 8.074617826911222e+20;
+    double DataRun2POT_15perct = 2.9300301931345543e+19;
+    return NormToOnBeam * MCFullPOT/DataRun2POT_15perct;
   });
 
 }
