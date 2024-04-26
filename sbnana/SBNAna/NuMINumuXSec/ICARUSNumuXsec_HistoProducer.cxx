@@ -985,26 +985,31 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
   std::vector<std::string> this_NSigmasPsetNames;
   std::vector<const ISyst*> this_NSigmasISysts;
   std::vector<std::pair<int,int>> this_NSigmasPairs;
+  std::vector<std::vector<double>> this_NSigmas;
 
   for(unsigned int i=0; i<genieMultisigmaKnobNames.size(); i++){
     this_NSigmasPsetNames.push_back( genieMultisigmaKnobNames.at(i) );
     this_NSigmasISysts.push_back( IGENIESysts.at(i) );
     this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
+    this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
   }
   for(unsigned int i=0; i<genieMorphKnobNames.size(); i++){
     this_NSigmasPsetNames.push_back( genieMorphKnobNames.at(i) );
     this_NSigmasISysts.push_back( IGENIEMorphSysts.at(i) );
     this_NSigmasPairs.push_back( std::make_pair(0, 1) );
+    this_NSigmas.push_back( {-1, -0.5, 0, 0.5, 1} );
   }
   for(unsigned int i=0; i<IFluxSysts.size(); i++){
     this_NSigmasPsetNames.push_back( IFluxSysts.at(i)->ShortName() );
     this_NSigmasISysts.push_back( IFluxSysts.at(i) );
     this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
+    this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
   }
   for(unsigned int i=0; i<IDetectorSysts.size(); i++){
     this_NSigmasPsetNames.push_back( IDetectorSysts.at(i)->ShortName() );
     this_NSigmasISysts.push_back( IDetectorSysts.at(i) );
     this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
+    this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
   }
 
   map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
@@ -1013,7 +1018,8 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       this_NSigmasPsetNames,
       loader,
       this_NSigmasISysts,
-      this_NSigmasPairs,
+      //this_NSigmasPairs,
+      this_NSigmas,
       spillCut, cut,
       kNoShift, true, true
     )
@@ -1144,7 +1150,8 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       this_NSigmasPsetNames,
       loader,
       this_NSigmasISysts,
-      this_NSigmasPairs,
+      //this_NSigmasPairs,
+      this_NSigmas,
       kTruthCut_IsSignal,
       kNoShift, true
     )
@@ -1841,10 +1848,34 @@ void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
   );
 */
 
-  FillCVSpectrum(loader, "CountSpill", spillvarTest, Binning::Simple(1, 0.,1.), spillCut);
+  //FillCVSpectrum(loader, "CountSpill", spillvarTest, Binning::Simple(1, 0.,1.), spillCut);
   //FillCVSpectrum(loader, "CountSlice", varCountSlice, Binning::Simple(1, 0.,1.), spillCut, cut);
 
   //FillCVSpectrum(loader, "SliceTestVar", SliceTestVar, Binning::Simple(1, 0.,1.), spillCut, cut);
+
+  std::vector<std::string> this_NSigmasPsetNames;
+  std::vector<const ISyst*> this_NSigmasISysts;
+  std::vector<std::vector<double>> this_NSigmas;
+
+  for(unsigned int i=0; i<genieMorphKnobNames.size(); i++){
+    if(genieMorphKnobNames.at(i)=="DecayAngMEC"){
+      this_NSigmasPsetNames.push_back( genieMorphKnobNames.at(i) );
+      this_NSigmasISysts.push_back( IGENIEMorphSysts.at(i) );
+      this_NSigmas.push_back( {-1, -0.5, 0, 0.5, 1} );
+    }
+  }
+
+  map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
+    new ana::NSigmasTree(
+      "selectedEvents_NSigmas",
+      this_NSigmasPsetNames,
+      loader,
+      this_NSigmasISysts,
+      this_NSigmas,
+      spillCut, cut,
+      kNoShift, true, true
+    )
+  );
 
 }
 
@@ -2135,7 +2166,8 @@ void HistoProducer::setSystematicWeights(){
       }
       std::string psetname = SystProviderPrefix+"_multisigma_"+name;
       std::cout << "[HistoProducer::setSystematicWeights] Multisigma, " << name << " (psetname = " << psetname << ")" << std::endl;
-      IGENIEMorphSysts.push_back( new SBNWeightSyst(psetname) );
+      //IGENIEMorphSysts.push_back( new SBNWeightSyst(psetname) );
+      IGENIEMorphSysts.push_back( new SBNWeightMirrorSyst(psetname) );
     }
     // 1) pi syst
     //genieMorphKnobNames.push_back( "CC1piTPi" );
