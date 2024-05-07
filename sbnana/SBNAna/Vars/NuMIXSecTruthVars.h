@@ -20,6 +20,8 @@ namespace ana{
 
   // Neutrino/interaction
 
+  extern const TruthVar kTruth_IsData;
+
   const TruthVar kTruth_NeutrinoE = SIMPLETRUTHVAR(E);
   const TruthVar kTruth_NeutrinoPDG = SIMPLETRUTHVAR(pdg);
   const TruthVar kTruth_NeutrinoMode = SIMPLETRUTHVAR(genie_mode);

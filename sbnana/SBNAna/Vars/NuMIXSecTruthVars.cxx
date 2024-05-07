@@ -2,6 +2,11 @@
 
 namespace ana{
 
+
+  const TruthVar kTruth_IsData([](const caf::SRTrueInteractionProxy *nu) -> int {
+    return 0;
+  });
+
   // Neutrino/interaction
 
   const TruthVar kTruth_NProton_Primary([](const caf::SRTrueInteractionProxy *nu) -> int {
@@ -222,8 +227,22 @@ namespace ana{
 
     int truth_idx = kTruth_MuonIndex(nu);
     if(truth_idx>=0){
-      if(nu->prim.at(truth_idx).contained) ret = 1;
-      else ret = 0;
+      // Using SRTrueParticle::contained 
+      //if(nu->prim.at(truth_idx).contained) ret = 1;
+      //else ret = 0;
+
+      // Using our definition
+      auto& prim_nu = nu->prim.at(truth_idx);
+      double x = prim_nu.end.x;
+      double y = prim_nu.end.y;
+      double z = prim_nu.end.z;
+      if ( std::isnan(x) || std::isnan(y) || std::isnan(z) ) ret = -1;
+      else{
+        ret = ( ( ( x < -61.94 - 10. && x > -358.49 + 10. ) ||
+                  ( x >  61.94 + 10. && x <  358.49 - 10. ) ) &&
+                ( ( y > -181.86 + 10. && y < 134.96 - 10. ) &&
+                  ( z > -894.95 + 10. && z < 894.95 - 10. ) ) );
+      }
     }
 
     return ret;

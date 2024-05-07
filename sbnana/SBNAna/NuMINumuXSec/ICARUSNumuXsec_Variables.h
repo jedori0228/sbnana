@@ -149,7 +149,10 @@ namespace ICARUSNumuXsec{
 
   extern const Var IsCosmicSlice;
   extern const TruthVar DummyTruthVar;
+  extern const Var AlwaysZero;
   extern const Var AlwaysOne;
+  extern const Var Run1OffbeamDataLivetimeSF_Random15Percent;
+  extern const Var Run2OffbeamDataLivetimeSF_Random15Percent;
   extern const Var Run1OffbeamDataLivetimeSF;
   extern const Var Run2OffbeamDataLivetimeSF;
 

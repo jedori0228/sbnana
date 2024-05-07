@@ -19,6 +19,8 @@ HistoProducer::HistoProducer(){
 
   ApplyNuMIPPFXCVWeight = false;
 
+  IsData = false;
+
   FillMetaData = true;
   FillSystematics = false;
 
@@ -26,6 +28,9 @@ HistoProducer::HistoProducer(){
   FillNuSyst = false;
   FillFlux = true;
   FillGEANT4 = true;
+
+  Add_Run1OffbeamDataLivetimeSF = false;
+  Add_Run2OffbeamDataLivetimeSF = false;
 
   cout << "[HistoProducer::HistoProducer] Finished" << endl;
 
@@ -915,17 +920,61 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
   std::vector<std::string> this_reco_labels = GetNuMIRecoTreeLabels();
   std::vector<Var> this_reco_vars = GetNuMIRecoTreeVars();
 
-  if(Add_Run1OffbeamDataLivetimeSF){
-    this_reco_labels.push_back( "OffbeamOnlyWeight" );
-    this_reco_vars.push_back( Run1OffbeamDataLivetimeSF );
-  }
-  else if(Add_Run2OffbeamDataLivetimeSF){
-    this_reco_labels.push_back( "OffbeamOnlyWeight" );
-    this_reco_vars.push_back( Run2OffbeamDataLivetimeSF );
+  if(IsData){
+
+    this_reco_labels.push_back( "IsData/i" );
+    this_reco_vars.push_back(
+      Var([](const caf::SRSliceProxy* slc) -> int {
+        return 1;
+      })
+    );
+
   }
   else{
+
+    this_reco_labels.push_back( "IsData/i" );
+    this_reco_vars.push_back( 
+      Var([](const caf::SRSliceProxy* slc) -> int {
+        return 0;
+      })
+    );
+
+  }
+
+  if(Add_Run1OffbeamDataLivetimeSF){
+
+    this_reco_labels.push_back( "OffbeamOnlyWeight_Random15Percent" );
+    this_reco_vars.push_back( Run1OffbeamDataLivetimeSF_Random15Percent );
+
     this_reco_labels.push_back( "OffbeamOnlyWeight" );
-    this_reco_vars.push_back( AlwaysOne );
+    this_reco_vars.push_back( Run1OffbeamDataLivetimeSF );
+
+  }
+  else if(Add_Run2OffbeamDataLivetimeSF){
+
+    this_reco_labels.push_back( "OffbeamOnlyWeight_Random15Percent" );
+    this_reco_vars.push_back( Run2OffbeamDataLivetimeSF_Random15Percent );
+
+    this_reco_labels.push_back( "OffbeamOnlyWeight" );
+    this_reco_vars.push_back( Run2OffbeamDataLivetimeSF );
+
+  }
+  else{
+
+    this_reco_labels.push_back( "OffbeamOnlyWeight_Random15Percent" );
+    this_reco_vars.push_back(
+      Var([](const caf::SRSliceProxy* slc) -> double {
+        return 1.;
+      })
+    );
+
+    this_reco_labels.push_back( "OffbeamOnlyWeight" );
+    this_reco_vars.push_back(
+      Var([](const caf::SRSliceProxy* slc) -> double {
+        return 1.;
+      })
+    );
+
   }
 
   // CV

@@ -7,6 +7,7 @@ namespace ana{
   std::vector<string> GetNuMITrueTreeLabels(){
 
     return {
+      "IsData/i",
       // Interaction
       "TruePDG/i", "TrueMode/i", "TrueTarget/i", "TrueIsCC/i",
       "TrueIsFHC/i",
@@ -59,6 +60,7 @@ namespace ana{
   std::vector<TruthVar> GetNuMITrueTreeVars(){
 
     return {
+      kTruth_IsData,
       // Interaction
       kTruth_NeutrinoPDG, kTruth_NeutrinoMode, kTruth_Target, kTruth_IsCC,
       kTruth_IsFHC,

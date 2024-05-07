@@ -875,25 +875,38 @@ return 0.;
     return 1;
   });
 
+  const Var AlwaysZero([](const caf::SRSliceProxy* slc) -> int {
+    return 0;
+  });
   const Var AlwaysOne([](const caf::SRSliceProxy* slc) -> int {
-    return 1.;
+    return 1;
   });
 
-  const Var Run1OffbeamDataLivetimeSF([](const caf::SRSliceProxy* slc) -> int {
+
+  const Var Run1OffbeamDataLivetimeSF_Random15Percent([](const caf::SRSliceProxy* slc) -> double {
     // (15% onbeam)/(all offbeam)
     // We want a SF that matches MC full POT
-    double NormToOnBeam = 0.171122;
-    double MCFullPOT = 8.074617826911222e+20;
-    double DataRun1POT_15perct = 6.983230011348827e+18;
-    return NormToOnBeam * MCFullPOT/DataRun1POT_15perct;
+    double NormToOnBeam = 0.174105;
+    return NormToOnBeam;
   });
-  const Var Run2OffbeamDataLivetimeSF([](const caf::SRSliceProxy* slc) -> int {
+  const Var Run2OffbeamDataLivetimeSF_Random15Percent([](const caf::SRSliceProxy* slc) -> double {
     // (15% onbeam)/(all offbeam)
     // We want a SF that matches MC full POT
-    double NormToOnBeam = 0.138717;
-    double MCFullPOT = 8.074617826911222e+20;
-    double DataRun2POT_15perct = 2.9300301931345543e+19;
-    return NormToOnBeam * MCFullPOT/DataRun2POT_15perct;
+    double NormToOnBeam = 0.145303;
+    return NormToOnBeam;
+  });
+
+  const Var Run1OffbeamDataLivetimeSF([](const caf::SRSliceProxy* slc) -> double {
+    // (all onbeam)/(all offbeam)
+    // We want a SF that matches MC full POT
+    double NormToOnBeam = 1.163560;
+    return NormToOnBeam;
+  });
+  const Var Run2OffbeamDataLivetimeSF([](const caf::SRSliceProxy* slc) -> double {
+    // (all onbeam)/(all offbeam)
+    // We want a SF that matches MC full POT
+    double NormToOnBeam = 0.977164;
+    return NormToOnBeam;
   });
 
 }
