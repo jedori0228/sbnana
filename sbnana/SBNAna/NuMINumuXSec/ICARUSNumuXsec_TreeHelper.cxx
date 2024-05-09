@@ -146,6 +146,8 @@ namespace ana{
       "SPPTpiPbLinearFitWR",
       "SPPTpiMINERvATemplateReweight",
       "SPPTpiMINERvAFittedReweight",
+      // TrackSplit Syst
+      "TrackSplitRW",
       // NuE
       "TrueE",
       // Vertex
@@ -289,6 +291,8 @@ namespace ana{
       kNuMISPPTpiPbLinearFitReweight,
       kNuMISPPTpiMINERvATemplateReweight,
       kNuMISPPTpiMINERvAFittedReweight,
+      // TrackSplit Syst
+      kNuMISplitTrackCVCorrection,
       // NuE
       kNuMITrueNuE,
       // Vertex
