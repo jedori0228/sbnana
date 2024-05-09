@@ -48,6 +48,7 @@ namespace ana {
 
   }
 
+/*
   const NuMIXSecDetectorSysts kNuMIXSecFrontIndPlaneGainSyst(
     NuMIXSecDetectorSysts::kFrontIndPlaneGain,
     "NuMIXSecFrontIndPlaneGainSyst",
@@ -68,6 +69,6 @@ namespace ana {
     "NuMIXSecMiddleIndPlaneTransparencySyst",
     "Middle ind. plane transparency"
   );
-
+*/
 
 } // end namespace ana

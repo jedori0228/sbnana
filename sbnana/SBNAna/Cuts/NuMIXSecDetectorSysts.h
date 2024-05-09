@@ -32,9 +32,11 @@ namespace ana
 
   };
 
+/*
   extern const NuMIXSecDetectorSysts kNuMIXSecFrontIndPlaneGainSyst;
   extern const NuMIXSecDetectorSysts kNuMIXSecFrontIndPlaneNoiseSyst;
   extern const NuMIXSecDetectorSysts kNuMIXSecFrontIndPlaneSignalShapeSyst;
   extern const NuMIXSecDetectorSysts kNuMIXSecMiddleIndPlaneTransparencySyst;
+*/
 
 }
