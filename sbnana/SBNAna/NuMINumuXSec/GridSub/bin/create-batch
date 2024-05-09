@@ -421,6 +421,7 @@ ls ${SBNDATA_DIR}/beamData/NuMIdata/
 ## - sbndata/anaData/NuMI/
 mkdir -p ${SBNDATA_DIR}/anaData/NuMI/
 ifdh cp /pnfs/icarus/scratch/users/jskim/NuMINumuXSec/anaData/NuMI/TrackSplitReweight_cathode.root ${SBNDATA_DIR}/anaData/NuMI/TrackSplitReweight_cathode.root
+ifdh cp /pnfs/icarus/scratch/users/jskim/NuMINumuXSec/anaData/NuMI/TrackSplitReweight_zzero.root ${SBNDATA_DIR}/anaData/NuMI/TrackSplitReweight_zzero.root
 ## now print
 echo "@@ ${SBNDATA_DIR}/anaData/NuMI/"
 ls ${SBNDATA_DIR}/anaData/NuMI/
