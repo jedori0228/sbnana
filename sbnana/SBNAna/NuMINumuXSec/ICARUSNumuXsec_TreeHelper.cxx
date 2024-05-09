@@ -148,6 +148,8 @@ namespace ana{
       "SPPTpiMINERvAFittedReweight",
       // TrackSplit Syst
       "TrackSplitRW",
+      "CathodeTrackSplitRW",
+      "ZZeroTrackSplitRW",
       // NuE
       "TrueE",
       // Vertex
@@ -293,6 +295,8 @@ namespace ana{
       kNuMISPPTpiMINERvAFittedReweight,
       // TrackSplit Syst
       kNuMISplitTrackCVCorrection,
+      kNuMICathodeSplitTrackCVCorrection,
+      kNuMIZZeroSplitTrackCVCorrection,
       // NuE
       kNuMITrueNuE,
       // Vertex
