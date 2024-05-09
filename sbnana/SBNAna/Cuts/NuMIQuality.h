@@ -19,6 +19,7 @@ namespace ana
   public:
     NuMIQuality();
     ~NuMIQuality();
+    static NuMIQuality& Instance();
 
     bool IsBadTriggeredSpill(unsigned int run, unsigned int subrun, unsigned int event) const;
 
@@ -26,8 +27,6 @@ namespace ana
     std::string filename_bad_triggered_spill;
   };
 
-  // set up to use the flux weight
-  static const NuMIQuality kNuMIQuality;
   extern const SpillCut kNuMINotBadTriggeredSpill;
 
 }

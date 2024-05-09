@@ -24,6 +24,13 @@ namespace ana {
   {
   }
 
+  NuMIQuality& NuMIQuality::Instance()
+  {
+    static NuMIQuality numiQual;
+    return numiQual;
+  }
+
+
   bool NuMIQuality::IsBadTriggeredSpill(unsigned int run, unsigned int subrun, unsigned int event) const {
 
     std::ifstream csv_bad_triggered_spill(filename_bad_triggered_spill);
@@ -54,7 +61,9 @@ namespace ana {
 
     if(sr->hdr.ismc) return true;
 
-    if( kNuMIQuality.IsBadTriggeredSpill(sr->hdr.run, sr->hdr.subrun, sr->hdr.evt) ) return false;
+    const NuMIQuality& numiQual = NuMIQuality::Instance();
+
+    if( numiQual.IsBadTriggeredSpill(sr->hdr.run, sr->hdr.subrun, sr->hdr.evt) ) return false;
     else return true;
 
   });
