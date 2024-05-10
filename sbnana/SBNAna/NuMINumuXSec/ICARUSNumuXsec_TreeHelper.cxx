@@ -214,6 +214,7 @@ namespace ana{
       "TrueChargedPionBestMatchedTrackHitPurityChi2Muon",
       "TrueChargedPionBestMatchedTrackHitPurityChi2Proton",
       "TrueChargedPionBestMatchedTrackHitPurityChi2MIP",
+      "TrueChargedPionCos",
       // - Reco
       //   - Track
       "LeadingChargedPionCandidateLength",
@@ -235,6 +236,9 @@ namespace ana{
       "LeadingChargedPionCandidateMindEdX",
       "LeadingChargedPionCandidateChi2MuonRecalc0p5",
       "LeadingChargedPionCandidateChi2MuonRecalc1p0",
+      "LeadingChargedPionCandidateCos",
+      // pi+proton
+      "RecoChargedPionProtonCos", "TrueChargedPionProtonCos",
       // Michel
       "NMichelCandidates/i",
       "MichelCandidateTrackLength",
@@ -361,6 +365,7 @@ namespace ana{
       kNuMINChargedPionBestMatchedTrackByHitPurityChi2Muon,
       kNuMINChargedPionBestMatchedTrackByHitPurityChi2Proton,
       kNuMINChargedPionBestMatchedTrackByHitPurityChi2MIP,
+      kLeadingChargedPionCandidateTrueCosThVtx,
       // - Reco
       //   - Track
       kNuMILeadingChargedPionCandidateLength,
@@ -382,6 +387,9 @@ namespace ana{
       kNuMILeadingChargedPionCandidateMindEdX,
       ICARUSNumuXsec::kNuMILeadingChargedPionCandidateChi2MuonRecalc0p5,
       ICARUSNumuXsec::kNuMILeadingChargedPionCandidateChi2MuonRecalc1p0,
+      kLeadingChargedPionCandidateRecoCosThVtx,
+      // pi+proton
+      kNuMIRecoCosThProtonChargedPion, kNuMITrueCosThProtonChargedPion,
       // Michel
       kNuMINMichelCandidates,
       kNuMIMichelCandidateTrackLength,
