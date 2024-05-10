@@ -145,6 +145,15 @@ namespace ana
   extern const Var kNuMILeadingChargedPionCandidateMindEdX;
   extern const MultiVar kNuMILeadingChargedPionCandidatedEdXs;
   extern const MultiVar kNuMILeadingChargedPionCandidateRRs;
+  // Chargedpion angle w.r.t. beam
+  extern const Var kLeadingChargedPionCandidateRecoCosThBeam;
+  extern const Var kLeadingChargedPionCandidateTrueCosThBeam;
+  // Chargedpion angle w.r.t. numi-to-vtx direction (= proxy of neutrino direction)
+  extern const Var kLeadingChargedPionCandidateRecoCosThVtx;
+  extern const Var kLeadingChargedPionCandidateTrueCosThVtx;
+  // Angle btw chargedpion and proton
+  extern const Var kNuMIRecoCosThProtonChargedPion;
+  extern const Var kNuMITrueCosThProtonChargedPion;
 
   // Investigate shower vars for the cut
   extern const MultiVar kNuMIShowerCandidateIdxs;
