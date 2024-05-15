@@ -185,10 +185,6 @@ namespace ICARUSNumuXsec{
     bool FillFlux;
     bool FillGEANT4;
 
-    bool Add_Run1OffbeamDataLivetimeSF;
-    bool Add_Run2OffbeamDataLivetimeSF;
-
-
   private:
 
   };

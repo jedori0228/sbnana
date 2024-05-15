@@ -29,9 +29,6 @@ HistoProducer::HistoProducer(){
   FillFlux = true;
   FillGEANT4 = true;
 
-  Add_Run1OffbeamDataLivetimeSF = false;
-  Add_Run2OffbeamDataLivetimeSF = false;
-
   cout << "[HistoProducer::HistoProducer] Finished" << endl;
 
 }
@@ -936,42 +933,6 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
     this_reco_vars.push_back( 
       Var([](const caf::SRSliceProxy* slc) -> int {
         return 0;
-      })
-    );
-
-  }
-
-  if(Add_Run1OffbeamDataLivetimeSF){
-
-    this_reco_labels.push_back( "OffbeamOnlyWeight_Random15Percent" );
-    this_reco_vars.push_back( Run1OffbeamDataLivetimeSF_Random15Percent );
-
-    this_reco_labels.push_back( "OffbeamOnlyWeight" );
-    this_reco_vars.push_back( Run1OffbeamDataLivetimeSF );
-
-  }
-  else if(Add_Run2OffbeamDataLivetimeSF){
-
-    this_reco_labels.push_back( "OffbeamOnlyWeight_Random15Percent" );
-    this_reco_vars.push_back( Run2OffbeamDataLivetimeSF_Random15Percent );
-
-    this_reco_labels.push_back( "OffbeamOnlyWeight" );
-    this_reco_vars.push_back( Run2OffbeamDataLivetimeSF );
-
-  }
-  else{
-
-    this_reco_labels.push_back( "OffbeamOnlyWeight_Random15Percent" );
-    this_reco_vars.push_back(
-      Var([](const caf::SRSliceProxy* slc) -> double {
-        return 1.;
-      })
-    );
-
-    this_reco_labels.push_back( "OffbeamOnlyWeight" );
-    this_reco_vars.push_back(
-      Var([](const caf::SRSliceProxy* slc) -> double {
-        return 1.;
       })
     );
 
@@ -2192,6 +2153,8 @@ void HistoProducer::setSystematicWeights(){
     // 1) pi syst
     genieMultisigmaKnobNames.push_back( "CC1piTPi" );
     IGENIESysts.push_back( new NuMIXSecPiSyst("CC1piTPi", "CC1piTpi") );
+    genieMultisigmaKnobNames.push_back( "LowQ2Suppression" );
+    IGENIESysts.push_back( new NuMIXSecLowQ2Suppression("LowQ2Suppression", "LowQ2Suppression") );
     // 2) nusyst
     if(FillNuSyst){
       genieMultisigmaKnobNames.push_back( "ZExpPCAB1" );
@@ -2446,7 +2409,6 @@ void HistoProducer::FillSystSpectrum(SpectrumLoader& loader, const std::string& 
 
 void HistoProducer::FillSystSpectrum(SpectrumLoader& loader, const std::string& label, const SpillVar& var, const Binning& binning, SpillCut spillCut){
 
-  static const std::vector<std::string> genieMultisigmaKnobNames = ICARUSNumuXsec::GetGENIEMultisigmaKnobNames();
   for(const std::string& name: genieMultisigmaKnobNames){
     if(name=="FormZone"){
      continue;

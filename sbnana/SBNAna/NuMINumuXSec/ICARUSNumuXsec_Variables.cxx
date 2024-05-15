@@ -875,38 +875,9 @@ return 0.;
     return 1;
   });
 
-  const Var AlwaysZero([](const caf::SRSliceProxy* slc) -> int {
-    return 0;
-  });
-  const Var AlwaysOne([](const caf::SRSliceProxy* slc) -> int {
-    return 1;
-  });
-
-
-  const Var Run1OffbeamDataLivetimeSF_Random15Percent([](const caf::SRSliceProxy* slc) -> double {
-    // (15% onbeam)/(all offbeam)
-    // We want a SF that matches MC full POT
-    double NormToOnBeam = 0.174105;
-    return NormToOnBeam;
-  });
-  const Var Run2OffbeamDataLivetimeSF_Random15Percent([](const caf::SRSliceProxy* slc) -> double {
-    // (15% onbeam)/(all offbeam)
-    // We want a SF that matches MC full POT
-    double NormToOnBeam = 0.145303;
-    return NormToOnBeam;
-  });
-
-  const Var Run1OffbeamDataLivetimeSF([](const caf::SRSliceProxy* slc) -> double {
-    // (all onbeam)/(all offbeam)
-    // We want a SF that matches MC full POT
-    double NormToOnBeam = 1.163560;
-    return NormToOnBeam;
-  });
-  const Var Run2OffbeamDataLivetimeSF([](const caf::SRSliceProxy* slc) -> double {
-    // (all onbeam)/(all offbeam)
-    // We want a SF that matches MC full POT
-    double NormToOnBeam = 0.977164;
-    return NormToOnBeam;
+  const Var kNuMINUANCECode([](const caf::SRSliceProxy* slc) -> int {
+    if( slc->truth.index < 0 ) return -1;
+    else return slc->truth.genie_inttype;
   });
 
 }

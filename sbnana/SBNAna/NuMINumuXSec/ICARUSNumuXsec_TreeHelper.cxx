@@ -21,6 +21,9 @@ namespace ana{
       "FluxWeight",
       "FluxWeightWithG3Chase",
       "FluxWeightWithG4Updated",
+      // SPP RW for res events
+      "IsSPP/i",
+      "SPPCVCorrection",
       // Interaction
       "TrueE",
       "TrueQ2",
@@ -74,6 +77,9 @@ namespace ana{
       kGetTruthNuMIFluxWeight,
       kGetTruthNuMIFluxWeightG3Chase,
       kGetTruthNuMIFluxWeightUpdated,
+      // SPP RW for res events
+      kTruth_IsSPP,
+      kTruth_NuMISPPCVCorrection,
       // Interaction
       kTruth_NeutrinoE,
       kTruth_Q2,
@@ -121,6 +127,8 @@ namespace ana{
       "TrueIsFHC/i",
       "TrueParentPDG/i",
       "TrueQ2",
+      "TrueW",
+      "TrueNUANCECode/i",
       // Number of primary particles
       "TrueNProton/i", "TrueNNeutron/i",
       "TrueNProtonThreshold/i",
@@ -141,6 +149,7 @@ namespace ana{
       // SPP Syst
       "IsSPP/i",
       "SPPQ2RW",
+      "SPPLowQ2Suppression",
       "SPPTpiCHLinearFitWR",
       "SPPTpiFeLinearFitWR",
       "SPPTpiPbLinearFitWR",
@@ -258,7 +267,11 @@ namespace ana{
       "DiPhotonMass",
       // Nu
       "ENu_Muon_LeadingProton",
-      "ENu_Muon_AllProtons"
+      "ENu_Muon_AllProtons",
+      // Shared variable
+      "RecoENu",
+      "RecoQ2",
+      "RecoWexp",
     };
 
   }
@@ -272,6 +285,8 @@ namespace ana{
       kNuMIIsFHC,
       kNuMITrueParentPDG,
       kNuMITrueQ2,
+      kNuMITruew,
+      ICARUSNumuXsec::kNuMINUANCECode,
       // Number of primary particles
       kNuMITrueNProton, kNuMITrueNNeutron,
       kNuMITrueNProton_Threshold,
@@ -292,6 +307,7 @@ namespace ana{
       // SPP Syst
       kNuMITrueIsSPP,
       kNuMISPPQ2RW,
+      kNuMISPPLowQ2Suppression,
       kNuMISPPTpiCHLinearFitReweight,
       kNuMISPPTpiFeLinearFitReweight,
       kNuMISPPTpiPbLinearFitReweight,
@@ -410,6 +426,10 @@ namespace ana{
       // Nu
       kNuMIRecoENu_Muon_LeadingProton,
       kNuMIRecoENu_Muon_AllProtons,
+      // Shared variable
+      kNuMIRecoEnu,
+      kNuMIRecoQ2,
+      kNuMIRecoWexp,
     };
 
   }
