@@ -272,6 +272,9 @@ namespace ana{
       "RecoENu",
       "RecoQ2",
       "RecoWexp",
+      // For mu-pi flip study
+      "RecoMuonTruePDG",
+      "LeadingChargedPionCandidateTruePDG",
     };
 
   }
@@ -430,6 +433,9 @@ namespace ana{
       kNuMIRecoEnu,
       kNuMIRecoQ2,
       kNuMIRecoWexp,
+      // For mu-pi flip study
+      kNuMIRecoMuonCandidateTruePDG,
+      kNuMIRecoPionCandidateTruePDG,
     };
 
   }
