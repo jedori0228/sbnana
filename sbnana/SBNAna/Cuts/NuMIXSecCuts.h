@@ -97,4 +97,23 @@ namespace ana
 
   // FSI cov
   extern const TruthCut kNuMITrueNuMuCCInFV;
+
+  // mu-pi flip flag
+  extern const Var kNuMIIsMuonPionFlipped;
+  extern const Var kNuMIIsPionPionSelected;
+  extern const Var kNuMIIsMuonPionCorrect;
+  extern const Var kNuMI_AhtBY_m3sigma;
+  extern const Var kNuMI_BhtBY_p3sigma;
+  extern const Var kNuMI_CV1uBY_p3sigma;
+  extern const Var kNuMI_CV2uBY_m3sigma;
+  extern const Var kNuMI_NonRESBGvpCC2pi_m3sigma;
+  extern const Var kNuMI_NonRESBGvpNC2pi_m3sigma;
+  extern const Var kNuMI_NonRESBGvnCC2pi_m3sigma;
+  extern const Var kNuMI_NonRESBGvnNC2pi_m3sigma;
+  extern const Var kNuMI_NonRESBGvbarpCC2pi_m3sigma;
+  extern const Var kNuMI_NonRESBGvbarpNC2pi_m3sigma;
+  extern const Var kNuMI_NonRESBGvbarnCC2pi_m3sigma;
+  extern const Var kNuMI_NonRESBGvbarnNC2pi_m3sigma;
+
+
 }

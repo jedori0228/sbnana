@@ -2,6 +2,7 @@
 #include "sbnana/SBNAna/Vars/NuMIXSecVars.h"
 #include <algorithm>
 #include <iostream>
+#include "sbnana/CAFAna/Systs/SBNWeightSysts.h"
 
 namespace ana {
 
@@ -458,5 +459,41 @@ namespace ana {
          !isInFV(nu->position.x, nu->position.y, nu->position.z) ) return false;
     else return true;
   });
+
+  // mu-pi flip flag
+  const Var kNuMIIsMuonPionFlipped([](const caf::SRSliceProxy* slc) -> int {
+    int muon_pdg = kNuMIRecoMuonCandidateTruePDG(slc);
+    int pion_pdg = kNuMIRecoPionCandidateTruePDG(slc);
+
+    if( abs(muon_pdg)==211 && abs(pion_pdg)==13 ) return 1;
+    else return 0;
+  });
+  const Var kNuMIIsPionPionSelected([](const caf::SRSliceProxy* slc) -> int {
+    int muon_pdg = kNuMIRecoMuonCandidateTruePDG(slc);
+    int pion_pdg = kNuMIRecoPionCandidateTruePDG(slc);
+
+    if( abs(muon_pdg)==211 && abs(pion_pdg)==211 ) return 1;
+    else return 0;
+  });
+  const Var kNuMIIsMuonPionCorrect([](const caf::SRSliceProxy* slc) -> int {
+    int muon_pdg = kNuMIRecoMuonCandidateTruePDG(slc);
+    int pion_pdg = kNuMIRecoPionCandidateTruePDG(slc);
+
+    if( abs(muon_pdg)==13 && abs(pion_pdg)==211 ) return 1;
+    else return 0;
+  });
+
+  const Var kNuMI_AhtBY_m3sigma = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_AhtBY", 4);
+  const Var kNuMI_BhtBY_p3sigma = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_BhtBY", 5);
+  const Var kNuMI_CV1uBY_p3sigma = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_CV1uBY", 5);
+  const Var kNuMI_CV2uBY_m3sigma = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_CV2uBY", 4);
+  const Var kNuMI_NonRESBGvpCC2pi_m3sigma = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_NonRESBGvpCC2pi", 4);
+  const Var kNuMI_NonRESBGvpNC2pi_m3sigma = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_NonRESBGvpNC2pi", 4);
+  const Var kNuMI_NonRESBGvnCC2pi_m3sigma = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_NonRESBGvnCC2pi", 4);
+  const Var kNuMI_NonRESBGvnNC2pi_m3sigma = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_NonRESBGvnNC2pi", 4);
+  const Var kNuMI_NonRESBGvbarpCC2pi_m3sigma = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_NonRESBGvbarpCC2pi", 4);
+  const Var kNuMI_NonRESBGvbarpNC2pi_m3sigma = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_NonRESBGvbarpNC2pi", 4);
+  const Var kNuMI_NonRESBGvbarnCC2pi_m3sigma = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_NonRESBGvbarnCC2pi", 4);
+  const Var kNuMI_NonRESBGvbarnNC2pi_m3sigma = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_NonRESBGvbarnNC2pi", 4);
 
 }

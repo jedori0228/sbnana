@@ -275,6 +275,22 @@ namespace ana{
       // For mu-pi flip study
       "RecoMuonTruePDG",
       "LeadingChargedPionCandidateTruePDG",
+      "IsMuonPionFlipped",
+      "IsPionPionSelected",
+      "IsMuonPionCorrect",
+      // MockDataWeights
+      "Reweight_AhtBY_m3sigma",
+      "Reweight_BhtBY_p3sigma",
+      "Reweight_CV1uBY_p3sigma",
+      "Reweight_CV2uBY_m3sigma",
+      "Reweight_NonRESBGvpCC2pi_m3sigma",
+      "Reweight_NonRESBGvpNC2pi_m3sigma",
+      "Reweight_NonRESBGvnCC2pi_m3sigma",
+      "Reweight_NonRESBGvnNC2pi_m3sigma",
+      "Reweight_NonRESBGvbarpCC2pi_m3sigma",
+      "Reweight_NonRESBGvbarpNC2pi_m3sigma",
+      "Reweight_NonRESBGvbarnCC2pi_m3sigma",
+      "Reweight_NonRESBGvbarnNC2pi_m3sigma",
     };
 
   }
@@ -436,6 +452,22 @@ namespace ana{
       // For mu-pi flip study
       kNuMIRecoMuonCandidateTruePDG,
       kNuMIRecoPionCandidateTruePDG,
+      kNuMIIsMuonPionFlipped,
+      kNuMIIsPionPionSelected,
+      kNuMIIsMuonPionCorrect,
+      // MockDataWeights
+      kNuMI_AhtBY_m3sigma,
+      kNuMI_BhtBY_p3sigma,
+      kNuMI_CV1uBY_p3sigma,
+      kNuMI_CV2uBY_m3sigma,
+      kNuMI_NonRESBGvpCC2pi_m3sigma,
+      kNuMI_NonRESBGvpNC2pi_m3sigma,
+      kNuMI_NonRESBGvnCC2pi_m3sigma,
+      kNuMI_NonRESBGvnNC2pi_m3sigma,
+      kNuMI_NonRESBGvbarpCC2pi_m3sigma,
+      kNuMI_NonRESBGvbarpNC2pi_m3sigma,
+      kNuMI_NonRESBGvbarnCC2pi_m3sigma,
+      kNuMI_NonRESBGvbarnNC2pi_m3sigma,
     };
 
   }
