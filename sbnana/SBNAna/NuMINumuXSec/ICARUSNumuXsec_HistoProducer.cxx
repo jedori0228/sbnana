@@ -895,7 +895,15 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       kNuMIValidTrigger
     )
   );
-
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum(
+      "TriggerTime_ValidTrig_WithG3ChaseWeight", Binning::Simple(500, -20., 30.),
+      loader,
+      kNuMISpillTriggerTime,
+      kNuMIValidTrigger,
+      kNuMIG3ChaseSpillWeightByClosesetNu
+    )
+  );
 
   map_cutName_to_vec_Spectrums[currentCutName].push_back(
     new Spectrum(
@@ -1260,6 +1268,8 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     "FluxWeightWithG3Chase",
     "FluxWeightWithG4Updated",
     "SPPCVCorrection",
+    // TrackSplit Syst
+    "TrackSplitRW",
     // Muon
     "MuonSelection/i",
     "MuonMatchType/i",
@@ -1302,6 +1312,8 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     kGetNuMIFluxWeightG3Chase,
     kGetNuMIFluxWeightUpdated,
     kNuMISPPCVCorrection,
+    // TrackSplit Syst
+    kNuMISplitTrackCVCorrection,
     // Muon
     kNuMIIsRelaxedMuonSelection,
     kNuMIRelaxedMuonTrackMatchType,
@@ -1390,33 +1402,39 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
   std::vector<std::string> this_NSigmasPsetNames;
   std::vector<const ISyst*> this_NSigmasISysts;
   std::vector<std::pair<int,int>> this_NSigmasPairs;
+  std::vector<std::vector<double>> this_NSigmas;
   for(unsigned int i=0; i<genieMultisigmaKnobNames.size(); i++){
     this_NSigmasPsetNames.push_back( genieMultisigmaKnobNames.at(i) );
     this_NSigmasISysts.push_back( IGENIESysts.at(i) );
     this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
+    this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
   }
   for(unsigned int i=0; i<genieMorphKnobNames.size(); i++){
     this_NSigmasPsetNames.push_back( genieMorphKnobNames.at(i) );
     this_NSigmasISysts.push_back( IGENIEMorphSysts.at(i) );
     this_NSigmasPairs.push_back( std::make_pair(0, 1) );
+    this_NSigmas.push_back( {-1, -0.5, 0, 0.5, 1} );
   }
   for(unsigned int i=0; i<IFluxSysts.size(); i++){
     this_NSigmasPsetNames.push_back( IFluxSysts.at(i)->ShortName() );
     this_NSigmasISysts.push_back( IFluxSysts.at(i) );
     this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
+    this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
   }
   for(unsigned int i=0; i<IDetectorSysts.size(); i++){
     this_NSigmasPsetNames.push_back( IDetectorSysts.at(i)->ShortName() );
     this_NSigmasISysts.push_back( IDetectorSysts.at(i) );
     this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
+    this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
   }
+
   map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
     new ana::NSigmasTree(
       ("PIDStudyTree_NSigmas_"+currentCutName).Data(),
       this_NSigmasPsetNames,
       loader,
       this_NSigmasISysts,
-      this_NSigmasPairs,
+      this_NSigmas,
       spillCut, cut,
       kNoShift, true, true
     )
@@ -1585,7 +1603,7 @@ void HistoProducer::MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut, C
     )
   );
 
-  std::vector<std::string> labels = {
+  std::vector<std::string> true_labels = {
     // Weight
     "FluxWeight",
     "FluxWeightWithG3Chase",
@@ -1610,7 +1628,7 @@ void HistoProducer::MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut, C
     "TruedeltaphiT",
   };
 
-  std::vector<TruthVar> truvars = {
+  std::vector<TruthVar> true_vars = {
     // Weight
     kGetTruthNuMIFluxWeight,
     kGetTruthNuMIFluxWeightG3Chase,
@@ -1638,7 +1656,7 @@ void HistoProducer::MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut, C
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
       ("trueEvents_WithPhaseSpaceCut_"+currentCutName).Data(),
-      labels, loader, truvars, kNuMIValidTrigger, kTruthCut_IsSignal,
+      true_labels, loader, true_vars, kNuMIValidTrigger, kTruthCut_IsSignal,
       cut,
       kNoShift,
       true
@@ -1648,10 +1666,29 @@ void HistoProducer::MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut, C
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
       ("trueEvents_WithoutPhaseSpaceCut_"+currentCutName).Data(),
-      labels, loader, truvars, kNuMIValidTrigger, kTruthCut_IsSignalWithoutPhaseSpaceCut,
+      true_labels, loader, true_vars, kNuMIValidTrigger, kTruthCut_IsSignalWithoutPhaseSpaceCut,
       cut,
       kNoShift,
       true
+    )
+  );
+
+  std::vector<Var> reco_vars;
+  reco_vars.push_back(
+    Var([](const caf::SRSliceProxy* slc) -> int {
+      return 1;
+    })
+  );
+  std::vector<std::string> reco_labels;
+  reco_labels.push_back( "Pass" );
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      ("selectedEvents_"+currentCutName).Data(), reco_labels,
+      loader,
+      reco_vars,
+      spillCut, cut,
+      kNoShift, true, true
     )
   );
 
@@ -1847,41 +1884,20 @@ void HistoProducer::MakeFSICovTree(SpectrumLoader& loader, SpillCut spillCut, Cu
 }
 
 void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
-/*
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(
-    new Spectrum(
-      "NuMILeadingChargedPionCandidateRR_vs_NuMILeadingChargedPionCandidatedEdX", loader,
-      Binning::Simple(300, 0., 30.), kNuMILeadingChargedPionCandidateRRs,
-      Binning::Simple(200, 0., 20.), kNuMILeadingChargedPionCandidatedEdXs,
-      spillCut, cut
-    )
-  );
-*/
 
-  //FillCVSpectrum(loader, "CountSpill", spillvarTest, Binning::Simple(1, 0.,1.), spillCut);
-  //FillCVSpectrum(loader, "CountSlice", varCountSlice, Binning::Simple(1, 0.,1.), spillCut, cut);
+  std::vector<std::string> this_reco_labels_all = GetNuMIRecoTreeLabels();
+  std::vector<Var> this_reco_vars_all = GetNuMIRecoTreeVars();
 
-  //FillCVSpectrum(loader, "SliceTestVar", SliceTestVar, Binning::Simple(1, 0.,1.), spillCut, cut);
+  std::vector<std::string> this_reco_labels = {this_reco_labels_all.begin(), this_reco_labels_all.begin() + debug_uint};
+  std::vector<Var> this_reco_vars = {this_reco_vars_all.begin(), this_reco_vars_all.begin() + debug_uint};
+  std::cout << "[JSKIMDEBUG] debug_uint = " << debug_uint << std::endl;
+  std::cout << "[JSKIMDEBUG] Last variable = " << this_reco_labels.back() << std::endl;
 
-  std::vector<std::string> this_NSigmasPsetNames;
-  std::vector<const ISyst*> this_NSigmasISysts;
-  std::vector<std::vector<double>> this_NSigmas;
-
-  for(unsigned int i=0; i<genieMorphKnobNames.size(); i++){
-    if(genieMorphKnobNames.at(i)=="DecayAngMEC"){
-      this_NSigmasPsetNames.push_back( genieMorphKnobNames.at(i) );
-      this_NSigmasISysts.push_back( IGENIEMorphSysts.at(i) );
-      this_NSigmas.push_back( {-1, -0.5, 0, 0.5, 1} );
-    }
-  }
-
-  map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
-    new ana::NSigmasTree(
-      "selectedEvents_NSigmas",
-      this_NSigmasPsetNames,
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "selectedEvents", this_reco_labels,
       loader,
-      this_NSigmasISysts,
-      this_NSigmas,
+      this_reco_vars,
       spillCut, cut,
       kNoShift, true, true
     )
@@ -2219,6 +2235,7 @@ void HistoProducer::setSystematicWeights(){
     cout << "[HistoProducer::setSystematicWeights] Setting flux systematics" << endl;
     IFluxSysts = GetAllNuMIFluxSysts(NNuMIFluxPCA);
     IFluxSysts.push_back( GetNuMIBeamShiftSyst() );
+    IFluxSysts.push_back( new NuMIBeamG3ChaseSyst("numi_beam_G3Chase", "numi_beam_G3Chase") );
 
     for(unsigned int i=0; i<IFluxSysts.size(); i++){
       cout << "[HistoProducer::setSystematicWeights] Syst = " << IFluxSysts.at(i)->ShortName() << endl;

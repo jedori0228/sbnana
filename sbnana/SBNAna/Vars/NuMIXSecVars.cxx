@@ -103,7 +103,11 @@ namespace ana {
     double foundTriggerTime = sr->hdr.triggerinfo.trigger_within_gate;
 
     // TODO, Tepmorary? 10/10/2023, JK: Gray's /pnfs/icarus/scratch/users/gputnam/DMCP2023G/reprod/D-* has trigger time is shifted by 4 us
-    if(!sr->hdr.ismc) foundTriggerTime -= 4.; 
+    if(!sr->hdr.ismc){
+      if(sr->hdr.run<9300){
+        foundTriggerTime -= 4.; 
+      }
+    }
 
     if ( !std::isnan(foundTriggerTime) && !std::isinf(foundTriggerTime) && foundTriggerTime < -15. ) triggerTime = -15.;
     else if ( std::isnan(foundTriggerTime) || std::isinf(foundTriggerTime) ) triggerTime = -16.;

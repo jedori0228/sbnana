@@ -12,7 +12,11 @@ namespace ICARUSNumuXsec{
     std::vector<double> rets;
 
     double manual_shift = 0.;
-    if(!sr->hdr.ismc) manual_shift -= 4.;
+    if(!sr->hdr.ismc){
+      if(sr->hdr.run<9300){
+        manual_shift -= 4.;
+      }
+    }
 
     for(const auto& opflash : sr->opflashes){
       rets.push_back( opflash.firsttime + manual_shift );
@@ -26,7 +30,11 @@ namespace ICARUSNumuXsec{
     std::vector<double> rets;
 
     double manual_shift = 0.;
-    if(!sr->hdr.ismc) manual_shift -= 4.;
+    if(!sr->hdr.ismc){
+      if(sr->hdr.run<9300){
+        manual_shift -= 4.;
+      }
+    }
 
     for(const auto& opflash : sr->opflashes){
       rets.push_back( opflash.time + manual_shift );
@@ -52,7 +60,11 @@ namespace ICARUSNumuXsec{
     if(HasSlicePassSelection){
 
       double manual_shift = 0.;
-      if(!sr->hdr.ismc) manual_shift -= 4.;
+      if(!sr->hdr.ismc){
+        if(sr->hdr.run<9300){
+          manual_shift -= 4.;
+        }
+      }
 
       for(const auto& opflash : sr->opflashes){
         rets.push_back( opflash.time + manual_shift );
@@ -878,6 +890,28 @@ return 0.;
   const Var kNuMINUANCECode([](const caf::SRSliceProxy* slc) -> int {
     if( slc->truth.index < 0 ) return -1;
     else return slc->truth.genie_inttype;
+  });
+
+  const SpillVar kNuMIG3ChaseSpillWeightByClosesetNu( [](const caf::SRSpillProxy *sr) -> double {
+
+    if(!sr->hdr.ismc) return 1.;
+
+    // Find the triggering neutrino. If none, skip this slice.
+    double spillTime = kNuMISpillTriggerTime(sr);
+    if ( !(spillTime > -5.) ) return 1.;
+    double theMinDeltaT = 999999.;
+    unsigned int idxMinDeltaT = 0;
+    for ( unsigned int idx=0; idx < sr->mc.nu.size(); ++idx ) {
+      if ( fabs(sr->mc.nu[idx].time - spillTime) < theMinDeltaT ) {
+        theMinDeltaT = fabs(sr->mc.nu[idx].time - spillTime);
+        idxMinDeltaT = idx;
+      }
+    }
+
+    double wtForTriggeringNu = kGetTruthNuMIFluxWeightG3Chase(&sr->mc.nu[idxMinDeltaT]);
+
+    return wtForTriggeringNu;
+
   });
 
 }

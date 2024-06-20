@@ -427,6 +427,16 @@ namespace ana {
     else return 0;
   });
 
+  /// \ref Var for slice type (CutType; 1=Signal,         3=OtherCC, 4=NuNC, 5=NotNu)
+  const Var kNuMISliceSignalTypeWithoutOOPS([](const caf::SRSliceProxy* slc) -> int {
+    if ( kNuMI_1muNp0piStudy_Signal_WithPhaseSpaceCut(slc) ) return 1; // Signal (with phase space cut)
+    else if ( kNuMI_1muNp0piStudy_Signal_FailPhaseSpaceCut(slc) ) return 3; // Signal but out of phase space cut (OOPS)
+    else if ( kNuMI_1muNp0piStudy_OtherNuCC(slc) ) return 3; // CC but not (signal without phase space cut)
+    else if ( kNuMI_IsSliceNuNC(slc) ) return 4; // NC
+    else if ( kNuMI_IsSlcNotNu(slc) ) return 5; // Not nu-slice Cosmic
+    else return 0;
+  });
+
   /// \ref Check if the nu interaction is in the fiducial volume only
   bool IsNuInFV(const caf::Proxy<caf::SRTrueInteraction>& true_int){
     if ( true_int.index < 0 ) return false;

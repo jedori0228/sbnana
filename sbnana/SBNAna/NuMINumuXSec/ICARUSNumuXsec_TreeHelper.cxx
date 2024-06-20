@@ -142,6 +142,7 @@ namespace ana{
       "RecoProtonMatchedToTrueProton/i",
       // Is Signal
       "IsSignal/i",
+      "IsSignalWithoutOOPS/i",
       // Weight
       "FluxWeight",
       "FluxWeightWithG3Chase",
@@ -272,6 +273,7 @@ namespace ana{
       "RecoENu",
       "RecoQ2",
       "RecoWexp",
+/*
       // For mu-pi flip study
       "RecoMuonTruePDG",
       "LeadingChargedPionCandidateTruePDG",
@@ -279,6 +281,7 @@ namespace ana{
       "IsPionPionSelected",
       "IsMuonPionCorrect",
       // MockDataWeights
+      // TODO) Errors for real data
       "Reweight_AhtBY_m3sigma",
       "Reweight_BhtBY_p3sigma",
       "Reweight_CV1uBY_p3sigma",
@@ -291,6 +294,9 @@ namespace ana{
       "Reweight_NonRESBGvbarpNC2pi_m3sigma",
       "Reweight_NonRESBGvbarnCC2pi_m3sigma",
       "Reweight_NonRESBGvbarnNC2pi_m3sigma",
+*/
+      // Sideband pi RW
+      "SidebandPiRW",
     };
 
   }
@@ -319,6 +325,7 @@ namespace ana{
       kNuMIRecoProtonMatchedToTrueProton,
       // Is Signal
       kNuMISliceSignalType,
+      kNuMISliceSignalTypeWithoutOOPS,
       // Weight
       kGetNuMIFluxWeight,
       kGetNuMIFluxWeightG3Chase,
@@ -449,6 +456,7 @@ namespace ana{
       kNuMIRecoEnu,
       kNuMIRecoQ2,
       kNuMIRecoWexp,
+/*
       // For mu-pi flip study
       kNuMIRecoMuonCandidateTruePDG,
       kNuMIRecoPionCandidateTruePDG,
@@ -456,6 +464,7 @@ namespace ana{
       kNuMIIsPionPionSelected,
       kNuMIIsMuonPionCorrect,
       // MockDataWeights
+      // TODO) Errors for real data
       kNuMI_AhtBY_m3sigma,
       kNuMI_BhtBY_p3sigma,
       kNuMI_CV1uBY_p3sigma,
@@ -468,6 +477,9 @@ namespace ana{
       kNuMI_NonRESBGvbarpNC2pi_m3sigma,
       kNuMI_NonRESBGvbarnCC2pi_m3sigma,
       kNuMI_NonRESBGvbarnNC2pi_m3sigma,
+*/
+      // Sideband pi RW
+      kNuMISidebandPiRW,
     };
 
   }

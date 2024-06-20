@@ -153,4 +153,6 @@ namespace ICARUSNumuXsec{
 
   extern const Var kNuMINUANCECode;
 
+  extern const SpillVar kNuMIG3ChaseSpillWeightByClosesetNu;
+
 }
