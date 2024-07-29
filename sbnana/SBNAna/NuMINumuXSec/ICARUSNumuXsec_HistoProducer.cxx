@@ -1673,25 +1673,69 @@ void HistoProducer::MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut, C
     )
   );
 
-  std::vector<Var> reco_vars;
-  reco_vars.push_back(
-    Var([](const caf::SRSliceProxy* slc) -> int {
-      return 1;
-    })
-  );
-  std::vector<std::string> reco_labels;
-  reco_labels.push_back( "Pass" );
-
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      ("selectedEvents_"+currentCutName).Data(), reco_labels,
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum(
+      ("WeightedEvents_WithoutTrackSplitRW"+currentCutName).Data(), Binning::Simple(1, 0., 1.),
       loader,
-      reco_vars,
-      spillCut, cut,
-      kNoShift, true, true
+      Var([](const caf::SRSliceProxy* slc) -> double {return 0.5;}),
+      spillCut,
+      cut,
+      kNoShift,
+      kGetNuMIFluxWeightG3Chase * kNuMISPPQ2RW * kNuMISPPTpiMINERvAFittedReweight
     )
   );
 
+  std::cout << "currentCutName = " << currentCutName << std::endl;
+  if( currentCutName=="AllSamples_NoCut" ){
+
+    std::vector<Var> reco_vars;
+    reco_vars.push_back(kGetNuMIFluxWeightG3Chase);
+    reco_vars.push_back(kNuMISPPQ2RW);
+    reco_vars.push_back(kNuMISPPTpiMINERvAFittedReweight);
+    reco_vars.push_back(kNuMISplitTrackCVCorrection);
+    reco_vars.push_back(kNuMISliceSignalType);
+    reco_vars.push_back(kNuMISliceSignalTypeWithoutOOPS);
+
+    std::vector<std::string> reco_labels;
+    reco_labels.push_back( "FluxWeightWithG3Chase" );
+    reco_labels.push_back( "SPPQ2RW" );
+    reco_labels.push_back( "SPPTpiMINERvAFittedReweight" );
+    reco_labels.push_back( "TrackSplitRW" );
+    reco_labels.push_back( "IsSignal/I" );
+    reco_labels.push_back( "IsSignalWithoutOOPS/I" );
+
+
+    reco_vars.push_back( Var([](const caf::SRSliceProxy* slc) -> int {return kNuMIVertexInFV(slc) ? 1 : 0;}) );
+    reco_vars.push_back( Var([](const caf::SRSliceProxy* slc) -> int {return kNuMINotClearCosmic(slc) ? 1 : 0;}) );
+    reco_vars.push_back( Var([](const caf::SRSliceProxy* slc) -> int {return kNuMIHasMuonCandidate(slc) ? 1 : 0;}) );
+    reco_vars.push_back( Var([](const caf::SRSliceProxy* slc) -> int {return kNuMIHasProtonCandidate(slc) ? 1 : 0;}) );
+    reco_vars.push_back( Var([](const caf::SRSliceProxy* slc) -> int {return kNuMIProtonCandidateRecoPTreshold(slc) ? 1 : 0;}) );
+    reco_vars.push_back( Var([](const caf::SRSliceProxy* slc) -> int {return kNuMIAllPrimaryHadronsContained(slc) ? 1 : 0;}) );
+    reco_vars.push_back( Var([](const caf::SRSliceProxy* slc) -> int {return kNuMINoSecondPrimaryMuonlikeTracks(slc) ? 1 : 0;}) );
+    reco_vars.push_back( Var([](const caf::SRSliceProxy* slc) -> int {return kNuMICutPhotons(slc) ? 1 : 0;}) );
+    reco_vars.push_back( Var([](const caf::SRSliceProxy* slc) -> int {return kNuMIMuonCandidateContained(slc) ? 1 : 0;}) );
+
+    reco_labels.push_back( "Pass_VtxInFV/I" );
+    reco_labels.push_back( "Pass_NotClearCosmic/I" );
+    reco_labels.push_back( "Pass_HasMuon/I" );
+    reco_labels.push_back( "Pass_HasProton/I" );
+    reco_labels.push_back( "Pass_ProtonPCut/I" );
+    reco_labels.push_back( "Pass_PrimaryHadronContained/I" );
+    reco_labels.push_back( "Pass_NoChargedPionTrack/I" );
+    reco_labels.push_back( "Pass_NoNeutralPionShower/I" );
+    reco_labels.push_back( "Pass_MuonContained/I" );
+
+    map_cutName_to_vec_Trees[currentCutName].push_back(
+      new ana::Tree(
+        ("selectedEvents_"+currentCutName).Data(), reco_labels,
+        loader,
+        reco_vars,
+        spillCut, cut,
+        kNoShift, true, true
+      )
+    );
+
+  }
 
 }
 
@@ -1883,8 +1927,35 @@ void HistoProducer::MakeFSICovTree(SpectrumLoader& loader, SpillCut spillCut, Cu
 
 }
 
+// - 240712_DupeCheck
+void HistoProducer::MakeDupeCheckTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  std::vector<std::string> this_reco_labels;
+  std::vector<Var> this_reco_vars;
+
+  this_reco_labels.push_back( "Dummy/i" );
+  this_reco_vars.push_back(
+    Var([](const caf::SRSliceProxy* slc) -> int {
+      return 1;
+    })
+  );
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "selectedEvents", this_reco_labels,
+      loader,
+      this_reco_vars,
+      spillCut, cut,
+      kNoShift, true, true
+    )
+  );
+
+
+}
+
 void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
+/*
   std::vector<std::string> this_reco_labels_all = GetNuMIRecoTreeLabels();
   std::vector<Var> this_reco_vars_all = GetNuMIRecoTreeVars();
 
@@ -1900,6 +1971,16 @@ void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
       this_reco_vars,
       spillCut, cut,
       kNoShift, true, true
+    )
+  );
+*/
+
+  map_cutName_to_vec_Spectrums[currentCutName].push_back(
+    new Spectrum(
+      "testspillvar", Binning::Simple(1, 0., 1.),
+      loader,
+      spillvarTest,
+      kNoSpillCut
     )
   );
 

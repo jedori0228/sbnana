@@ -95,6 +95,8 @@ namespace ICARUSNumuXsec{
     void MakeBNBFluxTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     // - 240315_FSICovTree
     void MakeFSICovTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    // - 240712_DupeCheck
+    void MakeDupeCheckTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
     void Test(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
