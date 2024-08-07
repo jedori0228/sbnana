@@ -409,22 +409,29 @@ mrbslp
 echo "@@ Using local SBNDATA_DIR"
 cd ${nodeBaseDir}
 export SBNDATA_DIR=${nodeBaseDir}/sbndata_local/
+
 ## - sbndata/beamData/NuMIdata/
+echo "@@ Copying files for sbndata/beamData/NuMIdata/"
 mkdir -p ${SBNDATA_DIR}/beamData/NuMIdata/
 ifdh cp /pnfs/icarus/scratch/users/jskim/NuMINumuXSec/local_sbndata/beamData/NuMIdata/2023-07-31_out_450.37_7991.98_79512.66_QEL11.root ${SBNDATA_DIR}/beamData/NuMIdata/2023-07-31_out_450.37_7991.98_79512.66_QEL11.root
 ifdh cp /pnfs/icarus/scratch/users/jskim/NuMINumuXSec/local_sbndata/beamData/NuMIdata/bad_triggered_spills.csv ${SBNDATA_DIR}/beamData/NuMIdata/bad_triggered_spills.csv
 ifdh cp /pnfs/icarus/scratch/users/jskim/NuMINumuXSec/local_sbndata/beamData/NuMIdata/g3Chase_weights_rewritten.root ${SBNDATA_DIR}/beamData/NuMIdata/g3Chase_weights_rewritten.root
 ifdh cp /pnfs/icarus/scratch/users/jskim/NuMINumuXSec/local_sbndata/beamData/NuMIdata/g4_10_4_weights_rewritten.root ${SBNDATA_DIR}/beamData/NuMIdata/g4_10_4_weights_rewritten.root
-## now print
-echo "@@ ${SBNDATA_DIR}/beamData/NuMIdata/"
-ls ${SBNDATA_DIR}/beamData/NuMIdata/
-## - sbndata/anaData/NuMI/
+echo "@@ ls -alh ${SBNDATA_DIR}/beamData/NuMIdata/"
+ls -alh ${SBNDATA_DIR}/beamData/NuMIdata/
+
+echo "@@ Copying files for sbndata/anaData/NuMI/"
 mkdir -p ${SBNDATA_DIR}/anaData/NuMI/
 ifdh cp /pnfs/icarus/scratch/users/jskim/NuMINumuXSec/local_sbndata/anaData/NuMI/TrackSplitReweight_cathode.root ${SBNDATA_DIR}/anaData/NuMI/TrackSplitReweight_cathode.root
 ifdh cp /pnfs/icarus/scratch/users/jskim/NuMINumuXSec/local_sbndata/anaData/NuMI/TrackSplitReweight_zzero.root ${SBNDATA_DIR}/anaData/NuMI/TrackSplitReweight_zzero.root
-## now print
-echo "@@ ${SBNDATA_DIR}/anaData/NuMI/"
-ls ${SBNDATA_DIR}/anaData/NuMI/
+echo "@@ ls -alh ${SBNDATA_DIR}/anaData/NuMI/"
+ls -alh ${SBNDATA_DIR}/anaData/NuMI/
+
+echo "@@ Copying files for sbndata/recoData/"
+mkdir -p ${SBNDATA_DIR}/recoData
+ifdh cp /pnfs/icarus/scratch/users/jskim/NuMINumuXSec/local_sbndata/recoData/output_histo_split_tracks_data.root ${SBNDATA_DIR}/recoData/output_histo_split_tracks_data.root
+echo "@@ ls -alh ${SBNDATA_DIR}/recoData/"
+ls -alh ${SBNDATA_DIR}/recoData/
 
 ##  TEMPORARY FOR THIS RELEASE (v09_75_03)
 cd ${nodeBaseDir}

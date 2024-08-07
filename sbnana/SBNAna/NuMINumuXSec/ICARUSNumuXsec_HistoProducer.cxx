@@ -927,6 +927,8 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
 
   if(IsData){
 
+    // Data CV only
+
     this_reco_labels.push_back( "IsData/i" );
     this_reco_vars.push_back(
       Var([](const caf::SRSliceProxy* slc) -> int {
@@ -934,8 +936,23 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       })
     );
 
+    // CV
+
+    map_cutName_to_vec_Trees[currentCutName].push_back(
+      new ana::Tree(
+        "selectedEvents", this_reco_labels,
+        loader,
+        this_reco_vars,
+        spillCut, cut,
+        kNoShift,
+        true, true
+      )
+    );
+
   }
   else{
+
+    // MC
 
     this_reco_labels.push_back( "IsData/i" );
     this_reco_vars.push_back( 
@@ -944,251 +961,304 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       })
     );
 
-  }
-
-  // CV
-
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      "selectedEvents", this_reco_labels,
-      loader,
-      this_reco_vars,
-      spillCut, cut,
-      kNoShift, true, true
-    )
-  );
-
-
-  // Shift
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      "selectedEvents_CalodEdXShiftUp", this_reco_labels,
-      loader,
-      this_reco_vars,
-      spillCut, cut,
-      SystShifts(&kCalodEdXShiftSyst, +1.), true, true
-    )
-  );
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      "selectedEvents_CalodEdXShiftDown", this_reco_labels,
-      loader,
-      this_reco_vars,
-      spillCut, cut,
-      SystShifts(&kCalodEdXShiftSyst, -1.), true, true
-    )
-  );
-
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      "selectedEvents_CaloGainShiftUp", this_reco_labels,
-      loader,
-      this_reco_vars,
-      spillCut, cut,
-      SystShifts(&kCaloGainShiftSyst, +1.), true, true
-    )
-  );
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      "selectedEvents_CaloGainShiftDown", this_reco_labels,
-      loader,
-      this_reco_vars,
-      spillCut, cut,
-      SystShifts(&kCaloGainShiftSyst, -1.), true, true
-    )
-  );
-
-  // NSigma
-
-  std::vector<std::string> this_NSigmasPsetNames;
-  std::vector<const ISyst*> this_NSigmasISysts;
-  std::vector<std::pair<int,int>> this_NSigmasPairs;
-  std::vector<std::vector<double>> this_NSigmas;
-
-  for(unsigned int i=0; i<genieMultisigmaKnobNames.size(); i++){
-    this_NSigmasPsetNames.push_back( genieMultisigmaKnobNames.at(i) );
-    this_NSigmasISysts.push_back( IGENIESysts.at(i) );
-    this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
-    this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
-  }
-  for(unsigned int i=0; i<genieMorphKnobNames.size(); i++){
-    this_NSigmasPsetNames.push_back( genieMorphKnobNames.at(i) );
-    this_NSigmasISysts.push_back( IGENIEMorphSysts.at(i) );
-    this_NSigmasPairs.push_back( std::make_pair(0, 1) );
-    this_NSigmas.push_back( {-1, -0.5, 0, 0.5, 1} );
-  }
-  for(unsigned int i=0; i<IFluxSysts.size(); i++){
-    this_NSigmasPsetNames.push_back( IFluxSysts.at(i)->ShortName() );
-    this_NSigmasISysts.push_back( IFluxSysts.at(i) );
-    this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
-    this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
-  }
-  for(unsigned int i=0; i<IDetectorSysts.size(); i++){
-    this_NSigmasPsetNames.push_back( IDetectorSysts.at(i)->ShortName() );
-    this_NSigmasISysts.push_back( IDetectorSysts.at(i) );
-    this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
-    this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
-  }
-
-  map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
-    new ana::NSigmasTree(
-      "selectedEvents_NSigmas",
-      this_NSigmasPsetNames,
-      loader,
-      this_NSigmasISysts,
-      //this_NSigmasPairs,
-      this_NSigmas,
-      spillCut, cut,
-      kNoShift, true, true
-    )
-  );
-
-  // NUniverses
-
-  std::vector<std::string> this_NUniversesPsetNames;
-  std::vector<std::vector<Var>> this_NUniversesVarVectors;
-  std::vector<std::vector<TruthVar>> this_NUniversesTruthVarVectors;
-  std::vector<unsigned int> this_NUniversesNUnivs;
-
-  for(const std::string& name: genieDependentKnobNames){
-    this_NUniversesPsetNames.push_back( name );
-    this_NUniversesVarVectors.push_back( map_DepDialName_to_UniverseWeights[name] );
-    this_NUniversesTruthVarVectors.push_back( map_DepDialName_to_TruthUniverseWeights[name] );
-    this_NUniversesNUnivs.push_back( 100 );
-  }
-  for(const std::string& name: geant4DependentKnobNames){
-    this_NUniversesPsetNames.push_back( name );
-    this_NUniversesVarVectors.push_back( map_DepDialName_to_UniverseWeights[name] );
-    this_NUniversesTruthVarVectors.push_back( map_DepDialName_to_TruthUniverseWeights[name] );
-    this_NUniversesNUnivs.push_back( 1000 );
-  }
-
-  map_cutName_to_vec_NUniversesTrees[currentCutName].push_back(
-
-    new ana::NUniversesTree(
-      "selectedEvents_NUniverses",
-      this_NUniversesPsetNames,
-      loader,
-      this_NUniversesVarVectors,
-      this_NUniversesNUnivs,
-      spillCut, cut,
-      kNoShift, true, true
-    )
-
-  );
-
-  // TrueTree
-  if(TrueTreeFilled) return;
-
-  std::vector< std::pair<std::string, Cut> > RecoCutsForEffs = {
-    std::make_pair("", kNuMISelection_1muNp0pi),
-    std::make_pair("_Contained", kNuMISelection_1muNp0pi && kNuMIMuonCandidateContained),
-    std::make_pair("_Exiting", kNuMISelection_1muNp0pi && !kNuMIMuonCandidateContained),
-  };
-
-  for(unsigned i_Cut=0; i_Cut<RecoCutsForEffs.size(); i_Cut++){
+    // CV
 
     map_cutName_to_vec_Trees[currentCutName].push_back(
       new ana::Tree(
-        "trueEvents"+RecoCutsForEffs[i_Cut].first, 
-        GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
-        RecoCutsForEffs[i_Cut].second,
-        kNoShift,
-        true
+        "selectedEvents", this_reco_labels,
+        loader,
+        this_reco_vars,
+        spillCut, cut,
+        //kNoShift,
+        SystShifts(&kTrackSplittingSyst, +1.),
+        true, true
+      )
+    );
+
+    // Shift
+    map_cutName_to_vec_Trees[currentCutName].push_back(
+      new ana::Tree(
+        "selectedEvents_CalodEdXShiftUp", this_reco_labels,
+        loader,
+        this_reco_vars,
+        spillCut, cut,
+        //SystShifts(&kCalodEdXShiftSyst, +1.),
+        SystShifts({
+          {&kTrackSplittingSyst, +1.},
+          {&kCalodEdXShiftSyst, +1.},
+        }),
+        true, true
+      )
+    );
+    map_cutName_to_vec_Trees[currentCutName].push_back(
+      new ana::Tree(
+        "selectedEvents_CalodEdXShiftDown", this_reco_labels,
+        loader,
+        this_reco_vars,
+        spillCut, cut,
+        //SystShifts(&kCalodEdXShiftSyst, -1.),
+        SystShifts({
+          {&kTrackSplittingSyst, +1.},
+          {&kCalodEdXShiftSyst, -1.},
+        }),
+        true, true
       )
     );
 
     map_cutName_to_vec_Trees[currentCutName].push_back(
       new ana::Tree(
-        "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CalodEdXShiftUp",
-        GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
-        RecoCutsForEffs[i_Cut].second,
-        SystShifts(&kCalodEdXShiftSyst, +1.),
-        true
+        "selectedEvents_CaloGainShiftUp", this_reco_labels,
+        loader,
+        this_reco_vars,
+        spillCut, cut,
+        //SystShifts(&kCaloGainShiftSyst, +1.),
+        SystShifts({
+          {&kTrackSplittingSyst, +1.},
+          {&kCaloGainShiftSyst, +1.},
+        }),
+        true, true
       )
     );
-
     map_cutName_to_vec_Trees[currentCutName].push_back(
       new ana::Tree(
-        "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CalodEdXShiftDown",
-        GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
-        RecoCutsForEffs[i_Cut].second,
-        SystShifts(&kCalodEdXShiftSyst, -1.),
-        true
+        "selectedEvents_CaloGainShiftDown", this_reco_labels,
+        loader,
+        this_reco_vars,
+        spillCut, cut,
+        //SystShifts(&kCaloGainShiftSyst, -1.),
+        SystShifts({
+          {&kTrackSplittingSyst, +1.},
+          {&kCaloGainShiftSyst, -1.},
+        }),
+        true, true
       )
     );
 
-    map_cutName_to_vec_Trees[currentCutName].push_back(
-      new ana::Tree(
-        "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CaloGainShiftUp",
-        GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
-        RecoCutsForEffs[i_Cut].second,
-        SystShifts(&kCaloGainShiftSyst, +1.),
-        true
-      )
-    );
+    // NSigma
 
-    map_cutName_to_vec_Trees[currentCutName].push_back(
-      new ana::Tree(
-        "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CaloGainShiftDown",
-        GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
-        RecoCutsForEffs[i_Cut].second,
-        SystShifts(&kCaloGainShiftSyst, -1.),
-        true
-      )
-    );
+    std::vector<std::string> this_NSigmasPsetNames;
+    std::vector<const ISyst*> this_NSigmasISysts;
+    std::vector<std::pair<int,int>> this_NSigmasPairs;
+    std::vector<std::vector<double>> this_NSigmas;
 
+    for(unsigned int i=0; i<genieMultisigmaKnobNames.size(); i++){
+      this_NSigmasPsetNames.push_back( genieMultisigmaKnobNames.at(i) );
+      this_NSigmasISysts.push_back( IGENIESysts.at(i) );
+      this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
+      this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
+    }
+    for(unsigned int i=0; i<genieMorphKnobNames.size(); i++){
+      this_NSigmasPsetNames.push_back( genieMorphKnobNames.at(i) );
+      this_NSigmasISysts.push_back( IGENIEMorphSysts.at(i) );
+      this_NSigmasPairs.push_back( std::make_pair(0, 1) );
+      this_NSigmas.push_back( {-1, -0.5, 0, 0.5, 1} );
+    }
+    for(unsigned int i=0; i<IFluxSysts.size(); i++){
+      this_NSigmasPsetNames.push_back( IFluxSysts.at(i)->ShortName() );
+      this_NSigmasISysts.push_back( IFluxSysts.at(i) );
+      this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
+      this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
+    }
     for(unsigned int i=0; i<IDetectorSysts.size(); i++){
+      this_NSigmasPsetNames.push_back( IDetectorSysts.at(i)->ShortName() );
+      this_NSigmasISysts.push_back( IDetectorSysts.at(i) );
+      this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
+      this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
+    }
+
+    map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
+      new ana::NSigmasTree(
+        "selectedEvents_NSigmas",
+        this_NSigmasPsetNames,
+        loader,
+        this_NSigmasISysts,
+        //this_NSigmasPairs,
+        this_NSigmas,
+        spillCut, cut,
+        //kNoShift,
+        SystShifts(&kTrackSplittingSyst, +1.),
+        true, true
+      )
+    );
+
+    // NUniverses
+
+    std::vector<std::string> this_NUniversesPsetNames;
+    std::vector<std::vector<Var>> this_NUniversesVarVectors;
+    std::vector<std::vector<TruthVar>> this_NUniversesTruthVarVectors;
+    std::vector<unsigned int> this_NUniversesNUnivs;
+
+    for(const std::string& name: genieDependentKnobNames){
+      this_NUniversesPsetNames.push_back( name );
+      this_NUniversesVarVectors.push_back( map_DepDialName_to_UniverseWeights[name] );
+      this_NUniversesTruthVarVectors.push_back( map_DepDialName_to_TruthUniverseWeights[name] );
+      this_NUniversesNUnivs.push_back( 100 );
+    }
+    for(const std::string& name: geant4DependentKnobNames){
+      this_NUniversesPsetNames.push_back( name );
+      this_NUniversesVarVectors.push_back( map_DepDialName_to_UniverseWeights[name] );
+      this_NUniversesTruthVarVectors.push_back( map_DepDialName_to_TruthUniverseWeights[name] );
+      this_NUniversesNUnivs.push_back( 1000 );
+    }
+
+    map_cutName_to_vec_NUniversesTrees[currentCutName].push_back(
+
+      new ana::NUniversesTree(
+        "selectedEvents_NUniverses",
+        this_NUniversesPsetNames,
+        loader,
+        this_NUniversesVarVectors,
+        this_NUniversesNUnivs,
+        spillCut, cut,
+        //kNoShift,
+        SystShifts(&kTrackSplittingSyst, +1.),
+        true, true
+      )
+
+    );
+
+    // TrueTree
+    if(TrueTreeFilled) return;
+
+    std::vector< std::pair<std::string, Cut> > RecoCutsForEffs = {
+      std::make_pair("", kNuMISelection_1muNp0pi),
+      std::make_pair("_Contained", kNuMISelection_1muNp0pi && kNuMIMuonCandidateContained),
+      std::make_pair("_Exiting", kNuMISelection_1muNp0pi && !kNuMIMuonCandidateContained),
+    };
+
+    for(unsigned i_Cut=0; i_Cut<RecoCutsForEffs.size(); i_Cut++){
+
       map_cutName_to_vec_Trees[currentCutName].push_back(
         new ana::Tree(
-          "trueEvents"+RecoCutsForEffs[i_Cut].first+"_"+IDetectorSysts.at(i)->ShortName()+"Up",
-          {"Dummy"}, loader, {DummyTruthVar}, kNuMIValidTrigger, kTruthCut_IsSignal,
+          "trueEvents"+RecoCutsForEffs[i_Cut].first, 
+          GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
           RecoCutsForEffs[i_Cut].second,
-          SystShifts(IDetectorSysts.at(i), +1.),
+          //kNoShift,
+          SystShifts(&kTrackSplittingSyst, +1.),
           true
         )
       );
+
       map_cutName_to_vec_Trees[currentCutName].push_back(
         new ana::Tree(
-          "trueEvents"+RecoCutsForEffs[i_Cut].first+"_"+IDetectorSysts.at(i)->ShortName()+"Down",
-          {"Dummy"}, loader, {DummyTruthVar}, kNuMIValidTrigger, kTruthCut_IsSignal,
+          "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CalodEdXShiftUp",
+          GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
           RecoCutsForEffs[i_Cut].second,
-          SystShifts(IDetectorSysts.at(i), -1.),
+          //SystShifts(&kCalodEdXShiftSyst, +1.),
+          SystShifts({
+            {&kTrackSplittingSyst, +1.},
+            {&kCalodEdXShiftSyst, +1.},
+          }),
           true
         )
       );
+
+      map_cutName_to_vec_Trees[currentCutName].push_back(
+        new ana::Tree(
+          "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CalodEdXShiftDown",
+          GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
+          RecoCutsForEffs[i_Cut].second,
+          //SystShifts(&kCalodEdXShiftSyst, -1.),
+          SystShifts({
+            {&kTrackSplittingSyst, +1.},
+            {&kCalodEdXShiftSyst, -1.},
+          }),
+          true
+        )
+      );
+
+      map_cutName_to_vec_Trees[currentCutName].push_back(
+        new ana::Tree(
+          "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CaloGainShiftUp",
+          GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
+          RecoCutsForEffs[i_Cut].second,
+          //SystShifts(&kCaloGainShiftSyst, +1.),
+          SystShifts({
+            {&kTrackSplittingSyst, +1.},
+            {&kCaloGainShiftSyst, +1.},
+          }),
+          true
+        )
+      );
+
+      map_cutName_to_vec_Trees[currentCutName].push_back(
+        new ana::Tree(
+          "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CaloGainShiftDown",
+          GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
+          RecoCutsForEffs[i_Cut].second,
+          //SystShifts(&kCaloGainShiftSyst, -1.),
+          SystShifts({
+            {&kTrackSplittingSyst, +1.},
+            {&kCaloGainShiftSyst, -1.},
+          }),
+          true
+        )
+      );
+
+      for(unsigned int i=0; i<IDetectorSysts.size(); i++){
+        map_cutName_to_vec_Trees[currentCutName].push_back(
+          new ana::Tree(
+            "trueEvents"+RecoCutsForEffs[i_Cut].first+"_"+IDetectorSysts.at(i)->ShortName()+"Up",
+            {"Dummy"}, loader, {DummyTruthVar}, kNuMIValidTrigger, kTruthCut_IsSignal,
+            RecoCutsForEffs[i_Cut].second,
+            //SystShifts(IDetectorSysts.at(i), +1.),
+            SystShifts({
+              {&kTrackSplittingSyst, +1.},
+              {IDetectorSysts.at(i), +1.},
+            }),
+            true
+          )
+        );
+        map_cutName_to_vec_Trees[currentCutName].push_back(
+          new ana::Tree(
+            "trueEvents"+RecoCutsForEffs[i_Cut].first+"_"+IDetectorSysts.at(i)->ShortName()+"Down",
+            {"Dummy"}, loader, {DummyTruthVar}, kNuMIValidTrigger, kTruthCut_IsSignal,
+            RecoCutsForEffs[i_Cut].second,
+            //SystShifts(IDetectorSysts.at(i), -1.),
+            SystShifts({
+              {&kTrackSplittingSyst, +1.},
+              {IDetectorSysts.at(i), -1.},
+            }),
+            true
+          )
+        );
+
+      }
 
     }
 
+    map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
+      new ana::NSigmasTree(
+        "trueEvents_NSigmas",
+        this_NSigmasPsetNames,
+        loader,
+        this_NSigmasISysts,
+        //this_NSigmasPairs,
+        this_NSigmas,
+        kTruthCut_IsSignal,
+        //kNoShift,
+        SystShifts(&kTrackSplittingSyst, +1.),
+        true
+      )
+    );
+
+    map_cutName_to_vec_NUniversesTrees[currentCutName].push_back(
+      new ana::NUniversesTree(
+        "trueEvents_NUniverses",
+        this_NUniversesPsetNames,
+        loader,
+        this_NUniversesTruthVarVectors,
+        this_NUniversesNUnivs,
+        kTruthCut_IsSignal,
+        //kNoShift,
+        SystShifts(&kTrackSplittingSyst, +1.),
+        true
+      )
+    );
+
+    TrueTreeFilled = true;
+
   }
-
-  map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
-    new ana::NSigmasTree(
-      "trueEvents_NSigmas",
-      this_NSigmasPsetNames,
-      loader,
-      this_NSigmasISysts,
-      //this_NSigmasPairs,
-      this_NSigmas,
-      kTruthCut_IsSignal,
-      kNoShift, true
-    )
-  );
-
-  map_cutName_to_vec_NUniversesTrees[currentCutName].push_back(
-    new ana::NUniversesTree(
-      "trueEvents_NUniverses",
-      this_NUniversesPsetNames,
-      loader,
-      this_NUniversesTruthVarVectors,
-      this_NUniversesNUnivs,
-      kTruthCut_IsSignal,
-      kNoShift, true
-    )
-  );
-
-  TrueTreeFilled = true;
-
 
 
 
@@ -1268,8 +1338,6 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     "FluxWeightWithG3Chase",
     "FluxWeightWithG4Updated",
     "SPPCVCorrection",
-    // TrackSplit Syst
-    "TrackSplitRW",
     // Muon
     "MuonSelection/i",
     "MuonMatchType/i",
@@ -1312,8 +1380,6 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     kGetNuMIFluxWeightG3Chase,
     kGetNuMIFluxWeightUpdated,
     kNuMISPPCVCorrection,
-    // TrackSplit Syst
-    kNuMISplitTrackCVCorrection,
     // Muon
     kNuMIIsRelaxedMuonSelection,
     kNuMIRelaxedMuonTrackMatchType,
@@ -1349,125 +1415,179 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     kNuMIRelaxedChargedPionTrackMatchedTruthContained,
   };
 
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      ("PIDStudyTree_"+currentCutName).Data(), labels,
-      loader,
-      varlists,
-      spillCut, cut,
-      kNoShift, true, true
-    )
-  );
+  if(IsData){
 
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      ("PIDStudyTree_CalodEdXShiftUp_"+currentCutName).Data(), labels,
-      loader,
-      varlists,
-      spillCut, cut,
-      SystShifts(&kCalodEdXShiftSyst, +1.), true, true
-    )
-  );
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      ("PIDStudyTree_CalodEdXShiftDown_"+currentCutName).Data(), labels,
-      loader,
-      varlists,
-      spillCut, cut,
-      SystShifts(&kCalodEdXShiftSyst, -1.), true, true
-    )
-  );
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      ("PIDStudyTree_CaloGainShiftUp_"+currentCutName).Data(), labels,
-      loader,
-      varlists,
-      spillCut, cut,
-      SystShifts(&kCaloGainShiftSyst, +1.), true, true
-    )
-  );
-  map_cutName_to_vec_Trees[currentCutName].push_back(
-    new ana::Tree(
-      ("PIDStudyTree_CaloGainShiftDown_"+currentCutName).Data(), labels,
-      loader,
-      varlists,
-      spillCut, cut,
-      SystShifts(&kCaloGainShiftSyst, -1.), true, true
-    )
-  );
+    // Data
 
-  if(!FillSystematics) return;
+    // CV
 
-  // NSigmas
-  std::vector<std::string> this_NSigmasPsetNames;
-  std::vector<const ISyst*> this_NSigmasISysts;
-  std::vector<std::pair<int,int>> this_NSigmasPairs;
-  std::vector<std::vector<double>> this_NSigmas;
-  for(unsigned int i=0; i<genieMultisigmaKnobNames.size(); i++){
-    this_NSigmasPsetNames.push_back( genieMultisigmaKnobNames.at(i) );
-    this_NSigmasISysts.push_back( IGENIESysts.at(i) );
-    this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
-    this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
-  }
-  for(unsigned int i=0; i<genieMorphKnobNames.size(); i++){
-    this_NSigmasPsetNames.push_back( genieMorphKnobNames.at(i) );
-    this_NSigmasISysts.push_back( IGENIEMorphSysts.at(i) );
-    this_NSigmasPairs.push_back( std::make_pair(0, 1) );
-    this_NSigmas.push_back( {-1, -0.5, 0, 0.5, 1} );
-  }
-  for(unsigned int i=0; i<IFluxSysts.size(); i++){
-    this_NSigmasPsetNames.push_back( IFluxSysts.at(i)->ShortName() );
-    this_NSigmasISysts.push_back( IFluxSysts.at(i) );
-    this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
-    this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
-  }
-  for(unsigned int i=0; i<IDetectorSysts.size(); i++){
-    this_NSigmasPsetNames.push_back( IDetectorSysts.at(i)->ShortName() );
-    this_NSigmasISysts.push_back( IDetectorSysts.at(i) );
-    this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
-    this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
-  }
+    map_cutName_to_vec_Trees[currentCutName].push_back(
+      new ana::Tree(
+        ("PIDStudyTree_"+currentCutName).Data(), labels,
+        loader,
+        varlists,
+        spillCut, cut,
+        kNoShift,
+        true, true
+      )
+    );
 
-  map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
-    new ana::NSigmasTree(
-      ("PIDStudyTree_NSigmas_"+currentCutName).Data(),
-      this_NSigmasPsetNames,
-      loader,
-      this_NSigmasISysts,
-      this_NSigmas,
-      spillCut, cut,
-      kNoShift, true, true
-    )
-  );
+  }
+  else{
 
-  // NUniverses
-  std::vector<std::string> this_NUniversesPsetNames;
-  std::vector<std::vector<Var>> this_NUniversesVarVectors;
-  std::vector<std::vector<TruthVar>> this_NUniversesTruthVarVectors;
-  std::vector<unsigned int> this_NUniversesNUnivs;
-  for(const std::string& name: genieDependentKnobNames){
-    this_NUniversesPsetNames.push_back( name );
-    this_NUniversesVarVectors.push_back( map_DepDialName_to_UniverseWeights[name] );
-    this_NUniversesTruthVarVectors.push_back( map_DepDialName_to_TruthUniverseWeights[name] );
-    this_NUniversesNUnivs.push_back( 100 );
+    // MC
+
+    // CV
+
+    map_cutName_to_vec_Trees[currentCutName].push_back(
+      new ana::Tree(
+        ("PIDStudyTree_"+currentCutName).Data(), labels,
+        loader,
+        varlists,
+        spillCut, cut,
+        //kNoShift,
+        SystShifts(&kTrackSplittingSyst, +1.),
+        true, true
+      )
+    );
+
+    // Shifts
+
+    map_cutName_to_vec_Trees[currentCutName].push_back(
+      new ana::Tree(
+        ("PIDStudyTree_CalodEdXShiftUp_"+currentCutName).Data(), labels,
+        loader,
+        varlists,
+        spillCut, cut,
+        //SystShifts(&kCalodEdXShiftSyst, +1.),
+        SystShifts({
+          {&kTrackSplittingSyst, +1.},
+          {&kCalodEdXShiftSyst, +1.},
+        }),
+        true, true
+      )
+    );
+    map_cutName_to_vec_Trees[currentCutName].push_back(
+      new ana::Tree(
+        ("PIDStudyTree_CalodEdXShiftDown_"+currentCutName).Data(), labels,
+        loader,
+        varlists,
+        spillCut, cut,
+        //SystShifts(&kCalodEdXShiftSyst, -1.),
+        SystShifts({
+          {&kTrackSplittingSyst, +1.},
+          {&kCalodEdXShiftSyst, -1.},
+        }),
+        true, true
+      )
+    );
+    map_cutName_to_vec_Trees[currentCutName].push_back(
+      new ana::Tree(
+        ("PIDStudyTree_CaloGainShiftUp_"+currentCutName).Data(), labels,
+        loader,
+        varlists,
+        spillCut, cut,
+        //SystShifts(&kCaloGainShiftSyst, +1.),
+        SystShifts({
+          {&kTrackSplittingSyst, +1.},
+          {&kCaloGainShiftSyst, +1.},
+        }),
+        true, true
+      )
+    );
+    map_cutName_to_vec_Trees[currentCutName].push_back(
+      new ana::Tree(
+        ("PIDStudyTree_CaloGainShiftDown_"+currentCutName).Data(), labels,
+        loader,
+        varlists,
+        spillCut, cut,
+        //SystShifts(&kCaloGainShiftSyst, -1.),
+        SystShifts({
+          {&kTrackSplittingSyst, +1.},
+          {&kCaloGainShiftSyst, -1.},
+        }),
+        true, true
+      )
+    );
+
+    if(!FillSystematics) return;
+
+    // NSigmas
+    std::vector<std::string> this_NSigmasPsetNames;
+    std::vector<const ISyst*> this_NSigmasISysts;
+    std::vector<std::pair<int,int>> this_NSigmasPairs;
+    std::vector<std::vector<double>> this_NSigmas;
+    for(unsigned int i=0; i<genieMultisigmaKnobNames.size(); i++){
+      this_NSigmasPsetNames.push_back( genieMultisigmaKnobNames.at(i) );
+      this_NSigmasISysts.push_back( IGENIESysts.at(i) );
+      this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
+      this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
+    }
+    for(unsigned int i=0; i<genieMorphKnobNames.size(); i++){
+      this_NSigmasPsetNames.push_back( genieMorphKnobNames.at(i) );
+      this_NSigmasISysts.push_back( IGENIEMorphSysts.at(i) );
+      this_NSigmasPairs.push_back( std::make_pair(0, 1) );
+      this_NSigmas.push_back( {-1, -0.5, 0, 0.5, 1} );
+    }
+    for(unsigned int i=0; i<IFluxSysts.size(); i++){
+      this_NSigmasPsetNames.push_back( IFluxSysts.at(i)->ShortName() );
+      this_NSigmasISysts.push_back( IFluxSysts.at(i) );
+      this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
+      this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
+    }
+    for(unsigned int i=0; i<IDetectorSysts.size(); i++){
+      this_NSigmasPsetNames.push_back( IDetectorSysts.at(i)->ShortName() );
+      this_NSigmasISysts.push_back( IDetectorSysts.at(i) );
+      this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
+      this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
+    }
+
+    map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
+      new ana::NSigmasTree(
+        ("PIDStudyTree_NSigmas_"+currentCutName).Data(),
+        this_NSigmasPsetNames,
+        loader,
+        this_NSigmasISysts,
+        this_NSigmas,
+        spillCut, cut,
+        //kNoShift,
+        SystShifts(&kTrackSplittingSyst, +1.),
+        true, true
+      )
+    );
+
+    // NUniverses
+    std::vector<std::string> this_NUniversesPsetNames;
+    std::vector<std::vector<Var>> this_NUniversesVarVectors;
+    std::vector<std::vector<TruthVar>> this_NUniversesTruthVarVectors;
+    std::vector<unsigned int> this_NUniversesNUnivs;
+    for(const std::string& name: genieDependentKnobNames){
+      this_NUniversesPsetNames.push_back( name );
+      this_NUniversesVarVectors.push_back( map_DepDialName_to_UniverseWeights[name] );
+      this_NUniversesTruthVarVectors.push_back( map_DepDialName_to_TruthUniverseWeights[name] );
+      this_NUniversesNUnivs.push_back( 100 );
+    }
+    for(const std::string& name: geant4DependentKnobNames){
+      this_NUniversesPsetNames.push_back( name );
+      this_NUniversesVarVectors.push_back( map_DepDialName_to_UniverseWeights[name] );
+      this_NUniversesTruthVarVectors.push_back( map_DepDialName_to_TruthUniverseWeights[name] );
+      this_NUniversesNUnivs.push_back( 1000 );
+    }
+    map_cutName_to_vec_NUniversesTrees[currentCutName].push_back(
+      new ana::NUniversesTree(
+        ("PIDStudyTree_NUniverses_"+currentCutName).Data(),
+        this_NUniversesPsetNames,
+        loader,
+        this_NUniversesVarVectors,
+        this_NUniversesNUnivs,
+        spillCut, cut,
+        //kNoShift,
+        SystShifts(&kTrackSplittingSyst, +1.),
+        true, true
+      )
+    );
+
   }
-  for(const std::string& name: geant4DependentKnobNames){
-    this_NUniversesPsetNames.push_back( name );
-    this_NUniversesVarVectors.push_back( map_DepDialName_to_UniverseWeights[name] );
-    this_NUniversesTruthVarVectors.push_back( map_DepDialName_to_TruthUniverseWeights[name] );
-    this_NUniversesNUnivs.push_back( 1000 );
-  }
-  map_cutName_to_vec_NUniversesTrees[currentCutName].push_back(
-    new ana::NUniversesTree(
-      ("PIDStudyTree_NUniverses_"+currentCutName).Data(),
-      this_NUniversesPsetNames,
-      loader,
-      this_NUniversesVarVectors,
-      this_NUniversesNUnivs,
-      spillCut, cut,
-      kNoShift, true, true
-    )
-  );
 
 
 }
@@ -1953,6 +2073,32 @@ void HistoProducer::MakeDupeCheckTree(SpectrumLoader& loader, SpillCut spillCut,
 
 }
 
+// - 240805_EventListTree
+void HistoProducer::MakeEventListTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  std::vector<std::string> this_labels;
+  std::vector<SpillVar> this_vars;
+
+  this_labels.push_back( "Dummy/i" );
+  this_vars.push_back(
+    SpillVar([](const caf::SRSpillProxy* slc) -> int {
+      return 1;
+    })
+  );
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "EvenvList", this_labels,
+      loader,
+      this_vars,
+      spillCut,
+      true
+    )
+  );
+
+
+}
+
 void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
 /*
@@ -2254,18 +2400,38 @@ void HistoProducer::setSystematicWeights(){
     IGENIESysts.push_back( new NuMIXSecLowQ2Suppression("LowQ2Suppression", "LowQ2Suppression") );
     // 2) nusyst
     if(FillNuSyst){
+
+      // Lars' 2p2h
+      std::vector<std::string> Lars2p2hDialNames = {
+        "DecayAngMEC",
+      };
+
+      for(const std::string& name: Lars2p2hDialNames){
+
+        std::string dialname = "Lars2p2h_"+name;
+        std::string psetname = "GENIEReWeight_SBNNuSyst_GENIE_multisigma_"+name;
+
+        std::cout << "[HistoProducer::setSystematicWeights] Multisigma, " << name << " (psetname = " << psetname << ")" << std::endl;
+
+        genieMultisigmaKnobNames.push_back( dialname );
+        IGENIESysts.push_back( new SBNWeightSyst(psetname) );
+
+      }
+
+      // PCAed z-exp parameters
       genieMultisigmaKnobNames.push_back( "ZExpPCAB1" );
-      IGENIESysts.push_back( new SBNWeightSyst("ZExpPCAWeighter_myreweighter_b1") );
+      IGENIESysts.push_back( new SBNWeightSyst("ZExpPCAWeighter_SBNNuSyst_ZExpPCA_multisigma_b1") );
       genieMultisigmaKnobNames.push_back( "ZExpPCAB2" );
-      IGENIESysts.push_back( new SBNWeightSyst("ZExpPCAWeighter_myreweighter_b2") );
+      IGENIESysts.push_back( new SBNWeightSyst("ZExpPCAWeighter_SBNNuSyst_ZExpPCA_multisigma_b2") );
       genieMultisigmaKnobNames.push_back( "ZExpPCAB3" );
-      IGENIESysts.push_back( new SBNWeightSyst("ZExpPCAWeighter_myreweighter_b3") );
+      IGENIESysts.push_back( new SBNWeightSyst("ZExpPCAWeighter_SBNNuSyst_ZExpPCA_multisigma_b3") );
       genieMultisigmaKnobNames.push_back( "ZExpPCAB4" );
-      IGENIESysts.push_back( new SBNWeightSyst("ZExpPCAWeighter_myreweighter_b4") );
+      IGENIESysts.push_back( new SBNWeightSyst("ZExpPCAWeighter_SBNNuSyst_ZExpPCA_multisigma_b4") );
+
     }
 
 
-    // Shape morphs
+    // Morphs
     cout << "[HistoProducer::setSystematicWeights] - Adding morphing dials" << std::endl;
     genieMorphKnobNames = ICARUSNumuXsec::GetGENIEMorphKnobNames();
     for(const std::string& name: genieMorphKnobNames){
@@ -2278,9 +2444,34 @@ void HistoProducer::setSystematicWeights(){
       //IGENIEMorphSysts.push_back( new SBNWeightSyst(psetname) );
       IGENIEMorphSysts.push_back( new SBNWeightMirrorSyst(psetname) );
     }
-    // 1) pi syst
-    //genieMorphKnobNames.push_back( "CC1piTPi" );
-    //IGENIEMorphSysts.push_back( new NuMIXSecPiSyst("CC1piTPi", "CC1piTpi") );
+    // Adding custom
+    // 1) nusyst
+    if(FillNuSyst){
+
+      // Lars' 2p2h
+      std::vector<std::string> Lars2p2hDialNames = {
+        "XSecShape_CCMEC_Empirical",
+        "XSecShape_CCMEC_Martini",
+        "EnergyDependence_CCMEC",
+      };
+
+      for(const std::string& name: Lars2p2hDialNames){
+
+        std::string dialname = "Lars2p2h_"+name;
+        std::string psetname = "GENIEReWeight_SBNNuSyst_GENIE_multisigma_"+name;
+
+        std::cout << "[HistoProducer::setSystematicWeights] Multisigma, " << name << " (psetname = " << psetname << ")" << std::endl;
+
+        genieMorphKnobNames.push_back( dialname );
+        IGENIEMorphSysts.push_back( new SBNWeightMirrorSyst(psetname) );
+
+      }
+
+      // CCQE RPA
+      genieMorphKnobNames.push_back( "CCQERPAReweight" );
+      IGENIEMorphSysts.push_back( new SBNWeightMirrorSyst("CCQERPAReweight_SBNNuSyst_CCQERPAReweight_multisigma_CCQERPAReweight") );
+
+    }
 
     // Multisim for dependent dials
     cout << "[HistoProducer::setSystematicWeights] - Adding dependent dials by multisim" << std::endl;

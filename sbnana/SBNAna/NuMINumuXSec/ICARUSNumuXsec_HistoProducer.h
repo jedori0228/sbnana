@@ -24,6 +24,7 @@
 #include "sbnana/CAFAna/Systs/SBNWeightSysts.h"
 #include "sbnana/CAFAna/Systs/NuMIFluxSysts.h"
 #include "sbnana/CAFAna/Systs/CalorimetrySysts.h"
+#include "sbnana/CAFAna/Systs/TrackSplitSyst.h"
 
 
 // SBNANA
@@ -97,6 +98,8 @@ namespace ICARUSNumuXsec{
     void MakeFSICovTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     // - 240712_DupeCheck
     void MakeDupeCheckTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    // - 240805_EventListTree
+    void MakeEventListTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
     void Test(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
