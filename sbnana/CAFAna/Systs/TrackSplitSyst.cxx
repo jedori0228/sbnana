@@ -171,9 +171,6 @@ namespace ana {
     dedx_range_pi  = (TProfile*)file_Chi2Template->Get("dedx_range_pi");
     dedx_range_mu  = (TProfile*)file_Chi2Template->Get("dedx_range_mu");
 
-    // Set up the random engine
-    tRand = new TRandom3(0);
-
     // Set up the spline used for momentum calculation, as in
     // https://github.com/LArSoft/larreco/blob/LARSOFT_SUITE_v09_72_00/larreco/RecoAlg/TrackMomentumCalculator.cxx
     std::array<float, 29> Range_grampercm{
@@ -821,7 +818,24 @@ namespace ana {
       }
       // DEBUGGING!
       //if ( fDebug ) std::cout << "This track crosses a boundary and its p for splitting is: " << pToSplit << std::endl;
-      if ( tRand->Rndm() > pToSplit*sigma ) {
+
+
+      // Set up the random engine
+      // Set a seed using track variables
+      // 
+      if ( std::isnan(pfp.trk.len) || std::isnan(pfp.trk.start.x) ||
+           std::isnan(pfp.trk.start.z) || std::isnan(pfp.trk.end.x) || std::isnan(pfp.trk.end.z) ) {
+      }
+
+      std::uint32_t seed = int(pfp.trk.len) + 
+                           1000 * abs(pfp.trk.start.x) +
+                           1000000 * abs(pfp.trk.start.z) + 
+                           1000000000 * abs(pfp.trk.end.x) +
+                           1000000000000 * abs(pfp.trk.end.z);
+      //std::cout << "[JSKIMDEBUG] seed = " << seed << std::endl;
+      TRandom3 tRand(seed);
+
+      if ( tRand.Rndm() > pToSplit*sigma ) {
         //if ( fDebug ) std::cout << "... but we did not split it." << std::endl;
         //caf::SRPFP newPfp;
         //TrackSplitSyst::FillPtrPFP(newPfp, pfp);

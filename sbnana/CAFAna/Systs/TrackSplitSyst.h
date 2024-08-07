@@ -47,8 +47,6 @@ namespace ana
     void Shift(double sigma, caf::SRSliceProxy *sr, double& weight) const override;
 
   private:
-    // Random engine
-    TRandom3 *tRand;
 
     // split probabilities
     TH2D *splitProb[2][2]; // In ICARUS, idx1: 0 = East and 1 = West, idx2: 0 = cathode, 1 = z=0 point
