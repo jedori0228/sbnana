@@ -826,17 +826,11 @@ namespace ana {
 
       // Set up the random engine
       // Set a seed using track variables
-      // 
-      if ( std::isnan(pfp.trk.len) || std::isnan(pfp.trk.start.x) ||
-           std::isnan(pfp.trk.start.z) || std::isnan(pfp.trk.end.x) || std::isnan(pfp.trk.end.z) ) {
-      }
-
       std::uint32_t seed = int(pfp.trk.len) + 
-                           1000 * abs(pfp.trk.start.x) +
-                           1000000 * abs(pfp.trk.start.z) + 
-                           1000000000 * abs(pfp.trk.end.x) +
-                           1000000000000 * abs(pfp.trk.end.z);
-      //std::cout << "[JSKIMDEBUG] seed = " << seed << std::endl;
+                           10 * abs(pfp.trk.start.x) +
+                           100 * abs(pfp.trk.start.z) + 
+                           1000 * abs(pfp.trk.end.x) +
+                           10000 * abs(pfp.trk.end.z);
       TRandom3 tRand(seed);
 
       if ( tRand.Rndm() > pToSplit*sigma ) {
@@ -1255,6 +1249,9 @@ namespace ana {
 
 
   // Class for checking the approximations/calculations used in the systematic
+  void TrackSplitSystCheck::Shift(double sigma, caf::SRTrueInteractionProxy *sr, double& weight) const {
+
+  }
   void TrackSplitSystCheck::Shift(double sigma, caf::SRSliceProxy *sr, double& weight) const
   {
     if ( sr->is_clear_cosmic ) return;
