@@ -404,7 +404,7 @@ namespace ana {
     // Re-implementing pieces to store the values, but the calculation bits should be the same.
 
     if (length < 0 || std::isnan(length)) {
-      std::cout << "Invalid track range " << length << " return -1" << std::endl;
+      //std::cout << "Invalid track range " << length << " return -1" << std::endl;
       TrkMomentumResults output;
       output.p_proton = -1.;
       output.p_pion = -1.;
