@@ -1244,7 +1244,7 @@ namespace ana {
   } // Shift
 
   const TrackSplitSyst kTrackSplittingSyst("TrackSplittingSyst", "Split tracks systematic");
-  const TrackSplitSyst kTrackSplittingSystDebug("TrackSplittingSyst", "Split tracks systematic", true);
+  const TrackSplitSyst kTrackSplittingSystDebug("TrackSplittingSystDebug", "Split tracks systematic", true);
 
 
 
