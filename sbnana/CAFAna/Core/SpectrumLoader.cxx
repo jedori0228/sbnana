@@ -624,11 +624,13 @@ namespace ana
                 //std::cout << "    VAL = " << val << std::endl;
 
                 if(std::isnan(val) || std::isinf(val)){
+/*
                   std::cerr << "Warning: Bad value: " << val
                             << " returned from a Var. The input variable(s) could "
                             << "be NaN in the CAF, or perhaps your "
                             << "Var code computed 0/0?";
                   std::cout << " Still filling into the ''branch'' for this slice." << std::endl;
+*/
                 }
 
                 recordVals[varname].push_back(val);
@@ -685,11 +687,13 @@ namespace ana
           const double val = varormulti.GetVar()(sr);
 
           if(std::isnan(val) || std::isinf(val)){
+/*
             std::cerr << "Warning: Bad value: " << val
                       << " returned from a Var. The input variable(s) could "
                       << "be NaN in the CAF, or perhaps your "
                       << "Var code computed 0/0?";
             std::cout << " Still filling into the ''branch'' for this slice." << std::endl;
+*/
           }
 
           recordVals[varname].push_back(val);
@@ -765,11 +769,13 @@ namespace ana
                 //std::cout << "    VAL = " << turthval << std::endl;
 
                 if(std::isnan(truthval) || std::isinf(truthval)){
+/*
                   std::cerr << "Warning: Bad value: " << truthval
                             << " returned from a Var. The input variable(s) could "
                             << "be NaN in the CAF, or perhaps your "
                             << "Var code computed 0/0?";
                   std::cout << " Still filling into the ''branch'' for this slice." << std::endl;
+*/
                 }
 
                 recordVals[truthvarname].push_back(truthval);
