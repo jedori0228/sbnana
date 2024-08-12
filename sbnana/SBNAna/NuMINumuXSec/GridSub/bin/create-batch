@@ -455,6 +455,9 @@ echo "@@ date :"
 date
 echo "@@ Running cafe -bq ${filesFromSender}/run_${nProcess}.C %s"
 cafe -bq ${filesFromSender}/run_${nProcess}.C %s
+
+/usr/bin/time -v cafe 2>&1
+
 echo "@@ date :"
 date
 echo "@@ Checking output file"
