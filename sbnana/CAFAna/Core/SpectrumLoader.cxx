@@ -150,7 +150,11 @@ namespace ana
       // If there is no husk field there is no concept of husk events
       if(!has_husk) sr.hdr.husk = false;
 
-      HandleRecord(&sr);
+      std::string thisFilePath = f->GetName();
+      std::size_t lastSlash = thisFilePath.find_last_of("/");
+      std::string thisFileName = thisFilePath.substr(lastSlash+1);
+
+      HandleRecord(&sr,thisFileName);
 
       if(prog) prog->SetProgress(double(n)/Nentries);
     } // end for n
@@ -185,7 +189,7 @@ namespace ana
   };
 
   //----------------------------------------------------------------------
-  void SpectrumLoader::HandleRecord(caf::SRSpillProxy* sr)
+  void SpectrumLoader::HandleRecord(caf::SRSpillProxy* sr, const std::string& fName)
   {
     if(sr->hdr.first_in_subrun){
       fPOT += sr->hdr.pot;
@@ -608,6 +612,7 @@ namespace ana
             for ( std::map<Tree*, std::map<VarOrMultiVar, std::string>>::iterator treemapIt=treemap.begin(); treemapIt!=treemap.end(); ++treemapIt ) {
               //unsigned int idxVar = 0;
               std::map<std::string, std::vector<double>> recordVals;
+              std::map<std::string, std::vector<std::string>> recordFileNames;
               unsigned int numEntries=0;
               for ( auto& [varormulti, varname] : treemapIt->second ) {
                 //std::cout << "SpillCut " << idxSpillCut << " Slice " << idxSlice << " Shift " << idxShift << " Cut " << idxCut << " Tree " << idxTree << " Var " << idxVar << std::endl;
@@ -644,13 +649,14 @@ namespace ana
                     recordVals["Run/i"].push_back( sr->hdr.run );
                     recordVals["Subrun/i"].push_back( sr->hdr.subrun );
                     recordVals["Evt/i"].push_back( sr->hdr.evt );
+                    recordFileNames["FileName"].push_back(fName);
                   }
                   if ( treemapIt->first->SaveSliceNum() ) {
                     recordVals["Slice/i"].push_back( idxSlice );
                   }
                 }
               }
-              treemapIt->first->UpdateEntries(recordVals);
+              treemapIt->first->UpdateEntries(recordVals,recordFileNames);
               //idxTree+=1;
             } // end for tree
             //idxCut+=1;
@@ -675,6 +681,7 @@ namespace ana
 
       for ( std::map<Tree*, std::map<SpillVarOrMultiVar, std::string>>::iterator treemapIt=treemap.begin(); treemapIt!=treemap.end(); ++treemapIt ) {
         std::map<std::string, std::vector<double>> recordVals;
+        std::map<std::string, std::vector<std::string>> recordFileNames;
         unsigned int numEntries = 0;
         for ( auto& [varormulti, varname] : treemapIt->second ) {
           if(varormulti.IsMulti()){
@@ -704,9 +711,10 @@ namespace ana
             recordVals["Run/i"].push_back( sr->hdr.run );
             recordVals["Subrun/i"].push_back( sr->hdr.subrun );
             recordVals["Evt/i"].push_back( sr->hdr.evt );
+            recordFileNames["FileName"].push_back(fName);
           }
         }
-        treemapIt->first->UpdateEntries(recordVals);
+        treemapIt->first->UpdateEntries(recordVals,recordFileNames);
       } // end for tree
     } // end for spillcut
 
@@ -753,6 +761,7 @@ namespace ana
             for ( std::map<Tree*, std::map<TruthVarOrMultiVar, std::string>>::iterator treemapIt=treemap.begin(); treemapIt!=treemap.end(); ++treemapIt ) {
               //unsigned int idxVar = 0;
               std::map<std::string, std::vector<double>> recordVals;
+              std::map<std::string, std::vector<std::string>> recordFileNames;
               unsigned int numEntries=0;
               for ( auto& [truthvarormulti, truthvarname] : treemapIt->second ) {
                 //std::cout << "SpillCut " << idxSpillCut << " Shift " << idxShift << " Cut " << idxCut << " Tree " << idxTree << " Var " << idxVar << std::endl;
@@ -788,6 +797,7 @@ namespace ana
                   recordVals["Run/i"].push_back( sr->hdr.run );
                   recordVals["Subrun/i"].push_back( sr->hdr.subrun );
                   recordVals["Evt/i"].push_back( sr->hdr.evt );
+                  recordFileNames["FileName"].push_back(fName);
                 }
               }
               // Adding CutType
@@ -829,9 +839,7 @@ namespace ana
 
               }
 
-
-
-              treemapIt->first->UpdateEntries(recordVals);
+              treemapIt->first->UpdateEntries(recordVals, recordFileNames);
               //idxTree+=1;
             } // end for tree
             //idxCut+=1;
