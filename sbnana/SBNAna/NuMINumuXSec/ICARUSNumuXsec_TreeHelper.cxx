@@ -269,28 +269,6 @@ namespace ana{
       "RecoENu",
       "RecoQ2",
       "RecoWexp",
-/*
-      // For mu-pi flip study
-      "RecoMuonTruePDG",
-      "LeadingChargedPionCandidateTruePDG",
-      "IsMuonPionFlipped",
-      "IsPionPionSelected",
-      "IsMuonPionCorrect",
-      // MockDataWeights
-      // TODO) Errors for real data
-      "Reweight_AhtBY_m3sigma",
-      "Reweight_BhtBY_p3sigma",
-      "Reweight_CV1uBY_p3sigma",
-      "Reweight_CV2uBY_m3sigma",
-      "Reweight_NonRESBGvpCC2pi_m3sigma",
-      "Reweight_NonRESBGvpNC2pi_m3sigma",
-      "Reweight_NonRESBGvnCC2pi_m3sigma",
-      "Reweight_NonRESBGvnNC2pi_m3sigma",
-      "Reweight_NonRESBGvbarpCC2pi_m3sigma",
-      "Reweight_NonRESBGvbarpNC2pi_m3sigma",
-      "Reweight_NonRESBGvbarnCC2pi_m3sigma",
-      "Reweight_NonRESBGvbarnNC2pi_m3sigma",
-*/
       // Sideband pi RW
       "SidebandPiRW",
     };
@@ -448,7 +426,44 @@ namespace ana{
       kNuMIRecoEnu,
       kNuMIRecoQ2,
       kNuMIRecoWexp,
-/*
+      // Sideband pi RW
+      kNuMISidebandPiRW,
+    };
+
+  }
+
+  std::vector<std::string> GetLowQ2RecStudyLabels(){
+
+    return {
+      // For mu-pi flip study
+      "RecoMuonTruePDG",
+      "LeadingChargedPionCandidateTruePDG",
+      "IsMuonPionFlipped",
+      "IsPionPionSelected",
+      "IsMuonPionCorrect",
+      // MockDataWeights
+      // TODO) Errors for real data
+      "Reweight_AhtBY_m3sigma",
+      "Reweight_BhtBY_p3sigma",
+      "Reweight_CV1uBY_p3sigma",
+      "Reweight_CV2uBY_m3sigma",
+      "Reweight_NonRESBGvpCC2pi_m3sigma",
+      "Reweight_NonRESBGvpNC2pi_m3sigma",
+      "Reweight_NonRESBGvnCC2pi_m3sigma",
+      "Reweight_NonRESBGvnNC2pi_m3sigma",
+      "Reweight_NonRESBGvbarpCC2pi_m3sigma",
+      "Reweight_NonRESBGvbarpNC2pi_m3sigma",
+      "Reweight_NonRESBGvbarnCC2pi_m3sigma",
+      "Reweight_NonRESBGvbarnNC2pi_m3sigma",
+
+    };
+  
+  }
+
+  std::vector<Var> GetLowQ2RecStudyVars(){
+
+    return {
+
       // For mu-pi flip study
       kNuMIRecoMuonCandidateTruePDG,
       kNuMIRecoPionCandidateTruePDG,
@@ -469,9 +484,7 @@ namespace ana{
       kNuMI_NonRESBGvbarpNC2pi_m3sigma,
       kNuMI_NonRESBGvbarnCC2pi_m3sigma,
       kNuMI_NonRESBGvbarnNC2pi_m3sigma,
-*/
-      // Sideband pi RW
-      kNuMISidebandPiRW,
+
     };
 
   }
