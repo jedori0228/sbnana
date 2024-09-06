@@ -851,14 +851,15 @@ namespace ana {
       std::vector< std::vector<caf::SRCaloPoint> > savedCaloPoints;
       std::vector< std::vector<caf::SRCaloPoint> > savedScdryCaloPoints;
 
+      unsigned int nPoints1st[3] = {0, 0, 0};
+      unsigned int nPoints2nd[3] = {0, 0, 0};
+
       for ( unsigned int idxPlane=0; idxPlane < 3; ++idxPlane ){
         savedCaloPoints.push_back({});
         savedScdryCaloPoints.push_back({});
         double minDist = std::numeric_limits<double>::max();
         double largestRR = 0.;
         unsigned int nRRThatAreNaN = 0;
-        unsigned int nPoints1st = 0;
-        unsigned int nPoints2nd = 0;
 
         //unsigned int initialPoints = pfp.trk.calo[idxPlane].points.size();
 
@@ -899,12 +900,12 @@ namespace ana {
             // this is before the split
             savedCaloPoint.rr = caloPt.rr - splitPoint[idxPlane].rr;
             savedCaloPoints[idxPlane].push_back(savedCaloPoint);
-            if ( savedCaloPoint.dedx < 1000. ) nPoints1st+=1;
+            if ( savedCaloPoint.dedx < 1000. ) nPoints1st[idxPlane]+=1;
           }
           else {
             // beyond split point, save to savedScdryCaloPoints
             savedScdryCaloPoints[idxPlane].push_back( savedCaloPoint );
-            if ( savedCaloPoint.dedx < 1000. ) nPoints2nd+=1;
+            if ( savedCaloPoint.dedx < 1000. ) nPoints2nd[idxPlane]+=1;
           }
         } // calo points to save
       } // loop planes
@@ -922,7 +923,7 @@ namespace ana {
         // save calo point information
         for ( unsigned int idxPlane=0; idxPlane < 3; ++idxPlane ){
           // Update the calo info as needed
-          pfp.trk.calo[idxPlane].nhit = nPoints1st;
+          pfp.trk.calo[idxPlane].nhit = nPoints1st[idxPlane];
           pfp.trk.calo[idxPlane].ke = caf::kSignalingNaN;
           pfp.trk.calo[idxPlane].charge = caf::kSignalingNaN;
           pfp.trk.calo[idxPlane].points = savedCaloPoints[idxPlane];
@@ -973,7 +974,22 @@ namespace ana {
         pfp.shw.len = 0.9*pfp.trk.len;
 
         // Defaulting things?
-        pfp.trk.mcsP.SetDefault(); // not 100% sure if this does the right thing?
+	pfp.trk.mcsP.fwdP_muon = -5.0;
+        pfp.trk.mcsP.fwdP_pion = -5.0;
+        pfp.trk.mcsP.fwdP_kaon = -5.0;
+        pfp.trk.mcsP.fwdP_proton = -5.0;
+        pfp.trk.mcsP.fwdP_err_muon = -5.0;
+	pfp.trk.mcsP.fwdP_err_pion = -5.0;
+	pfp.trk.mcsP.fwdP_err_kaon = -5.0;
+	pfp.trk.mcsP.fwdP_err_proton = -5.0;
+        pfp.trk.mcsP.bwdP_muon = -5.0;
+	pfp.trk.mcsP.bwdP_pion = -5.0;
+	pfp.trk.mcsP.bwdP_kaon = -5.0;
+	pfp.trk.mcsP.bwdP_proton = -5.0;
+	pfp.trk.mcsP.bwdP_err_muon = -5.0;
+	pfp.trk.mcsP.bwdP_err_pion = -5.0;
+	pfp.trk.mcsP.bwdP_err_kaon = -5.0;
+	pfp.trk.mcsP.bwdP_err_proton = -5.0;
         pfp.trk.scatterClosestApproach.mean = -5.f;
         pfp.trk.scatterClosestApproach.stdDev = -5.f;
         pfp.trk.scatterClosestApproach.max = -5.f;
@@ -991,9 +1007,19 @@ namespace ana {
         // UPDATE STUFF TO BE THE SECOND TRACK, again now we just have to MODIFY
         //        things from the initial track, not instantiate all new PFPs like I did in first implementation...
         // save calo point information
+
+	std::vector< std::map<double, caf::SRCaloPoint> > caloPointRRMap;
+
         for ( unsigned int idxPlane=0; idxPlane < 3; ++idxPlane ){
+	  caloPointRRMap.push_back( std::map<double, caf::SRCaloPoint>() );
+	  for ( auto const& caloPt : savedScdryCaloPoints[idxPlane] ) {
+	    if ( !std::isnan(caloPt.rr) ) {
+	      caloPointRRMap[idxPlane][ caloPt.rr ] = caloPt;
+	    }
+	  }
+
           // Update the calo info as needed
-          pfp.trk.calo[idxPlane].nhit = nPoints2nd;
+          pfp.trk.calo[idxPlane].nhit = nPoints2nd[idxPlane];
           pfp.trk.calo[idxPlane].ke = caf::kSignalingNaN;
           pfp.trk.calo[idxPlane].charge = caf::kSignalingNaN;
           pfp.trk.calo[idxPlane].points = savedScdryCaloPoints[idxPlane];
@@ -1097,9 +1123,9 @@ namespace ana {
         // Update length as above
         pfp.shw.len = 0.9*pfp.trk.len;
         // Make start X, Y, Z be the same as the track start
-        pfp.shw.start.x = !std::isnan(pfp.trk.start.x) ? pfp.trk.start.x : caf::kSignalingNaN;
-        pfp.shw.start.y = !std::isnan(pfp.trk.start.y) ? pfp.trk.start.y : caf::kSignalingNaN;
-        pfp.shw.start.z = !std::isnan(pfp.trk.start.z) ? pfp.trk.start.z : caf::kSignalingNaN;
+        pfp.shw.start.x = !std::isnan(pfp.trk.start.x) ? (float)pfp.trk.start.x : caf::kSignalingNaN;
+        pfp.shw.start.y = !std::isnan(pfp.trk.start.y) ? (float)pfp.trk.start.y : caf::kSignalingNaN;
+        pfp.shw.start.z = !std::isnan(pfp.trk.start.z) ? (float)pfp.trk.start.z : caf::kSignalingNaN;
         // Make conversion gap be the distance between the slice vertex and this point...
         if ( std::isnan(pfp.shw.start.x) || std::isnan(pfp.shw.start.y) || std::isnan(pfp.shw.start.z) ) {
           pfp.shw.conversion_gap = caf::kSignalingNaN;
@@ -1111,7 +1137,22 @@ namespace ana {
         }
 
         // Set same defaults as we do in the 1st track case
-        pfp.trk.mcsP.SetDefault(); // not 100% sure if this does the right thing?
+        pfp.trk.mcsP.fwdP_muon = -5.0;
+	pfp.trk.mcsP.fwdP_pion = -5.0;
+	pfp.trk.mcsP.fwdP_kaon = -5.0;
+	pfp.trk.mcsP.fwdP_proton = -5.0;
+	pfp.trk.mcsP.fwdP_err_muon = -5.0;
+	pfp.trk.mcsP.fwdP_err_pion = -5.0;
+	pfp.trk.mcsP.fwdP_err_kaon = -5.0;
+	pfp.trk.mcsP.fwdP_err_proton = -5.0;
+        pfp.trk.mcsP.bwdP_muon = -5.0;
+	pfp.trk.mcsP.bwdP_pion = -5.0;
+	pfp.trk.mcsP.bwdP_kaon = -5.0;
+        pfp.trk.mcsP.bwdP_proton = -5.0;
+        pfp.trk.mcsP.bwdP_err_muon = -5.0;
+        pfp.trk.mcsP.bwdP_err_pion = -5.0;
+        pfp.trk.mcsP.bwdP_err_kaon = -5.0;
+        pfp.trk.mcsP.bwdP_err_proton = -5.0;
         pfp.trk.scatterClosestApproach.mean = -5.f;
         pfp.trk.scatterClosestApproach.stdDev = -5.f;
         pfp.trk.scatterClosestApproach.max = -5.f;
