@@ -28,6 +28,7 @@ HistoProducer::HistoProducer(){
   FillNuSyst = false;
   FillFlux = true;
   FillGEANT4 = true;
+  ApplyTrackSplit = false;
 
   cout << "[HistoProducer::HistoProducer] Finished" << endl;
 
@@ -1084,8 +1085,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
         loader,
         this_reco_vars,
         spillCut, cut,
-        //kNoShift,
-        SystShifts(&kTrackSplittingSyst, +1.),
+        ApplyTrackSplit ? SystShifts(&kTrackSplittingSyst, +1.) : kNoShift,
         true, true
       )
     );
@@ -1100,11 +1100,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
           loader,
           this_reco_vars,
           spillCut, cut,
-          //SystShifts(&kCalodEdXShiftSyst, +1.),
-          SystShifts({
-            {&kTrackSplittingSyst, +1.},
-            {&kCalodEdXShiftSyst, +1.},
-          }),
+          ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {&kCalodEdXShiftSyst, +1.}} ) : SystShifts(&kCalodEdXShiftSyst, +1.),
           true, true
         )
       );
@@ -1115,11 +1111,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
           loader,
           this_reco_vars,
           spillCut, cut,
-          //SystShifts(&kCalodEdXShiftSyst, -1.),
-          SystShifts({
-            {&kTrackSplittingSyst, +1.},
-            {&kCalodEdXShiftSyst, -1.},
-          }),
+          ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {&kCalodEdXShiftSyst, -1.}} ) : SystShifts(&kCalodEdXShiftSyst, -1.),
           true, true
         )
       );
@@ -1130,11 +1122,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
           loader,
           this_reco_vars,
           spillCut, cut,
-          //SystShifts(&kCaloGainShiftSyst, +1.),
-          SystShifts({
-            {&kTrackSplittingSyst, +1.},
-            {&kCaloGainShiftSyst, +1.},
-          }),
+          ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {&kCaloGainShiftSyst, +1.}} ) : SystShifts(&kCaloGainShiftSyst, +1.),
           true, true
         )
       );
@@ -1145,11 +1133,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
           loader,
           this_reco_vars,
           spillCut, cut,
-          //SystShifts(&kCaloGainShiftSyst, -1.),
-          SystShifts({
-            {&kTrackSplittingSyst, +1.},
-            {&kCaloGainShiftSyst, -1.},
-          }),
+          ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {&kCaloGainShiftSyst, -1.}} ) : SystShifts(&kCaloGainShiftSyst, -1.),
           true, true
         )
       );
@@ -1165,8 +1149,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
           //this_NSigmasPairs,
           this_NSigmas,
           spillCut, cut,
-          //kNoShift,
-          SystShifts(&kTrackSplittingSyst, +1.),
+          ApplyTrackSplit ? SystShifts(&kTrackSplittingSyst, +1.) : kNoShift,
           true, true
         )
       );
@@ -1182,8 +1165,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
           this_NUniversesVarVectors,
           this_NUniversesNUnivs,
           spillCut, cut,
-          //kNoShift,
-          SystShifts(&kTrackSplittingSyst, +1.),
+          ApplyTrackSplit ? SystShifts(&kTrackSplittingSyst, +1.) : kNoShift,
           true, true
         )
 
@@ -1207,8 +1189,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
           "trueEvents"+RecoCutsForEffs[i_Cut].first, 
           GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
           RecoCutsForEffs[i_Cut].second,
-          //kNoShift,
-          SystShifts(&kTrackSplittingSyst, +1.),
+          ApplyTrackSplit ? SystShifts(&kTrackSplittingSyst, +1.) : kNoShift,
           true
         )
       );
@@ -1222,11 +1203,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
             "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CalodEdXShiftUp",
             GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
             RecoCutsForEffs[i_Cut].second,
-            //SystShifts(&kCalodEdXShiftSyst, +1.),
-            SystShifts({
-              {&kTrackSplittingSyst, +1.},
-              {&kCalodEdXShiftSyst, +1.},
-            }),
+            ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {&kCalodEdXShiftSyst, +1.}} ) : SystShifts(&kCalodEdXShiftSyst, +1.),
             true
           )
         );
@@ -1236,11 +1213,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
             "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CalodEdXShiftDown",
             GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
             RecoCutsForEffs[i_Cut].second,
-            //SystShifts(&kCalodEdXShiftSyst, -1.),
-            SystShifts({
-              {&kTrackSplittingSyst, +1.},
-              {&kCalodEdXShiftSyst, -1.},
-            }),
+            ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {&kCalodEdXShiftSyst, -1.}} ) : SystShifts(&kCalodEdXShiftSyst, -1.),
             true
           )
         );
@@ -1250,11 +1223,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
             "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CaloGainShiftUp",
             GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
             RecoCutsForEffs[i_Cut].second,
-            //SystShifts(&kCaloGainShiftSyst, +1.),
-            SystShifts({
-              {&kTrackSplittingSyst, +1.},
-              {&kCaloGainShiftSyst, +1.},
-            }),
+            ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {&kCaloGainShiftSyst, +1.}} ) : SystShifts(&kCaloGainShiftSyst, +1.),
             true
           )
         );
@@ -1264,11 +1233,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
             "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CaloGainShiftDown",
             GetNuMITrueTreeLabels(), loader, GetNuMITrueTreeVars(), kNuMIValidTrigger, kTruthCut_IsSignal,
             RecoCutsForEffs[i_Cut].second,
-            //SystShifts(&kCaloGainShiftSyst, -1.),
-            SystShifts({
-              {&kTrackSplittingSyst, +1.},
-              {&kCaloGainShiftSyst, -1.},
-            }),
+            ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {&kCaloGainShiftSyst, -1.}} ) : SystShifts(&kCaloGainShiftSyst, -1.),
             true
           )
         );
@@ -1279,11 +1244,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
               "trueEvents"+RecoCutsForEffs[i_Cut].first+"_"+IDetectorSysts.at(i)->ShortName()+"Up",
               {"Dummy"}, loader, {DummyTruthVar}, kNuMIValidTrigger, kTruthCut_IsSignal,
               RecoCutsForEffs[i_Cut].second,
-              //SystShifts(IDetectorSysts.at(i), +1.),
-              SystShifts({
-                {&kTrackSplittingSyst, +1.},
-                {IDetectorSysts.at(i), +1.},
-              }),
+              ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {IDetectorSysts.at(i), +1.}} ) : SystShifts(IDetectorSysts.at(i), +1.),
               true
             )
           );
@@ -1292,11 +1253,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
               "trueEvents"+RecoCutsForEffs[i_Cut].first+"_"+IDetectorSysts.at(i)->ShortName()+"Down",
               {"Dummy"}, loader, {DummyTruthVar}, kNuMIValidTrigger, kTruthCut_IsSignal,
               RecoCutsForEffs[i_Cut].second,
-              //SystShifts(IDetectorSysts.at(i), -1.),
-              SystShifts({
-                {&kTrackSplittingSyst, +1.},
-                {IDetectorSysts.at(i), -1.},
-              }),
+              ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {IDetectorSysts.at(i), -1.}} ) : SystShifts(IDetectorSysts.at(i), -1.),
               true
             )
           );
@@ -1318,8 +1275,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
           //this_NSigmasPairs,
           this_NSigmas,
           kTruthCut_IsSignal,
-          //kNoShift,
-          SystShifts(&kTrackSplittingSyst, +1.),
+          ApplyTrackSplit ? SystShifts(&kTrackSplittingSyst, +1.) : kNoShift,
           true
         )
       );
@@ -1332,8 +1288,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
           this_NUniversesTruthVarVectors,
           this_NUniversesNUnivs,
           kTruthCut_IsSignal,
-          //kNoShift,
-          SystShifts(&kTrackSplittingSyst, +1.),
+          ApplyTrackSplit ? SystShifts(&kTrackSplittingSyst, +1.) : kNoShift,
           true
         )
       );
@@ -1529,8 +1484,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
         loader,
         varlists,
         spillCut, cut,
-        //kNoShift,
-        SystShifts(&kTrackSplittingSyst, +1.),
+        ApplyTrackSplit ? SystShifts(&kTrackSplittingSyst, +1.) : kNoShift,
         true, true
       )
     );
@@ -1543,11 +1497,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
         loader,
         varlists,
         spillCut, cut,
-        //SystShifts(&kCalodEdXShiftSyst, +1.),
-        SystShifts({
-          {&kTrackSplittingSyst, +1.},
-          {&kCalodEdXShiftSyst, +1.},
-        }),
+        ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {&kCalodEdXShiftSyst, +1.}} ) : SystShifts(&kCalodEdXShiftSyst, +1.),
         true, true
       )
     );
@@ -1557,11 +1507,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
         loader,
         varlists,
         spillCut, cut,
-        //SystShifts(&kCalodEdXShiftSyst, -1.),
-        SystShifts({
-          {&kTrackSplittingSyst, +1.},
-          {&kCalodEdXShiftSyst, -1.},
-        }),
+        ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {&kCalodEdXShiftSyst, -1.}} ) : SystShifts(&kCalodEdXShiftSyst, -1.),
         true, true
       )
     );
@@ -1571,11 +1517,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
         loader,
         varlists,
         spillCut, cut,
-        //SystShifts(&kCaloGainShiftSyst, +1.),
-        SystShifts({
-          {&kTrackSplittingSyst, +1.},
-          {&kCaloGainShiftSyst, +1.},
-        }),
+        ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {&kCaloGainShiftSyst, +1.}} ) : SystShifts(&kCaloGainShiftSyst, +1.),
         true, true
       )
     );
@@ -1585,11 +1527,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
         loader,
         varlists,
         spillCut, cut,
-        //SystShifts(&kCaloGainShiftSyst, -1.),
-        SystShifts({
-          {&kTrackSplittingSyst, +1.},
-          {&kCaloGainShiftSyst, -1.},
-        }),
+        ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {&kCaloGainShiftSyst, -1.}} ) : SystShifts(&kCaloGainShiftSyst, -1.),
         true, true
       )
     );
@@ -1634,8 +1572,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
         this_NSigmasISysts,
         this_NSigmas,
         spillCut, cut,
-        //kNoShift,
-        SystShifts(&kTrackSplittingSyst, +1.),
+        ApplyTrackSplit ? SystShifts(&kTrackSplittingSyst, +1.) : kNoShift,
         true, true
       )
     );
@@ -1665,8 +1602,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
         this_NUniversesVarVectors,
         this_NUniversesNUnivs,
         spillCut, cut,
-        //kNoShift,
-        SystShifts(&kTrackSplittingSyst, +1.),
+        ApplyTrackSplit ? SystShifts(&kTrackSplittingSyst, +1.) : kNoShift,
         true, true
       )
     );

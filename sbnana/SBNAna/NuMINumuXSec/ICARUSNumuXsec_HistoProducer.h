@@ -189,6 +189,7 @@ namespace ICARUSNumuXsec{
     bool FillNuSyst;
     bool FillFlux;
     bool FillGEANT4;
+    bool ApplyTrackSplit;
 
     // DEBUG
     unsigned int debug_uint;
