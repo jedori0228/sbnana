@@ -84,6 +84,9 @@ TODO:
     -- vtx to start point as conv gap
     -- 90% of length as shw length
     -- FOR THE SECOND PFP, setting the start point to be the start point of the second pfp's track (obvious bug fixed on 19 March 2024)
+
+>> NB: THE COMMITTED VERSION DOES ACTUALLY MAKE THE SECOND TRACK BUT DOES NOT DEAL WITH SHOWERS...
+>> 4 SEPT 2024:: MAKING A MODIFICATION TO CHOOSE ONLY ONE OF THESE TO SAVE... if the split is within 10cm save the 2nd track, if > 10cm from vtx, save the first.
 */
 
 #include "sbnana/CAFAna/Systs/TrackSplitSyst.h"
@@ -731,13 +734,6 @@ namespace ana {
   {
     if ( sr->is_clear_cosmic ) return;
 
-    std::vector< caf::SRPFP > retPfps;
-
-    // Vectors for the second tracks...
-    std::map< unsigned int, std::vector<std::vector<caf::SRCaloPoint>> > scdryInitIdxToPfpCaloPts;
-    std::map< unsigned int, ana::PreservedInitialTrkResults > scdryInitIdxToPreservedInfo;
-    unsigned int expectedScdryTrks = 0;
-
     int pfpIdx = -1;
 
     // Loop through each pfp and if we should split it, then do the things...
@@ -823,7 +819,6 @@ namespace ana {
       // DEBUGGING!
       //if ( fDebug ) std::cout << "This track crosses a boundary and its p for splitting is: " << pToSplit << std::endl;
 
-
       // Set up the random engine
       // Set a seed using track variables
       std::uint32_t seed = int(pfp.trk.len) + 
@@ -854,10 +849,10 @@ namespace ana {
       caf::SRCaloPoint firstPoint[3];
 
       std::vector< std::vector<caf::SRCaloPoint> > savedCaloPoints;
-
       std::vector< std::vector<caf::SRCaloPoint> > savedScdryCaloPoints;
 
-      ana::PreservedInitialTrkResults PreservedTrkResults;
+      unsigned int nPoints1st[3] = {0, 0, 0};
+      unsigned int nPoints2nd[3] = {0, 0, 0};
 
       for ( unsigned int idxPlane=0; idxPlane < 3; ++idxPlane ){
         savedCaloPoints.push_back({});
@@ -865,7 +860,6 @@ namespace ana {
         double minDist = std::numeric_limits<double>::max();
         double largestRR = 0.;
         unsigned int nRRThatAreNaN = 0;
-        unsigned int nPoints = 0;
 
         //unsigned int initialPoints = pfp.trk.calo[idxPlane].points.size();
 
@@ -898,6 +892,7 @@ namespace ana {
         } // Get the split point and first point
         ////if ( fDebug ) std::cout << std::endl;
 
+        // Calo points to save
         for ( auto const& caloPt : pfp.trk.calo[idxPlane].points ) {
           caf::SRCaloPoint savedCaloPoint = FillCaloPointFrom(caloPt);
 
@@ -905,342 +900,278 @@ namespace ana {
             // this is before the split
             savedCaloPoint.rr = caloPt.rr - splitPoint[idxPlane].rr;
             savedCaloPoints[idxPlane].push_back(savedCaloPoint);
-            if ( savedCaloPoint.dedx < 1000. ) nPoints+=1;
+            if ( savedCaloPoint.dedx < 1000. ) nPoints1st[idxPlane]+=1;
           }
           else {
             // beyond split point, save to savedScdryCaloPoints
             savedScdryCaloPoints[idxPlane].push_back( savedCaloPoint );
-          } 
+            if ( savedCaloPoint.dedx < 1000. ) nPoints2nd[idxPlane]+=1;
+          }
         } // calo points to save
-
-        // Update the calo info as needed
-        pfp.trk.calo[idxPlane].nhit = nPoints;
-        pfp.trk.calo[idxPlane].ke = caf::kSignalingNaN;
-        pfp.trk.calo[idxPlane].charge = caf::kSignalingNaN;
-        pfp.trk.calo[idxPlane].points = savedCaloPoints[idxPlane];
-
-        // The Chi2PID
-        TrkChi2Results chi2output = CalculateChi2(pfp.trk.calo[idxPlane]);
-        pfp.trk.chi2pid[idxPlane].chi2_proton = chi2output.chi2_proton;
-        pfp.trk.chi2pid[idxPlane].chi2_kaon = chi2output.chi2_kaon;
-        pfp.trk.chi2pid[idxPlane].chi2_pion = chi2output.chi2_pion;
-        pfp.trk.chi2pid[idxPlane].chi2_muon = chi2output.chi2_muon;
-        pfp.trk.chi2pid[idxPlane].pida = chi2output.pida;
-        pfp.trk.chi2pid[idxPlane].pid_ndof = chi2output.pid_ndof;
-
-        // DEBUGS
-        //if ( fDebug ) std::cout << "... PLANE DEBUG INFO: " << idxPlane << std::endl;
-        //if ( fDebug ) std::cout << "    initial points = " << initialPoints << std::endl;
-        //if ( fDebug ) std::cout << "    --> Post systematic shift" << std::endl;
-        //if ( fDebug ) std::cout << "    nRRThatAreNaN = " << nRRThatAreNaN << std::endl;
-        //if ( fDebug ) std::cout << "    nhit = " << nPoints << std::endl;
-        //if ( fDebug ) std::cout << "    first point (x,y,z) = (" << firstPoint[idxPlane].x << "," << firstPoint[idxPlane].y << "," << firstPoint[idxPlane].z << ")" << std::endl;
-        //if ( fDebug ) std::cout << "    first point rr = " << firstPoint[idxPlane].rr << std::endl;
-        //if ( fDebug ) std::cout << "    split point (x,y,z) = (" << splitPoint[idxPlane].x << "," << splitPoint[idxPlane].y << "," << splitPoint[idxPlane].z << ")" << std::endl;
-        //if ( fDebug ) std::cout << "    split point rr = " << splitPoint[idxPlane].rr << std::endl;
       } // loop planes
 
-      // Save the Preserved Track Info
-      PreservedTrkResults.producer = pfp.trk.producer;
-      PreservedTrkResults.end_x = pfp.trk.end.x;
-      PreservedTrkResults.end_y = pfp.trk.end.y;
-      PreservedTrkResults.end_z = pfp.trk.end.z;
-      PreservedTrkResults.dir_end_x = pfp.trk.dir_end.x;
-      PreservedTrkResults.dir_end_y = pfp.trk.dir_end.y;
-      PreservedTrkResults.dir_end_z = pfp.trk.dir_end.z;
+      // Length of the first segment will tell us if we want to save the first track or second track
+      double splitLen = std::max(firstPoint[0].rr, std::max(firstPoint[1].rr, firstPoint[2].rr)) - std::min(splitPoint[0].rr, std::min(splitPoint[1].rr, splitPoint[2].rr));
 
-      // Update the track info
-      //pfp.trk.len = ((firstPoint[2].rr-splitPoint[2].rr) + (firstPoint[1].rr-splitPoint[1].rr))/2.;
-      pfp.trk.len = std::max(firstPoint[0].rr, std::max(firstPoint[1].rr, firstPoint[2].rr)) - std::min(splitPoint[0].rr, std::min(splitPoint[1].rr, splitPoint[2].rr));
-      pfp.trk.npts = (pfp.trk.calo[2].nhit + pfp.trk.calo[1].nhit + pfp.trk.calo[0].nhit);
-      pfp.trk.bestplane = ( pfp.trk.calo[2].nhit >= pfp.trk.calo[1].nhit ? (pfp.trk.calo[2].nhit >= pfp.trk.calo[0].nhit ? caf::Plane_t(2) : caf::Plane_t(0) ) : 
-                                                                           (pfp.trk.calo[0].nhit >= pfp.trk.calo[1].nhit ? caf::Plane_t(0) : caf::Plane_t(1) ));
-
-      ////if ( fDebug ) std::cout << "... and its length post-split is now: " << pfp.trk.len << std::endl;
-
-      // updated end point: 24 May 2024
-      double endRR = std::numeric_limits<double>::max();
-      double endPtX = -9999.;
-      double endPtY = -9999.;
-      double endPtZ = -9999.;
-      for ( unsigned int idxPt = 0; idxPt < 3; ++idxPt ) {
-      	if ( std::isnan(splitPoint[idxPt].rr) || std::isinf(splitPoint[idxPt].rr) ) continue;
-        if ( splitPoint[idxPt].rr < endRR ) {
-          endRR = splitPoint[idxPt].rr;
-          endPtX = splitPoint[idxPt].x;
-          endPtY = splitPoint[idxPt].y;
-          endPtZ = splitPoint[idxPt].z;
-        }
+      bool saveFirstTrack = true;
+      if ( splitLen < 10. ) {
+        saveFirstTrack = false;
       }
-      caf::SRVector3D trkEnd( endPtX, endPtY, endPtZ );
-      pfp.trk.end = trkEnd;
 
-      caf::SRVector3D trkEndDir( caf::kSignalingNaN, caf::kSignalingNaN, caf::kSignalingNaN );
-      pfp.trk.dir_end = trkEndDir;
+      // IF SAVE FIRST TRACK:
+      if (saveFirstTrack) {
+        // save calo point information
+        for ( unsigned int idxPlane=0; idxPlane < 3; ++idxPlane ){
+          // Update the calo info as needed
+          pfp.trk.calo[idxPlane].nhit = nPoints1st[idxPlane];
+          pfp.trk.calo[idxPlane].ke = caf::kSignalingNaN;
+          pfp.trk.calo[idxPlane].charge = caf::kSignalingNaN;
+          pfp.trk.calo[idxPlane].points = savedCaloPoints[idxPlane];
 
-      TrkMomentumResults p_output = CalculateMomenta((float)pfp.trk.len);
-      pfp.trk.rangeP.p_muon = p_output.p_muon;
-      pfp.trk.rangeP.p_proton = p_output.p_proton;
-      pfp.trk.rangeP.p_pion = p_output.p_pion;
+          // The Chi2PID
+          TrkChi2Results chi2output = CalculateChi2(pfp.trk.calo[idxPlane]);
+          pfp.trk.chi2pid[idxPlane].chi2_proton = chi2output.chi2_proton;
+          pfp.trk.chi2pid[idxPlane].chi2_kaon = chi2output.chi2_kaon;
+          pfp.trk.chi2pid[idxPlane].chi2_pion = chi2output.chi2_pion;
+          pfp.trk.chi2pid[idxPlane].chi2_muon = chi2output.chi2_muon;
+          pfp.trk.chi2pid[idxPlane].pida = chi2output.pida;
+          pfp.trk.chi2pid[idxPlane].pid_ndof = chi2output.pid_ndof;
+        }
 
-      // NaN some of the remaining variables we don't want the user to use with this shift...
-      // TODO: maybe think of rerunning MCS with calo point info?
-      caf::SRTrkMCS newMCS;
-      pfp.trk.mcsP = newMCS;
+        // update other stuff -> NB: now we no longer have to copy over EVERY INDIVIDUAL FIELD, only to update the ones that have changed.
+        pfp.trk.len = splitLen;
+        pfp.trk.npts = (pfp.trk.calo[2].nhit + pfp.trk.calo[1].nhit + pfp.trk.calo[0].nhit);
+        pfp.trk.bestplane = ( pfp.trk.calo[2].nhit >= pfp.trk.calo[1].nhit ? (pfp.trk.calo[2].nhit >= pfp.trk.calo[0].nhit ? caf::Plane_t(2) : caf::Plane_t(0) ) : 
+                                                                             (pfp.trk.calo[0].nhit >= pfp.trk.calo[1].nhit ? caf::Plane_t(0) : caf::Plane_t(1) ));
 
-      caf::SRTrackScatterClosestApproach newScatter;
-      pfp.trk.scatterClosestApproach = newScatter;
+        // updated end point: 24 May 2024
+        double endRR = std::numeric_limits<double>::max();
+        double endPtX = -9999.;
+        double endPtY = -9999.;
+        double endPtZ = -9999.;
+        for ( unsigned int idxPt = 0; idxPt < 3; ++idxPt ) {
+          if ( std::isnan(splitPoint[idxPt].rr) || std::isinf(splitPoint[idxPt].rr) ) continue;
+          if ( splitPoint[idxPt].rr < endRR ) {
+            endRR = splitPoint[idxPt].rr;
+            endPtX = splitPoint[idxPt].x;
+            endPtY = splitPoint[idxPt].y;
+            endPtZ = splitPoint[idxPt].z;
+          }
+        }
+        caf::SRVector3D trkEnd( endPtX, endPtY, endPtZ );
+        pfp.trk.end = trkEnd;
 
-      caf::SRTrackStoppingChi2Fit newStopChi2;
-      pfp.trk.stoppingChi2Fit = newStopChi2;
+        caf::SRVector3D trkEndDir( caf::kSignalingNaN, caf::kSignalingNaN, caf::kSignalingNaN );
+        pfp.trk.dir_end = trkEndDir;
 
-      caf::SRTrackDazzle newDazzle;
-      pfp.trk.dazzle = newDazzle;
+        TrkMomentumResults p_output = CalculateMomenta((float)pfp.trk.len);
+        pfp.trk.rangeP.p_muon = p_output.p_muon;
+        pfp.trk.rangeP.p_proton = p_output.p_proton;
+        pfp.trk.rangeP.p_pion = p_output.p_pion;
 
-      // Update shower variables... for this one, we ONLY update the shower length to be 90% the track length...
-      // -- We may want to update others later...
-      pfp.shw.len = 0.9*pfp.trk.len;
+        // Update shower variables... for this one, we ONLY update the shower length to be 90% the track length...
+        // -- We may want to update others later...
+        pfp.shw.len = 0.9*pfp.trk.len;
 
-      // Save the secondary track info
-      unsigned int pfpIdxUI = (unsigned int)pfpIdx;
-      scdryInitIdxToPfpCaloPts[ pfpIdxUI ] = savedScdryCaloPoints;
-      scdryInitIdxToPreservedInfo[ pfpIdxUI ] = PreservedTrkResults;
-      expectedScdryTrks+=1;
+        // Defaulting things?
+	pfp.trk.mcsP.fwdP_muon = -5.0;
+        pfp.trk.mcsP.fwdP_pion = -5.0;
+        pfp.trk.mcsP.fwdP_kaon = -5.0;
+        pfp.trk.mcsP.fwdP_proton = -5.0;
+        pfp.trk.mcsP.fwdP_err_muon = -5.0;
+	pfp.trk.mcsP.fwdP_err_pion = -5.0;
+	pfp.trk.mcsP.fwdP_err_kaon = -5.0;
+	pfp.trk.mcsP.fwdP_err_proton = -5.0;
+        pfp.trk.mcsP.bwdP_muon = -5.0;
+	pfp.trk.mcsP.bwdP_pion = -5.0;
+	pfp.trk.mcsP.bwdP_kaon = -5.0;
+	pfp.trk.mcsP.bwdP_proton = -5.0;
+	pfp.trk.mcsP.bwdP_err_muon = -5.0;
+	pfp.trk.mcsP.bwdP_err_pion = -5.0;
+	pfp.trk.mcsP.bwdP_err_kaon = -5.0;
+	pfp.trk.mcsP.bwdP_err_proton = -5.0;
+        pfp.trk.scatterClosestApproach.mean = -5.f;
+        pfp.trk.scatterClosestApproach.stdDev = -5.f;
+        pfp.trk.scatterClosestApproach.max = -5.f;
+        pfp.trk.stoppingChi2Fit.pol0Chi2 = -5.f;
+        pfp.trk.stoppingChi2Fit.expChi2 = -5.f;
+        pfp.trk.stoppingChi2Fit.pol0Fit = -5.f;
+        pfp.trk.dazzle.pdg = -5;
+        pfp.trk.dazzle.muonScore = -5.f;
+        pfp.trk.dazzle.pionScore = -5.f;
+        pfp.trk.dazzle.protonScore = -5.f;
+        pfp.trk.dazzle.otherScore = -5.f;
+        pfp.trk.dazzle.bestScore = -5.f;
+      } // 1st trk
+      else {
+        // UPDATE STUFF TO BE THE SECOND TRACK, again now we just have to MODIFY
+        //        things from the initial track, not instantiate all new PFPs like I did in first implementation...
+        // save calo point information
 
-      // Fill the new PFP
-      caf::SRPFP newPfp;
-      TrackSplitSyst::FillPtrPFP(newPfp, pfp);
-      retPfps.push_back( newPfp );
+	std::vector< std::map<double, caf::SRCaloPoint> > caloPointRRMap;
+
+        for ( unsigned int idxPlane=0; idxPlane < 3; ++idxPlane ){
+	  caloPointRRMap.push_back( std::map<double, caf::SRCaloPoint>() );
+	  for ( auto const& caloPt : savedScdryCaloPoints[idxPlane] ) {
+	    if ( !std::isnan(caloPt.rr) ) {
+	      caloPointRRMap[idxPlane][ caloPt.rr ] = caloPt;
+	    }
+	  }
+
+          // Update the calo info as needed
+          pfp.trk.calo[idxPlane].nhit = nPoints2nd[idxPlane];
+          pfp.trk.calo[idxPlane].ke = caf::kSignalingNaN;
+          pfp.trk.calo[idxPlane].charge = caf::kSignalingNaN;
+          pfp.trk.calo[idxPlane].points = savedScdryCaloPoints[idxPlane];
+
+          // The Chi2PID
+          TrkChi2Results chi2output = CalculateChi2(pfp.trk.calo[idxPlane]);
+          pfp.trk.chi2pid[idxPlane].chi2_proton = chi2output.chi2_proton;
+          pfp.trk.chi2pid[idxPlane].chi2_kaon = chi2output.chi2_kaon;
+          pfp.trk.chi2pid[idxPlane].chi2_pion = chi2output.chi2_pion;
+          pfp.trk.chi2pid[idxPlane].chi2_muon = chi2output.chi2_muon;
+          pfp.trk.chi2pid[idxPlane].pida = chi2output.pida;
+          pfp.trk.chi2pid[idxPlane].pid_ndof = chi2output.pid_ndof;
+        }
+
+        // Attempt to get the start direction
+        std::vector< std::vector<double> > startPoints;
+        std::vector< std::vector<double> > dirs;
+        std::vector<double> scdryLengths;
+        for ( unsigned int idxPlane=1; idxPlane < 3; ++idxPlane ) {
+          unsigned int nPoints = 0;
+          std::map<double, caf::SRCaloPoint>::iterator it = caloPointRRMap[idxPlane].end();
+          if ( caloPointRRMap[idxPlane].size() == 0 ) continue; // if no points then we skip this plane
+          --it; // get away from .end()
+          scdryLengths.push_back( it->second.rr );
+          std::vector<double> startPoint = { it->second.x, it->second.y, it->second.z };
+          startPoints.push_back(startPoint);
+          while ( it!=caloPointRRMap[idxPlane].begin() ) {
+            double xyz_start[3] = { it->second.x, it->second.y, it->second.z };
+            //std::cout << "xyz: " << xyz_start[0] << " " << xyz_start[1] << " " << xyz_start[2] << std::endl;
+            --it;
+            double xyz_end[3] = { it->second.x, it->second.y, it->second.z };
+            nPoints+=1;
+            std::vector<double> dir = { xyz_end[0]-xyz_start[0], xyz_end[1]-xyz_start[1], xyz_end[2]-xyz_start[2] };
+            dirs.push_back(dir);
+            if ( nPoints==5 ) break;
+          }
+        }
+
+        std::vector< double > ave_dir = {0., 0., 0.};
+        for ( auto const& dir: dirs ) {
+          TVector3 dir_tv3( dir[0], dir[1], dir[2] );
+          dir_tv3 = dir_tv3.Unit();
+          ave_dir[0] += dir_tv3.X();
+          ave_dir[1] += dir_tv3.Y();
+          ave_dir[2] += dir_tv3.Z();
+        }
+        if ( dirs.size() != 0 ) {
+          ave_dir[0] /= double(dirs.size());
+          ave_dir[1] /= double(dirs.size());
+          ave_dir[2] /= double(dirs.size());
+        }
+
+        TVector3 ave_dir_tv3( ave_dir[0], ave_dir[1], ave_dir[2] );
+        if ( dirs.size() != 0 ) ave_dir_tv3 = ave_dir_tv3.Unit();
+
+        caf::SRVector3D trkStartDir( ave_dir_tv3.X(),
+                                    ave_dir_tv3.Y(),
+                                    ave_dir_tv3.Z() );
+        pfp.trk.dir = trkStartDir;
+
+        // Length
+        double scdryLength = 0.;
+        // Commenting out to use this updated length definition (24 march 2024)
+        //for ( auto const& scdryLenVal : scdryLengths ) scdryLength+=scdryLenVal;
+        //if( scdryLengths.size() != 0 ) scdryLength /= double(scdryLengths.size());
+        for ( auto const& scdryLenVal : scdryLengths ) {
+          if ( scdryLenVal > scdryLength ) scdryLength=scdryLenVal;
+        }
+        pfp.trk.len = scdryLength;
+
+        // Start point (updated 24 may 2024)
+        double startRR = 0.;
+        double startPtX = caf::kSignalingNaN;
+        double startPtY = caf::kSignalingNaN;
+        double startPtZ = caf::kSignalingNaN;
+        for ( unsigned int idxPt = 0 ; idxPt < startPoints.size(); ++idxPt ) {
+          if ( scdryLengths[idxPt] > startRR ) {
+            startRR = scdryLengths[idxPt];
+            startPtX = startPoints[idxPt][0];
+            startPtY = startPoints[idxPt][1];
+            startPtZ = startPoints[idxPt][2];
+          }
+        }
+        caf::SRVector3D trkStartLoc( startPtX,
+                                    startPtY,
+                                    startPtZ );
+        pfp.trk.start = trkStartLoc;
+
+        // N points & best plane
+        pfp.trk.npts = (pfp.trk.calo[2].nhit + pfp.trk.calo[1].nhit + pfp.trk.calo[0].nhit);
+        pfp.trk.bestplane = ( pfp.trk.calo[2].nhit >= pfp.trk.calo[1].nhit ? (pfp.trk.calo[2].nhit >= pfp.trk.calo[0].nhit ? caf::Plane_t(2) : caf::Plane_t(0) ) : 
+                                                                             (pfp.trk.calo[0].nhit >= pfp.trk.calo[1].nhit ? caf::Plane_t(0) : caf::Plane_t(1) ));
+
+        TrkMomentumResults p_output = CalculateMomenta(pfp.trk.len);
+        pfp.trk.rangeP.p_muon = p_output.p_muon;
+        pfp.trk.rangeP.p_proton = p_output.p_proton;
+        pfp.trk.rangeP.p_pion = p_output.p_pion;
+
+        // Shower Elements:
+        // for our shower cut we check shw.start.x, shw.len, shw.conversion_gap
+        // Update length as above
+        pfp.shw.len = 0.9*pfp.trk.len;
+        // Make start X, Y, Z be the same as the track start
+        pfp.shw.start.x = !std::isnan(pfp.trk.start.x) ? (float)pfp.trk.start.x : caf::kSignalingNaN;
+        pfp.shw.start.y = !std::isnan(pfp.trk.start.y) ? (float)pfp.trk.start.y : caf::kSignalingNaN;
+        pfp.shw.start.z = !std::isnan(pfp.trk.start.z) ? (float)pfp.trk.start.z : caf::kSignalingNaN;
+        // Make conversion gap be the distance between the slice vertex and this point...
+        if ( std::isnan(pfp.shw.start.x) || std::isnan(pfp.shw.start.y) || std::isnan(pfp.shw.start.z) ) {
+          pfp.shw.conversion_gap = caf::kSignalingNaN;
+        }
+        else {
+          pfp.shw.conversion_gap = std::hypot( pfp.shw.start.x - sr->vertex.x,
+                                               pfp.shw.start.y - sr->vertex.y,
+                                               pfp.shw.start.z - sr->vertex.z );
+        }
+
+        // Set same defaults as we do in the 1st track case
+        pfp.trk.mcsP.fwdP_muon = -5.0;
+	pfp.trk.mcsP.fwdP_pion = -5.0;
+	pfp.trk.mcsP.fwdP_kaon = -5.0;
+	pfp.trk.mcsP.fwdP_proton = -5.0;
+	pfp.trk.mcsP.fwdP_err_muon = -5.0;
+	pfp.trk.mcsP.fwdP_err_pion = -5.0;
+	pfp.trk.mcsP.fwdP_err_kaon = -5.0;
+	pfp.trk.mcsP.fwdP_err_proton = -5.0;
+        pfp.trk.mcsP.bwdP_muon = -5.0;
+	pfp.trk.mcsP.bwdP_pion = -5.0;
+	pfp.trk.mcsP.bwdP_kaon = -5.0;
+        pfp.trk.mcsP.bwdP_proton = -5.0;
+        pfp.trk.mcsP.bwdP_err_muon = -5.0;
+        pfp.trk.mcsP.bwdP_err_pion = -5.0;
+        pfp.trk.mcsP.bwdP_err_kaon = -5.0;
+        pfp.trk.mcsP.bwdP_err_proton = -5.0;
+        pfp.trk.scatterClosestApproach.mean = -5.f;
+        pfp.trk.scatterClosestApproach.stdDev = -5.f;
+        pfp.trk.scatterClosestApproach.max = -5.f;
+        pfp.trk.stoppingChi2Fit.pol0Chi2 = -5.f;
+        pfp.trk.stoppingChi2Fit.expChi2 = -5.f;
+        pfp.trk.stoppingChi2Fit.pol0Fit = -5.f;
+        pfp.trk.dazzle.pdg = -5;
+        pfp.trk.dazzle.muonScore = -5.f;
+        pfp.trk.dazzle.pionScore = -5.f;
+        pfp.trk.dazzle.protonScore = -5.f;
+        pfp.trk.dazzle.otherScore = -5.f;
+        pfp.trk.dazzle.bestScore = -5.f;
+        // ... and for now leave EVERYTHING else alone.
+        // Buyer beware of this. If other groups/analyses want to use this, we may need to rethink.
+      } //2nd trk
+
     } // loop pfps
 
-    // DEAL WITH SECONDARY TRACKS...
-    if ( expectedScdryTrks > 0 )
-      //if ( fDebug ) std::cout << "... Dealing with " << expectedScdryTrks << " secondary tracks." << std::endl;
-    for ( auto const& [initIdx, caloPtsVec] : scdryInitIdxToPfpCaloPts ) {
-      caf::SRPFP newPfp;
-
-      // PFP Elements:
-      newPfp.id = -999; // Some default...
-      newPfp.parent = sr->reco.pfp[initIdx].id;
-      newPfp.parent_is_primary = false;
-      newPfp.trackScore = sr->reco.pfp[initIdx].trackScore;
-      // --> also the score vars...
-      newPfp.pfochar.chgendfrac = sr->reco.pfp[initIdx].pfochar.chgendfrac;
-      newPfp.pfochar.chgfracspread = sr->reco.pfp[initIdx].pfochar.chgfracspread;
-      newPfp.pfochar.linfitdiff = sr->reco.pfp[initIdx].pfochar.linfitdiff;
-      newPfp.pfochar.linfitlen = sr->reco.pfp[initIdx].pfochar.linfitlen;
-      newPfp.pfochar.linfitgaplen = sr->reco.pfp[initIdx].pfochar.linfitgaplen;
-      newPfp.pfochar.linfitrms = sr->reco.pfp[initIdx].pfochar.linfitrms;
-      newPfp.pfochar.openanglediff = sr->reco.pfp[initIdx].pfochar.openanglediff;
-      newPfp.pfochar.pca2ratio = sr->reco.pfp[initIdx].pfochar.pca2ratio;
-      newPfp.pfochar.pca3ratio = sr->reco.pfp[initIdx].pfochar.pca3ratio;
-      newPfp.pfochar.vtxdist = sr->reco.pfp[initIdx].pfochar.vtxdist;
-      /////////////////////////////
-      newPfp.slcID = sr->reco.pfp[initIdx].slcID;
-      newPfp.t0 = (std::isnan(sr->reco.pfp[initIdx].t0) ? caf::kSignalingNaN : (float)sr->reco.pfp[initIdx].t0);
-
-      // Track Elements:
-      // Things unchanged from initial track...
-      newPfp.trk.producer = scdryInitIdxToPreservedInfo[ initIdx ].producer;
-
-      caf::SRVector3D trkEnd( scdryInitIdxToPreservedInfo[ initIdx ].end_x,
-                              scdryInitIdxToPreservedInfo[ initIdx ].end_y,
-                              scdryInitIdxToPreservedInfo[ initIdx ].end_z );
-      newPfp.trk.end = trkEnd;
-
-      caf::SRVector3D trkEndDir( scdryInitIdxToPreservedInfo[ initIdx ].dir_end_x,
-                                 scdryInitIdxToPreservedInfo[ initIdx ].dir_end_y,
-                                 scdryInitIdxToPreservedInfo[ initIdx ].dir_end_z );
-      newPfp.trk.dir_end = trkEndDir;
-
-      // Things changed from initial track...
-      std::vector< std::map<double, caf::SRCaloPoint> > caloPointRRMap;
-
-      for ( unsigned int idxPlane=0; idxPlane < 3; ++idxPlane ){
-        caloPointRRMap.push_back( std::map<double, caf::SRCaloPoint>() );
-        unsigned int nRRThatAreNaN = 0;
-        unsigned int nPoints = 0;
-
-        for ( auto const& caloPt : caloPtsVec[idxPlane] ) {
-          if ( !std::isnan(caloPt.rr) ) {
-            caloPointRRMap[idxPlane][ caloPt.rr ] = caloPt;
-          }
-          else if ( std::isnan(caloPt.rr) ) {
-            nRRThatAreNaN+=1;
-          }
-        } // Get the ordering of points to be able to find "first" 5
-
-        for ( auto const& caloPt : caloPtsVec[idxPlane] ) {
-          if ( caloPt.dedx < 1000. ) nPoints+=1;
-        } // calo points to save
-
-        // Update the calo info as needed
-        newPfp.trk.calo[idxPlane].nhit = nPoints;
-        newPfp.trk.calo[idxPlane].ke = caf::kSignalingNaN;
-        newPfp.trk.calo[idxPlane].charge = caf::kSignalingNaN;
-        newPfp.trk.calo[idxPlane].points = caloPtsVec[idxPlane];
-
-        // The Chi2PID
-        TrkChi2Results scdryChi2output = CalculateChi2(newPfp.trk.calo[idxPlane]);
-        newPfp.trk.chi2pid[idxPlane].chi2_proton = scdryChi2output.chi2_proton;
-        newPfp.trk.chi2pid[idxPlane].chi2_kaon = scdryChi2output.chi2_kaon;
-        newPfp.trk.chi2pid[idxPlane].chi2_pion = scdryChi2output.chi2_pion;
-        newPfp.trk.chi2pid[idxPlane].chi2_muon = scdryChi2output.chi2_muon;
-        newPfp.trk.chi2pid[idxPlane].pida = scdryChi2output.pida;
-        newPfp.trk.chi2pid[idxPlane].pid_ndof = scdryChi2output.pid_ndof;
-      } // loop planes
-
-      //if ( fDebug ) {
-      //  std::cout << "Secondary track RRs: ";
-      //  for ( auto const& [rrs, pt] : caloPointRRMap[2] ) {
-      //    std::cout << rrs << " ";
-      //  }
-      //  std::cout << std::endl;
-      //}
-
-      // Attempt to get the start direction
-      std::vector< std::vector<double> > startPoints;
-      std::vector< std::vector<double> > dirs;
-      std::vector<double> scdryLengths;
-      for ( unsigned int idxPlane=1; idxPlane < 3; ++idxPlane ) {
-        unsigned int nPoints = 0;
-        std::map<double, caf::SRCaloPoint>::iterator it = caloPointRRMap[idxPlane].end();
-        if ( caloPointRRMap[idxPlane].size() == 0 ) continue; // if no points then we skip this plane
-        --it; // get away from .end()
-        scdryLengths.push_back( it->second.rr );
-        std::vector<double> startPoint = { it->second.x, it->second.y, it->second.z };
-        startPoints.push_back(startPoint);
-        while ( it!=caloPointRRMap[idxPlane].begin() ) {
-          double xyz_start[3] = { it->second.x, it->second.y, it->second.z };
-          //std::cout << "xyz: " << xyz_start[0] << " " << xyz_start[1] << " " << xyz_start[2] << std::endl;
-          --it;
-          double xyz_end[3] = { it->second.x, it->second.y, it->second.z };
-          nPoints+=1;
-          std::vector<double> dir = { xyz_end[0]-xyz_start[0], xyz_end[1]-xyz_start[1], xyz_end[2]-xyz_start[2] };
-          dirs.push_back(dir);
-          if ( nPoints==5 ) break;
-        }
-      }
-
-      std::vector< double > ave_dir = {0., 0., 0.};
-      for ( auto const& dir: dirs ) {
-        TVector3 dir_tv3( dir[0], dir[1], dir[2] );
-        dir_tv3 = dir_tv3.Unit();
-        ave_dir[0] += dir_tv3.X();
-        ave_dir[1] += dir_tv3.Y();
-        ave_dir[2] += dir_tv3.Z();
-      }
-      if ( dirs.size() != 0 ) {
-        ave_dir[0] /= double(dirs.size());
-        ave_dir[1] /= double(dirs.size());
-        ave_dir[2] /= double(dirs.size());
-      }
-
-      TVector3 ave_dir_tv3( ave_dir[0], ave_dir[1], ave_dir[2] );
-      if ( dirs.size() != 0 ) ave_dir_tv3 = ave_dir_tv3.Unit();
-
-      caf::SRVector3D trkStartDir( ave_dir_tv3.X(),
-                                   ave_dir_tv3.Y(),
-                                   ave_dir_tv3.Z() );
-      newPfp.trk.dir = trkStartDir;
-
-      // Length
-      double scdryLength = 0.;
-      // Commenting out to use this updated length definition (24 march 2024)
-      //for ( auto const& scdryLenVal : scdryLengths ) scdryLength+=scdryLenVal;
-      //if( scdryLengths.size() != 0 ) scdryLength /= double(scdryLengths.size());
-      for ( auto const& scdryLenVal : scdryLengths ) {
-        if ( scdryLenVal > scdryLength ) scdryLength=scdryLenVal;
-      }
-      newPfp.trk.len = scdryLength;
-
-      // Start point (updated 24 may 2024)
-      double startRR = 0.;
-      double startPtX = caf::kSignalingNaN;
-      double startPtY = caf::kSignalingNaN;
-      double startPtZ = caf::kSignalingNaN;
-      for ( unsigned int idxPt = 0 ; idxPt < startPoints.size(); ++idxPt ) {
-        if ( scdryLengths[idxPt] > startRR ) {
-          startRR = scdryLengths[idxPt];
-          startPtX = startPoints[idxPt][0];
-          startPtY = startPoints[idxPt][1];
-          startPtZ = startPoints[idxPt][2];
-        }
-      }
-      caf::SRVector3D trkStartLoc( startPtX,
-                                   startPtY,
-                                   startPtZ );
-      newPfp.trk.start = trkStartLoc;
-
-      // N points & best plane
-      newPfp.trk.npts = (newPfp.trk.calo[2].nhit + newPfp.trk.calo[1].nhit + newPfp.trk.calo[0].nhit);
-      newPfp.trk.bestplane = ( newPfp.trk.calo[2].nhit >= newPfp.trk.calo[1].nhit ? (newPfp.trk.calo[2].nhit >= newPfp.trk.calo[0].nhit ? caf::Plane_t(2) : caf::Plane_t(0) ) : 
-                                                                                    (newPfp.trk.calo[0].nhit >= newPfp.trk.calo[1].nhit ? caf::Plane_t(0) : caf::Plane_t(1) ));
-
-      TrkMomentumResults p_output = CalculateMomenta(newPfp.trk.len);
-      newPfp.trk.rangeP.p_muon = p_output.p_muon;
-      newPfp.trk.rangeP.p_proton = p_output.p_proton;
-      newPfp.trk.rangeP.p_pion = p_output.p_pion;
-
-      // Shower Elements:
-      // for our shower cut we check shw.start.x, shw.len, shw.conversion_gap
-      // Update length as above
-      newPfp.shw.len = 0.9*newPfp.trk.len;
-      // Make start X, Y, Z be the same as the track start
-      newPfp.shw.start.x = !std::isnan(newPfp.trk.start.x) ? newPfp.trk.start.x : caf::kSignalingNaN;
-      newPfp.shw.start.y = !std::isnan(newPfp.trk.start.y) ? newPfp.trk.start.y : caf::kSignalingNaN;
-      newPfp.shw.start.z = !std::isnan(newPfp.trk.start.z) ? newPfp.trk.start.z : caf::kSignalingNaN;
-      // Make conversion gap be the distance between the slice vertex and this point...
-      if ( std::isnan(newPfp.shw.start.x) || std::isnan(newPfp.shw.start.y) || std::isnan(newPfp.shw.start.z) ) {
-        newPfp.shw.conversion_gap = caf::kSignalingNaN;
-      }
-      else {
-        newPfp.shw.conversion_gap = std::hypot( newPfp.shw.start.x - sr->vertex.x,
-                                                newPfp.shw.start.y - sr->vertex.y,
-                                                newPfp.shw.start.z - sr->vertex.z );
-      }
-
-      // ... and for now leave EVERYTHING else alone.
-      // Buyer beware of this. If other groups/analyses want to use this, we may need to rethink.
-      retPfps.push_back( newPfp ); // ORIGINAL
-      //sr->reco.pfp.push_back( newPfp ); // TESTING!!
-    } // secondary tracks
-
-    //     std::map< unsigned int, ana::PreservedInitialTrkResults > scdryInitIdxToPreservedInfo;
-    if ( scdryInitIdxToPreservedInfo.size()==0 ) {
-      // No split tracks
-      return;
-    } // return NO SPLIT
-    else {
-      // We have the tracks that were split put into new retPfps. We need to make the OTHERS into caf::SRPFP objects.
-      for ( unsigned int idxPfp = 0; idxPfp < sr->reco.pfp.size(); ++idxPfp ) {
-        bool isThisTheSplitTrack = false;
-        for ( auto const& [idxSplit, preservedInfo] : scdryInitIdxToPreservedInfo ) {
-          if ( idxPfp == idxSplit ) {
-            isThisTheSplitTrack = true;
-            break;
-          }
-        } // loop split tracks
-        if ( isThisTheSplitTrack ) continue;
-
-        // Fill a new PFP for this PFP
-        caf::SRPFP newPfp;
-        TrackSplitSyst::FillPtrPFP(newPfp, sr->reco.pfp[idxPfp]);
-        retPfps.push_back( newPfp );
-      } // loop pfps
-
-      // Update the slice reco info with these SRPFPs
-      sr->reco.npfp = retPfps.size();
-      sr->reco.pfp = retPfps;
-
-      return;
-    } // return WITH SPLIT
-
-    // Update the slice reco info with these SRPFPs
-    //sr->reco.npfp = retPfps.size();
-    //sr->reco.pfp = retPfps;
-
-
+    return;
   } // Shift
 
   const TrackSplitSyst kTrackSplittingSyst("TrackSplittingSyst", "Split tracks systematic");
