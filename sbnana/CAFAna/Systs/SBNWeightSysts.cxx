@@ -135,7 +135,6 @@ namespace ana
     }
     else{
       const Univs u = GetUnivs(x);
-
       double y = 0;
       if(u.w0 != 0) y += u.w0 * wgts[fIdx].univ[u.i0];
       if(u.w1 != 0) y += u.w1 * wgts[fIdx].univ[u.i1];
@@ -419,7 +418,128 @@ namespace ana
     // convert x (sigma) into an absoluate value which is saved as univ[] in CAF
     double this_abs = ConvertToAbsolute(x);
 
+    if(nu->index < 0) return;
+
+    if(fIdx == -1) fIdx = UniverseOracle::Instance().SystIndex(ShortName());
+
+    const caf::Proxy<std::vector<caf::SRMultiverse>>& wgts = nu->wgt;
+    if(wgts.empty()) return;
+
+    // Check if 0-to-1 dial
+    // For 0-to-1 dials, e.g., GENIE DecayAngMEC,
+    // we only save one universe with x=1.
+    // In this case, 
+    bool IsMorphDial = false;
+    const std::vector<float>& v = UniverseOracle::Instance().ShiftsForSyst( ShortName() );
+    if(v.size()==1){
+      if( fabs(v[0] - 1.0) < 1E-5 ){
+        IsMorphDial = true;
+      }
+    }
+
+    if(IsMorphDial){
+      double fullrw = wgts[fIdx].univ[0];
+      double this_rw = x * fullrw + (1.-x) * 1.;
+      weight *= this_rw;
+    }
+    else{
+      const Univs u = GetUnivs(x);
+
+      double y = 0;
+      if(u.w0 != 0){
+        if(u.i0<0){
+          std::cout << "[JSKIMDEBUG][SBNWeightAbsVarSyst::Shift] x = " << x << std::endl;
+          std::cout << "[JSKIMDEBUG][SBNWeightAbsVarSyst::Shift] this_abs = " << this_abs << std::endl;
+          std::cout << "[JSKIMDEBUG][SBNWeightAbsVarSyst::Shift] u.i0 = " << u.i0 << std::endl;
+          std::cout << "[JSKIMDEBUG][SBNWeightAbsVarSyst::Shift] u.i1 = " << u.i1 << std::endl;
+
+          size_t n = absvar_to_sigma.size();
+
+          int idx_left = 0;
+          int idx_right = 1;
+
+          if (x <= absvar_to_sigma[0].second){
+            idx_left = 0;
+            idx_right = 1;
+          }
+          else if(x >= absvar_to_sigma[n-1].second) {
+            idx_left = n-2;
+            idx_right = n-1;
+          }
+          else{
+
+            for (size_t i = 0; i < absvar_to_sigma.size() - 1; ++i) {
+              if (x >= absvar_to_sigma[i].second && x <= absvar_to_sigma[i+1].second) {
+                idx_left = i;
+                idx_right = i+1;
+                break;
+              }
+            }
+
+          }
+
+          std::cout << "[JSKIMDEBUG][SBNWeightAbsVarSyst::Shift] idx_left = " << idx_left << std::endl;
+          std::cout << "[JSKIMDEBUG][SBNWeightAbsVarSyst::Shift] idx_right = " << idx_right << std::endl;
+          std::cout << "[JSKIMDEBUG][SBNWeightAbsVarSyst::Shift] Printing absvar_to_sigma:" << std::endl;
+          for (size_t i = 0; i < absvar_to_sigma.size(); ++i) {
+            std::cout << "[JSKIMDEBUG][SBNWeightAbsVarSyst::Shift] i = " << i << ", first = " << absvar_to_sigma[i].first << ", second = " << absvar_to_sigma[i].second << std::endl;
+          }
+
+        }
+        y += u.w0 * wgts[fIdx].univ[u.i0];
+      }
+      if(u.w1 != 0){
+        if(u.i1<0){
+          std::cout << "[JSKIMDEBUG][SBNWeightAbsVarSyst::Shift] x = " << x << std::endl;
+          std::cout << "[JSKIMDEBUG][SBNWeightAbsVarSyst::Shift] this_abs = " << this_abs << std::endl;
+          std::cout << "[JSKIMDEBUG][SBNWeightAbsVarSyst::Shift] u.i0 = " << u.i0 << std::endl;
+          std::cout << "[JSKIMDEBUG][SBNWeightAbsVarSyst::Shift] u.i1 = " << u.i1 << std::endl;
+
+          size_t n = absvar_to_sigma.size();
+
+          int idx_left = 0;
+          int idx_right = 1;
+
+          if (x <= absvar_to_sigma[0].second){
+            idx_left = 0;
+            idx_right = 1;
+          }
+          else if(x >= absvar_to_sigma[n-1].second) {
+            idx_left = n-2;
+            idx_right = n-1;
+          }
+          else{
+
+            for (size_t i = 0; i < absvar_to_sigma.size() - 1; ++i) {
+              if (x >= absvar_to_sigma[i].second && x <= absvar_to_sigma[i+1].second) {
+                idx_left = i;
+                idx_right = i+1;
+                break;
+              }
+            }
+
+          }
+
+          std::cout << "[JSKIMDEBUG][SBNWeightAbsVarSyst::Shift] idx_left = " << idx_left << std::endl;
+          std::cout << "[JSKIMDEBUG][SBNWeightAbsVarSyst::Shift] idx_right = " << idx_right << std::endl;
+          std::cout << "[JSKIMDEBUG][SBNWeightAbsVarSyst::Shift] Printing absvar_to_sigma:" << std::endl;
+          for (size_t i = 0; i < absvar_to_sigma.size(); ++i) {
+            std::cout << "[JSKIMDEBUG][SBNWeightAbsVarSyst::Shift] i = " << i << ", first = " << absvar_to_sigma[i].first << ", second = " << absvar_to_sigma[i].second << std::endl;
+          }
+
+        }
+        y += u.w1 * wgts[fIdx].univ[u.i1];
+      }
+
+      weight *= y;
+    }
+
+
+
+/*
     return SBNWeightSyst::Shift(this_abs, nu, weight);
+*/
+
 
   }
 
