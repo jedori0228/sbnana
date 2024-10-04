@@ -2511,6 +2511,7 @@ void HistoProducer::setSystematicWeights(){
     if(FillNuSyst){
 
       // Lars' 2p2h; independent ones
+
       std::vector<std::string> Lars2p2hDialNames = {
         "XSecShape_CCMEC",
         "XSecShape_CCMEC_Empirical",
@@ -2531,7 +2532,6 @@ void HistoProducer::setSystematicWeights(){
       }
 
       // Lars' 2p2h; dependent, dec ang mec
-
 
       genieMorphKnobNames.push_back( "Lars2p2p_DecayAngMEC_P1Variation_P2CV" );
       IGENIEMorphSysts.push_back( 
@@ -2597,8 +2597,24 @@ void HistoProducer::setSystematicWeights(){
 */
 
       // CCQE RPA
+
       genieMorphKnobNames.push_back( "CCQERPAReweight" );
       IGENIEMorphSysts.push_back( new SBNWeightMirrorSyst("CCQERPAReweight_SBNNuSyst_CCQERPAReweight_multisigma_CCQERPAReweight") );
+
+      // FSI; hA-to-hN
+
+      genieMorphKnobNames.push_back( "FSIReweight_hN" );
+      IGENIEMorphSysts.push_back( new SBNWeightMirrorSyst("FSIReweight_SBNNuSyst_FSI_hNReweight_multisigma_FSIReweight") );
+
+      // FSI; hA-to-INCL
+
+      genieMorphKnobNames.push_back( "FSIReweight_INCL" );
+      IGENIEMorphSysts.push_back( new SBNWeightMirrorSyst("FSIReweight_SBNNuSyst_FSI_INCLReweight_multisigma_FSIReweight") );
+
+      // FSI; hA-to-G4BC
+
+      genieMorphKnobNames.push_back( "FSIReweight_G4BC" );
+      IGENIEMorphSysts.push_back( new SBNWeightMirrorSyst("FSIReweight_SBNNuSyst_FSI_G4BCReweight_multisigma_FSIReweight") );
 
     }
 
