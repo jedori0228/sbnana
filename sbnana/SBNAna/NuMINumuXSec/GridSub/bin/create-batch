@@ -463,9 +463,25 @@ date
 echo "@@ Checking output file"
 ls -alh ${thisOutputCreationDir}/*
 
-echo "ifdh cp "${thisOutputCreationDir}"/output.root "${outDir}"/output_"${nProcess}".root"
-ifdh cp ${thisOutputCreationDir}/output.root ${outDir}/output_${nProcess}.root
-echo "@@ Done!"
+#echo "ifdh cp "${thisOutputCreationDir}"/output.root "${outDir}"/output_"${nProcess}".root"
+#ifdh cp ${thisOutputCreationDir}/output.root ${outDir}/output_${nProcess}.root
+#echo "@@ Done!"
+
+Trial=0
+while [ "$Trial" -lt 10 ]; do
+  echo "@@ Copying the output file; Trail: ${Trial}"
+  ifdh cp ${thisOutputCreationDir}/output.root ${outDir}/output_${nProcess}.root
+  larsoft_exit_code=$?
+  if [ "$larsoft_exit_code" -eq 1 ]; then
+    echo "@@ Failed with code: "${larsoft_exit_code}
+    echo "@@ Trying again"
+    sleep 10
+  else
+    echo "@@ Success with code: "${larsoft_exit_code}
+    break
+  fi
+done
+
 
 '''%(gridLibDirPNFS, gridLibDirPNFS, SBNANA_VERSION, base_rundir+'/output/', ArgsToPass, ArgsToPass))
 
