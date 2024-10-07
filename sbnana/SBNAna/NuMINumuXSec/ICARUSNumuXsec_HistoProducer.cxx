@@ -29,6 +29,7 @@ HistoProducer::HistoProducer(){
   FillFlux = true;
   FillGEANT4 = true;
   ApplyTrackSplit = false;
+  FillFakeDataWeights = false;
 
   cout << "[HistoProducer::HistoProducer] Finished" << endl;
 
@@ -942,10 +943,10 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
   std::vector<std::vector<TruthVar>> this_NUniversesTruthVarVectors;
   std::vector<unsigned int> this_NUniversesNUnivs;
 
-  if(FillSystematics){
+  if(FillFakeDataWeights){
 
-    std::vector<std::string> this_lowq2rec_study_labels = GetLowQ2RecStudyLabels();
-    std::vector<Var> this_lowq2rec_study_vars = GetLowQ2RecStudyVars();
+    std::vector<std::string> this_lowq2rec_study_labels = GetFakeDataWeightsLabels();
+    std::vector<Var> this_lowq2rec_study_vars = GetFakeDataWeightsVars();
 
     this_reco_labels.insert(
       this_reco_labels.end(),
@@ -958,6 +959,10 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       this_lowq2rec_study_vars.begin(),
       this_lowq2rec_study_vars.end()
     );
+
+  }
+
+  if(FillSystematics){
 
     // NSigma
 

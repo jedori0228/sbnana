@@ -506,4 +506,13 @@ namespace ana {
   const Var kNuMI_NonRESBGvbarnCC2pi_m3sigma = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_NonRESBGvbarnCC2pi", 4);
   const Var kNuMI_NonRESBGvbarnNC2pi_m3sigma = GetUniverseWeight("GENIEReWeight_ICARUS_v2_multisigma_NonRESBGvbarnNC2pi", 4);
 
+  // NuSyst fake data studies
+  // - 2p2h
+  const Var kNuMI_Lars2p2h_XSecShape_CCMEC = GetUniverseWeight("GENIEReWeight_SBNNuSyst_GENIE_multisigma_XSecShape_CCMEC", 1);
+  const Var kNuMI_Lars2p2h_EnergyDependence_CCMEC = GetUniverseWeight("GENIEReWeight_SBNNuSyst_GENIE_multisigma_EnergyDependence_CCMEC", 1);
+  // - FSI
+  const Var kNuMI_FSI_hN = GetUniverseWeight("FSIReweight_SBNNuSyst_FSI_hNReweight_multisigma_FSIReweight", 1);
+  const Var kNuMI_FSI_INCL = GetUniverseWeight("FSIReweight_SBNNuSyst_FSI_INCLReweight_multisigma_FSIReweight", 1);
+  const Var kNuMI_FSI_G4BC = GetUniverseWeight("FSIReweight_SBNNuSyst_FSI_G4BCReweight_multisigma_FSIReweight", 1);
+
 }

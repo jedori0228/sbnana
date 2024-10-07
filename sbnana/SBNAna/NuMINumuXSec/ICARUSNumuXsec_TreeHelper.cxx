@@ -432,7 +432,7 @@ namespace ana{
 
   }
 
-  std::vector<std::string> GetLowQ2RecStudyLabels(){
+  std::vector<std::string> GetFakeDataWeightsLabels(){
 
     return {
       // For mu-pi flip study
@@ -455,12 +455,18 @@ namespace ana{
       "Reweight_NonRESBGvbarpNC2pi_m3sigma",
       "Reweight_NonRESBGvbarnCC2pi_m3sigma",
       "Reweight_NonRESBGvbarnNC2pi_m3sigma",
-
+      // 2p2h
+      "Reweight_Lars2p2h_XSecShape_CCMEC",
+      "Reweight_Lars2p2h_EnergyDependence_CCMEC",
+      // FSI
+      "Reweight_FSI_hN",
+      "Reweight_FSI_INCL",
+      "Reweight_FSI_G4BC",
     };
   
   }
 
-  std::vector<Var> GetLowQ2RecStudyVars(){
+  std::vector<Var> GetFakeDataWeightsVars(){
 
     return {
 
@@ -484,6 +490,13 @@ namespace ana{
       kNuMI_NonRESBGvbarpNC2pi_m3sigma,
       kNuMI_NonRESBGvbarnCC2pi_m3sigma,
       kNuMI_NonRESBGvbarnNC2pi_m3sigma,
+      // 2p2h
+      kNuMI_Lars2p2h_XSecShape_CCMEC,
+      kNuMI_Lars2p2h_EnergyDependence_CCMEC,
+      // FSI
+      kNuMI_FSI_hN,
+      kNuMI_FSI_INCL,
+      kNuMI_FSI_G4BC,
 
     };
 

@@ -18,7 +18,7 @@ namespace ana{
   std::vector<std::string> GetNuMIRecoTreeLabels();
   std::vector<Var> GetNuMIRecoTreeVars();
 
-  std::vector<std::string> GetLowQ2RecStudyLabels();
-  std::vector<Var> GetLowQ2RecStudyVars();
+  std::vector<std::string> GetFakeDataWeightsLabels();
+  std::vector<Var> GetFakeDataWeightsVars();
 
 }

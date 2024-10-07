@@ -190,6 +190,7 @@ namespace ICARUSNumuXsec{
     bool FillFlux;
     bool FillGEANT4;
     bool ApplyTrackSplit;
+    bool FillFakeDataWeights;
 
     // DEBUG
     unsigned int debug_uint;

@@ -118,5 +118,13 @@ namespace ana
   extern const Var kNuMI_NonRESBGvbarnCC2pi_m3sigma;
   extern const Var kNuMI_NonRESBGvbarnNC2pi_m3sigma;
 
+  // NuSyst fake data studies
+  // - 2p2h
+  extern const Var kNuMI_Lars2p2h_XSecShape_CCMEC;
+  extern const Var kNuMI_Lars2p2h_EnergyDependence_CCMEC;
+  // - FSI
+  extern const Var kNuMI_FSI_hN;
+  extern const Var kNuMI_FSI_INCL;
+  extern const Var kNuMI_FSI_G4BC;
 
 }
