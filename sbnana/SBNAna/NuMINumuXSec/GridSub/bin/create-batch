@@ -207,7 +207,6 @@ for InputSample in InputSamples:
   if NJobs>NTotalFiles or NJobs==0:
     NJobs = NTotalFiles
 
-  #SubmissionInfo = open(base_rundir+'/SubmissionInfo.log','w')
   SubmissionInfo = pnfsTool.Open('SubmissionInfo.log')
 
   SubmissionInfo.write("<create-batch> NTotalFiles = "+str(NTotalFiles)+'\n')
@@ -252,7 +251,6 @@ for InputSample in InputSamples:
   for it_job in range(0,len(FileRanges)):
 
     cafeScriptFileName = base_rundir+'/ToGrid/run_%d.C'%(it_job)
-    #cafeScriptFile = open(cafeScriptFileName,'w')
     cafeScriptFile = pnfsTool.Open('run_%s.C'%(it_job))
 
     cafeScriptFile.write('''#include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_HistoProducer.h"
@@ -366,14 +364,12 @@ void run_%d(){
 }
 '''%(args.Analyzer))
 
-    #cafeScriptFile.close()  
     pnfsTool.Close(cafeScriptFile, base_rundir+'/ToGrid/run_%d.C'%(it_job))
 
   logger.LOG("INFO", "Writing grid executable")
 
   ## Now Write executable
   executable_filename = args.Analyzer+'_%s_Run%s'%(DataStream,DataRunNum) if IsDATA else args.Analyzer+'_'+InputSample
-  #executable_file = open(base_rundir+'/'+executable_filename+'.sh','w')
   executable_file = pnfsTool.Open(executable_filename+'.sh')
   executable_file.write('''#!/bin/bash
 
@@ -495,7 +491,6 @@ done
 
 '''%(gridLibDirPNFS, gridLibDirPNFS, SBNANA_VERSION, base_rundir+'/output/', ArgsToPass, ArgsToPass))
 
-  #executable_file.close()
   pnfsTool.Close(executable_file, base_rundir+'/'+executable_filename+'.sh')
 
   os.system('tar -C %s -czf %s/ToGrid.tar ToGrid/'%(base_rundir, base_rundir))
@@ -522,7 +517,6 @@ done
   SubmissionInfo.write("## Submit command :\n")
   SubmissionInfo.write(submitcmd+'\n')
 
-  #SubmissionInfo.close()
   pnfsTool.Close(SubmissionInfo, base_rundir+'/SubmissionInfo.log')
 
   logger.LOG("DEBUG", "Submission command:\n%s"%(submitcmd))
@@ -551,19 +545,15 @@ done
     jobID_Schedd = this_GridJobInfo.split('@')[1]
     this_GridJobInfo = [jobID_Cluster,jobID_Schedd]
 
-    #killcmd_file = open(base_rundir+'/killcmd.sh','w')
     killcmd_file = pnfsTool.Open('killcmd.sh')
     for it_job in range(0,NJobs):
       killcmd_file.write('jobsub_rm -J%s.%d@%s\n'%(jobID_Cluster,it_job,jobID_Schedd))
-    #killcmd_file.close()
     pnfsTool.Close(killcmd_file, base_rundir+'/killcmd.sh')
 
-    #mergecmd_file = open(base_rundir+'/mergecmd.sh','w')
     mergecmd_file = pnfsTool.Open('mergecmd.sh')
     mergecmd_file.write('# FinalOutputPath = %s\n'%(FinalOutputPath))
     mergecmd_file.write('# outputname = %s.root\n'%(outputname))
     mergecmd_file.write('hadd -f %s/%s.root %s/output/*.root\n'%(FinalOutputPath, outputname, base_rundir))
-    #mergecmd_file.close()
     pnfsTool.Close(mergecmd_file, base_rundir+'/mergecmd.sh')
 
   gridJobInfos.append(this_GridJobInfo)
