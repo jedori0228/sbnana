@@ -110,6 +110,28 @@ namespace ana{
     }
     return isFV;
   });
+  const TruthVar kTruth_IsVertexInAV([](const caf::SRTrueInteractionProxy *nu) -> int {
+
+    bool isAV = (( ( nu->position.x < -61.94 && nu->position.x > -358.49 ) ||
+                   ( nu->position.x >  61.94 && nu->position.x <  358.49 )) &&
+                 ( ( nu->position.y > -181.86 && nu->position.y < 134.96 ) &&
+                   ( nu->position.z > -894.95 && nu->position.z < 894.95 ) ));
+
+    if(isAV) return 1;
+    else return 0;
+
+  });
+  const TruthVar kTruth_IsVertexInFV([](const caf::SRTrueInteractionProxy *nu) -> int {
+
+    bool  isFV = (( ( nu->position.x < -61.94 - 25 && nu->position.x > -358.49 + 25 ) ||
+                  ( nu->position.x >  61.94 + 25 && nu->position.x <  358.49 - 25 )) &&
+                  ( ( nu->position.y > -181.86 + 25 && nu->position.y < 134.96 - 25 ) &&
+                  ( nu->position.z > -894.95 + 30 && nu->position.z < 894.95 - 50 ) ));
+
+    if(isFV) return 1;
+    else return 0;
+
+  });
 
   // Muon
 

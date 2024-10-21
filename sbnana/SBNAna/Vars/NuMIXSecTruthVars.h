@@ -46,6 +46,8 @@ namespace ana{
 
   // Vertex
   extern const TruthCut kTruth_VertexInFV;
+  extern const TruthVar kTruth_IsVertexInAV;
+  extern const TruthVar kTruth_IsVertexInFV;
   const TruthVar kTruth_NuBaseline = SIMPLETRUTHVAR(baseline);
   const TruthVar kTruth_NuParentDkX = SIMPLETRUTHVAR(prod_vtx.x);
   const TruthVar kTruth_NuParentDkY = SIMPLETRUTHVAR(prod_vtx.y);
