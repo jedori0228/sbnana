@@ -514,5 +514,7 @@ namespace ana {
   const Var kNuMI_FSI_hN = GetUniverseWeight("FSIReweight_SBNNuSyst_FSI_hNReweight_multisigma_FSIReweight", 1);
   const Var kNuMI_FSI_INCL = GetUniverseWeight("FSIReweight_SBNNuSyst_FSI_INCLReweight_multisigma_FSIReweight", 1);
   const Var kNuMI_FSI_G4BC = GetUniverseWeight("FSIReweight_SBNNuSyst_FSI_G4BCReweight_multisigma_FSIReweight", 1);
+  // - LQCD Zexp
+  const Var kNuMI_LQCDZExpFit = GetUniverseWeight("GENIEReWeight_SBNNuSyst_LQCDZExpFit_multisim_ZExpAVariationResponse", 1);
 
 }

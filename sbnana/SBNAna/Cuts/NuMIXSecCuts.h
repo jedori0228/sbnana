@@ -126,5 +126,7 @@ namespace ana
   extern const Var kNuMI_FSI_hN;
   extern const Var kNuMI_FSI_INCL;
   extern const Var kNuMI_FSI_G4BC;
+  // - LQCD Zexp
+  extern const Var kNuMI_LQCDZExpFit;
 
 }
