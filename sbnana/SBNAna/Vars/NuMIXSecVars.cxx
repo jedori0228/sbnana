@@ -1974,4 +1974,89 @@ namespace ana {
       return 0;
     });
 
+  const SpillVar kNuMIIntimeNeutrinoTime( [](const caf::SRSpillProxy *sr) -> double {
+
+    double ret = -999.;
+    for(unsigned int i_p=0; i_p<sr->true_particles.size(); i_p++){
+      if( sr->true_particles[i_p].interaction_id!=-1 ){
+        ret = sr->true_particles[i_p].genT;
+      }
+    }
+
+    return ret;
+
+  });
+
+  const SpillVar kNuMIHasIntimeCosmicParticle( [](const caf::SRSpillProxy *sr) -> int {
+
+    bool HasIntimeCosmic = false;
+    for(unsigned int i_p=0; i_p<sr->true_particles.size(); i_p++){
+      if( sr->true_particles[i_p].interaction_id==-1 ){
+        double p_genT = sr->true_particles[i_p].genT;
+        if( p_genT>=0. && p_genT<10.5 ){
+          HasIntimeCosmic = true;
+          break;
+        }
+      }
+    }
+
+    if(HasIntimeCosmic) return 1;
+    else return 0;
+
+  });
+
+  const SpillVar kNuMIIntimeCosmicParticleLongestLength ( [](const caf::SRSpillProxy *sr) -> double {
+
+    double lmax = -999.;
+    for(unsigned int i_p=0; i_p<sr->true_particles.size(); i_p++){
+      if( sr->true_particles[i_p].interaction_id==-1 ){
+        double p_genT = sr->true_particles[i_p].genT;
+        if( p_genT>=0. && p_genT<10.5 ){
+          double this_length = sr->true_particles[i_p].length;
+          if( this_length > lmax ){
+            lmax = this_length;
+          }
+        }
+      }
+    }
+
+    return lmax;
+
+  });
+
+  const SpillVar kNuMIHasIntimeCosmicParticleWithCut ( [](const caf::SRSpillProxy *sr) -> int {
+
+    bool HasIntimeCosmic = false;
+    for(unsigned int i_p=0; i_p<sr->true_particles.size(); i_p++){
+      if( sr->true_particles[i_p].interaction_id==-1 ){
+        double p_genT = sr->true_particles[i_p].genT;
+        double p_length = sr->true_particles[i_p].length;
+        if( p_genT>=0. && p_genT<10.5 && p_length>5. ){
+          HasIntimeCosmic = true;
+          break;
+        }
+      }
+    }
+
+    if(HasIntimeCosmic) return 1;
+    else return 0;
+
+  });
+
+  const SpillMultiVar kNuMIIntimeCosmicParticleLengths( [](const caf::SRSpillProxy *sr) -> std::vector<double> {
+
+    std::vector<double> rets;
+    for(unsigned int i_p=0; i_p<sr->true_particles.size(); i_p++){
+      if( sr->true_particles[i_p].interaction_id==-1 ){
+        double p_genT = sr->true_particles[i_p].genT;
+        if( p_genT>=0. && p_genT<10.5 ){
+          rets.push_back( sr->true_particles[i_p].length );
+        }
+      }
+    }
+
+    return rets;
+
+  });
+
 }

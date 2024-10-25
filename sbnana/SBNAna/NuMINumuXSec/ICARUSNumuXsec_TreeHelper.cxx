@@ -127,6 +127,8 @@ namespace ana{
       "TrueIsFHC/i",
       "TrueParentPDG/i",
       "TrueQ2",
+      "Trueq0",
+      "Trueq3",
       "TrueW",
       "TrueNUANCECode/i",
       // Number of primary particles
@@ -284,6 +286,8 @@ namespace ana{
       kNuMIIsFHC,
       kNuMITrueParentPDG,
       kNuMITrueQ2,
+      kNuMITrueq0,
+      kNuMITrueq3,
       kNuMITruew,
       ICARUSNumuXsec::kNuMINUANCECode,
       // Number of primary particles
@@ -462,6 +466,8 @@ namespace ana{
       "Reweight_FSI_hN",
       "Reweight_FSI_INCL",
       "Reweight_FSI_G4BC",
+      // LQCD ZExp fit
+      "Reweight_LQCDZExpFit",
     };
   
   }
@@ -497,7 +503,8 @@ namespace ana{
       kNuMI_FSI_hN,
       kNuMI_FSI_INCL,
       kNuMI_FSI_G4BC,
-
+      // LQCD ZExp fit
+      kNuMI_LQCDZExpFit,
     };
 
   }

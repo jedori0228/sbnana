@@ -35,6 +35,7 @@
 #include "sbnana/SBNAna/Cuts/NuMIQuality.h"
 #include "sbnana/SBNAna/Cuts/NuMIXSecDetectorSysts.h"
 #include "sbnana/SBNAna/Cuts/NuMIXSecSysts.h"
+#include "sbnana/SBNAna/Vars/BeamExposureVars.h"
 
 // NuMINumuXSec
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Contants.h"
@@ -100,6 +101,11 @@ namespace ICARUSNumuXsec{
     void MakeDupeCheckTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     // - 240805_EventListTree
     void MakeEventListTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    // - 241021_BeamQualTree
+    void MakeBeamQualTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    // - 241021_InTimeCosmicOverlapTree
+    void MakeInTimeCosmicOverlapTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+
 
     void Test(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 

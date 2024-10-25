@@ -175,4 +175,10 @@ namespace ana
   extern const Var kNuMIRecoMuonCandidateTrueG4ID;
   extern const Var kNuMIRecoProtonCandidateTrueG4ID;
   extern const Var kNuMIRecoPionCandidateTrueG4ID;
+
+  extern const SpillVar kNuMIIntimeNeutrinoTime;
+  extern const SpillVar kNuMIHasIntimeCosmicParticle;
+  extern const SpillVar kNuMIIntimeCosmicParticleLongestLength;
+  extern const SpillVar kNuMIHasIntimeCosmicParticleWithCut;
+
 }

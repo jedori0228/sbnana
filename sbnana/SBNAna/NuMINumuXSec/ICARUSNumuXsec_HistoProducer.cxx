@@ -1888,19 +1888,39 @@ void HistoProducer::MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut, C
 void HistoProducer::MakeNuMINuCountTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
   std::vector<std::string> labels = {
+    "IsAV/I",
+    "IsFV/I",
     "NuPDG/I",
     "NuMode/I",
     "NuCC/I",
     "NuE",
+    "MuonP",
     "MuonLength",
+    // Weight
+    "FluxWeight",
+    "FluxWeightWithG3Chase",
+    "FluxWeightWithG4Updated",
+    // SPP RW for res events
+    "IsSPP/i",
+    "SPPCVCorrection",
   };
 
   std::vector<TruthVar> varlists = {
+    kTruth_IsVertexInAV,
+    kTruth_IsVertexInFV,
     kTruth_NeutrinoPDG,
     kTruth_NeutrinoMode,
     kTruth_IsCC,
     kTruth_NeutrinoE,
+    kTruth_MuonP,
     kTruth_MuonLength,
+    // Weight
+    kGetTruthNuMIFluxWeight,
+    kGetTruthNuMIFluxWeightG3Chase,
+    kGetTruthNuMIFluxWeightUpdated,
+    // SPP RW for res events
+    kTruth_IsSPP,
+    kTruth_NuMISPPCVCorrection,
   };
 
   map_cutName_to_vec_Trees[currentCutName].push_back(
@@ -1910,7 +1930,7 @@ void HistoProducer::MakeNuMINuCountTree(SpectrumLoader& loader, SpillCut spillCu
       loader,
       varlists,
       kNoSpillCut,
-      kTruth_VertexInFV,
+      kNoTruthCut,
       kNoCut,
       kNoShift,
       true
@@ -2040,31 +2060,68 @@ void HistoProducer::MakeFSICovTree(SpectrumLoader& loader, SpillCut spillCut, Cu
     )
   );
 
-  std::vector<std::string> systNames = {
-"FSI_pi_VariationResponse",
-"FSI_N_VariationResponse",
-  };
-  std::vector<std::vector<TruthVar>> systTruthVarVectors;
-  std::vector<unsigned int> systNUnivs;
+  // Multisigma
 
-  for(auto& systName: systNames){
+  std::vector<std::string> MultisigmaSystNames = {
+    "MFP_pi",
+    "FrCEx_pi",
+    "FrInel_pi",
+    "FrAbs_pi",
+    "FrPiProd_pi",
+    "MFP_N",
+    "FrCEx_N",
+    "FrInel_N",
+    "FrAbs_N",
+    "FrPiProd_N",
+  };
+
+  std::vector<const ISyst*> this_NSigmasISysts;
+  std::vector<std::vector<double>> this_NSigmas;
+  for(auto& name: MultisigmaSystNames){
+    std::string psetname = SystProviderPrefix+"_multisigma_"+name;
+    this_NSigmasISysts.push_back( new SBNWeightSyst(psetname) );
+    this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
+  }
+
+  map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
+    new ana::NSigmasTree(
+      "trueEvents_NSigmas",
+      MultisigmaSystNames,
+      loader,
+      this_NSigmasISysts,
+      this_NSigmas,
+      kNuMITrueNuMuCCInFV,
+      kNoShift, true
+    )
+  );
+
+  // Multisim
+
+  std::vector<std::string> MultisimSystNames = {
+    "FSI_pi_VariationResponse",
+    "FSI_N_VariationResponse",
+  };
+  std::vector<std::vector<TruthVar>> MultisimSystTruthVarVectors;
+  std::vector<unsigned int> MultisimSystNUnivs;
+
+  for(auto& systName: MultisimSystNames){
     std::vector<TruthVar> vec_VarVector;
     for(int u=0; u<100; u++){
       std::string psetname = SystProviderPrefix+"_multisim_"+systName;
       vec_VarVector.push_back( GetTruthUniverseWeight(psetname, u) );
     }
-    systTruthVarVectors.push_back( vec_VarVector );
-    systNUnivs.push_back( 100 );
+    MultisimSystTruthVarVectors.push_back( vec_VarVector );
+    MultisimSystNUnivs.push_back( 100 );
   }
 
 
   map_cutName_to_vec_NUniversesTrees[currentCutName].push_back(
     new ana::NUniversesTree(
       "trueEvents_NUniverses",
-      systNames,
+      MultisimSystNames,
       loader,
-      systTruthVarVectors,
-      systNUnivs,
+      MultisimSystTruthVarVectors,
+      MultisimSystNUnivs,
       kNuMITrueNuMuCCInFV,
       kNoShift, true
     )
@@ -2121,6 +2178,92 @@ void HistoProducer::MakeEventListTree(SpectrumLoader& loader, SpillCut spillCut,
     )
   );
 
+
+}
+
+// - 241021_BeamQualTree
+void HistoProducer::MakeBeamQualTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  // All 
+/*
+  std::vector<std::string> SpillMultiVar_labels = {
+    "TRTGTDAll",
+    "TR101DAll",
+    "HornCurrentAll",
+    "POTInSpillAll",
+    "BeamHPTGT",
+    "BeamVPTGT",
+    "BeamPosHAll",
+    "BeamPosVAll",
+    "BeamWidthHAll",
+    "BeamWidthVAll",
+    "EventAll/I",
+  };
+  std::vector<SpillMultiVar> SpillMultiVar_vars = {
+    kTRTGTDAll,
+    kTR101DAll,
+    kHornCurrentAll,
+    kPOTInSpillAll,
+    kBeamHPTGT,
+    kBeamVPTGT,
+    kBeamPosHAll,
+    kBeamPosVAll,
+    kBeamWidthHAll,
+    kBeamWidthVAll,
+    kEventAll,
+  };
+*/
+
+
+  std::vector<std::string> SpillMultiVar_labels = {
+"Test",
+  };
+  std::vector<SpillMultiVar> SpillMultiVar_vars = {
+spillvarTest
+  };
+
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "BeamQualTreeAll",
+      SpillMultiVar_labels,
+      loader,
+      SpillMultiVar_vars,
+      spillCut,
+      true
+    )
+  );
+
+
+}
+
+// - 241021_InTimeCosmicOverlapTree
+void HistoProducer::MakeInTimeCosmicOverlapTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  std::vector<std::string> SpillVar_labels = {
+"IntimeNeutrinoTime",
+"HasIntimeCosmicParticle/I",
+"HasIntimeCosmicParticleWithCut/I",
+"IntimeCosmicParticleLongestLength",
+  };
+  std::vector<SpillVar> SpillVar_vars = {
+kNuMIIntimeNeutrinoTime,
+kNuMIHasIntimeCosmicParticle,
+kNuMIHasIntimeCosmicParticleWithCut,
+kNuMIIntimeCosmicParticleLongestLength,
+  };
+
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "InTimeCosmicOverlapTree",
+      SpillVar_labels,
+      loader,
+      SpillVar_vars,
+      spillCut,
+      true
+    )
+  );
 
 }
 
