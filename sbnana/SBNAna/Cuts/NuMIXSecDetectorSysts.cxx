@@ -19,7 +19,6 @@ namespace ana {
     if(RecoProtonIdx<0) return;
 
     if(kDetSystType==kFrontIndPlaneGain){
-      double RecoProtonP = kNuMIProtonCandidateRecoP(sr);
 
       // pre-reprocessing
       //weight *= 1. + sigma * ( RecoProtonP<0.5 ? 0.10 : 0.05 );
@@ -37,23 +36,21 @@ namespace ana {
       //weight *= 1. + this_sigma * (-0.10);
 
       // post-reprocessing; flat 10.7%
-      weight *= 1. + sigma * (-0.107) ;
+      weight *= 1. + this_sigma * (-0.107) ;
 
     }
     else if(kDetSystType==kFrontIndPlaneSignalShape){
-      // +1: reduce the rate by 10%
-      //  0: CV
       // negative is mirrored
       double this_sigma = abs(sigma);
+
+      // pre-reprocessing
       weight *= 1. + this_sigma * (-0.10);
     }
     else if(kDetSystType==kFrontIndPlaneSignalShapeFitted){
-      // :1: smoothstep function
-      //  0: CV
-      // negative is mirrored
 
       double RecoProtonP = kNuMIProtonCandidateRecoP(sr);
 
+      // negative is mirrored
       double this_sigma = abs(sigma);
 
       double this_stepfunc = GetSmoothStepFunction(
