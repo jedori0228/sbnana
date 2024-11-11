@@ -20,14 +20,25 @@ namespace ana {
 
     if(kDetSystType==kFrontIndPlaneGain){
       double RecoProtonP = kNuMIProtonCandidateRecoP(sr);
-      weight *= 1. + sigma * ( RecoProtonP<0.5 ? 0.10 : 0.05 );
+
+      // pre-reprocessing
+      //weight *= 1. + sigma * ( RecoProtonP<0.5 ? 0.10 : 0.05 );
+
+      // post-reprocessing; flat 4.4%
+      weight *= 1. + sigma * (0.044) ;
+
     }
     else if(kDetSystType==kFrontIndPlaneNoise){
-      // +1: reduce the rate by 10%
-      //  0: CV
+
       // negative is mirrored
       double this_sigma = abs(sigma);
-      weight *= 1. + this_sigma * (-0.10);
+      
+      // pre-reprocessing
+      //weight *= 1. + this_sigma * (-0.10);
+
+      // post-reprocessing; flat 10.7%
+      weight *= 1. + sigma * (-0.107) ;
+
     }
     else if(kDetSystType==kFrontIndPlaneSignalShape){
       // +1: reduce the rate by 10%
@@ -56,7 +67,13 @@ namespace ana {
       weight *= 1. + this_sigma * this_onesig;
     }
     else if(kDetSystType==kMiddleIndPlaneTransparency){
-      weight *= 1. + sigma * 0.05;
+
+      // pre-reprocessing
+      //weight *= 1. + sigma * 0.05;
+
+      // post-reprocessing; flat 8.0%
+      weight *= 1. + sigma * 0.08;
+
     }
     else{
 
