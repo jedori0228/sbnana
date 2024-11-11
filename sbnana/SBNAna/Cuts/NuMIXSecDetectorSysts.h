@@ -46,6 +46,7 @@ namespace ana
       kFrontIndPlaneSignalShape,
       kFrontIndPlaneSignalShapeFitted,
       kMiddleIndPlaneTransparency,
+      kCaloGain,
       kSCE,
     };
 
