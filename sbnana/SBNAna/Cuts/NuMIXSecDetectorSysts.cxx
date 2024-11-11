@@ -72,6 +72,13 @@ namespace ana {
       weight *= 1. + sigma * 0.08;
 
     }
+    else if(kDetSystType==kCaloGain){
+
+      // post-reprocessing; flat 8.0%
+      weight *= 1. + sigma * 0.03;
+
+    }
+
     else{
 
     }
