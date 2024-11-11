@@ -2864,6 +2864,14 @@ void HistoProducer::setSystematicWeights(){
     "Front ind. plane signal shape"
     )
   );
+
+  IDetectorSysts.push_back(
+    new NuMIXSecDetectorSysts(
+    NuMIXSecDetectorSysts::kFrontIndPlaneSignalShapeFitted,
+    "NuMIXSecFrontIndPlaneSignalShapeFittedSyst",
+    "Front ind. plane signal shape, fitted"
+    )
+  );
   IDetectorSysts.push_back(
     new NuMIXSecDetectorSysts(
     NuMIXSecDetectorSysts::kMiddleIndPlaneTransparency,
