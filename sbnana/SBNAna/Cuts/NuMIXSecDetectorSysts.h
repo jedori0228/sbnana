@@ -6,6 +6,33 @@
 #include "sbnana/SBNAna/Vars/NuMIXSecVars.h"
 #include "sbnana/CAFAna/Core/ISyst.h"
 
+/*
+
+EXAMPLE)
+
+  const NuMIXSecDetectorSysts kNuMIXSecFrontIndPlaneGainSyst(
+    NuMIXSecDetectorSysts::kFrontIndPlaneGain,
+    "NuMIXSecFrontIndPlaneGainSyst",
+    "Front ind. plane gain #pm10%"
+  );
+  const NuMIXSecDetectorSysts kNuMIXSecFrontIndPlaneNoiseSyst(
+    NuMIXSecDetectorSysts::kFrontIndPlaneNoise,
+    "NuMIXSecFrontIndPlaneNoiseSyst",
+    "Front ind. plane noise +10%"
+  );
+  const NuMIXSecDetectorSysts kNuMIXSecFrontIndPlaneSignalShapeSyst(
+    NuMIXSecDetectorSysts::kFrontIndPlaneSignalShape,
+    "NuMIXSecFrontIndPlaneSignalShapeSyst",
+    "Front ind. plane signal shape"
+  );
+  const NuMIXSecDetectorSysts kNuMIXSecMiddleIndPlaneTransparencySyst(
+    NuMIXSecDetectorSysts::kMiddleIndPlaneTransparency,
+    "NuMIXSecMiddleIndPlaneTransparencySyst",
+    "Middle ind. plane transparency"
+  );
+
+*/
+
 namespace ana
 {
 
@@ -14,11 +41,12 @@ namespace ana
   public:
 
     enum DetSystType {
-      kFrontIndPlaneGain=0,
-      kFrontIndPlaneNoise=1,
-      kFrontIndPlaneSignalShape=2,
-      kMiddleIndPlaneTransparency=3,
-      kSCE=4,
+      kFrontIndPlaneGain,
+      kFrontIndPlaneNoise,
+      kFrontIndPlaneSignalShape,
+      kFrontIndPlaneSignalShapeFitted,
+      kMiddleIndPlaneTransparency,
+      kSCE,
     };
 
     NuMIXSecDetectorSysts(DetSystType detsyst_type, const std::string& name, const std::string& latexName);
@@ -26,17 +54,12 @@ namespace ana
     void Shift(double sigma, caf::SRSliceProxy *sr, double& weight) const override;
     void Shift(double sigma, caf::SRTrueInteractionProxy *sr, double& weight) const override;
 
+    double GetSmoothStepFunction(double x, double x_min, double x_max, double offset, double scale) const ;
+
   private:
 
     DetSystType kDetSystType;
 
   };
-
-/*
-  extern const NuMIXSecDetectorSysts kNuMIXSecFrontIndPlaneGainSyst;
-  extern const NuMIXSecDetectorSysts kNuMIXSecFrontIndPlaneNoiseSyst;
-  extern const NuMIXSecDetectorSysts kNuMIXSecFrontIndPlaneSignalShapeSyst;
-  extern const NuMIXSecDetectorSysts kNuMIXSecMiddleIndPlaneTransparencySyst;
-*/
 
 }
