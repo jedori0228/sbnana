@@ -155,4 +155,13 @@ namespace ICARUSNumuXsec{
 
   extern const SpillVar kNuMIG3ChaseSpillWeightByClosesetNu;
 
+  // LifetimeVariation
+  extern const Var kNuMI_MuonMatchedTrack_TrackScore;
+  extern const Var kNuMI_MuonMatchedTrack_Chi2Muon;
+  extern const Var kNuMI_MuonMatchedTrack_Chi2Proton;
+  extern const Var kNuMI_ProtonMatchedTrack_TrackScore;
+  extern const Var kNuMI_ProtonMatchedTrack_Chi2Muon;
+  extern const Var kNuMI_ProtonMatchedTrack_Chi2Proton;
+
+
 }

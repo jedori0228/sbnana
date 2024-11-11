@@ -2184,8 +2184,8 @@ void HistoProducer::MakeEventListTree(SpectrumLoader& loader, SpillCut spillCut,
 // - 241021_BeamQualTree
 void HistoProducer::MakeBeamQualTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
+
   // All 
-/*
   std::vector<std::string> SpillMultiVar_labels = {
     "TRTGTDAll",
     "TR101DAll",
@@ -2212,16 +2212,16 @@ void HistoProducer::MakeBeamQualTree(SpectrumLoader& loader, SpillCut spillCut, 
     kBeamWidthVAll,
     kEventAll,
   };
-*/
 
 
+/*
   std::vector<std::string> SpillMultiVar_labels = {
 "Test",
   };
   std::vector<SpillMultiVar> SpillMultiVar_vars = {
 spillvarTest
   };
-
+*/
 
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
@@ -2262,6 +2262,41 @@ kNuMIIntimeCosmicParticleLongestLength,
       SpillVar_vars,
       spillCut,
       true
+    )
+  );
+
+}
+
+// - 241031_LifetimeVariationTree
+void HistoProducer::MakeLifetimeVariationTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  std::vector<std::string> Var_labels = {
+"MuonMatchedTrack_TrackScore",
+"MuonMatchedTrack_Chi2Muon",
+"MuonMatchedTrack_Chi2Proton",
+"ProtonMatchedTrack_TrackScore",
+"ProtonMatchedTrack_Chi2Muon",
+"ProtonMatchedTrack_Chi2Proton",
+  };
+  std::vector<Var> Var_vars = {
+kNuMI_MuonMatchedTrack_TrackScore,
+kNuMI_MuonMatchedTrack_Chi2Muon,
+kNuMI_MuonMatchedTrack_Chi2Proton,
+kNuMI_ProtonMatchedTrack_TrackScore,
+kNuMI_ProtonMatchedTrack_Chi2Muon,
+kNuMI_ProtonMatchedTrack_Chi2Proton,
+  };
+
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "LifetimeVariationTree",
+      Var_labels,
+      loader,
+      Var_vars,
+      spillCut, cut,
+      ApplyTrackSplit ? SystShifts(&kTrackSplittingSyst, +1.) : kNoShift,
+      true, true
     )
   );
 

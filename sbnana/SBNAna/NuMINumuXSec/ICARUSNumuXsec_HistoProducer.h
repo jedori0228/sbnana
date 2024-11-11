@@ -105,6 +105,8 @@ namespace ICARUSNumuXsec{
     void MakeBeamQualTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     // - 241021_InTimeCosmicOverlapTree
     void MakeInTimeCosmicOverlapTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    // - 241031_LifetimeVariationTree
+    void MakeLifetimeVariationTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
 
     void Test(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);

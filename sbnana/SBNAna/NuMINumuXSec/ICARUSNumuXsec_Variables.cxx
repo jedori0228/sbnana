@@ -1,4 +1,5 @@
 #include "sbnana/SBNAna/NuMINumuXSec/ICARUSNumuXsec_Variables.h"
+#include "sbnana/SBNAna/Vars/BeamExposureVars.h"
 
 using namespace std;
 using namespace ana;
@@ -298,9 +299,59 @@ namespace ICARUSNumuXsec{
 
     std::vector<double> rets;
 
-    for(const auto& nu: sr->mc.nu){
-      kTruth_NuMISPPCVCorrection(&nu);
+/*
+    bool IsMyEvent = (sr->hdr.run==9599) && (sr->hdr.subrun==1) && (sr->hdr.evt==71031);
+    if(!IsMyEvent) return rets;
+
+
+    printf("[JSKIMDEBUG] Found the event\n");
+    for ( auto const& spill : sr->hdr.numiinfo ) {
+
+      if(spill.event==71031){
+        printf("[JSKIMDEBUG] Found the spill\n");
+        printf("[JSKIMDEBUG] HPTGT\n");
+        for( auto const& v: spill.HPTGT ) printf("[JSKIMDEBUG] %f\n", v.GetValue());
+        printf("[JSKIMDEBUG] HITGT\n");
+        for( auto const& v: spill.HITGT ) printf("[JSKIMDEBUG] %f\n", v.GetValue());
+        printf("[JSKIMDEBUG] VPTGT\n");
+        for( auto const& v: spill.VPTGT ) printf("[JSKIMDEBUG] %f\n", v.GetValue());
+        printf("[JSKIMDEBUG] VITGT\n");
+        for( auto const& v: spill.VITGT ) printf("[JSKIMDEBUG] %f\n", v.GetValue());
+        printf("[JSKIMDEBUG] HP121\n");
+        for( auto const& v: spill.HP121 ) printf("[JSKIMDEBUG] %f\n", v.GetValue());
+        printf("[JSKIMDEBUG] VP121\n");
+        for( auto const& v: spill.VP121 ) printf("[JSKIMDEBUG] %f\n", v.GetValue());
+
+        BeamPositionAtTargetVal( spill, sr->hdr.run );
+
+      }
+*/
+
+    bool found = false;
+    for ( auto const& spill : sr->hdr.numiinfo ) {
+
+      bool IsMyEvent = (sr->hdr.run==9944) && (sr->hdr.subrun==1) && (spill.event==10762);
+
+      double this_pot = spill.TRTGTD;
+      double target_pot = 5.270995E+13;
+      bool POTMatched = fabs(this_pot-target_pot)/target_pot<1E-6;
+
+      if(!IsMyEvent || !POTMatched) continue;
+      if(found) continue;
+      found = true;
+      printf("[JSKIMDEBUG] Found the event\n");
+      printf("[JSKIMDEBUG] - TRTGTD = %1.4e\n", spill.TRTGTD.GetValue());
+      for(auto const& m: spill.MTGTDS){
+        std::cout << m << std::endl;
+      }
+
+      BeamWidthVal(spill);
+       
+
+        //for( auto const& v: spill.VPTGT ) printf("[JSKIMDEBUG] %f\n", v.GetValue());
+
     }
+
     return rets;
 
 
@@ -911,6 +962,127 @@ return 0.;
     double wtForTriggeringNu = kGetTruthNuMIFluxWeightG3Chase(&sr->mc.nu[idxMinDeltaT]);
 
     return wtForTriggeringNu;
+
+  });
+
+  // LifetimeVariation
+  const Var kNuMI_MuonMatchedTrack_TrackScore([](const caf::SRSliceProxy* slc) -> double {
+
+    int TrueMuonIndex = kTruth_MuonIndex(&slc->truth);
+    if(TrueMuonIndex<0) return -1.;
+
+    const auto& prim_Muon = slc->truth.prim[TrueMuonIndex];
+
+    for(const auto& pfp: slc->reco.pfp){
+
+      if( pfp.trk.truth.p.G4ID == prim_Muon.G4ID ){
+        return pfp.trackScore;
+      }
+
+    }
+
+
+    return -2.;
+
+  });
+
+  const Var kNuMI_MuonMatchedTrack_Chi2Muon([](const caf::SRSliceProxy* slc) -> double {
+
+    int TrueMuonIndex = kTruth_MuonIndex(&slc->truth);
+    if(TrueMuonIndex<0) return -1.;
+
+    const auto& prim_Muon = slc->truth.prim[TrueMuonIndex];
+
+    for(const auto& pfp: slc->reco.pfp){
+
+      if( pfp.trk.truth.p.G4ID == prim_Muon.G4ID ){
+        return pfp.trk.chi2pid[2].chi2_muon;
+      }
+
+    }
+
+
+    return -2.;
+
+  });
+
+  const Var kNuMI_MuonMatchedTrack_Chi2Proton([](const caf::SRSliceProxy* slc) -> double {
+    
+    int TrueMuonIndex = kTruth_MuonIndex(&slc->truth);
+    if(TrueMuonIndex<0) return -1.;
+
+    const auto& prim_Muon = slc->truth.prim[TrueMuonIndex];
+
+    for(const auto& pfp: slc->reco.pfp){
+
+      if( pfp.trk.truth.p.G4ID == prim_Muon.G4ID ){
+        return pfp.trk.chi2pid[2].chi2_proton;
+      }
+
+    }
+
+
+    return -2.;
+
+  });
+
+  const Var kNuMI_ProtonMatchedTrack_TrackScore([](const caf::SRSliceProxy* slc) -> double {
+
+    int TrueProtonIndex = kTruth_ProtonIndex(&slc->truth);
+    if(TrueProtonIndex<0) return -1.;
+
+    const auto& prim_Proton = slc->truth.prim[TrueProtonIndex];
+
+    for(const auto& pfp: slc->reco.pfp){
+
+      if( pfp.trk.truth.p.G4ID == prim_Proton.G4ID ){
+        return pfp.trackScore;
+      }
+
+    }
+
+
+    return -2.;
+
+  });
+
+  const Var kNuMI_ProtonMatchedTrack_Chi2Muon([](const caf::SRSliceProxy* slc) -> double {
+
+    int TrueProtonIndex = kTruth_ProtonIndex(&slc->truth);
+    if(TrueProtonIndex<0) return -1.;
+
+    const auto& prim_Proton = slc->truth.prim[TrueProtonIndex];
+
+    for(const auto& pfp: slc->reco.pfp){
+
+      if( pfp.trk.truth.p.G4ID == prim_Proton.G4ID ){
+        return pfp.trk.chi2pid[2].chi2_muon;
+      }
+
+    }
+
+
+    return -2.;
+
+  });
+
+  const Var kNuMI_ProtonMatchedTrack_Chi2Proton([](const caf::SRSliceProxy* slc) -> double {
+    
+    int TrueProtonIndex = kTruth_ProtonIndex(&slc->truth);
+    if(TrueProtonIndex<0) return -1.;
+
+    const auto& prim_Proton = slc->truth.prim[TrueProtonIndex];
+
+    for(const auto& pfp: slc->reco.pfp){
+
+      if( pfp.trk.truth.p.G4ID == prim_Proton.G4ID ){
+        return pfp.trk.chi2pid[2].chi2_proton;
+      }
+
+    }
+
+
+    return -2.;
 
   });
 
