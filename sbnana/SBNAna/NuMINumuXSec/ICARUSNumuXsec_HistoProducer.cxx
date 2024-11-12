@@ -2880,6 +2880,14 @@ void HistoProducer::setSystematicWeights(){
     )
   );
 
+  IDetectorSysts.push_back(
+    new NuMIXSecDetectorSysts(
+    NuMIXSecDetectorSysts::kCaloGain,
+    "NuMIXSecCaloGainSyst",
+    "Calo gain up down"
+    )
+  );
+
 }
 
 // slice
