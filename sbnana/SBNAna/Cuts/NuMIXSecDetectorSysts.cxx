@@ -23,8 +23,8 @@ namespace ana {
       // pre-reprocessing
       //weight *= 1. + sigma * ( RecoProtonP<0.5 ? 0.10 : 0.05 );
 
-      // post-reprocessing; flat 4.4%
-      weight *= 1. + sigma * (0.044) ;
+      // post-reprocessing; flat 3.8%
+      weight *= 1. + sigma * (0.038) ;
 
     }
     else if(kDetSystType==kFrontIndPlaneNoise){
