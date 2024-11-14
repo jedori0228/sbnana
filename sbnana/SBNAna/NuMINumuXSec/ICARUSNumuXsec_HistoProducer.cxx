@@ -1803,7 +1803,7 @@ void HistoProducer::MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut, C
       ("trueEvents_WithPhaseSpaceCut_"+currentCutName).Data(),
       true_labels, loader, true_vars, kNuMIValidTrigger, kTruthCut_IsSignal,
       cut,
-      kNoShift,
+      ApplyTrackSplit ? SystShifts(&kTrackSplittingSyst, +1.) : kNoShift,
       true
     )
   );
@@ -1813,20 +1813,8 @@ void HistoProducer::MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut, C
       ("trueEvents_WithoutPhaseSpaceCut_"+currentCutName).Data(),
       true_labels, loader, true_vars, kNuMIValidTrigger, kTruthCut_IsSignalWithoutPhaseSpaceCut,
       cut,
-      kNoShift,
+      ApplyTrackSplit ? SystShifts(&kTrackSplittingSyst, +1.) : kNoShift,
       true
-    )
-  );
-
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(
-    new Spectrum(
-      ("WeightedEvents_WithoutTrackSplitRW"+currentCutName).Data(), Binning::Simple(1, 0., 1.),
-      loader,
-      Var([](const caf::SRSliceProxy* slc) -> double {return 0.5;}),
-      spillCut,
-      cut,
-      kNoShift,
-      kGetNuMIFluxWeightG3Chase * kNuMISPPQ2RW * kNuMISPPTpiMINERvAFittedReweight
     )
   );
 
@@ -1876,7 +1864,8 @@ void HistoProducer::MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut, C
         loader,
         reco_vars,
         spillCut, cut,
-        kNoShift, true, true
+        ApplyTrackSplit ? SystShifts(&kTrackSplittingSyst, +1.) : kNoShift,
+        true, true
       )
     );
 
