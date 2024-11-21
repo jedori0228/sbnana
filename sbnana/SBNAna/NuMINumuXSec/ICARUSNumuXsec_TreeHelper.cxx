@@ -20,7 +20,7 @@ namespace ana{
       // Weight
       "FluxWeight",
       "FluxWeightWithG3Chase",
-      "FluxWeightWithG4Updated",
+      "FluxWeightWithG4Update",
       // SPP RW for res events
       "IsSPP/i",
       "SPPCVCorrection",
@@ -76,7 +76,7 @@ namespace ana{
       // Weight
       kGetTruthNuMIFluxWeight,
       kGetTruthNuMIFluxWeightG3Chase,
-      kGetTruthNuMIFluxWeightUpdated,
+      kGetTruthNuMIFluxWeightG4Update,
       // SPP RW for res events
       kTruth_IsSPP,
       kTruth_NuMISPPCVCorrection,
@@ -148,7 +148,7 @@ namespace ana{
       // Weight
       "FluxWeight",
       "FluxWeightWithG3Chase",
-      "FluxWeightWithG4Updated",
+      "FluxWeightWithG4Update",
       // SPP Syst
       "IsSPP/i",
       "SPPQ2RW",
@@ -307,7 +307,7 @@ namespace ana{
       // Weight
       kGetNuMIFluxWeight,
       kGetNuMIFluxWeightG3Chase,
-      kGetNuMIFluxWeightUpdated,
+      kGetNuMIFluxWeightG4Update,
       // SPP Syst
       kNuMITrueIsSPP,
       kNuMISPPQ2RW,
