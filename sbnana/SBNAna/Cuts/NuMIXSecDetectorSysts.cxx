@@ -35,8 +35,8 @@ namespace ana {
       // pre-reprocessing
       //weight *= 1. + this_sigma * (-0.10);
 
-      // post-reprocessing; flat 10.7%
-      weight *= 1. + this_sigma * (-0.107) ;
+      // post-reprocessing; flat 10.5%
+      weight *= 1. + this_sigma * (-0.105) ;
 
     }
     else if(kDetSystType==kFrontIndPlaneSignalShape){
@@ -55,10 +55,10 @@ namespace ana {
 
       double this_stepfunc = GetSmoothStepFunction(
         RecoProtonP,
-        -6.59065706e+01,
-        6.72272754e-01,
-        -2.05684515e+03,
-        2.05780820e+03
+        -6.58186996e+01,
+        6.76128082e-01,
+        -1.99887838e+03,
+        1.99984206e+03
       );
       double this_onesig = abs(1.-this_stepfunc) * (-1.);
       weight *= 1. + this_sigma * this_onesig;
@@ -68,8 +68,8 @@ namespace ana {
       // pre-reprocessing
       //weight *= 1. + sigma * 0.05;
 
-      // post-reprocessing; flat 8.0%
-      weight *= 1. + sigma * 0.08;
+      // post-reprocessing; flat 7.9%
+      weight *= 1. + sigma * 0.079;
 
     }
     else if(kDetSystType==kCaloGain){
