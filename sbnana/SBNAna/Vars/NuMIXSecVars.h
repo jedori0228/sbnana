@@ -92,6 +92,11 @@ namespace ana
   // Angle btw muon and proton
   extern const Var kNuMIRecoCosThMuP;
   extern const Var kNuMITrueCosThMuP;
+  // Truth-matching info of muon track
+  extern const Var kNuMIMuonCand_TruthMatch_FromNu;
+  extern const Var kNuMIMuonCand_TruthMatch_pdg;
+  extern const Var kNuMIProtonCand_TruthMatch_FromNu;
+  extern const Var kNuMIProtonCand_TruthMatch_pdg;
 
   // TKI variables
   // - delta PT

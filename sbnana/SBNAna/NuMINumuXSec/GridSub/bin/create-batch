@@ -480,6 +480,7 @@ while [ "$Trial" -lt 10 ]; do
   ifdh cp ${thisOutputCreationDir}/output.root ${outDir}/output_${nProcess}.root
   larsoft_exit_code=$?
   if [ "$larsoft_exit_code" -eq 1 ]; then
+    Trial=$((Trial+=1))
     echo "@@ Failed with code: "${larsoft_exit_code}
     echo "@@ Trying again"
     sleep 10

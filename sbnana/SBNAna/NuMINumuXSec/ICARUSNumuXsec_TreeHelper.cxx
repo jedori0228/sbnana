@@ -273,6 +273,11 @@ namespace ana{
       "RecoWexp",
       // Sideband pi RW
       "SidebandPiRW",
+      // Track matching
+      "MuonCandTruthMatch_FromNu/I",
+      "MuonCandTruthMatch_pdg/I",
+      "ProtonCandTruthMatch_FromNu/I",
+      "ProtonCandTruthMatch_pdg/I",
     };
 
   }
@@ -432,6 +437,11 @@ namespace ana{
       kNuMIRecoWexp,
       // Sideband pi RW
       kNuMISidebandPiRW,
+      // Track matching
+      kNuMIMuonCand_TruthMatch_FromNu,
+      kNuMIMuonCand_TruthMatch_pdg,
+      kNuMIProtonCand_TruthMatch_FromNu,
+      kNuMIProtonCand_TruthMatch_pdg,
     };
 
   }

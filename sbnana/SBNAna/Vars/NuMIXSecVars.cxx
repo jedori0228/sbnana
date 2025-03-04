@@ -824,6 +824,44 @@ namespace ana {
     return costh;
   });
 
+  // Truth-matching info of muon track
+  const Var kNuMIMuonCand_TruthMatch_FromNu([](const caf::SRSliceProxy* slc) -> int {
+    int ret = 0;
+    if ( kNuMIMuonCandidateIdx(slc) >= 0 )
+    {
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      ret = (trk.truth.p.interaction_id >= 0) ? 1 : 0;
+    }
+    return ret;
+  });
+  const Var kNuMIMuonCand_TruthMatch_pdg([](const caf::SRSliceProxy* slc) -> int {
+    int ret = 0;
+    if ( kNuMIMuonCandidateIdx(slc) >= 0 )
+    { 
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      ret = trk.truth.p.pdg;
+    }
+    return ret;
+  });
+  const Var kNuMIProtonCand_TruthMatch_FromNu([](const caf::SRSliceProxy* slc) -> int {
+    int ret = 0;
+    if ( kNuMIProtonCandidateIdx(slc) >= 0 )
+    {
+      auto const& trk = slc->reco.pfp.at(kNuMIProtonCandidateIdx(slc)).trk;
+      ret = (trk.truth.p.interaction_id >= 0) ? 1 : 0;
+    }
+    return ret;
+  });
+  const Var kNuMIProtonCand_TruthMatch_pdg([](const caf::SRSliceProxy* slc) -> int {
+    int ret = 0;
+    if ( kNuMIProtonCandidateIdx(slc) >= 0 )
+    {
+      auto const& trk = slc->reco.pfp.at(kNuMIProtonCandidateIdx(slc)).trk;
+      ret = trk.truth.p.pdg;
+    }
+    return ret;
+  });
+
   const Var kNuMIRecodeltaPT([](const caf::SRSliceProxy* slc) -> float {
     float ret(-5.f);
 

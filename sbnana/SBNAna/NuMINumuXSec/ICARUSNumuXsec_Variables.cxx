@@ -295,64 +295,103 @@ namespace ICARUSNumuXsec{
 
 
   // - Test
-  const SpillMultiVar spillvarTest([](const caf::SRSpillProxy *sr) -> vector<double> {
+  const SpillMultiVar spillvarTest([](const caf::SRSpillProxy *sr) -> std::vector<double> {
 
-    std::vector<double> rets;
+    std::vector<double> ret;
 
+    int SigSelSliceIdx = kNuMI_SignalSelectionSlice_Idx(sr);
+    if(SigSelSliceIdx<0) return ret;
+    const auto& slc = sr->slc[SigSelSliceIdx];
+    int this_cuttype = kNuMISliceSignalType(&slc);
+
+    if(this_cuttype!=5){
+
+      double spillTriggerTime = kNuMISpillTriggerTime(sr);
+
+      printf("\n(run, subrun, event) = (%d, %d, %d), nSlice = %ld\n", sr->hdr.run.GetValue(), sr->hdr.subrun.GetValue(), sr->hdr.evt.GetValue(),sr->slc.size());
+      printf("Trigger time = %f\n", spillTriggerTime);
+      printf("- Number of true_particles = %ld\n", sr->true_particles.size());
+
+      for(unsigned int i_tp=0; i_tp<sr->true_particles.size(); i_tp++){
+
+        const auto& prim = sr->true_particles[i_tp];
+
+        double this_genT = prim.genT;
+        double this_time_diff = fabs( spillTriggerTime - this_genT );
+
+        double start_x = prim.start.x;
+        if( (start_x>-9998) && (this_time_diff < 0.3) ){
+        //if( (this_time_diff < 1.0)  ){
+          printf("  - i_tp = %d\n", i_tp);
+          printf("    - pdg = %d\n", prim.pdg.GetValue());
+          printf("    - genT = %f (genT - Trigger = %f)\n", this_genT, this_genT - spillTriggerTime);
+          printf("    - interaction_id = %d\n", prim.interaction_id.GetValue());
+          printf("    - start = (%1.2f, %1.2f, %1.2f)\n", prim.start.x.GetValue(), prim.start.y.GetValue(), prim.start.z.GetValue());
+          printf("    - end = (%1.2f, %1.2f, %1.2f)\n", prim.end.x.GetValue(), prim.end.y.GetValue(), prim.end.z.GetValue());
+          const float dist = std::hypot(prim.end.x - prim.start.x, prim.end.y - prim.start.y, prim.end.z - prim.start.z);
+          printf("    - |end-start| = %1.2f\n", dist);
+          printf("    - genp = (%1.2f, %1.2f, %1.2f)\n", prim.genp.x.GetValue(), prim.genp.y.GetValue(), prim.genp.z.GetValue());
+          printf("    - startE = %1.3f\n", prim.startE.GetValue());
+          printf("    - end_process = %d\n", prim.end_process.GetValue());
 /*
-    bool IsMyEvent = (sr->hdr.run==9599) && (sr->hdr.subrun==1) && (sr->hdr.evt==71031);
-    if(!IsMyEvent) return rets;
+          int parent_id = prim.parent;
 
+          const auto& prim_parent = sr->true_particles[parent_id];
 
-    printf("[JSKIMDEBUG] Found the event\n");
-    for ( auto const& spill : sr->hdr.numiinfo ) {
+          printf("    - parent info:\n");
 
-      if(spill.event==71031){
-        printf("[JSKIMDEBUG] Found the spill\n");
-        printf("[JSKIMDEBUG] HPTGT\n");
-        for( auto const& v: spill.HPTGT ) printf("[JSKIMDEBUG] %f\n", v.GetValue());
-        printf("[JSKIMDEBUG] HITGT\n");
-        for( auto const& v: spill.HITGT ) printf("[JSKIMDEBUG] %f\n", v.GetValue());
-        printf("[JSKIMDEBUG] VPTGT\n");
-        for( auto const& v: spill.VPTGT ) printf("[JSKIMDEBUG] %f\n", v.GetValue());
-        printf("[JSKIMDEBUG] VITGT\n");
-        for( auto const& v: spill.VITGT ) printf("[JSKIMDEBUG] %f\n", v.GetValue());
-        printf("[JSKIMDEBUG] HP121\n");
-        for( auto const& v: spill.HP121 ) printf("[JSKIMDEBUG] %f\n", v.GetValue());
-        printf("[JSKIMDEBUG] VP121\n");
-        for( auto const& v: spill.VP121 ) printf("[JSKIMDEBUG] %f\n", v.GetValue());
-
-        BeamPositionAtTargetVal( spill, sr->hdr.run );
-
-      }
+          printf("      - pdg = %d\n", prim_parent.pdg.GetValue());
+          printf("      - genT = %f (genT - Trigger = %f)\n", prim_parent.genT.GetValue(), prim_parent.genT.GetValue() - spillTriggerTime);
+          printf("      - start = (%1.2f, %1.2f, %1.2f)\n", prim_parent.start.x.GetValue(), prim_parent.start.y.GetValue(), prim_parent.start.z.GetValue());
+          printf("      - end = (%1.2f, %1.2f, %1.2f)\n", prim_parent.end.x.GetValue(), prim_parent.end.y.GetValue(), prim_parent.end.z.GetValue());
+          const float dist_parent = std::hypot(prim_parent.end.x - prim_parent.start.x, prim_parent.end.y - prim_parent.start.y, prim_parent.end.z - prim_parent.start.z);
+          printf("      - |end-start| = %1.2f\n", dist_parent);
+          printf("      - genp = (%1.2f, %1.2f, %1.2f)\n", prim_parent.genp.x.GetValue(), prim_parent.genp.y.GetValue(), prim_parent.genp.z.GetValue());
+          printf("      - startE = %1.3f\n", prim_parent.startE.GetValue());
+          printf("      - end_process = %d\n", prim_parent.end_process.GetValue());
 */
 
-    bool found = false;
-    for ( auto const& spill : sr->hdr.numiinfo ) {
-
-      bool IsMyEvent = (sr->hdr.run==9944) && (sr->hdr.subrun==1) && (spill.event==10762);
-
-      double this_pot = spill.TRTGTD;
-      double target_pot = 5.270995E+13;
-      bool POTMatched = fabs(this_pot-target_pot)/target_pot<1E-6;
-
-      if(!IsMyEvent || !POTMatched) continue;
-      if(found) continue;
-      found = true;
-      printf("[JSKIMDEBUG] Found the event\n");
-      printf("[JSKIMDEBUG] - TRTGTD = %1.4e\n", spill.TRTGTD.GetValue());
-      for(auto const& m: spill.MTGTDS){
-        std::cout << m << std::endl;
+        }
       }
 
-      BeamWidthVal(spill);
-       
 
-        //for( auto const& v: spill.VPTGT ) printf("[JSKIMDEBUG] %f\n", v.GetValue());
+      printf("- Number of truth nu = %ld\n",sr->mc.nu.size());
+      for(unsigned int i_nu=0; i_nu<sr->mc.nu.size(); i_nu++){
+        const auto& nu = sr->mc.nu[i_nu];
+        printf("  - i_nu = %d\n", i_nu);
+        printf("    - GENIE mode = %d\n", nu.genie_mode.GetValue());
+        printf("    - time = %1.3f\n",nu.time.GetValue());
+        printf("    - E = %f\n", nu.E.GetValue());
+        printf("    - nu pos = (%1.2f, %1.2f, %1.2f)\n", nu.position.x.GetValue(), nu.position.y.GetValue(), nu.position.z.GetValue());
+        printf("    - nu.prim.size() = %ld\n", nu.prim.size());
+/*
+        for(std::size_t j(0); j < nu.prim.size(); ++j){
+          const auto& prim = nu.prim[j];
+          printf("  - %ld-th prim\n",j);
+          printf("    - pdg = %d\n", prim.pdg.GetValue());
+          const double this_mass = ptlt.GetMass(prim.pdg.GetValue());
+          printf("    - Mass = %1.3f\n", this_mass);
+          printf("    - GStatus = %d\n", prim.gstatus.GetValue());
+          printf("    - Parent ID = %d\n", prim.parent.GetValue());
+          printf("    - ndaughters = %ld\n", prim.daughters.size());
+          printf("    - start = (%1.2f, %1.2f, %1.2f)\n", prim.start.x.GetValue(), prim.start.y.GetValue(), prim.start.z.GetValue());
+          printf("    - end = (%1.2f, %1.2f, %1.2f)\n", prim.end.x.GetValue(), prim.end.y.GetValue(), prim.end.z.GetValue());
+          const float dist = std::hypot(prim.end.x - prim.start.x, prim.end.y - prim.start.y, prim.end.z - prim.start.z);
+          printf("    - |end-start| = %1.2f\n", dist);
+          printf("    - genp = (%1.2f, %1.2f, %1.2f)\n", prim.genp.x.GetValue(), prim.genp.y.GetValue(), prim.genp.z.GetValue());
+          printf("    - startE = %1.3f\n", prim.startE.GetValue());
+          printf("    - startE-Mass = %1.3f\n", prim.startE.GetValue()-this_mass);
+          printf("    - startE-endE = %1.3f\n", prim.startE.GetValue()-prim.endE.GetValue());
+          printf("    - end_process = %d\n", prim.end_process.GetValue());
+
+        }
+*/
+
+      }
 
     }
-
-    return rets;
+    
+    return ret;
 
 
   });
@@ -1083,6 +1122,715 @@ return 0.;
 
 
     return -2.;
+
+  });
+
+  // Rock study
+  const SpillCut kNuMI_HasSignalSelectionSlice ( [](const caf::SRSpillProxy *sr) {
+
+    bool HasSlicePassSelection = false;
+    for(std::size_t i(0); i < sr->slc.size(); ++i){
+      const auto& slc = sr->slc.at(i);
+      if( kNuMISelection_1muNp0pi(&slc) ){
+        HasSlicePassSelection = true;
+        break;
+      }
+    }
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+
+    return HasSlicePassSelection && (spillTriggerTime > -0.1 && spillTriggerTime < 10.1);
+
+  });
+  const SpillVar kNuMI_SignalSelectionSlice_CutType ( [](const caf::SRSpillProxy *sr) -> int {
+
+    int ret = 0;
+    for(std::size_t i(0); i < sr->slc.size(); ++i){
+      const auto& slc = sr->slc.at(i);
+      if( kNuMISelection_1muNp0pi(&slc) ){
+        ret = kNuMISliceSignalType(&slc);
+        break;
+      }
+    }
+    return ret;
+
+  });
+
+  const SpillMultiVar kNuMI_SignalSelectionSlices_Others_MuonTrackMatched_genT ( [](const caf::SRSpillProxy *sr) {
+
+    std::vector<double> rets;
+    for(std::size_t i(0); i < sr->slc.size(); ++i){
+      const auto& slc = sr->slc.at(i);
+      if( kNuMISelection_1muNp0pi(&slc) ){
+        if( kNuMISliceSignalType(&slc)==5 ){
+
+          const auto& MuonIdx = kNuMIMuonCandidateIdx(&slc);
+          const auto& MuonTrk = slc.reco.pfp[MuonIdx].trk;
+
+          int MuonTrk_Truth_G4ID = MuonTrk.truth.p.G4ID;
+
+          for(unsigned int i_p=0; i_p<sr->true_particles.size(); i_p++){
+            if( sr->true_particles[i_p].G4ID==MuonTrk_Truth_G4ID ){
+              rets.push_back( sr->true_particles[i_p].genT );
+            }
+          }
+
+        }
+
+      }
+    }
+
+    return rets;
+
+  });
+
+  const SpillMultiVar kNuMI_SignalSelectionSlices_Others_MuonTrackMatched_pdg ( [](const caf::SRSpillProxy *sr) {
+
+    std::vector<double> rets;
+    for(std::size_t i(0); i < sr->slc.size(); ++i){
+      const auto& slc = sr->slc.at(i);
+      if( kNuMISelection_1muNp0pi(&slc) ){
+        if( kNuMISliceSignalType(&slc)==5 ){
+
+          const auto& MuonIdx = kNuMIMuonCandidateIdx(&slc);
+          const auto& MuonTrk = slc.reco.pfp[MuonIdx].trk;
+
+          int MuonTrk_Truth_G4ID = MuonTrk.truth.p.G4ID;
+
+          for(unsigned int i_p=0; i_p<sr->true_particles.size(); i_p++){
+            if( sr->true_particles[i_p].G4ID==MuonTrk_Truth_G4ID ){
+              rets.push_back( sr->true_particles[i_p].pdg );
+            }
+          }
+
+        }
+
+      }
+    }
+
+    return rets;
+
+  });
+
+  const SpillMultiVar kNuMI_SignalSelectionSlices_Others_MuonTrackMatched_interaction_id ( [](const caf::SRSpillProxy *sr) {
+
+    std::vector<double> rets;
+    for(std::size_t i(0); i < sr->slc.size(); ++i){
+      const auto& slc = sr->slc.at(i);
+      if( kNuMISelection_1muNp0pi(&slc) ){
+        if( kNuMISliceSignalType(&slc)==5 ){
+
+          const auto& MuonIdx = kNuMIMuonCandidateIdx(&slc);
+          const auto& MuonTrk = slc.reco.pfp[MuonIdx].trk;
+
+          int MuonTrk_Truth_G4ID = MuonTrk.truth.p.G4ID;
+
+          for(unsigned int i_p=0; i_p<sr->true_particles.size(); i_p++){
+            if( sr->true_particles[i_p].G4ID==MuonTrk_Truth_G4ID ){
+              rets.push_back( sr->true_particles[i_p].interaction_id );
+            }
+          }
+
+        }
+
+      }
+    }
+
+    return rets;
+
+  });
+
+  const SpillMultiVar kNuMI_TrueNeutrino_PosX ( [](const caf::SRSpillProxy *sr) -> std::vector<double> {
+
+    std::vector<double> rets;
+    for(std::size_t i(0); i < sr->mc.nu.size(); ++i){
+      rets.push_back(sr->mc.nu[i].position.x);
+    }
+
+    return rets;
+
+  });
+
+  const SpillMultiVar kNuMI_TrueNeutrino_PosY ( [](const caf::SRSpillProxy *sr) -> std::vector<double> {
+
+    std::vector<double> rets;
+    for(std::size_t i(0); i < sr->mc.nu.size(); ++i){
+      rets.push_back(sr->mc.nu[i].position.y);
+    }
+
+    return rets;
+
+  });
+
+  const SpillMultiVar kNuMI_TrueNeutrino_PosZ ( [](const caf::SRSpillProxy *sr) -> std::vector<double> {
+
+    std::vector<double> rets;
+    for(std::size_t i(0); i < sr->mc.nu.size(); ++i){
+      rets.push_back(sr->mc.nu[i].position.z);
+    }
+
+    return rets;
+
+  });
+
+  const SpillVar kNuMI_trigger_within_gate ( [](const caf::SRSpillProxy *sr) -> double {
+    return sr->hdr.triggerinfo.trigger_within_gate;
+  });
+  const SpillVar kNuMI_NumberOfNeutrinos ( [](const caf::SRSpillProxy *sr) -> int {
+    return sr->mc.nu.size();
+  });
+  const SpillVar kNuMI_TriggerNeutrino_Idx ( [](const caf::SRSpillProxy *sr) -> int {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return -1;
+
+    double ClosestTime = 9999.;
+    int TrigNuIdx = -2;
+    for(std::size_t i(0); i < sr->mc.nu.size(); ++i){
+      double this_time_diff = fabs( spillTriggerTime - sr->mc.nu[i].time );
+      if( this_time_diff < ClosestTime ){
+        ClosestTime = this_time_diff;
+        TrigNuIdx = i;
+      }
+    }
+
+    return TrigNuIdx;
+
+
+  });
+  const SpillVar kNuMI_TriggerNeutrino_time ( [](const caf::SRSpillProxy *sr) -> double {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return 99999999.;
+
+    int TrigNuIdx = kNuMI_TriggerNeutrino_Idx(sr);
+    if(TrigNuIdx<0) return 99999999.;
+
+    const auto& nu = sr->mc.nu[TrigNuIdx];
+    return nu.time;
+
+  });
+  const SpillVar kNuMI_TriggerNeutrino_PosX ( [](const caf::SRSpillProxy *sr) -> double {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return 99999999.;
+
+    int TrigNuIdx = kNuMI_TriggerNeutrino_Idx(sr);
+    if(TrigNuIdx<0) return 99999999.;
+
+    const auto& nu = sr->mc.nu[TrigNuIdx];
+    return nu.position.x;
+
+  });
+  const SpillVar kNuMI_TriggerNeutrino_PosY ( [](const caf::SRSpillProxy *sr) -> double {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return 99999999.;
+
+    int TrigNuIdx = kNuMI_TriggerNeutrino_Idx(sr);
+    if(TrigNuIdx<0) return 99999999.;
+
+    const auto& nu = sr->mc.nu[TrigNuIdx];
+    return nu.position.y;
+
+  });
+  const SpillVar kNuMI_TriggerNeutrino_PosZ ( [](const caf::SRSpillProxy *sr) -> double {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return 99999999.;
+
+    int TrigNuIdx = kNuMI_TriggerNeutrino_Idx(sr);
+    if(TrigNuIdx<0) return 99999999.;
+
+    const auto& nu = sr->mc.nu[TrigNuIdx];
+    return nu.position.z;
+
+  });
+  const SpillVar kNuMI_HasIntimeCosmic ( [](const caf::SRSpillProxy *sr) -> int {
+
+    bool HasIntimeCosmic = false;
+    for(unsigned int i_p=0; i_p<sr->true_particles.size(); i_p++){
+      //if( sr->true_particles[i_p].interaction_id==-1 && abs(sr->true_particles[i_p].pdg)==13 ){
+      if( sr->true_particles[i_p].interaction_id==-1 ){
+        if( sr->true_particles[i_p].genT>-0.1 && sr->true_particles[i_p].genT<10.1 ){
+          HasIntimeCosmic = true;
+          break;
+        }
+      }
+    }
+
+    if(HasIntimeCosmic) return 1;
+    else return 0;
+
+  });
+  const SpillVar kNuMI_NIntimeCosmic ( [](const caf::SRSpillProxy *sr) -> int {
+
+    int NIntimeCosmic = 0;
+    for(unsigned int i_p=0; i_p<sr->true_particles.size(); i_p++){
+      //if( sr->true_particles[i_p].interaction_id==-1 && abs(sr->true_particles[i_p].pdg)==13 ){
+      if( sr->true_particles[i_p].interaction_id==-1 ){
+        if( sr->true_particles[i_p].genT>-0.1 && sr->true_particles[i_p].genT<10.1 ){
+          NIntimeCosmic++;
+        }
+      }
+    }
+
+    return NIntimeCosmic;
+
+  });
+  const SpillVar kNuMI_IntimeCosmicClosestTime ( [](const caf::SRSpillProxy *sr) -> double {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    double ClosestTime = 9999.;
+    for(unsigned int i_p=0; i_p<sr->true_particles.size(); i_p++){
+      //if( sr->true_particles[i_p].interaction_id==-1 && abs(sr->true_particles[i_p].pdg)==13 ){
+      if( sr->true_particles[i_p].interaction_id==-1 ){
+        if( sr->true_particles[i_p].genT>-0.1 && sr->true_particles[i_p].genT<10.1 ){
+          double this_timediff = fabs(sr->true_particles[i_p].genT  - spillTriggerTime);
+          if(this_timediff<ClosestTime){
+            ClosestTime = this_timediff;
+          }
+        }
+      }
+    }
+
+    return ClosestTime;
+
+  });
+  const SpillVar kNuMI_TriggerNeutrino_PrimaryMuonIdx ( [](const caf::SRSpillProxy *sr) -> int {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return -1;
+
+    int TrigNuIdx = kNuMI_TriggerNeutrino_Idx(sr);
+    if(TrigNuIdx<0) return -2;
+
+    const auto& nu = sr->mc.nu[TrigNuIdx];
+    int MuonInd = -1;
+    for(unsigned int i_prim=0; i_prim<nu.prim.size(); i_prim++){
+
+      const auto& prim = nu.prim[i_prim];
+      if(abs(prim.pdg)==13){
+        MuonInd = i_prim;
+        break;
+      }
+
+    }
+    if(MuonInd==-1){
+
+      for(unsigned int i_prim=0; i_prim<nu.prim.size(); i_prim++){
+
+        const auto& prim = nu.prim[i_prim];
+        if(abs(prim.pdg)==211){
+          MuonInd = i_prim;
+          break;
+        }
+
+      }
+
+    }
+
+    return MuonInd;
+
+  });
+  const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_pdg ( [](const caf::SRSpillProxy *sr) -> double {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return -1;
+
+    int TrigNuIdx = kNuMI_TriggerNeutrino_Idx(sr);
+    if(TrigNuIdx<0) return -2;
+
+    int PrimMuIdx = kNuMI_TriggerNeutrino_PrimaryMuonIdx(sr);
+    if(PrimMuIdx<0) return 9999999.;
+
+    const auto& mu = sr->mc.nu[TrigNuIdx].prim[PrimMuIdx];
+
+    return mu.pdg;
+
+  });
+  const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_genE ( [](const caf::SRSpillProxy *sr) -> double {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return -1;
+
+    int TrigNuIdx = kNuMI_TriggerNeutrino_Idx(sr);
+    if(TrigNuIdx<0) return -2;
+
+    int PrimMuIdx = kNuMI_TriggerNeutrino_PrimaryMuonIdx(sr);
+    if(PrimMuIdx<0) return 9999999.;
+
+    const auto& mu = sr->mc.nu[TrigNuIdx].prim[PrimMuIdx];
+
+    return mu.genE;
+
+  });
+  const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_GenX ( [](const caf::SRSpillProxy *sr) -> double {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return -1;
+
+    int TrigNuIdx = kNuMI_TriggerNeutrino_Idx(sr);
+    if(TrigNuIdx<0) return -2;
+
+    int PrimMuIdx = kNuMI_TriggerNeutrino_PrimaryMuonIdx(sr);
+    if(PrimMuIdx<0) return 9999999.;
+
+    const auto& mu = sr->mc.nu[TrigNuIdx].prim[PrimMuIdx];
+
+    return mu.gen.x;
+
+  });
+  const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_GenY ( [](const caf::SRSpillProxy *sr) -> double {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return -1;
+
+    int TrigNuIdx = kNuMI_TriggerNeutrino_Idx(sr);
+    if(TrigNuIdx<0) return -2;
+
+    int PrimMuIdx = kNuMI_TriggerNeutrino_PrimaryMuonIdx(sr);
+    if(PrimMuIdx<0) return 9999999.;
+
+    const auto& mu = sr->mc.nu[TrigNuIdx].prim[PrimMuIdx];
+
+    return mu.gen.y;
+
+  });
+  const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_GenZ ( [](const caf::SRSpillProxy *sr) -> double {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return -1;
+
+    int TrigNuIdx = kNuMI_TriggerNeutrino_Idx(sr);
+    if(TrigNuIdx<0) return -2;
+
+    int PrimMuIdx = kNuMI_TriggerNeutrino_PrimaryMuonIdx(sr);
+    if(PrimMuIdx<0) return 9999999.;
+
+    const auto& mu = sr->mc.nu[TrigNuIdx].prim[PrimMuIdx];
+
+    return mu.gen.z;
+
+  });
+  const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_StartX ( [](const caf::SRSpillProxy *sr) -> double {
+    
+    double spillTriggerTime = kNuMISpillTriggerTime(sr); 
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return -1;
+    
+    int TrigNuIdx = kNuMI_TriggerNeutrino_Idx(sr);
+    if(TrigNuIdx<0) return -2;
+    
+    int PrimMuIdx = kNuMI_TriggerNeutrino_PrimaryMuonIdx(sr);
+    if(PrimMuIdx<0) return 9999999.;
+
+    const auto& mu = sr->mc.nu[TrigNuIdx].prim[PrimMuIdx];
+
+    return mu.start.x;
+
+  });
+  const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_StartY ( [](const caf::SRSpillProxy *sr) -> double {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return -1;
+
+    int TrigNuIdx = kNuMI_TriggerNeutrino_Idx(sr);
+    if(TrigNuIdx<0) return -2;
+
+    int PrimMuIdx = kNuMI_TriggerNeutrino_PrimaryMuonIdx(sr);
+    if(PrimMuIdx<0) return 9999999.;
+
+    const auto& mu = sr->mc.nu[TrigNuIdx].prim[PrimMuIdx];
+
+    return mu.start.y;
+
+  });
+  const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_StartZ ( [](const caf::SRSpillProxy *sr) -> double {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return -1;
+
+    int TrigNuIdx = kNuMI_TriggerNeutrino_Idx(sr);
+    if(TrigNuIdx<0) return -2;
+
+    int PrimMuIdx = kNuMI_TriggerNeutrino_PrimaryMuonIdx(sr);
+    if(PrimMuIdx<0) return 9999999.;
+
+    const auto& mu = sr->mc.nu[TrigNuIdx].prim[PrimMuIdx];
+
+    return mu.start.z;
+
+  });
+  const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_EndX ( [](const caf::SRSpillProxy *sr) -> double {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return -1;
+
+    int TrigNuIdx = kNuMI_TriggerNeutrino_Idx(sr);
+    if(TrigNuIdx<0) return -2;
+
+    int PrimMuIdx = kNuMI_TriggerNeutrino_PrimaryMuonIdx(sr);
+    if(PrimMuIdx<0) return 9999999.;
+
+    const auto& mu = sr->mc.nu[TrigNuIdx].prim[PrimMuIdx];
+
+    return mu.end.x;
+
+  });
+  const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_EndY ( [](const caf::SRSpillProxy *sr) -> double {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return -1;
+
+    int TrigNuIdx = kNuMI_TriggerNeutrino_Idx(sr);
+    if(TrigNuIdx<0) return -2;
+
+    int PrimMuIdx = kNuMI_TriggerNeutrino_PrimaryMuonIdx(sr);
+    if(PrimMuIdx<0) return 9999999.;
+
+    const auto& mu = sr->mc.nu[TrigNuIdx].prim[PrimMuIdx];
+
+    return mu.end.y;
+
+  });
+  const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_EndZ ( [](const caf::SRSpillProxy *sr) -> double {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return -1;
+
+    int TrigNuIdx = kNuMI_TriggerNeutrino_Idx(sr);
+    if(TrigNuIdx<0) return -2;
+
+    int PrimMuIdx = kNuMI_TriggerNeutrino_PrimaryMuonIdx(sr);
+    if(PrimMuIdx<0) return 9999999.;
+
+    const auto& mu = sr->mc.nu[TrigNuIdx].prim[PrimMuIdx];
+
+    return mu.end.z;
+
+  });
+
+  const SpillVar kNuMI_TriggerTrueParticle_Idx ( [](const caf::SRSpillProxy *sr) -> int {
+
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return -1;
+
+    double ClosestTime = 9999.;
+    int TrigTPIdx = -2;
+    for(unsigned int i_p=0; i_p<sr->true_particles.size(); i_p++){
+      double this_time_diff = fabs( spillTriggerTime - sr->true_particles[i_p].genT );
+      if( this_time_diff < ClosestTime ){
+        ClosestTime = this_time_diff;
+        TrigTPIdx = i_p;
+      }
+    }
+
+    return TrigTPIdx;
+
+
+  });
+  const SpillVar kNuMI_TriggerTrueParticle_pdg ( [](const caf::SRSpillProxy *sr) -> int {
+    
+    double spillTriggerTime = kNuMISpillTriggerTime(sr); 
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return -1;
+    
+    int TrigTPIdx = kNuMI_TriggerTrueParticle_Idx(sr);
+    if(TrigTPIdx<0) return 99999999;
+
+    else return sr->true_particles[TrigTPIdx].pdg;
+
+
+  });
+  const SpillVar kNuMI_SignalSelectionSlice_Idx( [](const caf::SRSpillProxy *sr) -> int {
+    int ret = -1;
+    for(std::size_t i(0); i < sr->slc.size(); ++i){
+      const auto& slc = sr->slc.at(i);
+      if( kNuMISelection_1muNp0pi(&slc) ){
+        ret = i;
+        break;
+      }
+    }
+    return ret;
+  });
+  const SpillVar kNuMI_SignalSelectionSlice_Truth_time( [](const caf::SRSpillProxy *sr) -> double {
+
+    int SigSelSliceIdx = kNuMI_SignalSelectionSlice_Idx(sr);
+    if(SigSelSliceIdx<0) return -99999.;
+    const auto& slc = sr->slc[SigSelSliceIdx];
+
+    return slc.truth.time;
+
+  });
+  const SpillVar kNuMI_SignalSelectionSlice_Truth_vtx_x( [](const caf::SRSpillProxy *sr) -> double {
+    
+    int SigSelSliceIdx = kNuMI_SignalSelectionSlice_Idx(sr);
+    if(SigSelSliceIdx<0) return -99999.;
+    const auto& slc = sr->slc[SigSelSliceIdx];
+
+    return slc.truth.prod_vtx.x;
+
+  });
+  const SpillVar kNuMI_SignalSelectionSlice_Truth_vtx_y( [](const caf::SRSpillProxy *sr) -> double {
+
+    int SigSelSliceIdx = kNuMI_SignalSelectionSlice_Idx(sr);
+    if(SigSelSliceIdx<0) return -99999.;
+    const auto& slc = sr->slc[SigSelSliceIdx];
+
+    return slc.truth.prod_vtx.y;
+
+  });
+  const SpillVar kNuMI_SignalSelectionSlice_Truth_vtx_z( [](const caf::SRSpillProxy *sr) -> double {
+
+    int SigSelSliceIdx = kNuMI_SignalSelectionSlice_Idx(sr);
+    if(SigSelSliceIdx<0) return -99999.;
+    const auto& slc = sr->slc[SigSelSliceIdx];
+
+    return slc.truth.prod_vtx.z;
+
+  });
+  const SpillVar kNuMI_MuonTrackMatchedTPIdx( [](const caf::SRSpillProxy *sr) -> int {
+
+    int SigSelSliceIdx = kNuMI_SignalSelectionSlice_Idx(sr);
+    if(SigSelSliceIdx<0) return -2;
+    const auto& slc = sr->slc[SigSelSliceIdx];
+
+    const auto& MuonIdx = kNuMIMuonCandidateIdx(&slc);
+    const auto& MuonTrk = slc.reco.pfp[MuonIdx].trk;
+    int MuonTrk_Truth_G4ID = MuonTrk.truth.p.G4ID;
+
+    int TPIdx = -1;
+    for(unsigned int i_p=0; i_p<sr->true_particles.size(); i_p++){
+      if( sr->true_particles[i_p].G4ID==MuonTrk_Truth_G4ID ){
+        TPIdx = i_p;
+        break;
+      }
+    }
+
+    return TPIdx;
+
+  });
+  const SpillVar kNuMI_MuonTrackMatchedTP_genT( [](const caf::SRSpillProxy *sr) -> double {
+
+    int TPIdx = kNuMI_MuonTrackMatchedTPIdx(sr);
+    if(TPIdx<0) return -999999.;
+
+    const auto& tp = sr->true_particles[TPIdx];
+    return tp.genT;
+
+  });
+  const SpillVar kNuMI_MuonTrackMatchedTP_pdg( [](const caf::SRSpillProxy *sr) -> int {
+
+    int TPIdx = kNuMI_MuonTrackMatchedTPIdx(sr);
+    if(TPIdx<0) return -999999.;
+
+    const auto& tp = sr->true_particles[TPIdx];
+    return tp.pdg;
+
+  });
+  const SpillVar kNuMI_MuonTrackMatchedTP_genE( [](const caf::SRSpillProxy *sr) -> double {
+
+    int TPIdx = kNuMI_MuonTrackMatchedTPIdx(sr);
+    if(TPIdx<0) return -999999.;
+
+    const auto& tp = sr->true_particles[TPIdx];
+    return tp.genE;
+
+  });
+  const SpillVar kNuMI_ProtonTrackMatchedTPIdx( [](const caf::SRSpillProxy *sr) -> int {
+    
+    int SigSelSliceIdx = kNuMI_SignalSelectionSlice_Idx(sr);
+    if(SigSelSliceIdx<0) return -2;
+    const auto& slc = sr->slc[SigSelSliceIdx];
+    
+    const auto& ProtonIdx = kNuMIProtonCandidateIdx(&slc);
+    const auto& ProtonTrk = slc.reco.pfp[ProtonIdx].trk;
+    int ProtonTrk_Truth_G4ID = ProtonTrk.truth.p.G4ID;
+    
+    int TPIdx = -1;
+    for(unsigned int i_p=0; i_p<sr->true_particles.size(); i_p++){
+      if( sr->true_particles[i_p].G4ID==ProtonTrk_Truth_G4ID ){
+        TPIdx = i_p;
+        break;
+      }
+    }
+
+    return TPIdx;
+
+  });
+  const SpillVar kNuMI_ProtonTrackMatchedTP_genT( [](const caf::SRSpillProxy *sr) -> double {
+
+    int TPIdx = kNuMI_ProtonTrackMatchedTPIdx(sr);
+    if(TPIdx<0) return -999999.;
+
+    const auto& tp = sr->true_particles[TPIdx];
+    return tp.genT;
+
+  });
+  const SpillVar kNuMI_ProtonTrackMatchedTP_pdg( [](const caf::SRSpillProxy *sr) -> int {
+
+    int TPIdx = kNuMI_ProtonTrackMatchedTPIdx(sr);
+    if(TPIdx<0) return -999999.;
+
+    const auto& tp = sr->true_particles[TPIdx];
+    return tp.pdg;
+
+  }); 
+  const SpillVar kNuMI_ProtonTrackMatchedTP_genE( [](const caf::SRSpillProxy *sr) -> double {
+  
+    int TPIdx = kNuMI_ProtonTrackMatchedTPIdx(sr);
+    if(TPIdx<0) return -999999.;
+
+    const auto& tp = sr->true_particles[TPIdx];
+    return tp.genE;
+    
+  });
+
+
+
+
+  const SpillMultiVar kNuMI_IntimeCosmics_genT ( [](const caf::SRSpillProxy *sr) -> std::vector<double> {
+
+    std::vector<double> rets;
+    for(unsigned int i_p=0; i_p<sr->true_particles.size(); i_p++){
+      if( sr->true_particles[i_p].interaction_id==-1 && abs(sr->true_particles[i_p].pdg)==13 ){
+        if( sr->true_particles[i_p].genT>-0.1 && sr->true_particles[i_p].genT<10.1 ){
+          rets.push_back( sr->true_particles[i_p].genT );
+        }
+      }
+    }
+
+    return rets;
+
+  });
+
+  const SpillMultiVar kNuMI_IntimeCosmics_TimeFromTrig ( [](const caf::SRSpillProxy *sr) -> std::vector<double> {
+
+    std::vector<double> rets;
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    for(unsigned int i_p=0; i_p<sr->true_particles.size(); i_p++){
+      if( sr->true_particles[i_p].interaction_id==-1 && abs(sr->true_particles[i_p].pdg)==13 ){
+        if( sr->true_particles[i_p].genT>-0.1 && sr->true_particles[i_p].genT<10.1 ){
+          rets.push_back( sr->true_particles[i_p].genT - spillTriggerTime );
+        }
+      }
+    }
+
+    return rets;
+
+  });
+
+
+  const SpillCut kNuMI_Spill_NoIntimeCosmic ( [](const caf::SRSpillProxy *sr) {
+    return ( kNuMI_HasIntimeCosmic(sr)== 0);
+  });
+  const SpillCut kNuMI_Spill_HasIntimeNu ( [](const caf::SRSpillProxy *sr) {
+    double TrigTime = kNuMI_trigger_within_gate(sr);
+    double TrigNuTime = kNuMI_TriggerNeutrino_time(sr);
+
+    if(TrigNuTime>9999) return false;
+    else{
+      return ( fabs(TrigNuTime - TrigTime) < 1.0 );
+    }
 
   });
 

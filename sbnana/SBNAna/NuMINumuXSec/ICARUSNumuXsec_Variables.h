@@ -163,5 +163,61 @@ namespace ICARUSNumuXsec{
   extern const Var kNuMI_ProtonMatchedTrack_Chi2Muon;
   extern const Var kNuMI_ProtonMatchedTrack_Chi2Proton;
 
+  // Rock study
+  extern const SpillCut kNuMI_HasSignalSelectionSlice;
+  extern const SpillVar kNuMI_SignalSelectionSlice_CutType;
+  extern const SpillMultiVar kNuMI_SignalSelectionSlices_Others_MuonTrackMatched_genT;
+  extern const SpillMultiVar kNuMI_SignalSelectionSlices_Others_MuonTrackMatched_pdg;
+  extern const SpillMultiVar kNuMI_SignalSelectionSlices_Others_MuonTrackMatched_interaction_id;
+
+  extern const SpillMultiVar kNuMI_TrueNeutrino_PosX;
+  extern const SpillMultiVar kNuMI_TrueNeutrino_PosY;
+  extern const SpillMultiVar kNuMI_TrueNeutrino_PosZ;
+
+  extern const SpillVar kNuMI_trigger_within_gate;
+  extern const SpillVar kNuMI_NumberOfNeutrinos;
+  extern const SpillVar kNuMI_TriggerNeutrino_Idx;
+  extern const SpillVar kNuMI_TriggerNeutrino_time;
+  extern const SpillVar kNuMI_TriggerNeutrino_PosX;
+  extern const SpillVar kNuMI_TriggerNeutrino_PosY;
+  extern const SpillVar kNuMI_TriggerNeutrino_PosZ;
+  extern const SpillVar kNuMI_HasIntimeCosmic;
+  extern const SpillVar kNuMI_NIntimeCosmic;
+  extern const SpillVar kNuMI_IntimeCosmicClosestTime;
+  extern const SpillVar kNuMI_TriggerNeutrino_PrimaryMuonIdx;
+  extern const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_pdg;
+  extern const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_genE;
+  extern const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_GenX;
+  extern const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_GenY;
+  extern const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_GenZ;
+  extern const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_StartX;
+  extern const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_StartY;
+  extern const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_StartZ;
+  extern const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_EndX;
+  extern const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_EndY;
+  extern const SpillVar kNuMI_TriggerNeutrino_PrimaryMuon_EndZ;
+  extern const SpillVar kNuMI_TriggerTrueParticle_Idx;
+  extern const SpillVar kNuMI_TriggerTrueParticle_pdg;
+  extern const SpillVar kNuMI_SignalSelectionSlice_Idx;
+  extern const SpillVar kNuMI_SignalSelectionSlice_Truth_time;
+  extern const SpillVar kNuMI_SignalSelectionSlice_Truth_vtx_x;
+  extern const SpillVar kNuMI_SignalSelectionSlice_Truth_vtx_y;
+  extern const SpillVar kNuMI_SignalSelectionSlice_Truth_vtx_z;
+  extern const SpillVar kNuMI_MuonTrackMatchedTPIdx;
+  extern const SpillVar kNuMI_MuonTrackMatchedTP_genT;
+  extern const SpillVar kNuMI_MuonTrackMatchedTP_pdg;
+  extern const SpillVar kNuMI_MuonTrackMatchedTP_genE;
+  extern const SpillVar kNuMI_ProtonTrackMatchedTPIdx;
+  extern const SpillVar kNuMI_ProtonTrackMatchedTP_genT;
+  extern const SpillVar kNuMI_ProtonTrackMatchedTP_pdg;
+  extern const SpillVar kNuMI_ProtonTrackMatchedTP_genE;
+
+
+
+  extern const SpillMultiVar kNuMI_IntimeCosmics_genT;
+  extern const SpillMultiVar kNuMI_IntimeCosmics_TimeFromTrig;
+
+  extern const SpillCut kNuMI_Spill_NoIntimeCosmic;
+  extern const SpillCut kNuMI_Spill_HasIntimeNu;
 
 }
