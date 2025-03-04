@@ -933,7 +933,6 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
 
   std::vector<std::string> this_NSigmasPsetNames;
   std::vector<const ISyst*> this_NSigmasISysts;
-  std::vector<std::pair<int,int>> this_NSigmasPairs;
   std::vector<std::vector<double>> this_NSigmas;
 
   // NUniverses
@@ -969,25 +968,21 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
     for(unsigned int i=0; i<genieMultisigmaKnobNames.size(); i++){
       this_NSigmasPsetNames.push_back( genieMultisigmaKnobNames.at(i) );
       this_NSigmasISysts.push_back( IGENIESysts.at(i) );
-      this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
       this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
     }
     for(unsigned int i=0; i<genieMorphKnobNames.size(); i++){
       this_NSigmasPsetNames.push_back( genieMorphKnobNames.at(i) );
       this_NSigmasISysts.push_back( IGENIEMorphSysts.at(i) );
-      this_NSigmasPairs.push_back( std::make_pair(0, 1) );
       this_NSigmas.push_back( {-1, -0.5, 0, 0.5, 1} );
     }
     for(unsigned int i=0; i<IFluxSysts.size(); i++){
       this_NSigmasPsetNames.push_back( IFluxSysts.at(i)->ShortName() );
       this_NSigmasISysts.push_back( IFluxSysts.at(i) );
-      this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
       this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
     }
     for(unsigned int i=0; i<IDetectorSysts.size(); i++){
       this_NSigmasPsetNames.push_back( IDetectorSysts.at(i)->ShortName() );
       this_NSigmasISysts.push_back( IDetectorSysts.at(i) );
-      this_NSigmasPairs.push_back( std::make_pair(-3, 3) );
       this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
     }
 
@@ -1042,7 +1037,6 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
           this_NSigmasPsetNames,
           loader,
           this_NSigmasISysts,
-          //this_NSigmasPairs,
           this_NSigmas,
           spillCut, cut,
           kNoShift,
@@ -1151,7 +1145,6 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
           this_NSigmasPsetNames,
           loader,
           this_NSigmasISysts,
-          //this_NSigmasPairs,
           this_NSigmas,
           spillCut, cut,
           ApplyTrackSplit ? SystShifts(&kTrackSplittingSyst, +1.) : kNoShift,
@@ -1277,7 +1270,6 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
           this_NSigmasPsetNames,
           loader,
           this_NSigmasISysts,
-          //this_NSigmasPairs,
           this_NSigmas,
           kTruthCut_IsSignal,
           ApplyTrackSplit ? SystShifts(&kTrackSplittingSyst, +1.) : kNoShift,
@@ -1380,7 +1372,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     // Weight
     "FluxWeight",
     "FluxWeightWithG3Chase",
-    "FluxWeightWithG4Updated",
+    "FluxWeightWithG4Update",
     "SPPCVCorrection",
     // Muon
     "MuonSelection/i",
@@ -1422,7 +1414,7 @@ void HistoProducer::MakePIDStudyTree(SpectrumLoader& loader, SpillCut spillCut, 
     // Weight
     kGetNuMIFluxWeight,
     kGetNuMIFluxWeightG3Chase,
-    kGetNuMIFluxWeightUpdated,
+    kGetNuMIFluxWeightG4Update,
     kNuMISPPCVCorrection,
     // Muon
     kNuMIIsRelaxedMuonSelection,
@@ -1752,7 +1744,7 @@ void HistoProducer::MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut, C
     // Weight
     "FluxWeight",
     "FluxWeightWithG3Chase",
-    "FluxWeightWithG4Updated",
+    "FluxWeightWithG4Update",
     // Nu E
     "TrueE",
     // Muon
@@ -1777,7 +1769,7 @@ void HistoProducer::MakeCutFlowTree(SpectrumLoader& loader, SpillCut spillCut, C
     // Weight
     kGetTruthNuMIFluxWeight,
     kGetTruthNuMIFluxWeightG3Chase,
-    kGetTruthNuMIFluxWeightUpdated,
+    kGetTruthNuMIFluxWeightG4Update,
     // Nu E
     kTruth_NeutrinoE,
     // Muon
@@ -1888,7 +1880,7 @@ void HistoProducer::MakeNuMINuCountTree(SpectrumLoader& loader, SpillCut spillCu
     // Weight
     "FluxWeight",
     "FluxWeightWithG3Chase",
-    "FluxWeightWithG4Updated",
+    "FluxWeightWithG4Update",
     // SPP RW for res events
     "IsSPP/i",
     "SPPCVCorrection",
@@ -1906,7 +1898,7 @@ void HistoProducer::MakeNuMINuCountTree(SpectrumLoader& loader, SpillCut spillCu
     // Weight
     kGetTruthNuMIFluxWeight,
     kGetTruthNuMIFluxWeightG3Chase,
-    kGetTruthNuMIFluxWeightUpdated,
+    kGetTruthNuMIFluxWeightG4Update,
     // SPP RW for res events
     kTruth_IsSPP,
     kTruth_NuMISPPCVCorrection,
@@ -2003,7 +1995,7 @@ void HistoProducer::MakeFSICovTree(SpectrumLoader& loader, SpillCut spillCut, Cu
     // Weight
     "FluxWeight",
     "FluxWeightWithG3Chase",
-    "FluxWeightWithG4Updated",
+    "FluxWeightWithG4Update",
     "SPPCVCorrection",
     // Muon
     "TrueMuonCos",
@@ -2022,7 +2014,7 @@ void HistoProducer::MakeFSICovTree(SpectrumLoader& loader, SpillCut spillCut, Cu
     // Weight
     kGetTruthNuMIFluxWeight,
     kGetTruthNuMIFluxWeightG3Chase,
-    kGetTruthNuMIFluxWeightUpdated,
+    kGetTruthNuMIFluxWeightG4Update,
     kTruth_NuMISPPCVCorrection,
     // Muon
     kTruth_MuonNuCosineTheta,
@@ -2291,8 +2283,204 @@ kNuMI_ProtonMatchedTrack_Chi2Proton,
 
 }
 
+// - 250124_NuMINuEAnaTree
+void HistoProducer::MakeNuMINuEAnaTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  std::vector<std::string> vec_labels = GetNuMITrueTreeLabels();
+  std::vector<TruthVar> vec_vars = GetNuMITrueTreeVars();
+
+  vec_labels.push_back("TrueElectronKE");
+  vec_vars.push_back(kTruth_ElectronKE);
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "trueEvents",
+      vec_labels,
+      loader,
+      vec_vars,
+      kNoSpillCut,
+      kTruthCut_Is1eNp,
+      kNoCut,
+      kNoShift,
+      true
+    )
+  );
+
+
+}
+
+void HistoProducer::MakeRockAnaTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "RockAnaTree_Spill",
+      std::vector<std::string>{
+        "trigger_within_gate",
+        "CutType/I",
+        "NNu/I",
+        "TrigNu_time",
+        "TrigNu_PosX",
+        "TrigNu_PosY",
+        "TrigNu_PosZ",
+        "HasIntimeCosmic/I",
+        "NIntimeCosmic/I",
+        "IntimeCosmicClosestTime",
+        "PrimaryMuon_pdg",
+        "PrimaryMuon_genE",
+        "PrimaryMuon_GenX",
+        "PrimaryMuon_GenY",
+        "PrimaryMuon_GenZ",
+        "PrimaryMuon_StartX",
+        "PrimaryMuon_StartY",
+        "PrimaryMuon_StartZ",
+        "PrimaryMuon_EndX",
+        "PrimaryMuon_EndY",
+        "PrimaryMuon_EndZ",
+        "TrigTP_pdg",
+        "SigSelSlice_Truth_Vtx_x",
+        "SigSelSlice_Truth_Vtx_y",
+        "SigSelSlice_Truth_Vtx_z",
+        "MuonTrackMatchedTP_genT",
+        "MuonTrackMatchedTP_pdg/I",
+        "MuonTrackMatchedTP_genE",
+        "ProtonTrackMatchedTP_genT",
+        "ProtonTrackMatchedTP_pdg/I",
+        "ProtonTrackMatchedTP_genE",
+      },
+      loader,
+      std::vector<SpillVar>{
+        ICARUSNumuXsec::kNuMI_trigger_within_gate,
+        ICARUSNumuXsec::kNuMI_SignalSelectionSlice_CutType,
+        ICARUSNumuXsec::kNuMI_NumberOfNeutrinos,
+        ICARUSNumuXsec::kNuMI_TriggerNeutrino_time,
+        ICARUSNumuXsec::kNuMI_TriggerNeutrino_PosX,
+        ICARUSNumuXsec::kNuMI_TriggerNeutrino_PosY,
+        ICARUSNumuXsec::kNuMI_TriggerNeutrino_PosZ,
+        ICARUSNumuXsec::kNuMI_HasIntimeCosmic,
+        ICARUSNumuXsec::kNuMI_NIntimeCosmic,
+        ICARUSNumuXsec::kNuMI_IntimeCosmicClosestTime,
+        ICARUSNumuXsec::kNuMI_TriggerNeutrino_PrimaryMuon_pdg,
+        ICARUSNumuXsec::kNuMI_TriggerNeutrino_PrimaryMuon_genE,
+        ICARUSNumuXsec::kNuMI_TriggerNeutrino_PrimaryMuon_GenX,
+        ICARUSNumuXsec::kNuMI_TriggerNeutrino_PrimaryMuon_GenY,
+        ICARUSNumuXsec::kNuMI_TriggerNeutrino_PrimaryMuon_GenZ,
+        ICARUSNumuXsec::kNuMI_TriggerNeutrino_PrimaryMuon_StartX,
+        ICARUSNumuXsec::kNuMI_TriggerNeutrino_PrimaryMuon_StartY,
+        ICARUSNumuXsec::kNuMI_TriggerNeutrino_PrimaryMuon_StartZ,
+        ICARUSNumuXsec::kNuMI_TriggerNeutrino_PrimaryMuon_EndX,
+        ICARUSNumuXsec::kNuMI_TriggerNeutrino_PrimaryMuon_EndY,
+        ICARUSNumuXsec::kNuMI_TriggerNeutrino_PrimaryMuon_EndZ,
+        ICARUSNumuXsec::kNuMI_TriggerTrueParticle_pdg,
+        ICARUSNumuXsec::kNuMI_SignalSelectionSlice_Truth_vtx_x,
+        ICARUSNumuXsec::kNuMI_SignalSelectionSlice_Truth_vtx_y,
+        ICARUSNumuXsec::kNuMI_SignalSelectionSlice_Truth_vtx_z,
+        ICARUSNumuXsec::kNuMI_MuonTrackMatchedTP_genT,
+        ICARUSNumuXsec::kNuMI_MuonTrackMatchedTP_pdg,
+        ICARUSNumuXsec::kNuMI_MuonTrackMatchedTP_genE,
+        ICARUSNumuXsec::kNuMI_ProtonTrackMatchedTP_genT,
+        ICARUSNumuXsec::kNuMI_ProtonTrackMatchedTP_pdg,
+        ICARUSNumuXsec::kNuMI_ProtonTrackMatchedTP_genE,
+      },
+      kNuMI_HasSignalSelectionSlice,
+      true
+    )
+  );
+
+
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "RockAnaTree_MuonTrackMatched",
+      std::vector<std::string>{
+        "genT",
+        "pdg",
+        "interaction_id",
+      },
+      loader,
+      std::vector<SpillMultiVar>{
+        ICARUSNumuXsec::kNuMI_SignalSelectionSlices_Others_MuonTrackMatched_genT,
+        ICARUSNumuXsec::kNuMI_SignalSelectionSlices_Others_MuonTrackMatched_pdg,
+        ICARUSNumuXsec::kNuMI_SignalSelectionSlices_Others_MuonTrackMatched_interaction_id,
+      },
+      kNuMI_HasSignalSelectionSlice,
+      true
+    )
+  );
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "RockAnaTree_TrueNeutrino",
+      std::vector<std::string>{
+        "TrueNeutrino_PosX",
+        "TrueNeutrino_PosY",
+        "TrueNeutrino_PosZ",
+      },
+      loader,
+      std::vector<SpillMultiVar>{
+      ICARUSNumuXsec::kNuMI_TrueNeutrino_PosX,
+      ICARUSNumuXsec::kNuMI_TrueNeutrino_PosY,
+      ICARUSNumuXsec::kNuMI_TrueNeutrino_PosZ,
+      },
+      kNuMI_HasSignalSelectionSlice,
+      true
+    )
+  );
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "RockAnaTree_IntimeCosmics",
+      std::vector<std::string>{
+        "IntimeCosmics_genT",
+        "IntimeCosmics_TimeFromTrig",
+      },
+      loader,
+      std::vector<SpillMultiVar>{
+      ICARUSNumuXsec::kNuMI_IntimeCosmics_genT,
+      ICARUSNumuXsec::kNuMI_IntimeCosmics_TimeFromTrig,
+      },
+      kNuMI_HasSignalSelectionSlice,
+      true
+    )
+  );
+
+}
+
 void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "TEst",
+      std::vector<std::string>{
+        "Test",
+      },
+      loader,
+      std::vector<SpillMultiVar>{
+      ICARUSNumuXsec::spillvarTest,
+      },
+      kNoSpillCut
+    )
+  );
+
+/*
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "RockAnaTree_TrueNeutrino",
+      std::vector<std::string>{
+        "TrueNeutrino_PosX",
+        "TrueNeutrino_PosY",
+        "TrueNeutrino_PosZ",
+      },
+      loader,
+      std::vector<SpillMultiVar>{
+      ICARUSNumuXsec::kNuMI_TrueNeutrino_PosX,
+      ICARUSNumuXsec::kNuMI_TrueNeutrino_PosY,
+      ICARUSNumuXsec::kNuMI_TrueNeutrino_PosZ,
+      },
+      kNoSpillCut
+    )
+  );
+*/
+/*
   // base variables
 
   std::vector<std::string> this_reco_labels = GetNuMIRecoTreeLabels();
@@ -2320,7 +2508,7 @@ void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
         true, true
       )
     );
-
+*/
 
 }
 
@@ -2874,6 +3062,14 @@ void HistoProducer::setSystematicWeights(){
     NuMIXSecDetectorSysts::kCaloGain,
     "NuMIXSecCaloGainSyst",
     "Calo gain up down"
+    )
+  );
+
+  IDetectorSysts.push_back(
+    new NuMIXSecDetectorSysts(
+    NuMIXSecDetectorSysts::kLifetime,
+    "NuMIXSecLifetimeSyst",
+    "Lifetime variation"
     )
   );
 
