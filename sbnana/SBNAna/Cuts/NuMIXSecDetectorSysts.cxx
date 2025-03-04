@@ -78,6 +78,15 @@ namespace ana {
       weight *= 1. + sigma * 0.03;
 
     }
+    else if(kDetSystType==kLifetime){
+
+      // negative is mirrored
+      double this_sigma = abs(sigma);
+
+      // post-reprocessing; flat 5.9%
+      weight *= 1. + this_sigma * (-0.059);
+
+    }
 
     else{
 
