@@ -44,6 +44,16 @@ namespace ana
              const SystShifts& shift = kNoShift,
              const Var& wei = kUnweighted);
 
+    Spectrum(const std::string& label, SpectrumLoaderBase& loader,
+             const Binning& bins, const Var& var,
+             const SpillCut& spillcut,
+             const Cut& cut,
+             const SystShifts& shift = kNoShift,
+             const Var& wei = kUnweighted)
+      :Spectrum(label, bins, loader, var, spillcut, cut, shift, wei)
+    {
+    }
+
     Spectrum(const std::string& label, const Binning& bins,
              SpectrumLoaderBase& loader,
              const Var& var,
@@ -59,6 +69,37 @@ namespace ana
              const SpillVar& var,
              const SpillCut& cut,
              const SpillVar& wei = kSpillUnweighted);
+
+    Spectrum(const std::string& label, const Binning& bins,
+             SpectrumLoaderBase& loader,
+             const TruthVar& var,
+             const TruthCut& truthcut,
+             const SpillCut& spillcut,
+             const SystShifts& shift = kNoShift,
+             const TruthVar& wei = kTruthUnweighted);
+    Spectrum(const std::string& label, const Binning& bins,
+             SpectrumLoaderBase& loader,
+             const TruthMultiVar& var,
+             const TruthCut& truthcut,
+             const SpillCut& spillcut,
+             const SystShifts& shift = kNoShift,
+             const TruthVar& wei = kTruthUnweighted);
+    Spectrum(const std::string& label, const Binning& bins,
+             SpectrumLoaderBase& loader,
+             const TruthVar& var,
+             const TruthCut& truthcut,
+             const SpillCut& spillcut,
+             const Cut& cut, // loop over reco slices and see if any matched to this truth and pass "cut"
+             const SystShifts& shift = kNoShift,
+             const TruthVar& wei = kTruthUnweighted);
+    Spectrum(const std::string& label, const Binning& bins,
+             SpectrumLoaderBase& loader,
+             const TruthMultiVar& var,
+             const TruthCut& truthcut,
+             const SpillCut& spillcut,
+             const Cut& cut, // loop over reco slices and see if any matched to this truth and pass "cut"
+             const SystShifts& shift = kNoShift,
+             const TruthVar& wei = kTruthUnweighted);
 
     /// The only \ref MultiVar variant available
     Spectrum(const std::string& label, const Binning& bins,
@@ -323,6 +364,8 @@ namespace ana
     unsigned int NDimensions() const{return fLabels.size();}
     std::vector<std::string> GetLabels() const {return fLabels;}
     std::vector<Binning> GetBinnings() const {return fBins;}
+
+    void SetLabel(int idx, std::string newlabel);
 
   protected:
     Spectrum(const std::vector<std::string>& labels,

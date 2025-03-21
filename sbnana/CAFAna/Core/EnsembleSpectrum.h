@@ -30,6 +30,38 @@ namespace ana
                      const std::vector<Var>& univ_weis,
                      const Var& cv_wei = kUnweighted);
 
+    EnsembleSpectrum(const std::string& label, const Binning& bins,
+                     SpectrumLoaderBase& loader,
+                     const SpillVar& var,
+                     const SpillCut& spillcut,
+                     const std::vector<SpillVar>& univ_weis,
+                     const SpillVar& cv_wei = kSpillUnweighted);
+
+    EnsembleSpectrum(SpectrumLoaderBase& loader,
+                     const HistAxis& xAxis,
+                     const HistAxis& yAxis,
+                     const SpillCut& spillcut,
+                     const Cut& cut,
+                     const std::vector<SystShifts>& univ_shifts,
+                     const Var& cv_wei = kUnweighted);
+
+    EnsembleSpectrum(SpectrumLoaderBase& loader,
+                     const HistAxis& xAxis,
+                     const HistAxis& yAxis,
+                     const SpillCut& spillcut,
+                     const Cut& cut,
+                     const std::vector<Var>& univ_weis,
+                     const Var& cv_wei = kUnweighted);
+
+    // TruthVar; but ordering the arguments similar to Spectrum
+    EnsembleSpectrum(const std::string& label, const Binning& bins,
+                     SpectrumLoaderBase& loader,
+                     const TruthVar& var,
+                     const TruthCut& truthcut,
+                     const SpillCut& spillcut,
+                     const std::vector<TruthVar>& univ_weis,
+                     const TruthVar& cv_wei = kTruthUnweighted);
+
     Spectrum Nominal() const {return fNom;}
     unsigned int NUniverses() const {return fUnivs.size();}
     Spectrum Universe(unsigned int i) const
@@ -43,7 +75,8 @@ namespace ana
     double Livetime() const {return fNom.Livetime();}
 
     /// Result can be painted prettily with \ref DrawErrorBand
-    TGraphAsymmErrors* ErrorBand(double exposure,
+    TGraphAsymmErrors* ErrorBand(double z,
+                                 double exposure,
                                  EExposureType expotype = kPOT,
                                  EBinType bintype = kBinContent) const;
 
