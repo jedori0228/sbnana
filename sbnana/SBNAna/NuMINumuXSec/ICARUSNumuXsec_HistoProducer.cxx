@@ -935,6 +935,10 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
   std::vector<const ISyst*> this_NSigmasISysts;
   std::vector<std::vector<double>> this_NSigmas;
 
+  std::vector<std::string> this_NSigmasPsetNames_ForTruth;
+  std::vector<const ISyst*> this_NSigmasISysts_ForTruth;
+  std::vector<std::vector<double>> this_NSigmas_ForTruth;
+
   // NUniverses
 
   std::vector<std::string> this_NUniversesPsetNames;
@@ -969,16 +973,28 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       this_NSigmasPsetNames.push_back( genieMultisigmaKnobNames.at(i) );
       this_NSigmasISysts.push_back( IGENIESysts.at(i) );
       this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
+
+      this_NSigmasPsetNames_ForTruth.push_back( genieMultisigmaKnobNames.at(i) );
+      this_NSigmasISysts_ForTruth.push_back( IGENIESysts.at(i) );
+      this_NSigmas_ForTruth.push_back( {-3, -2, -1, 0, 1, 2, 3} );
     }
     for(unsigned int i=0; i<genieMorphKnobNames.size(); i++){
       this_NSigmasPsetNames.push_back( genieMorphKnobNames.at(i) );
       this_NSigmasISysts.push_back( IGENIEMorphSysts.at(i) );
       this_NSigmas.push_back( {-1, -0.5, 0, 0.5, 1} );
+
+      this_NSigmasPsetNames_ForTruth.push_back( genieMorphKnobNames.at(i) );
+      this_NSigmasISysts_ForTruth.push_back( IGENIEMorphSysts.at(i) );
+      this_NSigmas_ForTruth.push_back( {-1, -0.5, 0, 0.5, 1} );
     }
     for(unsigned int i=0; i<IFluxSysts.size(); i++){
       this_NSigmasPsetNames.push_back( IFluxSysts.at(i)->ShortName() );
       this_NSigmasISysts.push_back( IFluxSysts.at(i) );
       this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
+
+      this_NSigmasPsetNames_ForTruth.push_back( IFluxSysts.at(i)->ShortName() );
+      this_NSigmasISysts_ForTruth.push_back( IFluxSysts.at(i) );
+      this_NSigmas_ForTruth.push_back( {-3, -2, -1, 0, 1, 2, 3} );
     }
     for(unsigned int i=0; i<IDetectorSysts.size(); i++){
       this_NSigmasPsetNames.push_back( IDetectorSysts.at(i)->ShortName() );
@@ -1196,6 +1212,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
 
       if(FillSystematics){
 
+/*
         map_cutName_to_vec_Trees[currentCutName].push_back(
           new ana::Tree(
             "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CalodEdXShiftUp",
@@ -1235,8 +1252,28 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
             true
           )
         );
+*/
 
+        std::vector<double> detsyst_dials = {-3, -2, -1, 0, 1, 2, 3};
+        std::vector<std::string> detsyst_dialnames = {"-3", "-2", "-1", "0", "+1", "+2", "+3"};
         for(unsigned int i=0; i<IDetectorSysts.size(); i++){
+
+          for(unsigned int i_dial=0; i_dial<detsyst_dials.size(); i_dial++){
+
+            std::string treename = "trueEvents"+RecoCutsForEffs[i_Cut].first+"_"+IDetectorSysts.at(i)->ShortName()+detsyst_dialnames[i_dial];
+
+            map_cutName_to_vec_Trees[currentCutName].push_back(
+              new ana::Tree(
+                treename,
+                {"Dummy"}, loader, {DummyTruthVar}, kNuMIValidTrigger, kTruthCut_IsSignal,
+                RecoCutsForEffs[i_Cut].second,
+                ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {IDetectorSysts.at(i), detsyst_dials[i_dial]}} ) : SystShifts(IDetectorSysts.at(i), detsyst_dials[i_dial]),
+                true
+              )
+            );
+
+          }
+/*
           map_cutName_to_vec_Trees[currentCutName].push_back(
             new ana::Tree(
               "trueEvents"+RecoCutsForEffs[i_Cut].first+"_"+IDetectorSysts.at(i)->ShortName()+"Up",
@@ -1255,6 +1292,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
               true
             )
           );
+*/
 
         } // END IDetectorSysts loop
 
@@ -1267,10 +1305,10 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
         new ana::NSigmasTree(
           "trueEvents_NSigmas",
-          this_NSigmasPsetNames,
+          this_NSigmasPsetNames_ForTruth,
           loader,
-          this_NSigmasISysts,
-          this_NSigmas,
+          this_NSigmasISysts_ForTruth,
+          this_NSigmas_ForTruth,
           kTruthCut_IsSignal,
           ApplyTrackSplit ? SystShifts(&kTrackSplittingSyst, +1.) : kNoShift,
           true
@@ -2346,6 +2384,17 @@ void HistoProducer::MakeRockAnaTree(SpectrumLoader& loader, SpillCut spillCut, C
         "ProtonTrackMatchedTP_genT",
         "ProtonTrackMatchedTP_pdg/I",
         "ProtonTrackMatchedTP_genE",
+        "PreTriggerCosmic_genT",
+        "PreTriggerCosmic_pdg/I",
+        "PreTriggerCosmic_GenX",
+        "PreTriggerCosmic_GenY",
+        "PreTriggerCosmic_GenZ",
+        "PreTriggerCosmic_StartX",
+        "PreTriggerCosmic_StartY",
+        "PreTriggerCosmic_StartZ",
+        "PreTriggerCosmic_EndX",
+        "PreTriggerCosmic_EndY",
+        "PreTriggerCosmic_EndZ",
       },
       loader,
       std::vector<SpillVar>{
@@ -2380,6 +2429,17 @@ void HistoProducer::MakeRockAnaTree(SpectrumLoader& loader, SpillCut spillCut, C
         ICARUSNumuXsec::kNuMI_ProtonTrackMatchedTP_genT,
         ICARUSNumuXsec::kNuMI_ProtonTrackMatchedTP_pdg,
         ICARUSNumuXsec::kNuMI_ProtonTrackMatchedTP_genE,
+        ICARUSNumuXsec::kNuMI_PreTriggerCosmic_genT,
+        ICARUSNumuXsec::kNuMI_PreTriggerCosmic_pdg,
+        ICARUSNumuXsec::kNuMI_PreTriggerCosmic_GenX,
+        ICARUSNumuXsec::kNuMI_PreTriggerCosmic_GenY,
+        ICARUSNumuXsec::kNuMI_PreTriggerCosmic_GenZ,
+        ICARUSNumuXsec::kNuMI_PreTriggerCosmic_StartX,
+        ICARUSNumuXsec::kNuMI_PreTriggerCosmic_StartY,
+        ICARUSNumuXsec::kNuMI_PreTriggerCosmic_StartZ,
+        ICARUSNumuXsec::kNuMI_PreTriggerCosmic_EndX,
+        ICARUSNumuXsec::kNuMI_PreTriggerCosmic_EndY,
+        ICARUSNumuXsec::kNuMI_PreTriggerCosmic_EndZ,
       },
       kNuMI_HasSignalSelectionSlice,
       true
@@ -2442,6 +2502,39 @@ void HistoProducer::MakeRockAnaTree(SpectrumLoader& loader, SpillCut spillCut, C
       true
     )
   );
+
+}
+
+void HistoProducer::MakeTriggerTimeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
+
+  std::vector<std::string> vec_labels = {
+    "TriggerTime",
+    "HasValidTrigger/I",
+    "G3ChaseWeight",
+    "HasIntimeCosmic/I",
+    "TrigNu_time",
+    "trigger_within_gate",
+  };
+  std::vector<SpillVar> vec_vars = {
+    kNuMISpillTriggerTime,
+    kNuMIValidTrigger_SpillVar,
+    kNuMIG3ChaseSpillWeightByClosesetNu,
+    ICARUSNumuXsec::kNuMI_HasIntimeCosmic,
+    ICARUSNumuXsec::kNuMI_TriggerNeutrino_time,
+    ICARUSNumuXsec::kNuMI_trigger_within_gate,
+  };
+
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "TriggerTimeTree",
+      vec_labels,
+      loader,
+      vec_vars,
+      spillCut,
+      true
+    )
+  );
+
 
 }
 

@@ -112,6 +112,8 @@ namespace ICARUSNumuXsec{
     void MakeNuMINuEAnaTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     // - 250219_RockStudy
     void MakeRockAnaTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
+    // - 250318_TriggerTimeTree
+    void MakeTriggerTimeTree(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
 
 
     void Test(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);

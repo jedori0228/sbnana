@@ -211,13 +211,27 @@ namespace ICARUSNumuXsec{
   extern const SpillVar kNuMI_ProtonTrackMatchedTP_genT;
   extern const SpillVar kNuMI_ProtonTrackMatchedTP_pdg;
   extern const SpillVar kNuMI_ProtonTrackMatchedTP_genE;
-
-
+  // Triggered by pre-beam cosmic activities
+  extern const SpillVar kNuMI_PreTriggerCosmic_Idx;
+  extern const SpillVar kNuMI_PreTriggerCosmic_genT;
+  extern const SpillVar kNuMI_PreTriggerCosmic_pdg;
+  extern const SpillVar kNuMI_PreTriggerCosmic_GenX;
+  extern const SpillVar kNuMI_PreTriggerCosmic_GenY;
+  extern const SpillVar kNuMI_PreTriggerCosmic_GenZ;
+  extern const SpillVar kNuMI_PreTriggerCosmic_StartX;
+  extern const SpillVar kNuMI_PreTriggerCosmic_StartY;
+  extern const SpillVar kNuMI_PreTriggerCosmic_StartZ;
+  extern const SpillVar kNuMI_PreTriggerCosmic_EndX;
+  extern const SpillVar kNuMI_PreTriggerCosmic_EndY;
+  extern const SpillVar kNuMI_PreTriggerCosmic_EndZ;
 
   extern const SpillMultiVar kNuMI_IntimeCosmics_genT;
   extern const SpillMultiVar kNuMI_IntimeCosmics_TimeFromTrig;
 
   extern const SpillCut kNuMI_Spill_NoIntimeCosmic;
   extern const SpillCut kNuMI_Spill_HasIntimeNu;
+
+  // TriggerTime Tree
+  extern const SpillVar kNuMIValidTrigger_SpillVar;
 
 }

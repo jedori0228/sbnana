@@ -1784,7 +1784,103 @@ return 0.;
     return tp.genE;
     
   });
+  // Triggered by pre-beam cosmic activities
+  const SpillVar kNuMI_PreTriggerCosmic_Idx( [](const caf::SRSpillProxy *sr) -> int {
 
+    double spillTriggerTime = kNuMISpillTriggerTime(sr);
+    if( ! (spillTriggerTime > -0.1 && spillTriggerTime < 10.1) ) return -1;
+
+    double ClosestTime = 9999.;
+    int PreTrigCosmicIdx = -2;
+    for(unsigned int i_p=0; i_p<sr->true_particles.size(); i_p++){
+      if( sr->true_particles[i_p].interaction_id==-1 ){
+        double this_genT = sr->true_particles[i_p].genT;
+        if( this_genT <= spillTriggerTime ){ 
+          double this_diff = spillTriggerTime - this_genT;
+          if(this_diff<ClosestTime){
+            ClosestTime = this_diff;
+            PreTrigCosmicIdx = i_p;
+          }
+        }
+      }
+    }
+
+    return PreTrigCosmicIdx;
+
+  });
+  const SpillVar kNuMI_PreTriggerCosmic_genT( [](const caf::SRSpillProxy *sr) -> double {
+    int PreTrigCosmicIdx = kNuMI_PreTriggerCosmic_Idx(sr);
+    if(PreTrigCosmicIdx<0) return -9999.;
+    else return sr->true_particles[PreTrigCosmicIdx].genT;
+  });
+  const SpillVar kNuMI_PreTriggerCosmic_pdg( [](const caf::SRSpillProxy *sr) -> int {
+    int PreTrigCosmicIdx = kNuMI_PreTriggerCosmic_Idx(sr);
+    if(PreTrigCosmicIdx<0) return -9999.;
+    else return sr->true_particles[PreTrigCosmicIdx].pdg;
+  });
+  const SpillVar kNuMI_PreTriggerCosmic_GenX ( [](const caf::SRSpillProxy *sr) -> double { 
+
+    int PreTrigCosmicIdx = kNuMI_PreTriggerCosmic_Idx(sr);
+    if(PreTrigCosmicIdx<0) return -9999.;
+    else return sr->true_particles[PreTrigCosmicIdx].gen.x;
+
+  });
+  const SpillVar kNuMI_PreTriggerCosmic_GenY ( [](const caf::SRSpillProxy *sr) -> double { 
+
+    int PreTrigCosmicIdx = kNuMI_PreTriggerCosmic_Idx(sr);
+    if(PreTrigCosmicIdx<0) return -9999.;
+    else return sr->true_particles[PreTrigCosmicIdx].gen.y;
+
+  });
+  const SpillVar kNuMI_PreTriggerCosmic_GenZ ( [](const caf::SRSpillProxy *sr) -> double { 
+
+    int PreTrigCosmicIdx = kNuMI_PreTriggerCosmic_Idx(sr);
+    if(PreTrigCosmicIdx<0) return -9999.;
+    else return sr->true_particles[PreTrigCosmicIdx].gen.z;
+
+  });
+  const SpillVar kNuMI_PreTriggerCosmic_StartX ( [](const caf::SRSpillProxy *sr) -> double {
+
+    int PreTrigCosmicIdx = kNuMI_PreTriggerCosmic_Idx(sr);
+    if(PreTrigCosmicIdx<0) return -9999.;
+    else return sr->true_particles[PreTrigCosmicIdx].start.x;
+
+  });
+  const SpillVar kNuMI_PreTriggerCosmic_StartY ( [](const caf::SRSpillProxy *sr) -> double {
+
+    int PreTrigCosmicIdx = kNuMI_PreTriggerCosmic_Idx(sr);
+    if(PreTrigCosmicIdx<0) return -9999.;
+    else return sr->true_particles[PreTrigCosmicIdx].start.y;
+
+  });
+  const SpillVar kNuMI_PreTriggerCosmic_StartZ ( [](const caf::SRSpillProxy *sr) -> double {
+
+    int PreTrigCosmicIdx = kNuMI_PreTriggerCosmic_Idx(sr);
+    if(PreTrigCosmicIdx<0) return -9999.;
+    else return sr->true_particles[PreTrigCosmicIdx].start.z;
+
+  });
+  const SpillVar kNuMI_PreTriggerCosmic_EndX ( [](const caf::SRSpillProxy *sr) -> double { 
+
+    int PreTrigCosmicIdx = kNuMI_PreTriggerCosmic_Idx(sr);
+    if(PreTrigCosmicIdx<0) return -9999.;
+    else return sr->true_particles[PreTrigCosmicIdx].end.x;
+
+  });
+  const SpillVar kNuMI_PreTriggerCosmic_EndY ( [](const caf::SRSpillProxy *sr) -> double { 
+
+    int PreTrigCosmicIdx = kNuMI_PreTriggerCosmic_Idx(sr);
+    if(PreTrigCosmicIdx<0) return -9999.;
+    else return sr->true_particles[PreTrigCosmicIdx].end.y;
+
+  });
+  const SpillVar kNuMI_PreTriggerCosmic_EndZ ( [](const caf::SRSpillProxy *sr) -> double { 
+
+    int PreTrigCosmicIdx = kNuMI_PreTriggerCosmic_Idx(sr);
+    if(PreTrigCosmicIdx<0) return -9999.;
+    else return sr->true_particles[PreTrigCosmicIdx].end.z;
+
+  });
 
 
 
@@ -1832,6 +1928,11 @@ return 0.;
       return ( fabs(TrigNuTime - TrigTime) < 1.0 );
     }
 
+  });
+
+  const SpillVar kNuMIValidTrigger_SpillVar( [](const caf::SRSpillProxy *sr) -> int {
+    if( kNuMIValidTrigger(sr) ) return 1;
+    else return 0;
   });
 
 }
