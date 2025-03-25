@@ -198,8 +198,6 @@ namespace ICARUSNumuXsec{
 
       static InteractionTool& Instance();
 
-      mutable bool UseGHepRecord;
-
       mutable vector<int> MuonIndices;
       mutable vector<int> ProtonIndices;
       mutable vector<int> NeutronIndices;

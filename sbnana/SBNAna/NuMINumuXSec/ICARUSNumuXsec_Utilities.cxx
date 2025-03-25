@@ -475,7 +475,6 @@ double ParticleTool::GetMass(int pdg) const {
 InteractionTool::InteractionTool(){
 
   ClearIndices();
-  UseGHepRecord = true;
 
 }
 InteractionTool& InteractionTool::Instance(){
@@ -498,50 +497,7 @@ InteractionTool::NParticles InteractionTool::GetNParticles(const caf::SRSlicePro
 
   InteractionTool::NParticles nptls;
 
-  if(UseGHepRecord){
-
-    // using ghep
-    int counter = -1;
-    for(const auto& ghepptl: slc->truth.ghepptl){
-      counter += 1;
-      if(ghepptl.gstatus!=1) continue;
-
-      const int pdg = ghepptl.pdg;
-      const int apdg = abs(pdg);
-      if(apdg==13){
-        nptls.NMuon++;
-        MuonIndices.push_back(counter);
-      }
-
-      if( pdg==2212 ){
-        nptls.NProton++;
-        ProtonIndices.push_back(counter);
-      }
-      else if( pdg==2112 ){
-        nptls.NNeutron++;
-        NeutronIndices.push_back(counter);
-      }
-      else if( pdg==211 ){
-        nptls.NPip++;
-        PipIndices.push_back(counter);
-      }
-      else if( pdg==-211 ){
-        nptls.NPim++;
-        PimIndices.push_back(counter);
-      }
-      else if( pdg==111 ){
-        Pi0Indices.push_back(counter);
-        nptls.NPi0++;
-      }
-
-    } // END prim loop
-
-  }
-  else{
-
-    GetNParticles(slc->truth.prim);
-
-  }
+  GetNParticles(slc->truth.prim);
 
   return nptls;
 
