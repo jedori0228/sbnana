@@ -958,28 +958,6 @@ namespace TwoTrack{
 
         printf("  - vertex = (%1.2f, %1.2f, %1.2f)\n", nu.vtx.x.GetValue(), nu.vtx.y.GetValue(), nu.vtx.z.GetValue());
         printf("  - nu pos = (%1.2f, %1.2f, %1.2f)\n", nu.position.x.GetValue(), nu.position.y.GetValue(), nu.position.z.GetValue());
-        //for(std::size_t j(0); j < nu.prim.size(); ++j){
-        //  const auto& prim = nu.prim[j];
-        for(std::size_t j(0); j < nu.ghepptl.size(); ++j){
-          const auto& prim = nu.ghepptl[j];
-          printf("  - %ld-th prim\n",j);
-          printf("    - pdg = %d\n", prim.pdg.GetValue());
-          const double this_mass = ptlt.GetMass(prim.pdg.GetValue());
-          printf("    - Mass = %1.3f\n", this_mass);
-          printf("    - GStatus = %d\n", prim.gstatus.GetValue());
-          printf("    - Parent ID = %d\n", prim.parent.GetValue());
-          printf("    - ndaughters = %ld\n", prim.daughters.size());
-          printf("    - start = (%1.2f, %1.2f, %1.2f)\n", prim.start.x.GetValue(), prim.start.y.GetValue(), prim.start.z.GetValue());
-          printf("    - end = (%1.2f, %1.2f, %1.2f)\n", prim.end.x.GetValue(), prim.end.y.GetValue(), prim.end.z.GetValue());
-          const float dist = std::hypot(prim.end.x - prim.start.x, prim.end.y - prim.start.y, prim.end.z - prim.start.z);
-          printf("    - |end-start| = %1.2f\n", dist);
-          printf("    - genp = (%1.2f, %1.2f, %1.2f)\n", prim.genp.x.GetValue(), prim.genp.y.GetValue(), prim.genp.z.GetValue());
-          printf("    - startE = %1.3f\n", prim.startE.GetValue());
-          printf("    - startE-Mass = %1.3f\n", prim.startE.GetValue()-this_mass);
-          printf("    - startE-endE = %1.3f\n", prim.startE.GetValue()-prim.endE.GetValue());
-          printf("    - end_process = %d\n", prim.end_process.GetValue());
-
-        }
       }
 
       for(std::size_t i(0); i < sr->slc.size(); ++i){
