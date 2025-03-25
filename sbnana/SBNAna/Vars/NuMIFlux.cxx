@@ -70,6 +70,12 @@ namespace ana {
           delete fWeight[i][j][k];
   }
 
+  NuMIPpfxFluxWeight& NuMIPpfxFluxWeight::Instance()
+  {
+    static NuMIPpfxFluxWeight m;
+    return m;
+  }
+
   //// ----------------------------------------------
 
   const Var kGetNuMIFluxWeight([](const caf::SRSliceProxy* slc) -> double {
@@ -81,7 +87,9 @@ namespace ana {
   const TruthVar kGetTruthNuMIFluxWeight([](const caf::SRTrueInteractionProxy* nu) -> double {
     if (nu->index < 0 || abs(nu->initpdg) == 16) return 1.0;
 
-    if (!FluxWeightNuMI.fWeight[0][0][0]) {
+    const NuMIPpfxFluxWeight& m = NuMIPpfxFluxWeight::Instance();
+
+    if (!m.fWeight[0][0][0]) {
       std::cout << "Trying to access un-available weight array..." << std::endl;
       std::abort();
     }
@@ -90,7 +98,7 @@ namespace ana {
     unsigned int flavIdx = (abs(nu->initpdg) == 12) ? 0 : 1;
     unsigned int signIdx = (nu->initpdg > 0) ? 0 : 1;
 
-    TH1* h = FluxWeightNuMI.fWeight[hcIdx][flavIdx][signIdx];
+    TH1* h = m.fWeight[hcIdx][flavIdx][signIdx];
     assert(h);
 
     const int bin = h->FindBin(nu->E);
@@ -235,6 +243,12 @@ namespace ana {
     }
   }
 
+  NuMIPpfxFluxWeightG3Chase& NuMIPpfxFluxWeightG3Chase::Instance()
+  {
+    static NuMIPpfxFluxWeightG3Chase m;
+    return m;
+  }
+
   double NuMIPpfxFluxWeightG3Chase::GetWeightFromSRTrueInt(const caf::SRTrueInteractionProxy* nu, const bool applyKaonRW) const
   {
     if (nu->index < 0 || abs(nu->initpdg) == 16) return 1.0;
@@ -302,7 +316,8 @@ namespace ana {
   //// ----------------------------------------------
 
   const TruthVar kGetTruthNuMIFluxWeightG3Chase([](const caf::SRTrueInteractionProxy* nu) -> double {
-    return FluxWeightNuMIG3Chase.GetWeightFromSRTrueInt(nu,false);
+    const NuMIPpfxFluxWeightG3Chase& m = NuMIPpfxFluxWeightG3Chase::Instance();
+    return m.GetWeightFromSRTrueInt(nu,false);
   });
 
   //// ----------------------------------------------
@@ -314,7 +329,8 @@ namespace ana {
   //// ----------------------------------------------
 
   const TruthVar kGetTruthNuMIFluxWeightUpdated([](const caf::SRTrueInteractionProxy* nu) -> double {
-    return FluxWeightNuMIG3Chase.GetWeightFromSRTrueInt(nu,true);
+    const NuMIPpfxFluxWeightG3Chase& m = NuMIPpfxFluxWeightG3Chase::Instance();
+    return m.GetWeightFromSRTrueInt(nu,true);
   });
 
 
@@ -426,9 +442,15 @@ namespace ana {
 
             TH1* h_g4update = (TH1*)f.Get(hNameG4Update.c_str());
             if (!h_g4update) {
-              std::cout << "[NuMIPpfxFluxWeightG4Update::NuMIPpfxFluxWeightG4Update] Failed to find " << hNameG4Update << " from " << f.GetName() << ", but this may be expected so continue" << std::endl;
+              //std::cout << "[NuMIPpfxFluxWeightG4Update::NuMIPpfxFluxWeightG4Update] Failed to find " << hNameG4Update << " from " << f.GetName() << ", but this may be expected so continue" << std::endl;
+              printf("[NuMIPpfxFluxWeightG4Update::NuMIPpfxFluxWeightG4Update] Fail: (currIdx, flavIdx, signIdx, pdgIdx) = (%d, %d, %d, %d)\n", currIdx, flavIdx, signIdx, pdgIdx);
+              printf("[NuMIPpfxFluxWeightG4Update::NuMIPpfxFluxWeightG4Update]   %s\n", hNameG4Update.c_str());
               fWeightG4Update[currIdx][flavIdx][signIdx][pdgIdx] = nullptr;
               continue;
+            }
+            else{
+              printf("[NuMIPpfxFluxWeightG4Update::NuMIPpfxFluxWeightG4Update] Found: (currIdx, flavIdx, signIdx, pdgIdx) = (%d, %d, %d, %d)\n", currIdx, flavIdx, signIdx, pdgIdx);
+              printf("[NuMIPpfxFluxWeightG4Update::NuMIPpfxFluxWeightG4Update]   %s\n", hNameG4Update.c_str());
             }
             h_g4update = (TH1*)h_g4update->Clone(UniqueName().c_str());
             h_g4update->SetDirectory(0);
@@ -442,11 +464,17 @@ namespace ana {
 
   }
 
+  NuMIPpfxFluxWeightG4Update& NuMIPpfxFluxWeightG4Update::Instance()
+  {
+    static NuMIPpfxFluxWeightG4Update m;
+    return m;
+  }
+
   double NuMIPpfxFluxWeightG4Update::GetWeightFromSRTrueInt(const caf::SRTrueInteractionProxy* nu) const
   {
     if (nu->index < 0 || abs(nu->initpdg) == 16) return 1.0;
 
-    if (!fWeight[0][0][0] || !fWeightG4Update[0][0][0]) {
+    if (!fWeight[0][0][0] || !fWeightG4Update[0][0][0][1]) {
       std::cout << "Trying to access un-available weight array..." << std::endl;
       std::abort();
     }
@@ -512,10 +540,12 @@ namespace ana {
   }
 
   const TruthVar kGetTruthNuMIFluxWeightG4Update([](const caf::SRTrueInteractionProxy* nu) -> double {
-    return FluxWeightNuMIG4Update.GetWeightFromSRTrueInt(nu);
+    const NuMIPpfxFluxWeightG4Update& m = NuMIPpfxFluxWeightG4Update::Instance();
+    return m.GetWeightFromSRTrueInt(nu);
+    //return FluxWeightNuMIG4Update.GetWeightFromSRTrueInt(nu);
   });
   const Var kGetNuMIFluxWeightG4Update([](const caf::SRSliceProxy* slc) -> double {
-    return kGetTruthNuMIFluxWeightUpdated(&slc->truth);
+    return kGetTruthNuMIFluxWeightG4Update(&slc->truth);
   });
 
 }
