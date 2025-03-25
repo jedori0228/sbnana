@@ -11,11 +11,10 @@ export PYTHONPATH=${PYTHONPATH}:${PostJobWD}/Libs/:${PostJobWD}/Configs/:${gridW
 
 
 
-export ANANAME=v09_75_03
+export ANANAME=v09_93_01
 export gridJobDir=/pnfs/icarus/scratch/users/${USER}/NuMINumuXSec/GridJob/
 export gridBinDir=${gridWD}/bin/
 export gridLibDir=${gridWD}/lib/
-#export gridLibDirPNFS=/pnfs/icarus/resilient/users/jskim/NuMINumuXSec/${ANANAME}/
 export gridLibDirPNFS=/pnfs/icarus/scratch/users/jskim/NuMINumuXSec/tars/${ANANAME}/
 export gridDataDir=${gridWD}/data/
 export gridOutputDir=/pnfs/icarus/persistent/users/${USER}/NuMINumuXSec/

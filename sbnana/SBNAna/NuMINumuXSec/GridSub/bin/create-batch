@@ -306,11 +306,6 @@ void run_%d(){
   m.FillMetaData = true;
   m.IsData = isDataInput;
 
-  if(isDataInput){
-    intt.UseGHepRecord = false;
-  }
-  //TODO
-  intt.UseGHepRecord = false;
 '''%(ssDefLines, esDefLines,InputSample))
 
 
@@ -389,10 +384,10 @@ filesFromSender=${CONDOR_DIR_INPUT}/ToGrid/ToGrid/
 echo "@@ setup_icarus.sh"
 source /cvmfs/icarus.opensciencegrid.org/products/icarus/setup_icarus.sh
 
-setup cetlib v3_16_00 -q e20:prof
+setup cetlib v3_18_02 -q e26:prof
 setup larsoft_data v1_02_02
-setup ifdhc v2_6_20 -q e20:p3913:prof
-setup sam_web_client v3_3
+setup ifdhc v2_7_1 -q e26:p3915:prof
+setup sam_web_client v3_6
 export IFDH_CP_MAXRETRIES=2
 
 echo "@@ Creating lib dir and go there"
@@ -411,7 +406,7 @@ export MRB_INSTALL=$(pwd)
 export PRODUCTS="${MRB_INSTALL}:${PRODUCTS}"
 mrbslp
 
-## TEMPORARY FOR THIS RELEASE (v09_75_03)
+## TEMPORARY FOR THIS RELEASE (v09_93_01)
 echo "@@ Using local SBNDATA_DIR"
 cd ${nodeBaseDir}
 export SBNDATA_DIR=${nodeBaseDir}/sbndata_local/
@@ -440,7 +435,7 @@ ifdh cp /pnfs/icarus/scratch/users/jskim/NuMINumuXSec/local_sbndata/recoData/out
 echo "@@ ls -alh ${SBNDATA_DIR}/recoData/"
 ls -alh ${SBNDATA_DIR}/recoData/
 
-##  TEMPORARY FOR THIS RELEASE (v09_75_03)
+##  TEMPORARY FOR THIS RELEASE (v09_93_01)
 cd ${nodeBaseDir}
 export FW_SEARCH_PATH=${nodeBaseDir}/CaloSyst/:${FW_SEARCH_PATH}
 mkdir -p ${nodeBaseDir}/CaloSyst/

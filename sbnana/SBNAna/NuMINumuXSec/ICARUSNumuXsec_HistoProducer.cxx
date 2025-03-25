@@ -5,7 +5,7 @@ HistoProducer::HistoProducer(){
   cout << "[HistoProducer::HistoProducer] called" << endl;
   SystProviderPrefix = "GENIEReWeight_ICARUS_v2";
   TrueTreeFilled = false;
-  NNuMIFluxPCA = 12;
+  NNuMIFluxPCA = 20;
   TargetPOT = 6.0e20;
   str_TargetPOT = "6.0e20 POT";
   outputName = "output.root";
@@ -1212,7 +1212,6 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
 
       if(FillSystematics){
 
-/*
         map_cutName_to_vec_Trees[currentCutName].push_back(
           new ana::Tree(
             "trueEvents"+RecoCutsForEffs[i_Cut].first+"_CalodEdXShiftUp",
@@ -1252,28 +1251,11 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
             true
           )
         );
-*/
 
         std::vector<double> detsyst_dials = {-3, -2, -1, 0, 1, 2, 3};
         std::vector<std::string> detsyst_dialnames = {"-3", "-2", "-1", "0", "+1", "+2", "+3"};
         for(unsigned int i=0; i<IDetectorSysts.size(); i++){
 
-          for(unsigned int i_dial=0; i_dial<detsyst_dials.size(); i_dial++){
-
-            std::string treename = "trueEvents"+RecoCutsForEffs[i_Cut].first+"_"+IDetectorSysts.at(i)->ShortName()+detsyst_dialnames[i_dial];
-
-            map_cutName_to_vec_Trees[currentCutName].push_back(
-              new ana::Tree(
-                treename,
-                {"Dummy"}, loader, {DummyTruthVar}, kNuMIValidTrigger, kTruthCut_IsSignal,
-                RecoCutsForEffs[i_Cut].second,
-                ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {IDetectorSysts.at(i), detsyst_dials[i_dial]}} ) : SystShifts(IDetectorSysts.at(i), detsyst_dials[i_dial]),
-                true
-              )
-            );
-
-          }
-/*
           map_cutName_to_vec_Trees[currentCutName].push_back(
             new ana::Tree(
               "trueEvents"+RecoCutsForEffs[i_Cut].first+"_"+IDetectorSysts.at(i)->ShortName()+"Up",
@@ -1292,7 +1274,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
               true
             )
           );
-*/
+
 
         } // END IDetectorSysts loop
 
@@ -2542,7 +2524,7 @@ void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
-      "TEst",
+      "Test",
       std::vector<std::string>{
         "Test",
       },
