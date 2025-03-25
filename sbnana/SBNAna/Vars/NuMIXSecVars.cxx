@@ -437,7 +437,7 @@ namespace ana {
 
   });
 
-  const Var kNuMINInelasticChargedPionCandidateIdxs([](const caf::SRSliceProxy* slc) -> double {
+  const Var kNuMINInelasticChargedPionCandidateIdxs([](const caf::SRSliceProxy* slc) -> int {
     return kNuMIInelasticChargedPionCandidateIdxs(slc).size();
   });
 
@@ -1957,7 +1957,7 @@ namespace ana {
       float W2 = (Mn*Mn) + (2.*Mn*(Enu-Emu)) - Q2;
 
       if ( W2 < 0. ) {
-	std::cout << "W2 < 0 ... Returning -5..." << std::endl;
+	//std::cout << "W2 < 0 ... Returning -5..." << std::endl;
 	return -5.f;
       }
       return sqrt(W2);
