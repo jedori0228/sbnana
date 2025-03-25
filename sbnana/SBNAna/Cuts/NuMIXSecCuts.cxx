@@ -259,7 +259,7 @@ namespace ana {
                                           kNuMIHasTwoPhotons; /*Neutral pion*/
 
   /// CutType; 1=Signal, 2=pi+- sideband, 3=pi0 sideband, 0=other
-  const Var kNuMICutType([](const caf::SRSliceProxy* slc) -> double {
+  const Var kNuMICutType([](const caf::SRSliceProxy* slc) -> int {
 
     if( kNuMISelection_1muNp0pi(slc) ) return 1;
     else if( kNuMIChargedPionSideBand(slc) ) return 2;
@@ -271,7 +271,7 @@ namespace ana {
   });
 
   /// CutType without the showers cut in signal selection; 1=Signal, 2=pi+- sideband, 3=pi0 sideband, 0=other
-  const Var kNuMICutTypeWithoutShowerCut([](const caf::SRSliceProxy* slc) -> double {
+  const Var kNuMICutTypeWithoutShowerCut([](const caf::SRSliceProxy* slc) -> int {
 
     if( kNuMISelection_1muNp0pi_WithoutShowerCut(slc) ) return 1;
     else if( kNuMIChargedPionSideBand(slc) ) return 2;
@@ -282,7 +282,7 @@ namespace ana {
   });
 
   /// Would pass the split muon cut or not?
-  const Var kNuMIPassesSplitMuonCut([](const caf::SRSliceProxy* slc) -> double {
+  const Var kNuMIPassesSplitMuonCut([](const caf::SRSliceProxy* slc) -> int {
     if( kNuMIRejectSplitMuons(slc) ) return 1;
     else return 0;
   });
