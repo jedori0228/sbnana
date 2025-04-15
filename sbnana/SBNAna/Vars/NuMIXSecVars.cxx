@@ -1655,6 +1655,30 @@ namespace ana {
 
     return costh;
   });
+  // Angle btw chargedpion and muon
+  const Var kNuMIRecoCosThMuonChargedPion([](const caf::SRSliceProxy* slc) -> float {
+    float costh(-5.f);
+
+    if ( kNuMILeadingChargedPionCandidateInd(slc) >= 0 && kNuMIMuonCandidateIdx(slc) >= 0 ) {
+      auto const& cpiontrk = slc->reco.pfp.at(kNuMILeadingChargedPionCandidateInd(slc)).trk;
+      auto const& mutrk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+
+      TVector3 cpionDir(cpiontrk.dir.x, cpiontrk.dir.y, cpiontrk.dir.z);
+      cpionDir = cpionDir.Unit();
+      TVector3 muDir(mutrk.dir.x, mutrk.dir.y, mutrk.dir.z);
+      muDir = muDir.Unit();
+
+      costh = TMath::Cos( cpionDir.Angle(muDir) );
+    }
+
+    return costh;
+  });
+  const Var kNuMITrueCosThMuonChargedPion([](const caf::SRSliceProxy* slc) -> float {
+    float costh(-5.f);
+    if ( slc->truth.index >= 0 ) costh = kTruth_CosThMuonChargedPion(&slc->truth);
+
+    return costh;
+  });
   // Angle btw chargedpion and proton
   const Var kNuMIRecoCosThProtonChargedPion([](const caf::SRSliceProxy* slc) -> float {
     float costh(-5.f);

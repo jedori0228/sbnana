@@ -743,6 +743,27 @@ namespace ana{
     return ret;
   });
 
+  // Pion+Muon
+  const TruthVar kTruth_CosThMuonChargedPion([](const caf::SRTrueInteractionProxy *nu) -> double {
+    double ret(-5.f);
+
+    int truth_cpion_idx = kTruth_ChargedPionIndex(nu);
+    int truth_mu_idx = kTruth_MuonIndex(nu);
+    if(truth_cpion_idx>=0 && truth_mu_idx>=0){
+
+      const auto& p_cpion = nu->prim.at(truth_cpion_idx).genp;
+      const auto& p_mu = nu->prim.at(truth_mu_idx).genp;
+
+      TVector3 vec_p_cpion(p_cpion.x, p_cpion.y, p_cpion.z);
+      TVector3 vec_p_mu(p_mu.x, p_mu.y, p_mu.z);
+
+      ret = vec_p_cpion.Unit().Dot( vec_p_mu.Unit() );
+
+    }
+
+    return ret;
+  });
+
   // Pion+Proton
   const TruthVar kTruth_CosThProtonChargedPion([](const caf::SRTrueInteractionProxy *nu) -> double {
     double ret(-5.f);

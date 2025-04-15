@@ -156,6 +156,9 @@ namespace ana
   // Chargedpion angle w.r.t. numi-to-vtx direction (= proxy of neutrino direction)
   extern const Var kLeadingChargedPionCandidateRecoCosThVtx;
   extern const Var kLeadingChargedPionCandidateTrueCosThVtx;
+  // Angle btw chargedpion and muon
+  extern const Var kNuMIRecoCosThMuonChargedPion;
+  extern const Var kNuMITrueCosThMuonChargedPion;
   // Angle btw chargedpion and proton
   extern const Var kNuMIRecoCosThProtonChargedPion;
   extern const Var kNuMITrueCosThProtonChargedPion;

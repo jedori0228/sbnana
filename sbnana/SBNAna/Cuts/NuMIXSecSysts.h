@@ -37,6 +37,35 @@ namespace ana
   // Our sideband-extracted pi rw
   double GetNuMIXsecSidebandPiReweight(double Q2Rec);
 
+  // Q2 only
+  class NuMIXSecMINERvAQ2ReweightSyst: public ISyst
+  {
+  public:
+
+    NuMIXSecMINERvAQ2ReweightSyst(const std::string& name, const std::string& latexName);
+
+    void Shift(double sigma, caf::SRSliceProxy *sr, double& weight) const override;
+    void Shift(double sigma, caf::SRTrueInteractionProxy *sr, double& weight) const override;
+
+  private:
+
+  };
+
+  // Tpi only
+  class NuMIXSecTpiSyst: public ISyst
+  {
+  public:
+
+    NuMIXSecTpiSyst(const std::string& name, const std::string& latexName);
+
+    void Shift(double sigma, caf::SRSliceProxy *sr, double& weight) const override;
+    void Shift(double sigma, caf::SRTrueInteractionProxy *sr, double& weight) const override;
+
+  private:
+
+  };
+
+  // Q2+Tpi combined
   class NuMIXSecPiSyst: public ISyst
   {
   public:
@@ -85,6 +114,8 @@ namespace ana
   extern const Var kNuMISPPTpiMINERvAFittedReweight;
 
   // Sideband-extracted pi RW
+  extern const TruthCut kTruth_HasPrimaryPion;
+  extern const Var kNuMISidebandPiFitCategory;
   extern const Var kNuMISidebandPiRW;
 
   //---------------------------------------------------------------------

@@ -935,10 +935,6 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
   std::vector<const ISyst*> this_NSigmasISysts;
   std::vector<std::vector<double>> this_NSigmas;
 
-  std::vector<std::string> this_NSigmasPsetNames_ForTruth;
-  std::vector<const ISyst*> this_NSigmasISysts_ForTruth;
-  std::vector<std::vector<double>> this_NSigmas_ForTruth;
-
   // NUniverses
 
   std::vector<std::string> this_NUniversesPsetNames;
@@ -973,28 +969,16 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       this_NSigmasPsetNames.push_back( genieMultisigmaKnobNames.at(i) );
       this_NSigmasISysts.push_back( IGENIESysts.at(i) );
       this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
-
-      this_NSigmasPsetNames_ForTruth.push_back( genieMultisigmaKnobNames.at(i) );
-      this_NSigmasISysts_ForTruth.push_back( IGENIESysts.at(i) );
-      this_NSigmas_ForTruth.push_back( {-3, -2, -1, 0, 1, 2, 3} );
     }
     for(unsigned int i=0; i<genieMorphKnobNames.size(); i++){
       this_NSigmasPsetNames.push_back( genieMorphKnobNames.at(i) );
       this_NSigmasISysts.push_back( IGENIEMorphSysts.at(i) );
       this_NSigmas.push_back( {-1, -0.5, 0, 0.5, 1} );
-
-      this_NSigmasPsetNames_ForTruth.push_back( genieMorphKnobNames.at(i) );
-      this_NSigmasISysts_ForTruth.push_back( IGENIEMorphSysts.at(i) );
-      this_NSigmas_ForTruth.push_back( {-1, -0.5, 0, 0.5, 1} );
     }
     for(unsigned int i=0; i<IFluxSysts.size(); i++){
       this_NSigmasPsetNames.push_back( IFluxSysts.at(i)->ShortName() );
       this_NSigmasISysts.push_back( IFluxSysts.at(i) );
       this_NSigmas.push_back( {-3, -2, -1, 0, 1, 2, 3} );
-
-      this_NSigmasPsetNames_ForTruth.push_back( IFluxSysts.at(i)->ShortName() );
-      this_NSigmasISysts_ForTruth.push_back( IFluxSysts.at(i) );
-      this_NSigmas_ForTruth.push_back( {-3, -2, -1, 0, 1, 2, 3} );
     }
     for(unsigned int i=0; i<IDetectorSysts.size(); i++){
       this_NSigmasPsetNames.push_back( IDetectorSysts.at(i)->ShortName() );
@@ -1287,10 +1271,10 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       map_cutName_to_vec_NSigmasTrees[currentCutName].push_back(
         new ana::NSigmasTree(
           "trueEvents_NSigmas",
-          this_NSigmasPsetNames_ForTruth,
+          this_NSigmasPsetNames,
           loader,
-          this_NSigmasISysts_ForTruth,
-          this_NSigmas_ForTruth,
+          this_NSigmasISysts,
+          this_NSigmas,
           kTruthCut_IsSignal,
           ApplyTrackSplit ? SystShifts(&kTrackSplittingSyst, +1.) : kNoShift,
           true
@@ -2851,6 +2835,13 @@ void HistoProducer::setSystematicWeights(){
     // 1) pi syst
     genieMultisigmaKnobNames.push_back( "CC1piTPi" );
     IGENIESysts.push_back( new NuMIXSecPiSyst("CC1piTPi", "CC1piTpi") );
+
+    genieMultisigmaKnobNames.push_back( "CC1piTPi_Q2Only" );
+    IGENIESysts.push_back( new NuMIXSecMINERvAQ2ReweightSyst("CC1piTPi_Q2Only", "CC1piTpi_Q2Only") );
+
+    genieMultisigmaKnobNames.push_back( "CC1piTPi_TpiOnly" );
+    IGENIESysts.push_back( new NuMIXSecTpiSyst("CC1piTPi_TpiOnly", "CC1piTpi_TpiOnly") );
+
     genieMultisigmaKnobNames.push_back( "LowQ2Suppression" );
     IGENIESysts.push_back( new NuMIXSecLowQ2Suppression("LowQ2Suppression", "LowQ2Suppression") );
     // 2) nusyst

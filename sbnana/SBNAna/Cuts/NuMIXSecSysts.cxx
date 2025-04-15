@@ -271,8 +271,14 @@ namespace ana {
     if(X<0) X = 0.;
     if(X>1.0) X = 1.0;
 
+/*
+    // Pre-reprocessing
     static double FitResult_norm = 1.184e+00;
     static double FitResult_offset = -1.845e-01;
+*/
+    // Post-reprocessing
+    static double FitResult_norm = 1.090e+00;
+    static double FitResult_offset = -1.013e-01;
 
     double out = (3.-2.*X)*(X*X);
     return FitResult_norm * out + FitResult_offset;
@@ -280,6 +286,70 @@ namespace ana {
 
   }
 
+  // Q2 only
+
+  NuMIXSecMINERvAQ2ReweightSyst::NuMIXSecMINERvAQ2ReweightSyst(const std::string& name, const std::string& latexName):
+    ISyst(name, latexName)
+  {
+
+  }
+
+  void NuMIXSecMINERvAQ2ReweightSyst::Shift(double sigma, caf::SRSliceProxy *sr, double& weight) const
+  {
+    this->Shift(sigma, &sr->truth, weight);
+  }
+
+  void NuMIXSecMINERvAQ2ReweightSyst::Shift(double sigma, caf::SRTrueInteractionProxy *nu, double& weight) const {
+
+    if( !IsSPP(nu) ) return;
+
+    double Q2 = kTruth_Q2(nu);
+    double CVCorr = GetSPPQ2Reweight(Q2);
+
+    // 1/CVCorr is the correction back to nominal = 1sigma
+    double oneSigRW = 1./CVCorr;
+    // Size of the one-sigma uncertainty obtained by subtracting 1
+    double oneSigUnc = oneSigRW-1.;
+
+    double this_rw = 1. + sigma * oneSigUnc;
+
+    weight *= this_rw;
+
+  }
+
+  // Tpi only
+
+  NuMIXSecTpiSyst::NuMIXSecTpiSyst(const std::string& name, const std::string& latexName):
+    ISyst(name, latexName)
+  {
+
+  }
+
+  void NuMIXSecTpiSyst::Shift(double sigma, caf::SRSliceProxy *sr, double& weight) const
+  {
+    this->Shift(sigma, &sr->truth, weight);
+  }
+
+  void NuMIXSecTpiSyst::Shift(double sigma, caf::SRTrueInteractionProxy *nu, double& weight) const {
+
+    if( !IsSPP(nu) ) return;
+
+    // Tpi
+    double Tpi = kTruth_ChargedPionKE(nu);
+    double CVCorr = GetSPPTpiMINERvAFittedReweight(Tpi);
+
+    // 1/CVCorr is the correction back to nominal = 1sigma
+    double oneSigRW = 1./CVCorr;
+    // Size of the one-sigma uncertainty obtained by subtracting 1
+    double oneSigUnc = oneSigRW-1.;
+
+    double this_rw = 1. + sigma * oneSigUnc;
+
+    weight *= this_rw;
+
+  }
+
+  // Q2+Tpi combined
 
   NuMIXSecPiSyst::NuMIXSecPiSyst(const std::string& name, const std::string& latexName):
     ISyst(name, latexName)
@@ -292,11 +362,11 @@ namespace ana {
     this->Shift(sigma, &sr->truth, weight);
   }
 
-  void NuMIXSecPiSyst::Shift(double sigma, caf::SRTrueInteractionProxy *sr, double& weight) const {
+  void NuMIXSecPiSyst::Shift(double sigma, caf::SRTrueInteractionProxy *nu, double& weight) const {
 
-    if( !IsSPP(sr) ) return;
+    if( !IsSPP(nu) ) return;
 
-    double CVCorr = kTruth_NuMISPPCVCorrection(sr);
+    double CVCorr = kTruth_NuMISPPCVCorrection(nu);
 
     // 1/CVCorr is the correction back to nominal = 1sigma 
     double oneSigRW = 1./CVCorr;
@@ -320,11 +390,11 @@ namespace ana {
     this->Shift(sigma, &sr->truth, weight);
   }
 
-  void NuMIXSecLowQ2Suppression::Shift(double sigma, caf::SRTrueInteractionProxy *sr, double& weight) const {
+  void NuMIXSecLowQ2Suppression::Shift(double sigma, caf::SRTrueInteractionProxy *nu, double& weight) const {
 
-    if( !IsSPP(sr) ) return;
+    if( !IsSPP(nu) ) return;
 
-    double CVCorr = kTruth_NuMISPPLowQ2Suppression(sr);
+    double CVCorr = kTruth_NuMISPPLowQ2Suppression(nu);
     double Suppression = 1. - CVCorr;
 
     double this_rw = 1. - sigma * Suppression;
@@ -450,21 +520,31 @@ namespace ana {
   });
 
   // Sideband-extracted pi RW
-  const Var kNuMISidebandPiRW([](const caf::SRSliceProxy* slc) -> float {
+  const TruthCut kTruth_HasPrimaryPion([](const caf::SRTrueInteractionProxy *nu){
+    int TrueNpip = kTruth_Npip_Primary(nu);
+    int TrueNpim = kTruth_Npim_Primary(nu);
+    int TrueNpi0 = kTruth_Npi0_Primary(nu);
+    return (TrueNpip+TrueNpim+TrueNpi0==0);
+  });
+  const Var kNuMISidebandPiFitCategory([](const caf::SRSliceProxy* slc) -> int {
 
     int IsSignal = kNuMISliceSignalType(slc);
-    if(IsSignal==5) return 1.;
+    if(IsSignal==5) return 3;
 
-    int TrueNpip = kNuMITrueNpip(slc);
-    int TrueNpim = kNuMITrueNpim(slc);
-    int TrueNpi0 = kNuMITrueNpi0(slc);
+    int NPrimPi = kTruth_HasPrimaryPion(&slc->truth);
+    if( NPrimPi==0 ) return 2;
 
-    if(TrueNpip+TrueNpim+TrueNpi0==0) return 1.;
+    return 1;
+
+  });
+  const Var kNuMISidebandPiRW([](const caf::SRSliceProxy* slc) -> float {
+
+    int SidebandPiFitCat = kNuMISidebandPiFitCategory(slc);
+
+    if(SidebandPiFitCat!=1) return 1.;
 
     double RecoQ2 = kNuMIRecoQ2(slc);
     return GetNuMIXsecSidebandPiReweight(RecoQ2);
-    
-
 
   });
 

@@ -245,6 +245,8 @@ namespace ana{
       "LeadingChargedPionCandidateChi2MuonRecalc0p5",
       "LeadingChargedPionCandidateChi2MuonRecalc1p0",
       "LeadingChargedPionCandidateCos",
+      // pi+muon
+      "RecoChargedPionMuonCos", "TrueChargedPionMuonCos",
       // pi+proton
       "RecoChargedPionProtonCos", "TrueChargedPionProtonCos",
       // Michel
@@ -272,6 +274,7 @@ namespace ana{
       "RecoQ2",
       "RecoWexp",
       // Sideband pi RW
+      "SidebandPiFitCategory/I",
       "SidebandPiRW",
       // Track matching
       "MuonCandTruthMatch_FromNu/I",
@@ -409,6 +412,8 @@ namespace ana{
       ICARUSNumuXsec::kNuMILeadingChargedPionCandidateChi2MuonRecalc0p5,
       ICARUSNumuXsec::kNuMILeadingChargedPionCandidateChi2MuonRecalc1p0,
       kLeadingChargedPionCandidateRecoCosThVtx,
+      // pi+muon
+      kNuMIRecoCosThMuonChargedPion, kNuMITrueCosThMuonChargedPion,
       // pi+proton
       kNuMIRecoCosThProtonChargedPion, kNuMITrueCosThProtonChargedPion,
       // Michel
@@ -436,6 +441,7 @@ namespace ana{
       kNuMIRecoQ2,
       kNuMIRecoWexp,
       // Sideband pi RW
+      kNuMISidebandPiFitCategory,
       kNuMISidebandPiRW,
       // Track matching
       kNuMIMuonCand_TruthMatch_FromNu,
