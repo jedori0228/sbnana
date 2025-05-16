@@ -430,10 +430,10 @@ namespace ana {
               hNameG4Update += "_kpm";
             }
             else if(pdgIdx==2){
-              hNameG4Update += "_k0l";
+              hNameG4Update += "_mu";
             }
             else if(pdgIdx==3){
-              hNameG4Update += "_mu";
+              hNameG4Update += "_k0l";
             }
             else{
               std::cout << "[NuMIPpfxFluxWeightG4Update::NuMIPpfxFluxWeightG4Update] Wrong pdgIdx: " << pdgIdx << std::endl;
@@ -504,7 +504,12 @@ namespace ana {
     }
     //assert(h2);
 
-    const int bin2 = h2->FindBin(nu->E);
+    double this_NuE = nu->E;
+    if( flavIdx==0 && pdgIdx==2 ){
+      this_NuE = 1.99;
+    }
+
+    const int bin2 = h2->FindBin(this_NuE);
     if ( bin2 != 0 && bin2 != h2->GetNbinsX() + 1 && !std::isinf(h2->GetBinContent(bin2)) && !std::isnan(h2->GetBinContent(bin2)) ) {
       weight*=h2->GetBinContent(bin2);
     }
