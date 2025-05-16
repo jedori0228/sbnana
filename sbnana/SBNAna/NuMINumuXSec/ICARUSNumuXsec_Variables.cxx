@@ -1935,4 +1935,48 @@ return 0.;
     else return 0;
   });
 
+  const TruthVar kTruth_dummy_MuonTrackType([](const caf::SRTrueInteractionProxy *nu) -> int {
+    return -1;
+  });
+  const TruthVar kTruth_dummy_RecoMuonLength([](const caf::SRTrueInteractionProxy *nu) -> double {
+    return -1.;
+  });
+
+  const SpillVar kNuMISpillVar_PassAnalysis ( [](const caf::SRSpillProxy *sr) -> int {
+
+    bool PassSelection = false;
+    for(std::size_t i(0); i < sr->slc.size(); ++i){
+      const auto& slc = sr->slc.at(i);
+      int cutType = kNuMICutType(&slc);
+      if( cutType==1 || (cutType==2&&kNuMILeadingChargedPionCandidateLength(&slc)>10.) ){
+        PassSelection = true;
+        break;
+      }
+    }
+
+    if(PassSelection) return 1;
+    else return 0;
+
+  });
+
+  const SpillVar kNuMISpillVar_SignalEvent ( [](const caf::SRSpillProxy *sr) -> int {
+    
+    bool PassSelection = false;
+    for(std::size_t i(0); i < sr->mc.nu.size(); ++i){
+
+      const auto& nu = sr->mc.nu[i];
+      bool IsSignal = kTruthCut_IsSignal(&nu);
+
+      if( IsSignal ){
+        PassSelection = true;
+        break;
+      }
+    }
+    
+    if(PassSelection) return 1;
+    else return 0;
+
+  });
+
+
 }

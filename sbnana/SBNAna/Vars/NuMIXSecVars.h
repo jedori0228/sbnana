@@ -189,4 +189,8 @@ namespace ana
   extern const SpillVar kNuMIIntimeCosmicParticleLongestLength;
   extern const SpillVar kNuMIHasIntimeCosmicParticleWithCut;
 
+  extern const SpillVar kNuMIVisEForTrigEff;
+  extern const SpillVar kNuMITrigWtRun1;
+  extern const SpillVar kNuMITrigWtRun2;
+
 }

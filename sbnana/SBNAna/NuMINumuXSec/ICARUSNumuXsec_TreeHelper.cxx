@@ -55,6 +55,8 @@ namespace ana{
       "TruedeltaphiT",
       // For extraction
       "IsSignal/i",
+      "MuonTrackType/i",
+      "RecoMuonLength",
       // G4Proton for G4 cov
       "TrueG4ProtonP",
     };
@@ -111,6 +113,8 @@ namespace ana{
       kTruth_deltaphiT,
       // For extraction
       kTruth_IsSignal,
+      ICARUSNumuXsec::kTruth_dummy_MuonTrackType,
+      ICARUSNumuXsec::kTruth_dummy_RecoMuonLength,
       // G4Proton for G4 cov
       kTruth_G4ProtonP,
     };
@@ -183,7 +187,7 @@ namespace ana{
       "RecoMuonCosBeam", "TrueMuonCosBeam",
       // Muon track direction
       "RecoMuonDirX", "RecoMuonDirY", "RecoMuonDirZ",
-      "RecoMuonStartX", "RecoMuonEndX",
+      "RecoMuonStartX", "RecoMuonEndX", "RecoMuonEndZ",
       "RecoMuonThetaXW_Plane0",
       // Muon track chi2
       "RecoMuonChi2Muon", 
@@ -350,7 +354,7 @@ namespace ana{
       kNuMIRecoCosThBeam, kNuMITrueCosThBeam,
       // Muon track direction
       kNuMIRecoMuonTrackDirX, kNuMIRecoMuonTrackDirY, kNuMIRecoMuonTrackDirZ,
-      kNuMIRecoMuonTrackStartX, kNuMIRecoMuonTrackEndX,
+      kNuMIRecoMuonTrackStartX, kNuMIRecoMuonTrackEndX, kNuMIRecoMuonTrackEndZ,
       kNuMIRecoMuonTrackThetaXW_Plane0,
       // Muon track chi2
       kNuMIRecoMuonTrackChi2Muon,

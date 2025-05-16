@@ -78,6 +78,7 @@ namespace ICARUSNumuXsec{
     // - 230418_StubStudy
     void StubStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     // - 230517_TriggerEffStudy
+    // - 250507_TriggerEffStudy
     void TriggerEffStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);
     // - 230524_MichelStudy
     void MichelStudy(SpectrumLoader& loader, SpillCut spillCut=kNoSpillCut, Cut cut=kNoCut);

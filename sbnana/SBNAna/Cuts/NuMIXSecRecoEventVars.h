@@ -76,6 +76,7 @@ namespace ana{
   extern const Var kNuMIRecoMuonTrackDirZ;
   extern const Var kNuMIRecoMuonTrackStartX;
   extern const Var kNuMIRecoMuonTrackEndX;
+  extern const Var kNuMIRecoMuonTrackEndZ;
   extern const Var kNuMIRecoMuonTrackThetaXW_Plane0;
   extern const Var kNuMIRecoMuonTrackChi2Muon;
   extern const Var kNuMIRecoMuonTrackChi2Proton;

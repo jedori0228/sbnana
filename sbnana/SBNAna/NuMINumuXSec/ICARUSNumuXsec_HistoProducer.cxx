@@ -785,15 +785,23 @@ void HistoProducer::StubStudy(SpectrumLoader& loader, SpillCut spillCut, Cut cut
 // - 230517_TriggerEffStudy
 void HistoProducer::TriggerEffStudy(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(
-    new Spectrum("TriggerWithinGate", Binning::Simple(300, -10.,20.), loader, TriggerWithinGate, spillCut)
-  );
-
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(
-    new Spectrum("NuMuSliceLongestTrackLenForTriggerEff", Binning::Simple(50, 0., 500.), loader, NuMuSliceLongestTrackLenForTriggerEff, spillCut)
-  );
-  map_cutName_to_vec_Spectrums[currentCutName].push_back(
-    new Spectrum("InTimeCosmicSliceLongestTrackLenForTriggerEff", Binning::Simple(50, 0., 500.), loader, InTimeCosmicSliceLongestTrackLenForTriggerEff, spillCut)
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "TriggerEffStudy",
+      std::vector<std::string>{
+        "VisE",
+        "TrigWtRun1",
+        "TrigWtRun2",
+      },
+      loader,
+      std::vector<SpillVar>{
+        kNuMIVisEForTrigEff,
+        kNuMITrigWtRun1,
+        kNuMITrigWtRun2,
+      },
+      spillCut,
+      true
+    )
   );
 
 }
@@ -1011,6 +1019,13 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
     this_reco_vars.push_back(
       Var([](const caf::SRSliceProxy* slc) -> int {
         return 1;
+      })
+    );
+
+    this_reco_labels.push_back( "POTWeightedTriggerWeight" );
+    this_reco_vars.push_back(
+      Var([](const caf::SRSliceProxy* slc) -> float {
+        return 1.;
       })
     );
 
@@ -2474,20 +2489,26 @@ void HistoProducer::MakeRockAnaTree(SpectrumLoader& loader, SpillCut spillCut, C
 void HistoProducer::MakeTriggerTimeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
 
   std::vector<std::string> vec_labels = {
+    "PassAnalysis/I",
+    "IsSignal/I",
     "TriggerTime",
     "HasValidTrigger/I",
     "G3ChaseWeight",
     "HasIntimeCosmic/I",
     "TrigNu_time",
     "trigger_within_gate",
+    "VisE",
   };
   std::vector<SpillVar> vec_vars = {
+    ICARUSNumuXsec::kNuMISpillVar_PassAnalysis,
+    ICARUSNumuXsec::kNuMISpillVar_SignalEvent,
     kNuMISpillTriggerTime,
     kNuMIValidTrigger_SpillVar,
     kNuMIG3ChaseSpillWeightByClosesetNu,
     ICARUSNumuXsec::kNuMI_HasIntimeCosmic,
     ICARUSNumuXsec::kNuMI_TriggerNeutrino_time,
     ICARUSNumuXsec::kNuMI_trigger_within_gate,
+    kNuMIVisEForTrigEff,
   };
 
   map_cutName_to_vec_Trees[currentCutName].push_back(
@@ -2505,7 +2526,26 @@ void HistoProducer::MakeTriggerTimeTree(SpectrumLoader& loader, SpillCut spillCu
 }
 
 void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
-
+/*
+  map_cutName_to_vec_Trees[currentCutName].push_back(
+    new ana::Tree(
+      "selectedEvents",
+      std::vector<std::string>{
+        "Test",
+      },
+      loader,
+      std::vector<Var>{
+        ICARUSNumuXsec::test_kMuMuChi2,
+      },
+      kNoSpillCut, kNoCut
+      //spillCut, cut,
+      //kNoShift
+      //SystShifts(&kTrackSplittingSyst, +1.),
+      //true, true
+    )
+  );
+*/
+/*
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(
       "Test",
@@ -2519,7 +2559,7 @@ void HistoProducer::Test(SpectrumLoader& loader, SpillCut spillCut, Cut cut){
       kNoSpillCut
     )
   );
-
+*/
 /*
   map_cutName_to_vec_Trees[currentCutName].push_back(
     new ana::Tree(

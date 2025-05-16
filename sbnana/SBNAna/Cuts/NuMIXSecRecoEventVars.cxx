@@ -376,6 +376,15 @@ namespace ana{
       return -9999999.;
     }
   });
+  const Var kNuMIRecoMuonTrackEndZ([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      return trk.end.z;
+    }
+    else{
+      return -9999999.;
+    }
+  });
 
   const Var kNuMIRecoMuonTrackThetaXW_Plane0([](const caf::SRSliceProxy* slc) -> double {
     if( kNuMIMuonCandidateIdx(slc) >= 0 ){

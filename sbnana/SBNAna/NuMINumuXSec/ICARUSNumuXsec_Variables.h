@@ -234,4 +234,9 @@ namespace ICARUSNumuXsec{
   // TriggerTime Tree
   extern const SpillVar kNuMIValidTrigger_SpillVar;
 
+  extern const TruthVar kTruth_dummy_MuonTrackType;
+  extern const TruthVar kTruth_dummy_RecoMuonLength;
+
+  extern const SpillVar kNuMISpillVar_PassAnalysis;
+  extern const SpillVar kNuMISpillVar_SignalEvent;
 }
