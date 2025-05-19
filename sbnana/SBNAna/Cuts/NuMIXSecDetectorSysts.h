@@ -49,6 +49,7 @@ namespace ana
       kCaloGain,
       kSCE,
       kLifetime,
+      kTrackSplit,
     };
 
     NuMIXSecDetectorSysts(DetSystType detsyst_type, const std::string& name, const std::string& latexName);

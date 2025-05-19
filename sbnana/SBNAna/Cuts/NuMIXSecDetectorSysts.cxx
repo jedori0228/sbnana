@@ -31,6 +31,7 @@ namespace ana {
 
       // negative is mirrored
       double this_sigma = abs(sigma);
+      this_sigma = sigma; // TODO
       
       // pre-reprocessing
       //weight *= 1. + this_sigma * (-0.10);
@@ -42,6 +43,7 @@ namespace ana {
     else if(kDetSystType==kFrontIndPlaneSignalShape){
       // negative is mirrored
       double this_sigma = abs(sigma);
+      this_sigma = sigma; // TODO
 
       // pre-reprocessing
       weight *= 1. + this_sigma * (-0.10);
@@ -52,6 +54,7 @@ namespace ana {
 
       // negative is mirrored
       double this_sigma = abs(sigma);
+      this_sigma = sigma; // TODO
 
       double this_stepfunc = GetSmoothStepFunction(
         RecoProtonP,
@@ -74,7 +77,7 @@ namespace ana {
     }
     else if(kDetSystType==kCaloGain){
 
-      // post-reprocessing; flat 8.0%
+      // post-reprocessing; flat 3.0%
       weight *= 1. + sigma * 0.03;
 
     }
@@ -82,9 +85,19 @@ namespace ana {
 
       // negative is mirrored
       double this_sigma = abs(sigma);
+      this_sigma = sigma; // TODO
 
       // post-reprocessing; flat 5.9%
       weight *= 1. + this_sigma * (-0.059);
+
+    }
+    else if(kDetSystType==kTrackSplit){
+
+      auto const& trk = sr->reco.pfp[RecoMuonIdx].trk;
+      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+
+      double one_sigma = (Contained) ? +0.10 : -0.10;
+      weight *= 1. + sigma * (one_sigma);
 
     }
 

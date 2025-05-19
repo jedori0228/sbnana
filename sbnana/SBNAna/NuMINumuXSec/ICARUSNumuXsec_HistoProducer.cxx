@@ -1106,6 +1106,10 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
 
     if(FillSystematics){
 
+/*
+
+      // 250516) Now we converted this into a flat normalization
+
       // Shifted tree
       // 1) Calo dE/dX up
       map_cutName_to_vec_Trees[currentCutName].push_back(
@@ -1151,6 +1155,7 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
           true, true
         )
       );
+*/
 
       // NSigmasTree
 
@@ -1196,7 +1201,6 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
     };
 
     for(unsigned i_Cut=0; i_Cut<RecoCutsForEffs.size(); i_Cut++){
-
       map_cutName_to_vec_Trees[currentCutName].push_back(
         new ana::Tree(
           "trueEvents"+RecoCutsForEffs[i_Cut].first, 
@@ -1210,6 +1214,10 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
       // Fill systematics
 
       if(FillSystematics){
+
+/*
+
+        // 250516) We don't need this
 
         map_cutName_to_vec_Trees[currentCutName].push_back(
           new ana::Tree(
@@ -1250,34 +1258,41 @@ void HistoProducer::MakeTree(SpectrumLoader& loader, SpillCut spillCut, Cut cut)
             true
           )
         );
+*/
 
-        std::vector<double> detsyst_dials = {-3, -2, -1, 0, 1, 2, 3};
-        std::vector<std::string> detsyst_dialnames = {"-3", "-2", "-1", "0", "+1", "+2", "+3"};
-        for(unsigned int i=0; i<IDetectorSysts.size(); i++){
+        if(!MakeGUNDAMTree){
 
-          map_cutName_to_vec_Trees[currentCutName].push_back(
-            new ana::Tree(
-              "trueEvents"+RecoCutsForEffs[i_Cut].first+"_"+IDetectorSysts.at(i)->ShortName()+"Up",
-              {"Dummy"}, loader, {DummyTruthVar}, kNuMIValidTrigger, kTruthCut_IsSignal,
-              RecoCutsForEffs[i_Cut].second,
-              ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {IDetectorSysts.at(i), +1.}} ) : SystShifts(IDetectorSysts.at(i), +1.),
-              true
-            )
-          );
-          map_cutName_to_vec_Trees[currentCutName].push_back(
-            new ana::Tree(
-              "trueEvents"+RecoCutsForEffs[i_Cut].first+"_"+IDetectorSysts.at(i)->ShortName()+"Down",
-              {"Dummy"}, loader, {DummyTruthVar}, kNuMIValidTrigger, kTruthCut_IsSignal,
-              RecoCutsForEffs[i_Cut].second,
-              ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {IDetectorSysts.at(i), -1.}} ) : SystShifts(IDetectorSysts.at(i), -1.),
-              true
-            )
-          );
+          for(unsigned int i=0; i<IDetectorSysts.size(); i++){
 
+            map_cutName_to_vec_Trees[currentCutName].push_back(
+              new ana::Tree(
+                "trueEvents"+RecoCutsForEffs[i_Cut].first+"_"+IDetectorSysts.at(i)->ShortName()+"Up",
+                {"Dummy"}, loader, {DummyTruthVar}, kNuMIValidTrigger, kTruthCut_IsSignal,
+                RecoCutsForEffs[i_Cut].second,
+                ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {IDetectorSysts.at(i), +1.}} ) : SystShifts(IDetectorSysts.at(i), +1.),
+                true
+              )
+            );
+            map_cutName_to_vec_Trees[currentCutName].push_back(
+              new ana::Tree(
+                "trueEvents"+RecoCutsForEffs[i_Cut].first+"_"+IDetectorSysts.at(i)->ShortName()+"Down",
+                {"Dummy"}, loader, {DummyTruthVar}, kNuMIValidTrigger, kTruthCut_IsSignal,
+                RecoCutsForEffs[i_Cut].second,
+                ApplyTrackSplit ? SystShifts( {{&kTrackSplittingSyst, +1.}, {IDetectorSysts.at(i), -1.}} ) : SystShifts(IDetectorSysts.at(i), -1.),
+                true
+              )
+            );
 
-        } // END IDetectorSysts loop
+          } // END IDetectorSysts loop
+
+        }
+
 
       } // END if FillSystematics
+
+      if(MakeGUNDAMTree){
+        if(i_Cut==0) break;
+      }
 
     } // END RecoCutsForEffs loop
 
@@ -3176,6 +3191,14 @@ void HistoProducer::setSystematicWeights(){
     NuMIXSecDetectorSysts::kLifetime,
     "NuMIXSecLifetimeSyst",
     "Lifetime variation"
+    )
+  );
+
+  IDetectorSysts.push_back(
+    new NuMIXSecDetectorSysts(
+    NuMIXSecDetectorSysts::kTrackSplit,
+    "NuMIXSecTrackSplitSyst",
+    "TrackSplit"
     )
   );
 
