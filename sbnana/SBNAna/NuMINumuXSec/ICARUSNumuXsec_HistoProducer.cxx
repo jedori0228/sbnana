@@ -2984,8 +2984,8 @@ void HistoProducer::setSystematicWeights(){
       }
       std::string psetname = SystProviderPrefix+"_multisigma_"+name;
       std::cout << "[HistoProducer::setSystematicWeights] Multisigma, " << name << " (psetname = " << psetname << ")" << std::endl;
-      //IGENIEMorphSysts.push_back( new SBNWeightSyst(psetname) );
-      IGENIEMorphSysts.push_back( new SBNWeightMirrorSyst(psetname) );
+      IGENIEMorphSysts.push_back( new SBNWeightMirrorSyst(psetname, 0) );
+      //IGENIEMorphSysts.push_back( new SBNWeightMirrorSyst(psetname, 1) );
     }
     // Adding custom
     // 1) nusyst
@@ -3132,7 +3132,6 @@ void HistoProducer::setSystematicWeights(){
   if(FillFlux){
     cout << "[HistoProducer::setSystematicWeights] Setting flux systematics" << endl;
     IFluxSysts = GetAllNuMIFluxSysts(NNuMIFluxPCA);
-    IFluxSysts.push_back( GetNuMIBeamShiftSyst() );
     IFluxSysts.push_back( new NuMIBeamG3ChaseSyst("numi_beam_G3Chase", "numi_beam_G3Chase") );
 
     for(unsigned int i=0; i<IFluxSysts.size(); i++){
@@ -3199,6 +3198,14 @@ void HistoProducer::setSystematicWeights(){
     NuMIXSecDetectorSysts::kTrackSplit,
     "NuMIXSecTrackSplitSyst",
     "TrackSplit"
+    )
+  );
+
+  IDetectorSysts.push_back(
+    new NuMIXSecDetectorSysts(
+    NuMIXSecDetectorSysts::kProtonEff,
+    "NuMIXSecProtonEffSyst",
+    "ProtonEff"
     )
   );
 
