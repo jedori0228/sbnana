@@ -998,7 +998,7 @@ return 0.;
       }
     }
 
-    double wtForTriggeringNu = kGetTruthNuMIFluxWeightG3Chase(&sr->mc.nu[idxMinDeltaT]);
+    double wtForTriggeringNu = kGetTruthNuMIBeamWidthCorrection(&sr->mc.nu[idxMinDeltaT]);
 
     return wtForTriggeringNu;
 
