@@ -50,6 +50,7 @@ namespace ana
       kSCE,
       kLifetime,
       kTrackSplit,
+      kProtonEff,
     };
 
     NuMIXSecDetectorSysts(DetSystType detsyst_type, const std::string& name, const std::string& latexName);

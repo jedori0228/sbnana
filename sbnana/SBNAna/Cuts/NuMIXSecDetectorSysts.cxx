@@ -100,7 +100,11 @@ namespace ana {
       weight *= 1. + sigma * (one_sigma);
 
     }
+    else if(kDetSystType==kProtonEff){
 
+      weight *= 1. + sigma * (0.075);
+
+    }
     else{
 
     }
