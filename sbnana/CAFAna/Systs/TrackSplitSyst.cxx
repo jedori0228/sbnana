@@ -789,8 +789,15 @@ namespace ana {
           //if ( fDebug ) std::cout << "   end: (" << pfp.trk.end.x << ", " << pfp.trk.end.y << ", " << pfp.trk.end.z << ")" << std::endl;
           pToSplit = 0;
         }
-        else pToSplit = (isWest ? splitProb[1][0]->GetBinContent(xBin,yBin) :
-                         splitProb[0][0]->GetBinContent(xBin,yBin) );
+        else{
+/*
+          // Using histogram
+          pToSplit = (isWest ? splitProb[1][0]->GetBinContent(xBin,yBin) :
+                       splitProb[0][0]->GetBinContent(xBin,yBin) );
+*/
+          // Using fixed number from BNB
+          pToSplit = (isWest ? 0.02 : 0.06);
+        }
       }
       else {
         bool isWest = pfp.trk.start.x > 0;
@@ -813,8 +820,16 @@ namespace ana {
           //if ( fDebug ) std::cout << "   end: (" << pfp.trk.end.x << ", " << pfp.trk.end.y << ", " << pfp.trk.end.z << ")" << std::endl;
           pToSplit = 0;
         }
-        else pToSplit = (isWest ? splitProb[1][1]->GetBinContent(xBin,yBin) :
+        else{
+/*
+          // Using histogram
+          pToSplit = (isWest ? splitProb[1][1]->GetBinContent(xBin,yBin) :
                                   splitProb[0][1]->GetBinContent(xBin,yBin) );
+*/
+          // Using fixed number from BNB
+          pToSplit = 0.19;
+
+        }
       }
       // DEBUGGING!
       //if ( fDebug ) std::cout << "This track crosses a boundary and its p for splitting is: " << pToSplit << std::endl;
