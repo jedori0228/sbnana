@@ -124,6 +124,9 @@ namespace ana{
   extern const MultiVar kNuMIChargedPionMichelMatchedPfpShowerOpeningAngles;
   extern const Var kNuMIChargedPionMichelMatchedPfpShowerEnergySum;
   // - Proton
+  extern const Var kNuMIRecoProtonTrackDirX;
+  extern const Var kNuMIRecoProtonTrackDirY;
+  extern const Var kNuMIRecoProtonTrackDirZ;
   extern const Var kNuMIRecoProtonMatchedToTrueProton;
   extern const Var kNuMIRecoProtonTrackChi2Muon;
   extern const Var kNuMIRecoProtonTrackChi2Proton;

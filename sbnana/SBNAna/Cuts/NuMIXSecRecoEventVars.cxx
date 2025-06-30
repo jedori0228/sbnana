@@ -865,6 +865,33 @@ namespace ana{
 
   });
   // - Proton
+  const Var kNuMIRecoProtonTrackDirX([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIProtonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIProtonCandidateIdx(slc)).trk;
+      return trk.dir.x;
+    }
+    else{
+      return -5.;
+    }
+  });
+  const Var kNuMIRecoProtonTrackDirY([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIProtonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIProtonCandidateIdx(slc)).trk;
+      return trk.dir.y;
+    }
+    else{
+      return -5.;
+    }
+  });
+  const Var kNuMIRecoProtonTrackDirZ([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIProtonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIProtonCandidateIdx(slc)).trk;
+      return trk.dir.z;
+    }
+    else{
+      return -5.;
+    }
+  });
   const Var kNuMIRecoProtonMatchedToTrueProton([](const caf::SRSliceProxy* slc) -> int {
     int true_leading_proton_index = kTruth_ProtonIndex(&slc->truth);
     if(true_leading_proton_index<0) return -1;
