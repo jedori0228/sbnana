@@ -18,9 +18,10 @@ namespace ana{
       "TrueNProtonG4/i",
       "TrueNpipAll/i", "TrueNpimAll/i", "TrueNpi0All/i",
       // Weight
-      "FluxWeight",
-      "FluxWeightWithG3Chase",
-      "FluxWeightWithG4Update",
+      //"FluxWeight",
+      //"FluxWeightWithG3Chase",
+      //"FluxWeightWithG4Update",
+      "FluxWeightWithBeamWidthCorrection",
       // SPP RW for res events
       "IsSPP/i",
       "SPPCVCorrection",
@@ -76,9 +77,10 @@ namespace ana{
       kTruth_NProton_G4,
       kTruth_Npip_All, kTruth_Npim_All, kTruth_Npi0_All,
       // Weight
-      kGetTruthNuMIFluxWeight,
-      kGetTruthNuMIFluxWeightG3Chase,
-      kGetTruthNuMIFluxWeightG4Update,
+      //kGetTruthNuMIFluxWeight,
+      //kGetTruthNuMIFluxWeightG3Chase,
+      //kGetTruthNuMIFluxWeightG4Update,
+      kGetTruthNuMIBeamWidthCorrection,
       // SPP RW for res events
       kTruth_IsSPP,
       kTruth_NuMISPPCVCorrection,
@@ -150,9 +152,10 @@ namespace ana{
       "IsSignal/i",
       "IsSignalWithoutOOPS/i",
       // Weight
-      "FluxWeight",
-      "FluxWeightWithG3Chase",
-      "FluxWeightWithG4Update",
+      //"FluxWeight",
+      //"FluxWeightWithG3Chase",
+      //"FluxWeightWithG4Update",
+      "FluxWeightWithBeamWidthCorrection",
       // SPP Syst
       "IsSPP/i",
       "SPPQ2RW",
@@ -317,9 +320,10 @@ namespace ana{
       kNuMISliceSignalType,
       kNuMISliceSignalTypeWithoutOOPS,
       // Weight
-      kGetNuMIFluxWeight,
-      kGetNuMIFluxWeightG3Chase,
-      kGetNuMIFluxWeightG4Update,
+      //kGetNuMIFluxWeight,
+      //kGetNuMIFluxWeightG3Chase,
+      //kGetNuMIFluxWeightG4Update,
+      kGetNuMIBeamWidthCorrection,
       // SPP Syst
       kNuMITrueIsSPP,
       kNuMISPPQ2RW,
