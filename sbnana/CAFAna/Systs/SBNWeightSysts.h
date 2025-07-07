@@ -70,16 +70,25 @@ namespace ana
   const std::vector<const ISyst*>& GetSBNBoosterFluxWeightSysts();
   const std::vector<const ISyst*>& GetSBNWeightSysts(); // genie+flux
 
-
+  // For the dials only provides positive sigmas (i.e., morphing dials)
+  // We manually define negative sigmas from positive sigmas
   class SBNWeightMirrorSyst: public SBNWeightSyst
   {
   public:
-    SBNWeightMirrorSyst(const std::string& systName);
+    // mode=0: symmetric pos-neg
+    // mode=1: asymmteric pos-neg
+    SBNWeightMirrorSyst(const std::string& systName, int mode=0);
 
     void Shift(double x, caf::SRSliceProxy* sr, double& weight) const override;
     void Shift(double x, caf::SRTrueInteractionProxy* sr, double& weight) const override;
+
+  private:
+    int Mode;
+
   };
 
+  // For the dials where the "x" is not in sigma but in absolute values
+  // an absolute-to-sigma mapping must be given
   class SBNWeightAbsVarSyst: public SBNWeightSyst
   {
   public:

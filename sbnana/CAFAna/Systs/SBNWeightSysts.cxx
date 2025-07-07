@@ -292,8 +292,8 @@ namespace ana
   }
   
   // --------------------------------------------------------------------------
-  SBNWeightMirrorSyst::SBNWeightMirrorSyst(const std::string& systName)
-    : SBNWeightSyst(systName)
+  SBNWeightMirrorSyst::SBNWeightMirrorSyst(const std::string& systName, int mode)
+    : SBNWeightSyst(systName), Mode(mode)
   {
   }
 
@@ -306,8 +306,6 @@ namespace ana
   // --------------------------------------------------------------------------
   void SBNWeightMirrorSyst::Shift(double x, caf::SRTrueInteractionProxy* nu, double& weight) const
   {
-
-    double mirrored_x = x<0 ? -x : x;
 
     if(nu->index < 0) return;
 
@@ -328,11 +326,30 @@ namespace ana
 
     if(iu_onesig>=0){
       double fullrw = wgts[fIdx].univ[iu_onesig];
-      double this_rw = mirrored_x * fullrw + (1.-mirrored_x) * 1.;
+      double rw_onesig = fullrw - 1.0;
+
+      double this_rw = 1.0;
+
+      if(Mode==0){
+        // note) was double this_rw = mirrored_x * fullrw + (1.-mirrored_x) * 1.;
+        this_rw = 1.0 + rw_onesig * fabs(x);
+      }
+      else if(Mode==1){
+        this_rw = 1.0 + rw_onesig * x;
+      }
+
       weight *= this_rw;
     }
     else{
-      const Univs u = GetUnivs(mirrored_x);
+
+      // iu_onesig should be found..
+      std::cout << "[SBNWeightMirrorSyst::Shift] iu_onesig not found" << std::endl;
+      for(unsigned int iu=0; iu<v.size(); iu++){
+        std::cout << "[SBNWeightMirrorSyst::Shift] iu = " << iu << ", v[iu] = " << v[iu] << std::endl;
+      }
+      abort();
+
+      const Univs u = GetUnivs( fabs(x) );
 
       double y = 0;
       if(u.w0 != 0) y += u.w0 * wgts[fIdx].univ[u.i0];
