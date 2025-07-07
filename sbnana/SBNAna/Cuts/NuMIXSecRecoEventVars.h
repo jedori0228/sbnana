@@ -68,6 +68,10 @@ namespace ana{
   extern const Var kNuMINExtraStub;
   // - Muon
   extern const Var kNuMIRecoMuonContained; //!< 0: Muon candidate track exiting, 1: Muon candidate track contained (-1: no muon candidate)
+  extern const Var kNuMIRecoMuonIsEEBad;
+  extern const Var kNuMIRecoMuonIsWWBad;
+
+
   extern const Var kNuMIRecoMuonTrackMatchType;
   extern const Cut kNuMIRecoMuonTrackMatchContainedNuMu;
   extern const Var kNuMISplitMuonCut;
@@ -76,6 +80,7 @@ namespace ana{
   extern const Var kNuMIRecoMuonTrackDirZ;
   extern const Var kNuMIRecoMuonTrackStartX;
   extern const Var kNuMIRecoMuonTrackEndX;
+  extern const Var kNuMIRecoMuonTrackEndY;
   extern const Var kNuMIRecoMuonTrackEndZ;
   extern const Var kNuMIRecoMuonTrackThetaXW_Plane0;
   extern const Var kNuMIRecoMuonTrackChi2Muon;

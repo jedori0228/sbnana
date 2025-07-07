@@ -275,6 +275,7 @@ namespace ana{
   const Var kNuMIRecoMuonContained([](const caf::SRSliceProxy* slc) -> int {
     if( kNuMIMuonCandidateIdx(slc) >= 0 ){
       auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+
       const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
       if(Contained) return 1;
       else return 0;
@@ -283,6 +284,32 @@ namespace ana{
       return -1;
     }
   });
+  const Var kNuMIRecoMuonIsEEBad([](const caf::SRSliceProxy* slc) -> int {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+
+      bool IsBad = isInTPCEEBadRegion(trk.end.x,trk.end.y,trk.end.z);
+      if(IsBad) return 1;
+      else return 0;
+    }
+    else{
+      return -1;
+    }
+  });
+  const Var kNuMIRecoMuonIsWWBad([](const caf::SRSliceProxy* slc) -> int {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+
+      bool IsBad = isInTPCWWBadRegion(trk.end.x,trk.end.y,trk.end.z);
+      if(IsBad) return 1;
+      else return 0;
+    }
+    else{
+      return -1;
+    }
+  });
+
+
   const Var kNuMIRecoMuonTrackMatchType([](const caf::SRSliceProxy* slc) -> int {
     int muonTrackIndex = kNuMIMuonCandidateIdx(slc);
     if(muonTrackIndex>=0){
@@ -371,6 +398,15 @@ namespace ana{
     if( kNuMIMuonCandidateIdx(slc) >= 0 ){
       auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
       return trk.end.x;
+    }
+    else{
+      return -9999999.;
+    }
+  });
+  const Var kNuMIRecoMuonTrackEndY([](const caf::SRSliceProxy* slc) -> double {
+    if( kNuMIMuonCandidateIdx(slc) >= 0 ){
+      auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
+      return trk.end.y;
     }
     else{
       return -9999999.;
