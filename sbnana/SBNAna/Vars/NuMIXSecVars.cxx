@@ -1834,25 +1834,25 @@ namespace ana {
 
       unsigned int idxTrk = 0;
       while ( IsValidTrkIdx(slc, idxTrk) ) {
-	int thisIdxInt = idxTrk;
-	if ( thisIdxInt == primaryInd ) {
-	  idxTrk+=1;
-	  continue; // skip the particle which is the muon candidate!
-	}
-	auto const& trk = slc->reco.pfp.at(idxTrk).trk;
-	unsigned int thisIdx = idxTrk;
-	idxTrk+=1;
+  int thisIdxInt = idxTrk;
+  if ( thisIdxInt == primaryInd ) {
+    idxTrk+=1;
+    continue; // skip the particle which is the muon candidate!
+  }
+  auto const& trk = slc->reco.pfp.at(idxTrk).trk;
+  unsigned int thisIdx = idxTrk;
+  idxTrk+=1;
 
-	if ( std::isnan(trk.start.x) || std::isnan(trk.len) || trk.len <= 0. ) continue;
-	if ( std::isnan(slc->vertex.x) || std::isnan(slc->vertex.y) || std::isnan(slc->vertex.z) ) continue;
-	const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
-				       slc->vertex.y - trk.start.y,
-				       slc->vertex.z - trk.start.z);
-	const bool isPrimCandidate = (Atslc < 10. && IsPrimaryPFP(slc,thisIdx));
+  if ( std::isnan(trk.start.x) || std::isnan(trk.len) || trk.len <= 0. ) continue;
+  if ( std::isnan(slc->vertex.x) || std::isnan(slc->vertex.y) || std::isnan(slc->vertex.z) ) continue;
+  const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
+               slc->vertex.y - trk.start.y,
+               slc->vertex.z - trk.start.z);
+  const bool isPrimCandidate = (Atslc < 10. && IsPrimaryPFP(slc,thisIdx));
 
-	if ( !isPrimCandidate ) continue;
-	const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
-	if ( Contained ) ret_idx.push_back(thisIdx);
+  if ( !isPrimCandidate ) continue;
+  const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
+  if ( Contained ) ret_idx.push_back(thisIdx);
       }
 
       return ret_idx;
@@ -1876,33 +1876,33 @@ namespace ana {
       // Let's make a map that gives the energy to add to Enu for each particle above, minus the muon...
       std::map<unsigned int, double> mapEFromPart;
       for ( auto const& idx : pro_idx ) {
-	unsigned int uint_idx = (unsigned int)std::lround(idx);
-	// Kinetic E if it's a proton candidate + binding energy
-	double rangePval = slc->reco.pfp.at(idx).trk.rangeP.p_proton;
-	mapEFromPart[uint_idx] = (sqrt(0.938272*0.938272 + rangePval*rangePval) - 0.938272) + 0.04;
+  unsigned int uint_idx = (unsigned int)std::lround(idx);
+  // Kinetic E if it's a proton candidate + binding energy
+  double rangePval = slc->reco.pfp.at(idx).trk.rangeP.p_proton;
+  mapEFromPart[uint_idx] = (sqrt(0.938272*0.938272 + rangePval*rangePval) - 0.938272) + 0.04;
       }
       for ( auto const& idx : pi_idx ) {
-	unsigned int uint_idx = (unsigned int)std::lround(idx);
-	// Full energy of pion if it's a pion
-	double rangePval = slc->reco.pfp.at(idx).trk.rangeP.p_pion;
-	mapEFromPart[uint_idx] = sqrt(0.13957*0.13957 + rangePval*rangePval);
+  unsigned int uint_idx = (unsigned int)std::lround(idx);
+  // Full energy of pion if it's a pion
+  double rangePval = slc->reco.pfp.at(idx).trk.rangeP.p_pion;
+  mapEFromPart[uint_idx] = sqrt(0.13957*0.13957 + rangePval*rangePval);
       }
 
       // Loop particles and sum energy:
       float Enu = 0.;
       unsigned int idxTrk = 0;
       while ( IsValidTrkIdx(slc, idxTrk) ) {
-	int thisIdxInt = idxTrk;
-	if ( thisIdxInt == mu_idx ) {
-	  // Full energy of muon (FROM RANGE)
-	  double rangePval = slc->reco.pfp.at(idxTrk).trk.rangeP.p_muon;
-	  Enu += sqrt( 0.105658*0.105658 + rangePval*rangePval );
-	}
-	else {
-	  if ( mapEFromPart.find(idxTrk)!=mapEFromPart.end() ) Enu+=mapEFromPart[idxTrk];
-	}
+  int thisIdxInt = idxTrk;
+  if ( thisIdxInt == mu_idx ) {
+    // Full energy of muon (FROM RANGE)
+    double rangePval = slc->reco.pfp.at(idxTrk).trk.rangeP.p_muon;
+    Enu += sqrt( 0.105658*0.105658 + rangePval*rangePval );
+  }
+  else {
+    if ( mapEFromPart.find(idxTrk)!=mapEFromPart.end() ) Enu+=mapEFromPart[idxTrk];
+  }
 
-	idxTrk+=1;
+  idxTrk+=1;
       }
 
       return Enu;
@@ -1949,8 +1949,8 @@ namespace ana {
       float W2 = (Mn*Mn) + (2.*Mn*(Enu-Emu)) - Q2;
 
       if ( W2 < 0. ) {
-	//std::cout << "W2 < 0 ... Returning -5..." << std::endl;
-	return -5.f;
+        //std::cout << "W2 < 0 ... Returning -5..." << std::endl;
+        return -5.f;
       }
       return sqrt(W2);
     });
