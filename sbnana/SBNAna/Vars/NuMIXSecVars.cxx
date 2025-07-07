@@ -7,34 +7,78 @@
 namespace ana {
 
   // Utility functions
-  bool isInAV (double x, double y, double z)
+
+  bool isInTPCEEBadRegion(double x, double y, double z)
   {
     if ( std::isnan(x) || std::isnan(y) || std::isnan(z) ) return false;
 
-    return (( ( x < -61.94 && x > -358.49 ) ||
+    double x_cath = -1.* (358.49+61.94)/2.;
+
+    bool x_isEE = (x > -358.49) && (x < x_cath);
+    bool isBad = (y>115) || (y<-161.86);
+
+    return (x_isEE && isBad);
+
+  }
+  bool isInTPCWWBadRegion(double x, double y, double z)
+  {
+    if ( std::isnan(x) || std::isnan(y) || std::isnan(z) ) return false;
+
+    double x_cath = (358.49+61.94)/2.;
+
+    bool x_isWW = (x > x_cath) && (x < 358.49);
+    bool isBad = (y>70) && (z>0);
+
+    return (x_isWW && isBad);
+
+  }
+
+  bool isInAV (double x, double y, double z, bool RejectBad)
+  {
+    if ( std::isnan(x) || std::isnan(y) || std::isnan(z) ) return false;
+
+    bool PassBase = (( ( x < -61.94 && x > -358.49 ) ||
               ( x >  61.94 && x <  358.49 )) &&
             ( ( y > -181.86 && y < 134.96 ) &&
               ( z > -894.95 && z < 894.95 ) ));
+
+    bool IsBad = isInTPCEEBadRegion(x,y,z) || isInTPCWWBadRegion(x,y,z);
+
+    if(RejectBad) return PassBase && !IsBad;
+    else return PassBase;
+
   }
   
-  bool isInFV (double x, double y, double z)
+  bool isInFV (double x, double y, double z, bool RejectBad)
   {
     if ( std::isnan(x) || std::isnan(y) || std::isnan(z) ) return false;
 
-    return (( ( x < -61.94 - 25 && x > -358.49 + 25 ) ||
+    bool PassBase = (( ( x < -61.94 - 25 && x > -358.49 + 25 ) ||
               ( x >  61.94 + 25 && x <  358.49 - 25 )) &&
             ( ( y > -181.86 + 25 && y < 134.96 - 25 ) &&
               ( z > -894.95 + 30 && z < 894.95 - 50 ) ));
+
+    bool IsBad = isInTPCEEBadRegion(x,y,z) || isInTPCWWBadRegion(x,y,z);
+
+    if(RejectBad) return PassBase && !IsBad;
+    else return PassBase;
+
   }
 
-  bool isContainedVol (double x, double y, double z)
+  bool isContainedVol (double x, double y, double z, bool RejectBad)
   {
     if ( std::isnan(x) || std::isnan(y) || std::isnan(z) ) return false;
 
-    return (( ( x < -61.94 - 10. && x > -358.49 + 10. ) ||
+    bool PassBase = (( ( x < -61.94 - 10. && x > -358.49 + 10. ) ||
               ( x >  61.94 + 10. && x <  358.49 - 10. )) &&
             ( ( y > -181.86 + 10. && y < 134.96 - 10. ) &&
               ( z > -894.95 + 10. && z < 894.95 - 10. ) ));
+
+    bool IsBad = isInTPCEEBadRegion(x,y,z) || isInTPCWWBadRegion(x,y,z);
+
+    if(RejectBad) return PassBase && !IsBad;
+    else return PassBase;
+
   }
 
   bool IsValidTrkIdx( const caf::SRSliceProxy* slice, const unsigned int idxTrk ) {
@@ -400,82 +444,6 @@ namespace ana {
     const auto& pfp = slc->reco.pfp.at(indices[0]);
     return pfp.shw.len;
     
-  });
-
-  const MultiVar kNuMIInelasticChargedPionCandidateIdxs([](const caf::SRSliceProxy* slc) -> std::vector<double> {
-
-    std::vector<double> rets;
-
-    int primaryInd = kNuMIMuonCandidateIdx(slc);
-    int primaryProtonInd = kNuMIProtonCandidateIdx(slc);
-
-    for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); ++i_pfp){
-
-      if ( i_pfp == (unsigned int)primaryInd || i_pfp == (unsigned int)primaryProtonInd ) {
-        continue; // skip the particle which is the muon or leading proton candidate!
-      }
-
-      auto const& trk = slc->reco.pfp.at(i_pfp).trk;
-
-      if ( std::isnan(trk.start.x) || std::isnan(trk.len) || trk.len <= 0. ) continue;
-      if ( std::isnan(slc->vertex.x) || std::isnan(slc->vertex.y) || std::isnan(slc->vertex.z) ) continue;
-      const float Atslc = std::hypot(slc->vertex.x - trk.start.x,
-                                     slc->vertex.y - trk.start.y,
-                                     slc->vertex.z - trk.start.z);
-      const bool isPrimCandidate = (Atslc < 10. && IsPrimaryPFP(slc,i_pfp));
-
-      if ( !isPrimCandidate || trk.calo[2].nhit < 5 ) continue;
-
-      const bool Contained = isContainedVol(trk.end.x,trk.end.y,trk.end.z);
-      const float Chi2MIP = GetChi2MIP(trk.calo[2]);
-      if ( Contained && Chi2MIP>0. && Chi2MIP<20. ){
-        rets.push_back( i_pfp );
-      }
-    }
-
-    return rets;
-
-  });
-
-  const Var kNuMINInelasticChargedPionCandidateIdxs([](const caf::SRSliceProxy* slc) -> int {
-    return kNuMIInelasticChargedPionCandidateIdxs(slc).size();
-  });
-
-  const MultiVar kNuMIChargedPionShowerCandidateIdxs([](const caf::SRSliceProxy* slc) -> std::vector<double> {
-    std::vector<double> rets;
-
-    int primaryInd = kNuMIMuonCandidateIdx(slc);
-    int primaryProtonInd = kNuMIProtonCandidateIdx(slc);
-
-    for(unsigned int i_pfp=0; i_pfp<slc->reco.pfp.size(); ++i_pfp){
-
-      if ( i_pfp == (unsigned int)primaryInd || i_pfp == (unsigned int)primaryProtonInd ) {
-        continue; // skip the particle which is the muon or leading proton candidate!
-      }
-      auto const& shw = slc->reco.pfp.at(i_pfp).shw;
-
-      if ( !IsPrimaryPFP(slc,i_pfp) ) continue;
-
-      // Check if shower fit even seems kind-of valid:
-      if ( std::isnan(shw.start.x) || (shw.start.x > -5.5 && shw.start.x < -4.5) ||
-           std::isnan(shw.len) || shw.len <= 0. ) continue;
-
-      // if it meets this then we're not going to cut on it...
-      if ( std::isnan(shw.plane[2].energy) || std::isinf(shw.plane[2].energy) || shw.plane[2].energy > 0.04 ) continue;
-
-      // and... if it meets then then we're not going to cut on it...
-      if ( std::isnan(shw.conversion_gap) || std::isinf(shw.conversion_gap) || shw.conversion_gap > 5. ) continue;
-
-      // if we got here, then it should be the case that the fit seems valid and:
-      // shwE > 0.040 GeV
-      // trackScore < 0.45 (technically <= 0.45)
-      // conversionGap > 5. cm
-
-      rets.push_back( i_pfp );
-
-    }
-
-    return rets;
   });
 
   // MultiVar for the proton candidate indices

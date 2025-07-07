@@ -8,11 +8,13 @@
 namespace ana
 {
   /// bool to determine if object is in fiducial volume
-  bool isInFV (double x, double y, double z);
-  bool isInAV (double x, double y, double z);
+  bool isInTPCEEBadRegion(double x, double y, double z);
+  bool isInTPCWWBadRegion(double x, double y, double z);
+  bool isInFV (double x, double y, double z, bool RejectBad=true);
+  bool isInAV (double x, double y, double z, bool RejectBad=true);
 
   /// bool to determine if object is in containment volume
-  bool isContainedVol (double x, double y, double z);
+  bool isContainedVol (double x, double y, double z, bool RejectBad=true);
 
   /// Utilities for PFParticle loops
   bool IsValidTrkIdx( const caf::SRSliceProxy* slice, const unsigned int idxTrk );
