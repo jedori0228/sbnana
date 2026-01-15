@@ -146,19 +146,4 @@ namespace ana
   extern const Var kNuMICathodeSplitTrackCVCorrection;
   extern const Var kNuMIZZeroSplitTrackCVCorrection;
 
-/*
-  class NuMIXSecSplitTrackSyst: public ISyst
-  {
-  public:
-
-    NuMIXSecSplitTrackSyst(const std::string& name, const std::string& latexName);
-
-    void Shift(double sigma, caf::SRSliceProxy *sr, double& weight) const override;
-    void Shift(double sigma, caf::SRTrueInteractionProxy *sr, double& weight) const override;
-
-  private:
-
-  };
-*/
-
 }

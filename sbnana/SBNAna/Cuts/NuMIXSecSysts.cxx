@@ -793,27 +793,4 @@ namespace ana {
     
   });
 
-
-/*
-  NuMIXSecSplitTrackSyst::NuMIXSecSplitTrackSyst(const std::string& name, const std::string& latexName):
-    ISyst(name, latexName)
-  {
-
-  }
-
-  void NuMIXSecSplitTrackSyst::Shift(double sigma, caf::SRSliceProxy *sr, double& weight) const
-  {
-
-    int MuonIdx = kNuMIMuonCandidateIdx(sr);
-    if(MuonIdx<0) return;
-
-    auto const& trk = slc->reco.pfp.at(kNuMIMuonCandidateIdx(slc)).trk;
-
-
-  }
-
-  void NuMIXSecSplitTrackSyst::Shift(double sigma, caf::SRTrueInteractionProxy *sr, double& weight) const {
-  }
-*/
-
 } // end namespace ana
