@@ -102,7 +102,12 @@ namespace ana {
     }
     else if(kDetSystType==kProtonEff){
 
-      weight *= 1. + sigma * (0.075);
+      // CV as Nu-only
+      //weight *= 1. + sigma * (0.075);
+
+      // CV as Nu+cosmic by reweighting
+      weight *= 1. + sigma * (0.118);
+
 
     }
     else{
