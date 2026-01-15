@@ -191,6 +191,13 @@ namespace ana {
     return false;
   });
 
+  const Cut kNuMIMuonRecoPCut([](const caf::SRSliceProxy* slc) {
+
+    double RecoMuonP = kNuMIMuonCandidateRecoP(slc);
+
+    return (RecoMuonP>0) && (RecoMuonP<0.8);
+  });
+
   // Reco quality (meant to help ID split tracks)
   const Cut kNuMIRejectSplitMuons([](const caf::SRSliceProxy* slc) {
     int primaryInd = kNuMIMuonCandidateIdx(slc);
@@ -417,6 +424,22 @@ namespace ana {
     else if ( kNuMI_IsSlcNotNu(slc) ) return 5; // Not nu-slice Cosmic
     else return 0;
   });
+  const Var kNuMISliceSignalTypeWithMuonP([](const caf::SRSliceProxy* slc) -> int {
+
+    double TrueMuonMomentum = kNuMIMuonTrueP(slc);
+    bool Pass_MuonPCut = (TrueMuonMomentum>0.) && (TrueMuonMomentum<0.8);
+
+    bool IsSignalDef = kNuMI_1muNp0piStudy_Signal_WithPhaseSpaceCut(slc) && Pass_MuonPCut;
+    bool IsOPPS = kNuMI_1muNp0piStudy_Signal_WithoutPhaseSpaceCut(slc) && // signal
+                  !(IsSignalDef);
+
+    if ( IsSignalDef ) return 1; // Signal (with phase space cut)
+    else if ( IsOPPS ) return 2; // Signal but out of phase space cut (OOPS)
+    else if ( kNuMI_1muNp0piStudy_OtherNuCC(slc) ) return 3; // CC but not (signal without phase space cut)
+    else if ( kNuMI_IsSliceNuNC(slc) ) return 4; // NC
+    else if ( kNuMI_IsSlcNotNu(slc) ) return 5; // Not nu-slice Cosmic
+    else return 0;
+  });
 
   const Var kNuMISliceSignalTypeWithPrintouts([](const caf::SRSliceProxy* slc) -> int {
     if ( kNuMI_1muNp0piStudy_Signal_WithPhaseSpaceCutWithPrintouts(slc) ) return 1; // Signal (with phase space cut)
@@ -516,5 +539,7 @@ namespace ana {
   const Var kNuMI_FSI_G4BC = GetUniverseWeight("FSIReweight_SBNNuSyst_FSI_G4BCReweight_multisigma_FSIReweight", 1);
   // - LQCD Zexp
   const Var kNuMI_LQCDZExpFit = GetUniverseWeight("GENIEReWeight_SBNNuSyst_LQCDZExpFit_multisim_ZExpAVariationResponse", 1);
-
+  const Var kNuMI_LQCDParkZExpFit = GetUniverseWeight("GENIEReWeight_SBNNuSyst_LQCDParkZExpFit_multisim_ZExpAVariationResponse", 1);
+  // - MINERvA Zexp
+  const Var kNuMI_MINERvAZExpFit = GetUniverseWeight("GENIEReWeight_SBNNuSyst_MINERvAZExpFit_multisim_ZExpAVariationResponse", 1);;
 }

@@ -46,6 +46,8 @@ namespace ana
   /// \ref Cut aimed at muon candidate containment, if so desired
   extern const Cut kNuMIMuonCandidateContained;
 
+  extern const Cut kNuMIMuonRecoPCut;
+
   /// \ref Cut aimed at reconstruction quality (e.g. split tracks)
   extern const Cut kNuMIRejectSplitMuons;
 
@@ -93,6 +95,7 @@ namespace ana
 
   /// \ref Var for slice type (CutType; 1=Signal, 2=OOPS, 3=OtherCC, 4=NuNC, 5=NotNu)
   extern const Var kNuMISliceSignalType;
+  extern const Var kNuMISliceSignalTypeWithMuonP;
   extern const Var kNuMISliceSignalTypeWithPrintouts;
 
   /// \ref Var for slice type (CutType; 1=Signal,         3=OtherCC, 4=NuNC, 5=NotNu)
@@ -128,5 +131,8 @@ namespace ana
   extern const Var kNuMI_FSI_G4BC;
   // - LQCD Zexp
   extern const Var kNuMI_LQCDZExpFit;
+  extern const Var kNuMI_LQCDParkZExpFit;
+  // - MINERvA Zexp
+  extern const Var kNuMI_MINERvAZExpFit;
 
 }
